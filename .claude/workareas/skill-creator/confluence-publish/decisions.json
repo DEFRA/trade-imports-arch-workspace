@@ -1,0 +1,28 @@
+{
+  "name": "confluence-publish",
+  "started_at": "2026-08-05T08:26:50Z",
+  "answered_at": null,
+  "scaffolded_at": "2026-08-05T08:44:49Z",
+  "answers": {
+    "purpose": "Publish a single documentation page to Confluence by orchestrating the existing delivery-info-arch-tooling scripts: pre-flight the prerequisites (Confluence/JIRA access, env vars, config entry), build and validate the source files (invoking the mermaid-check skill when the page carries Mermaid diagrams), stop with the reason if the publish cannot proceed, otherwise publish and report the outcome with a link to the page.",
+    "state_shape": "prose",
+    "dispatcher": true,
+    "prebake": false,
+    "fanout": {
+      "enabled": false,
+      "workers": []
+    },
+    "walker": false,
+    "helpers": [
+      "start-confluence-publish"
+    ],
+    "triggers": {
+      "phrases": [
+        "publish to confluence",
+        "push to confluence",
+        "publish page"
+      ],
+      "disambiguation": "Distinct from Claude Code built-in /init (CLAUDE.md scaffolding, no publishing). Distinct from mermaid-check (validates diagram syntax and rendering, never publishes): this skill invokes mermaid-check as its diagram-validation step rather than duplicating it. Distinct from editorial (content quality, not delivery). Orchestrates the existing delivery-info-arch-tooling build and publish scripts for one page; owns no build or publish logic of its own. The bare phrase publish page defaults here because Confluence is the only push target needing a skill; GitHub Pages deploys automatically via CI."
+    }
+  }
+}

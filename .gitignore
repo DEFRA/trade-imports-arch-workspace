@@ -1,0 +1,39 @@
+# Architecture tooling and docs are under their own git repo
+delivery-info-arch-tooling
+trade-imports-documentation
+
+# JetBrains IDE project configuration
+.idea
+
+# macOS Finder metadata
+.DS_Store
+
+# Local environment secrets (Atlassian credentials and similar) - never track
+.env
+
+# direnv loader that sources the local environment
+.envrc
+
+# asdf runtime version pins
+.tool-versions
+
+# Ongoing architecture analysis corpus (findings, requirements, source exports)
+analysis/
+
+# Child repo: shared docs-generation tooling library (its own git repository)
+delivery-info-arch-tooling/
+
+# Child repo: trade imports documentation monorepo (its own git repository)
+trade-imports-documentation/
+
+# Child repo: shared trade imports schemas (its own git repository)
+trade-imports-schemas/
+
+# Installed npm dependencies
+node_modules/
+
+# Root npm manifest and lockfile
+package-lock.json
+
+# Don't push Claude local settings
+settings.local.json

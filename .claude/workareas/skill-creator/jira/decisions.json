@@ -1,0 +1,31 @@
+{
+  "name": "jira",
+  "started_at": "2026-08-05T14:55:01Z",
+  "answered_at": null,
+  "scaffolded_at": "2026-08-05T14:58:17Z",
+  "answers": {
+    "purpose": "Create and read JIRA tickets from the workspace via the standalone curl+jq scripts in tools/jira/: single-key or JQL batch fetch with a flat JSON projection, ticket creation with type/priority/labels/parent, and an auth pre-flight.",
+    "state_shape": "prose",
+    "dispatcher": false,
+    "prebake": false,
+    "fanout": {
+      "enabled": false,
+      "workers": []
+    },
+    "walker": false,
+    "helpers": [
+      "create-ticket",
+      "fetch",
+      "auth"
+    ],
+    "triggers": {
+      "phrases": [
+        "create jira ticket",
+        "fetch jira ticket",
+        "read jira ticket",
+        "run jql"
+      ],
+      "disambiguation": "Distinct from confluence-publish (Atlassian Confluence pages, not JIRA issues) and from the built-in /init (CLAUDE.md scaffolding). Owns JIRA issue creation and reading only - not updates, transitions or comments."
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "mermaid-check",
+  "started_at": "2026-07-29T12:09:35Z",
+  "answered_at": null,
+  "scaffolded_at": "2026-07-29T13:23:54Z",
+  "answers": {
+    "purpose": "Authors and verifies Mermaid diagrams in Markdown files and standalone .mmd files, rendering each to confirm it parses before a doc ships.",
+    "state_shape": "prose",
+    "dispatcher": true,
+    "prebake": false,
+    "fanout": {
+      "enabled": false,
+      "workers": []
+    },
+    "walker": false,
+    "helpers": [
+      "start-mermaid-check",
+      "render-mermaid"
+    ],
+    "triggers": {
+      "phrases": [
+        "check mermaid",
+        "validate diagrams",
+        "verify mermaid renders",
+        "add a diagram"
+      ],
+      "disambiguation": "Not /init (which scaffolds CLAUDE.md). Owns Mermaid syntax and render correctness only: label wording, jargon and acronym-on-first-use belong to editorial, which this skill hands off to and is handed off from. Not for LikeC4 .c4 models, which have their own validate and export commands."
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git blame:*)",
+      "Bash(git diff:*)",
+      "Bash(git status)",
+      "Bash(git rev-list:*)",
+      "Bash(git shortlog:*)",
+      "Bash(git describe:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git cat-file:*)",
+      "Bash(git reflog:*)",
+      "Bash(git grep:*)",
+      "Bash(rg:*)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(~/trade-imports-arch-workspace/.claude/tools/:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-bash.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-edits.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
