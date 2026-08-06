@@ -232,6 +232,8 @@ Rationale:
 
 ## Runtime workareas
 
-`~/trade-imports-arch-workspace/.claude/workareas/` is runtime cache and is gitignored. Skills
-populate it (reviews, code-style reviews, ticket plans, upgrades) as they
-run; nothing under `workareas/` is part of the checked-in audit trail.
+`~/trade-imports-arch-workspace/.claude/workareas/` holds working state
+written by skill runs — interview decisions, audit plans, review
+artifacts. It is tracked, not gitignored: checked-in files
+(`skill-creator/<name>/decisions.json`, `skills-audit/<name>.md`) form
+the durable audit trail alongside each skill's `decisions.md` sidecar.
