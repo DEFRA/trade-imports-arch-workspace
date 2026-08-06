@@ -5,15 +5,22 @@
 #   scaffold-skill.sh --run-id <name> [--dry-run]
 #
 # Reads workareas/skill-creator/<name>/decisions.json and writes:
-#   .claude/skills/<name>/SKILL.md             (from template, TODO markers)
+#   .claude/skills/<name>/SKILL.md             (from template, TODO markers;
+#                                               + metadata.dependencies and a
+#                                               Dependencies section when the
+#                                               dependencies answer is depend)
 #   .claude/skills/<name>/references/<N>.md    (per fan-out worker)
 #   .claude/skills/<name>/assets/<name>-schema.md   (if state_shape=json)
 #   tools/<name>/<helper>.sh                    (per helper entry)
 #   .claude/skills/<name>/decisions.md          (rendered sidecar)
-#   .claude/settings.json                       (allowlist entries appended atomically)
+#   .claude/settings.json                       (allowlist entries appended only
+#                                               when the blanket tools/ entry
+#                                               does not already cover them)
 #
-# Refuses to scaffold if any of the 8 answers is missing or if
-# triggers.disambiguation is empty.
+# Refuses to scaffold if any of the 9 answers is missing or if
+# triggers.disambiguation is empty. Dependency gaps (depend without
+# declared tokens / justification / dispatcher) WARN and proceed —
+# audit pattern 9 flags them; the scaffold never blocks on judgment.
 #
 # All mutations atomic: write to .tmp then mv.
 
@@ -45,7 +52,7 @@ WS="$HOME/trade-imports-arch-workspace"
 DECISIONS="$WS/.claude/workareas/skill-creator/$RUN_ID/decisions.json"
 [[ -f "$DECISIONS" ]] || { echo "No decisions.json at $DECISIONS" >&2; exit 1; }
 
-# Validate all 8 answers present.
+# Validate all 9 answers present.
 # jq's // operator treats `false` as null, so use explicit
 # `has(key)` checks for booleans (dispatcher, prebake, walker,
 # fanout.enabled). String / array answers fall back to // null
@@ -54,6 +61,7 @@ missing=$(jq -r '
     .answers as $a |
     [
         (if ($a | has("purpose")) and $a.purpose != "" then empty else "purpose" end),
+        (if ($a.dependencies.resolution // "" | . == "none" or . == "build" or . == "port" or . == "depend") then empty else "dependencies.resolution" end),
         (if ($a | has("state_shape")) and $a.state_shape != "" then empty else "state_shape" end),
         (if ($a | has("dispatcher")) then empty else "dispatcher" end),
         (if ($a | has("prebake")) then empty else "prebake" end),
@@ -83,11 +91,23 @@ WALKER=$(jq -r '.answers.walker' "$DECISIONS")
 PURPOSE=$(jq -r '.answers.purpose' "$DECISIONS")
 DISAMBIG=$(jq -r '.answers.triggers.disambiguation' "$DECISIONS")
 TRIGGERS_CSV=$(jq -r '.answers.triggers.phrases | map("\"" + . + "\"") | join(", ")' "$DECISIONS")
+DEP_RESOLUTION=$(jq -r '.answers.dependencies.resolution // "none"' "$DECISIONS")
+DEP_DECLARED=$(jq -r '.answers.dependencies.declared // [] | join(" ")' "$DECISIONS")
+DEP_WHY=$(jq -r '.answers.dependencies.justification // ""' "$DECISIONS")
+
+# Advisory warnings, not gates (pattern 9 is audit criteria; the
+# scaffold never blocks on judgment calls).
+if [[ "$DEP_RESOLUTION" == "depend" ]]; then
+    [[ -z "$DEP_DECLARED" ]] && echo "WARN: resolution=depend with no declared tokens — frontmatter will carry a TODO; audit pattern 9 will flag it" >&2
+    [[ -z "$DEP_WHY" ]] && echo "WARN: resolution=depend with no justification — the Dependencies section will carry a TODO" >&2
+    [[ "$DISPATCHER" != "true" ]] && echo "WARN: resolution=depend without a dispatcher — no home for the pre-flight; audit pattern 9 will flag this until one exists" >&2
+fi
 
 if $DRY_RUN; then
     echo "DRY RUN — would scaffold $NAME:"
     echo "  SKILL.md → $SKILL_DIR/SKILL.md"
     echo "  state_shape=$STATE_SHAPE dispatcher=$DISPATCHER fanout=$FANOUT walker=$WALKER"
+    echo "  dependencies: resolution=$DEP_RESOLUTION declared=[$DEP_DECLARED]"
     echo "  helpers:"
     jq -r '.answers.helpers[] | "    tools/'"$NAME"'/" + . + ".sh"' "$DECISIONS"
     if [[ "$FANOUT" == "true" ]]; then
@@ -167,11 +187,42 @@ fi
 # Helpers cheat-sheet.
 helper_rows=$(jq -r '.answers.helpers[] | "| `" + . + ".sh` | TODO — one-line purpose |"' "$DECISIONS")
 
-cat > "$skill_md.tmp" <<EOF
----
+# Frontmatter — metadata.dependencies only when depending. Built as a
+# variable so the non-depending case leaves no blank line inside the
+# frontmatter block.
+frontmatter="---
 name: $NAME
-description: '$PURPOSE Triggers: $TRIGGERS_CSV. $DISAMBIG TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'
----
+description: '$PURPOSE Triggers: $TRIGGERS_CSV. $DISAMBIG TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'"
+if [[ "$DEP_RESOLUTION" == "depend" ]]; then
+    frontmatter="$frontmatter
+metadata:
+  dependencies: ${DEP_DECLARED:-TODO-declare-tokens}"
+fi
+frontmatter="$frontmatter
+---"
+
+# Dependencies body section (pattern 9) — only when depending.
+deps_section=""
+if [[ "$DEP_RESOLUTION" == "depend" ]]; then
+    deps_section=$(cat <<EOF
+
+## Dependencies
+
+This skill invokes ${DEP_DECLARED:-TODO — declare the project/tool tokens}
+at runtime instead of a local port.
+Why: ${DEP_WHY:-TODO — record the justification for depending}.
+Declared in the frontmatter \`metadata.dependencies\` (format contract:
+\`best-practices/skills/agent-skills.md\` → "Dependencies frontmatter");
+verified machine-wide by \`check-deps.sh\`; pre-flighted by
+\`start-$NAME.sh\`, which reports \`MODE: BLOCKED\` with a REASON naming
+the remedy when a dependency is missing. Keep this list in sync with
+what the steps actually invoke.
+EOF
+)
+fi
+
+cat > "$skill_md.tmp" <<EOF
+$frontmatter
 
 <!-- TODO: one-paragraph intro. State the audience (which tickets,
      which work) and the outcome (what artifact lands where). -->
@@ -197,6 +248,7 @@ $(jq -r '.answers.triggers.phrases[] | "| \"" + . + "\" | TODO — section name 
 
 NOT for TODO — name out-of-scope cases pointing at the right
 neighbouring skill.
+$deps_section
 $worker_block
 $state_block
 $step0_block
@@ -237,25 +289,9 @@ if [[ "$FANOUT" == "true" ]]; then
 TODO — one-paragraph statement of what this worker does and what
 single artifact it produces.
 
-## Bash call hygiene
-
-**Rule: one command per Bash call.** The allowlist matcher sees
-the whole command string; chains and pipes don't match the prefix
-rule even when each piece would.
-
-- No \`&&\` / \`;\` / \`|\` between commands — separate Bash calls.
-- No \`cd <dir> && cmd\` — use \`cmd -C <dir>\` (git), full paths to
-  binaries, or \`--prefix\` / \`-f\` flags.
-- No \`find ... -exec\` — use Glob + Read.
-- No \`\$VAR\` in LLM-typed Bash — use literal
-  \`~/trade-imports-arch-workspace/...\` paths.
-- No \`/Users/<you>/git/...\` resolved form — type the \`~/\` form.
-- No \`python3 -c\` for JSON — use \`jq\`.
-- No \`awk\` / \`sed -n\` / \`grep -n\` for file inspection — use Read
-  with offset+limit.
-
-Full rule table:
-\`~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md\`.
+**Bash call hygiene** — one command per Bash call. Full rule table:
+\`~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md\`
+→ "Bash call hygiene".
 
 ## Inputs
 
@@ -284,8 +320,9 @@ if [[ "$STATE_SHAPE" == "json" ]]; then
 Canonical state file:
 \`~/trade-imports-arch-workspace/.claude/workareas/$NAME/<id>/state.json\`.
 
-Mutated only via \`tools/$NAME/*.sh\` helpers. The markdown view
-is regenerated by \`render-$NAME.sh\` whenever the JSON changes.
+Mutated only via \`tools/$NAME/*.sh\` helpers. A markdown view is
+regenerated by the skill's render helper (if the helpers list
+includes one) whenever the JSON changes.
 
 ## Schema
 
@@ -316,6 +353,19 @@ fi
 while IFS= read -r helper; do
     [[ -z "$helper" ]] && continue
     sh="$TOOLS_DIR/$helper.sh"
+
+    # Pattern 9: the dispatcher stub of a depending skill carries the
+    # pre-flight TODO.
+    preflight=""
+    if [[ "$helper" == "start-$NAME" && "$DEP_RESOLUTION" == "depend" ]]; then
+        preflight="
+# TODO pattern 9 — pre-flight each declared dependency before real work:
+#   projects: [[ -d \$HOME/trade-imports-arch-workspace/<project> ]]
+#   tools:    command -v <tool>
+# On failure print MODE: BLOCKED plus REASON: <remedy> (model:
+# tools/confluence-publish/start-confluence-publish.sh).
+"
+    fi
     cat > "$sh.tmp" <<EOF
 #!/bin/bash
 # TODO — one-line purpose of this helper.
@@ -325,7 +375,9 @@ while IFS= read -r helper; do
 #   $helper.sh --run-id <id> [TODO other flags]
 #
 # Atomic mutations: write to .tmp then mv.
-
+# Solve, don't defer: handle missing prerequisites with a specific
+# remedy in the error message, never a raw failure.
+$preflight
 set -e
 
 RUN_ID=""
@@ -357,24 +409,41 @@ done < <(jq -r '.answers.helpers[]' "$DECISIONS")
 mv "$SKILL_DIR/decisions.md.tmp" "$SKILL_DIR/decisions.md"
 
 # ---------------------------------------------------------------------
-# .claude/settings.json — append allowlist entries atomically.
+# .claude/settings.json — allowlist coverage (pattern 8).
 # ---------------------------------------------------------------------
 entry1="Bash(~/trade-imports-arch-workspace/.claude/tools/$NAME/*)"
 entry2="Bash(~/trade-imports-arch-workspace/.claude/tools/$NAME/*:*)"
+blanket="Bash(~/trade-imports-arch-workspace/.claude/tools/:*)"
 
-# Append entries only if not already present. Preserves existing
-# ordering — `unique_by` would sort as a side effect.
-jq \
-    --arg e1 "$entry1" \
-    --arg e2 "$entry2" \
+# The blanket tools/ entry (the live settings.json shape) already
+# covers every tools/<name>/ script — appending per-skill entries
+# under it would be redundant from birth. Append only when neither
+# the blanket nor the per-skill pair is present.
+covered=$(jq \
+    --arg b "$blanket" --arg e1 "$entry1" --arg e2 "$entry2" \
     '.permissions.allow as $cur
-     | .permissions.allow = (
-        $cur + (
-            [$e1, $e2]
-            | map(select(. as $x | ($cur | index($x)) == null))
-        )
-     )' "$SETTINGS" > "$SETTINGS.tmp"
-mv "$SETTINGS.tmp" "$SETTINGS"
+     | (($cur | index($b)) != null)
+       or ((($cur | index($e1)) != null) and (($cur | index($e2)) != null))' \
+    "$SETTINGS")
+
+if [[ "$covered" == "true" ]]; then
+    ALLOWLIST_MSG="covered (blanket tools/ entry or per-skill pair already present; nothing appended)"
+else
+    # Append entries preserving existing ordering — `unique_by`
+    # would sort as a side effect.
+    jq \
+        --arg e1 "$entry1" \
+        --arg e2 "$entry2" \
+        '.permissions.allow as $cur
+         | .permissions.allow = (
+            $cur + (
+                [$e1, $e2]
+                | map(select(. as $x | ($cur | index($x)) == null))
+            )
+         )' "$SETTINGS" > "$SETTINGS.tmp"
+    mv "$SETTINGS.tmp" "$SETTINGS"
+    ALLOWLIST_MSG="appended $entry1"
+fi
 
 # Stamp scaffolded_at.
 jq --arg now "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
@@ -394,6 +463,6 @@ if [[ "$STATE_SHAPE" == "json" ]]; then
 fi
 jq -r '.answers.helpers[] | "  helper:      '"$TOOLS_DIR"'/" + . + ".sh"' "$DECISIONS"
 echo "  decisions:   $SKILL_DIR/decisions.md"
-echo "  allowlist:   $SETTINGS (appended $entry1)"
+echo "  allowlist:   $ALLOWLIST_MSG"
 echo
 echo "Open the SKILL.md and replace the TODO markers."

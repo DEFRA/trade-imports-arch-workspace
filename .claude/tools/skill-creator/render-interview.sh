@@ -30,6 +30,11 @@ name=$(jq -r '.name' "$target")
 jq_pretty='def show: if . == null then "(not answered)" else tostring end;'
 
 purpose=$(jq -r "$jq_pretty"' .answers.purpose | show' "$target")
+dep_resolution=$(jq -r "$jq_pretty"' .answers.dependencies.resolution | show' "$target")
+dep_declared=$(jq -r '.answers.dependencies.declared // [] | join(" ")' "$target")
+[[ -z "$dep_declared" ]] && dep_declared="(none)"
+dep_why=$(jq -r '.answers.dependencies.justification // ""' "$target")
+[[ -z "$dep_why" ]] && dep_why="(not applicable)"
 state_shape=$(jq -r "$jq_pretty"' .answers.state_shape | show' "$target")
 dispatcher=$(jq -r "$jq_pretty"' .answers.dispatcher | show' "$target")
 prebake=$(jq -r "$jq_pretty"' .answers.prebake | show' "$target")
@@ -52,37 +57,44 @@ changes; do not delete entries.
 
 $purpose
 
-## 2. State shape
+## 2. Dependencies
+
+**Resolution:** $dep_resolution
+**Declared:** $dep_declared
+**Why:** $dep_why
+**Pattern reference:** patterns.md §9
+
+## 3. State shape
 
 **Choice:** $state_shape
-**Pattern reference:** docs/best-practices/skills/patterns.md §1
+**Pattern reference:** patterns.md §1
 
-## 3. Dispatcher
+## 4. Dispatcher
 
 **Choice:** $dispatcher
 **Pattern reference:** patterns.md §2
 
-## 4. Pre-baked context
+## 5. Pre-baked context
 
 **Choice:** $prebake
 **Pattern reference:** patterns.md §3
 
-## 5. Worker fan-out
+## 6. Worker fan-out
 
 **Choice:** $fanout_enabled
 **Workers:** $fanout_workers
 **Pattern reference:** patterns.md §5
 
-## 6. Walker
+## 7. Walker
 
 **Choice:** $walker
 **Pattern reference:** patterns.md §7
 
-## 7. Helpers introduced
+## 8. Helpers introduced
 
 $helpers
 
-## 8. Triggers
+## 9. Triggers
 
 $triggers
 

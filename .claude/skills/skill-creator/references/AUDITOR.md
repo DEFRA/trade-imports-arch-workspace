@@ -1,4 +1,4 @@
-Audit **one** workspace skill against the 8-pattern checklist and
+Audit **one** workspace skill against the 9-pattern checklist and
 write a plan document.
 
 Your spawn prompt names a target skill, its `SKILL.md` path, and
@@ -21,7 +21,7 @@ Read these into context before walking the checklist (these are
 the canonical references the audit cites):
 
 - `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md`
-  — the 8-pattern checklist.
+  — the 9-pattern checklist.
 - `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md`
   — known mis-applications. Cite the matching entry (`A1`–`AN`)
   whenever you flag one.
@@ -42,7 +42,7 @@ Then Read the target skill exhaustively:
 Inspect `~/trade-imports-arch-workspace/.claude/settings.json`
 for matching allowlist entries.
 
-## The 8-pattern walkthrough
+## The 9-pattern walkthrough
 
 For each pattern below, produce a "Findings" subsection in the
 plan with concrete file:line citations. If the pattern doesn't
@@ -128,15 +128,41 @@ For each helper in `tools/<name>/`:
 
 ### 8. Allowlist coverage
 
-- Does `.claude/settings.json` contain
-  `Bash(~/trade-imports-arch-workspace/.claude/tools/<name>/*)`
-  + `:*` entries?
-- If missing, flag as a hard gap (skill is unusable without it).
+- Does `.claude/settings.json` cover the skill's `tools/<name>/`
+  scripts — via **either** the blanket
+  `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` entry
+  (the live settings.json shape) **or** the per-skill
+  `Bash(.../tools/<name>/*)` + `:*` pair?
+- Flag a hard gap only when **neither** form is present (skill is
+  unusable without coverage).
 
-### 9. Prose hygiene (companion)
+### 9. Dependencies
+
+- Grep the SKILL.md, `references/*.md`, and `tools/<name>/`
+  scripts for unbundled invocations: child-project paths
+  (`~/trade-imports-arch-workspace/<child>/`, `npm --prefix`,
+  `node_modules/@defra/`, tooling bin names) and beyond-baseline
+  tools (anything past bash, curl, jq, git).
+- Hard invocation with no `metadata.dependencies` frontmatter →
+  flag as a hard gap (undeclared dependency).
+- Soft probe with graceful fallback (probe, then fall back, never
+  block) → fine undeclared; do not flag.
+- If `metadata.dependencies` is declared, verify all of:
+  - each token resolves — run
+    `bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-deps.sh`
+    and read this skill's lines;
+  - a `## Dependencies` body section states the rationale;
+  - the `description` names the requirement;
+  - the dispatcher pre-flights each declared token (`MODE:
+    BLOCKED` + REASON naming the remedy) — a declared dependency
+    without a pre-flight is a gap.
+- Declared tokens nothing in the skill actually invokes → flag as
+  stale.
+
+### 10. Prose hygiene (companion)
 
 Scan the SKILL.md and `references/*.md` for trim candidates per
-the categories in `patterns.md` "Pattern 9 (companion)". This
+the categories in `patterns.md` "Pattern 10 (companion)". This
 deliverable is a **proposed trim diff** — per-file list of
 deletions / collapses with line refs and short rationale — NOT
 in-place edits.
@@ -189,9 +215,15 @@ form.>
 
 ### 8. Allowlist coverage
 
-<allowlist entry present? if missing, exact text to add.>
+<covering entry present (blanket or per-skill)? if neither, exact
+text to add.>
 
-### 9. Prose hygiene (trim diff)
+### 9. Dependencies
+
+<declared vs invoked; check-deps.sh result; pre-flight, body
+section and description criteria; stale tokens.>
+
+### 10. Prose hygiene (trim diff)
 
 <per-file deletions / collapses with line refs and short
 rationale. NOT in-place edits.>

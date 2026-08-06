@@ -27,6 +27,10 @@ tools/{{NAME}}/
 └── render-{{NAME}}.sh          # if JSON state has a markdown view: pattern 1
 ```
 
+A skill that declares `metadata.dependencies` (pattern 9) pre-flights each
+declared dependency in `start-{{NAME}}.sh` — `MODE: BLOCKED` plus a
+`REASON` naming the remedy when one is missing.
+
 `.claude/settings.json` allowlist entries (pattern 8):
 
 ```
@@ -40,6 +44,9 @@ Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*:*)
 ---
 name: {{NAME}}
 description: '{{ONE_LINE_PURPOSE}} {{WHEN_TO_USE}} (triggers: "{{TRIGGER_1}}", "{{TRIGGER_2}}"). NOT for {{OUT_OF_SCOPE}} — use the {{OTHER_SKILL}} skill for that.'
+metadata:
+  dependencies: {{DEP_TOKENS}}   # only if pattern 9 applies — format contract:
+                                 # agent-skills.md → "Dependencies frontmatter"
 ---
 
 <!-- TODO: one-paragraph intro. State the audience (which tickets,
@@ -123,53 +130,61 @@ All under `~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/`:
 
 ## decisions.md sidecar (CREATE writes alongside SKILL.md)
 
-CREATE mode emits a `decisions.md` next to SKILL.md recording why
-each shape choice was made. Schema mirrors the 8 interview
-questions; the rationale is what a future audit / refactor pass
-reads to avoid re-deriving the framework.
+CREATE mode emits a `decisions.md` next to SKILL.md by piping
+`render-interview.sh`, so the sidecar mirrors the 9 interview
+questions exactly; the rationale is what a future audit / refactor
+pass reads to avoid re-deriving the framework.
 
 ```markdown
 # {{NAME}} skill — decisions
 
-Recorded during scaffold. Update if a shape choice changes; do not
-delete entries (they explain the original judgment).
+Recorded during CREATE interview. Update if a shape choice
+changes; do not delete entries.
 
-## 1. State shape
+## 1. Purpose
 
-**Choice:** {{JSON | PROSE}}
-**Why:** {{ONE_LINE_RATIONALE}}
+{{ONE_LINE_PURPOSE}}
 
-## 2. Dispatcher
+## 2. Dependencies
 
-**Choice:** {{YES | NO}}
-**Why:** {{ONE_LINE_RATIONALE}}
+**Resolution:** {{none | build | port | depend}}
+**Declared:** {{DEP_TOKENS | (none)}}
+**Why:** {{JUSTIFICATION | (not applicable)}}
+**Pattern reference:** patterns.md §9
 
-## 3. Pre-baked context
+## 3. State shape
 
-**Choice:** {{YES | NO}}
-**Why:** {{ONE_LINE_RATIONALE}}
+**Choice:** {{json | prose}}
+**Pattern reference:** patterns.md §1
 
-## 4. Worker fan-out
+## 4. Dispatcher
 
-**Choice:** {{YES — N workers | NO}}
-**Why:** {{ONE_LINE_RATIONALE}}
+**Choice:** {{true | false}}
+**Pattern reference:** patterns.md §2
 
-## 5. Walker
+## 5. Pre-baked context
 
-**Choice:** {{YES | NO}}
-**Why:** {{ONE_LINE_RATIONALE}}
+**Choice:** {{true | false}}
+**Pattern reference:** patterns.md §3
 
-## 6. Helpers introduced
+## 6. Worker fan-out
+
+**Choice:** {{true | false}}
+**Workers:** {{WORKER_LIST}}
+**Pattern reference:** patterns.md §5
+
+## 7. Walker
+
+**Choice:** {{true | false}}
+**Pattern reference:** patterns.md §7
+
+## 8. Helpers introduced
 
 {{LIST}}
 
-## 7. Triggers (disambiguation)
+## 9. Triggers
 
-{{TRIGGER_LIST}} — distinct from {{NEIGHBOUR_SKILLS}} because
-{{ONE_LINE_RATIONALE}}.
+{{TRIGGER_LIST}}
 
-## 8. Allowlist entries added
-
-- `Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*)`
-- `Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*:*)`
+**Disambiguation:** {{ONE_LINE_RATIONALE}}
 ```

@@ -1,6 +1,8 @@
 ---
 name: confluence-publish
 description: 'Publish a single documentation page from trade-imports-documentation to Confluence by orchestrating the existing delivery-info-arch-tooling scripts: pre-flight prerequisites (credentials, API access, publishPaths entry, diagram exports), validate Mermaid via the mermaid-check skill, build missing diagrams, publish, and report the outcome with a link to the page. Stops with the reason if the publish cannot proceed. Triggers: "publish to confluence", "push to confluence", "publish page". NOT for validating diagrams alone (mermaid-check), content quality (editorial), the full-estate publish (npm run publish:confluence directly), GitHub Pages (deploys itself via CI), or ad-hoc Confluence page reads and one-off pages whose source of truth is Confluence itself (use the hand tools in .claude/tools/confluence/). Owns no build or publish logic - the tooling does the work.'
+metadata:
+  dependencies: delivery-info-arch-tooling trade-imports-documentation npm
 ---
 
 Publishes one markdown page from the doc repo's `docs/` tree to Confluence
@@ -12,12 +14,31 @@ critically (it has two silent-failure modes, described in Step 4). The
 outcome is either a page link or a stated reason nothing was published.
 
 **Workspace layout.** The canonical root is `~/trade-imports-arch-workspace`
-(a HOME-level symlink on machines where the checkout lives elsewhere);
-`trade-imports-documentation/` (the doc repo being published from) and
-`delivery-info-arch-tooling/` (the library) are its children. The dispatcher
-emits every downstream command in the `~`-spelled canonical form, so the
-commands match the permission allowlist verbatim and nothing you type
+(a HOME-level symlink on machines where the checkout lives elsewhere). The
+dispatcher emits every downstream command in the `~`-spelled canonical form,
+so the commands match the permission allowlist verbatim and nothing you type
 carries a variable.
+
+## Dependencies
+
+Declared in the frontmatter `metadata.dependencies` (format contract:
+`agent-skills.md` → "Dependencies frontmatter"), pre-flighted by the Step 0
+dispatcher (`MODE: BLOCKED` with the remedy when one is missing), and
+verified machine-wide by `check-deps.sh`.
+
+- `trade-imports-documentation` — the doc repo being published from: owns
+  the page tree (`docs/`), the publish config and the npm wrapping
+  (`publish:confluence`, `build:mmd`, `build:diagrams`).
+- `delivery-info-arch-tooling` — the library behind those npm scripts: owns
+  the publish pipeline (ADF conversion, diagram attachment,
+  `generated`-label safety). Reached through the doc repo's
+  `file:../delivery-info-arch-tooling` npm dependency, so the pre-flight
+  also checks the doc repo has been `npm install`ed.
+- `npm` — runs the wrapping scripts (Node 22+ per the doc repo's README).
+
+Why depend rather than port: the publish pipeline is actively maintained in
+the tooling, so a port would fork it — and this skill's charter is the
+opposite ("owns no build or publish logic; the tooling does the work").
 
 ## Path conventions
 

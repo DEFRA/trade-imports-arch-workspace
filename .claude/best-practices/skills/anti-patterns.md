@@ -1,6 +1,6 @@
 # Workspace skill anti-patterns
 
-Known mis-applications of the [8-pattern checklist](patterns.md).
+Known mis-applications of the [9-pattern checklist](patterns.md).
 This list grows: when a new audit pass surfaces a fresh trap, add it
 here. Skills (especially `skill-creator`) read this doc at session
 start so the checklist stays current without code changes.

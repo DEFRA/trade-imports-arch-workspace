@@ -46,6 +46,17 @@ esac
 target="$HOME/trade-imports-arch-workspace/.claude/workareas/skill-creator/$RUN_ID/decisions.json"
 [[ -f "$target" ]] || { echo "No decisions.json at $target — run start-skill-creator.sh first" >&2; exit 1; }
 
+# Cross-field guard: walker=true on prose state is anti-pattern A1
+# (walker on a single-artifact flow) — the one cross-field rule
+# interview-schema.md documents this helper enforcing.
+if [[ "$FIELD" == "walker" && "$VALUE" == "true" ]]; then
+    state_shape=$(jq -r '.answers.state_shape // ""' "$target")
+    if [[ "$state_shape" == "prose" ]]; then
+        echo "Refused: walker=true with state_shape=prose is anti-pattern A1. Re-answer the state-shape question first if the shape is wrong." >&2
+        exit 1
+    fi
+fi
+
 # Build the jq path expression from a dotted field (e.g. fanout.enabled
 # -> .answers.fanout.enabled). Each segment becomes a quoted key.
 IFS='.' read -r -a parts <<<"$FIELD"

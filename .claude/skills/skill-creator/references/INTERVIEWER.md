@@ -1,4 +1,4 @@
-Walk the user through the 8 shape questions for a new workspace
+Walk the user through the 9 shape questions for a new workspace
 skill, record each answer atomically into `decisions.json`, then
 invoke `scaffold-skill.sh` to materialise the scaffold.
 
@@ -22,7 +22,7 @@ Your job: fill in `answers.*` via
 If not already in context:
 
 - `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md`
-  — the 8-pattern checklist (used to phrase each question).
+  — the 9-pattern checklist (used to phrase each question).
 - `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md`
   — to call out mismatches as the user answers.
 - `~/trade-imports-arch-workspace/.claude/skills/skill-creator/assets/interview-schema.md`
@@ -46,7 +46,62 @@ The helper writes atomically (`jq ... > tmp; mv tmp file`).
 
 Free-form. Save as `answers.purpose` (string).
 
-### Q2 — State shape
+### Q2 — Dependencies
+
+Before shaping the skill, check whether its purpose overlaps
+functionality that already exists in a workspace child project, and
+surface any tools it will need beyond the workspace baseline (bash,
+curl, jq, git — see `agent-skills.md` → "Dependencies frontmatter").
+
+Probe each project the purpose plausibly touches (one Bash call per
+project):
+
+```bash
+~/trade-imports-arch-workspace/.claude/tools/skill-creator/list-project-features.sh \
+    --project delivery-info-arch-tooling
+```
+
+If a probe reports `STATUS: ABSENT`, tell the user and assess overlap
+from what you know.
+
+Compare the FACT lines against the Q1 purpose. If nothing overlaps and
+no beyond-baseline tools are needed, save `resolution: "none"` and move
+on. If something overlaps, share the design-center context first —
+skills are portable, self-contained bundles by design; the upstream
+spec's stance is that most skills need no environment requirements at
+all — then ask, in the workspace's preference order:
+
+> This overlaps `<feature>` in `<project>`. Three options:
+> **port** — copy the logic into a local `.claude/tools/<name>/`
+> script (self-contained, works on every machine);
+> **build** — build fresh locally (when the overlap is superficial);
+> **depend** — invoke `<project>` at runtime (the skill then becomes
+> unusable on machines without that project and couples to its
+> release cycle).
+> Which one — and if depend, what makes local impractical?
+
+Push back on `depend` once, concretely: name what a port would cost
+versus what the coupling costs. A good depend justification names
+actively-maintained logic a port would fork (e.g. the tooling's
+Confluence ADF pipeline); a thin transform is usually better ported.
+If the user still chooses depend, that is their call — capture the why
+verbatim. Awareness, not a gate.
+
+Save as `answers.dependencies` (full object in one call — shape in
+`assets/interview-schema.md`):
+
+```bash
+~/trade-imports-arch-workspace/.claude/tools/skill-creator/interview-add-answer.sh \
+    --run-id <name> --field dependencies \
+    --value '{"resolution":"depend","declared":["delivery-info-arch-tooling","npm"],"justification":"<why>"}'
+```
+
+`declared` lists project names and non-baseline tools; extend it during
+the helpers question as helper needs emerge. A depend answer implies
+the dispatcher pre-flights each declared dependency (pattern 9) — note
+that now; it informs Q4.
+
+### Q3 — State shape
 
 Show the user pattern 1 from `patterns.md` (one paragraph). Ask:
 
@@ -62,7 +117,7 @@ If `json`: warn the user that JSON state implies helper scripts
 If `prose`: warn the user that prose state means NO walker
 (pattern 7) and NO render helper (anti-pattern A6).
 
-### Q3 — Dispatcher
+### Q4 — Dispatcher
 
 > At session start, does the LLM need to run multiple sequential
 > deterministic commands (3+ steps: clone repos, fetch ticket,
@@ -73,7 +128,12 @@ Save as `answers.dispatcher` (boolean).
 If yes: the scaffold will create `start-<name>.sh`. If no, the
 scaffold won't.
 
-### Q4 — Pre-baked context
+If Q2 resolved to `depend`, recommend yes — the dependency
+pre-flight (pattern 9) needs a home in `start-<name>.sh`. Without a
+dispatcher the scaffold still proceeds, but audit pattern 9 will
+flag the missing pre-flight until one exists.
+
+### Q5 — Pre-baked context
 
 > Will fan-out workers (or the parent session) read the same
 > context multiple times (per-repo best-practices bundles, PR
@@ -84,7 +144,7 @@ Save as `answers.prebake` (boolean).
 If yes but the user can't name a multi-read use case: flag
 anti-pattern A7 and ask again.
 
-### Q5 — Worker fan-out
+### Q6 — Worker fan-out
 
 > Does the skill fan out work across N independent units (files,
 > packages, versions, items) that each need their own context?
@@ -96,29 +156,39 @@ Save as `answers.fanout.enabled` (boolean). If yes, also ask:
 
 Save as `answers.fanout.workers` (list of strings).
 
-### Q6 — Walker
+### Q7 — Walker
 
 > Does the skill produce a list of N decisions the user makes one
 > at a time (review findings, upgrade packages)?
 
 Save as `answers.walker` (boolean).
 
-Refuse `walker=true` if `state_shape=prose` (anti-pattern A1).
-Show the user the entry from `anti-patterns.md` and ask Q2 again
-if needed.
+Refuse `walker=true` if `state_shape=prose` (anti-pattern A1) —
+`interview-add-answer.sh` enforces this. Show the user the entry
+from `anti-patterns.md` and ask Q3 again if needed.
 
-### Q7 — Helpers
+### Q8 — Helpers
 
 > Which `tools/<name>/` helper scripts does the skill own? List
 > the names (one per line, no `.sh` suffix). At minimum,
-> `start-<name>` if Q3 was yes.
+> `start-<name>` if Q4 was yes.
 
 Save as `answers.helpers` (list of strings).
+
+The scaffold generates exactly what this list names — nothing is
+inferred from earlier answers. Prompt for: `render-<name>` if Q3
+was `json`, `prepare-<name>` if Q5 was yes, and the ported
+helper(s) if Q2 resolved to `port`.
+
+As helpers land, apply the script guidance: don't assume tools are
+installed — any beyond-baseline command a helper needs is added to
+`answers.dependencies.declared`; and helpers should solve, not
+defer — fail with a specific remedy, never a raw error.
 
 For each helper, optionally ask for a one-line purpose
 (captured in `decisions.md` later; not validated).
 
-### Q8 — Triggers
+### Q9 — Triggers
 
 > What trigger phrases activate this skill? (One per line.)
 
@@ -132,7 +202,7 @@ Then ask:
 Save as `answers.triggers.disambiguation` (string). Required —
 `scaffold-skill.sh` refuses to run if this is empty.
 
-## After all 8 answered
+## After all 9 answered
 
 Show the user a recap:
 
@@ -157,12 +227,14 @@ If no, scaffold:
 `scaffold-skill.sh` writes:
 
 - `.claude/skills/<name>/SKILL.md` (from the template, with TODO
-  markers).
-- `.claude/skills/<name>/references/<WORKER>.md` per Q5 worker.
-- `.claude/skills/<name>/assets/<name>-schema.md` if Q2 was
+  markers; includes `metadata.dependencies` frontmatter and a
+  `## Dependencies` body section when Q2 resolved to `depend`).
+- `.claude/skills/<name>/references/<WORKER>.md` per Q6 worker.
+- `.claude/skills/<name>/assets/<name>-schema.md` if Q3 was
   `json`.
-- `tools/<name>/<helper>.sh` per Q7 entry.
-- `.claude/settings.json` allowlist entries (atomic jq mutation).
+- `tools/<name>/<helper>.sh` per Q8 entry.
+- `.claude/settings.json` allowlist entries when not already
+  covered by the blanket `tools/` entry (atomic jq mutation).
 - `.claude/skills/<name>/decisions.md` sidecar (rendered from
   `decisions.json`).
 
@@ -179,7 +251,7 @@ Paths:
   .claude/skills/<name>/assets/<name>-schema.md   (if JSON state)
   tools/<name>/<helper>.sh                          (one per Q7 entry)
 
-Allowlist entries appended.
+Allowlist coverage confirmed (blanket tools/ entry) or entries appended.
 Decisions sidecar: .claude/skills/<name>/decisions.md
 
 Open the SKILL.md and replace the TODO markers with the actual

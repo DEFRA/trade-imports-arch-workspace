@@ -52,3 +52,20 @@ Publish a single documentation page to Confluence by orchestrating the existing 
 - "publish page"
 
 **Disambiguation:** Distinct from Claude Code built-in /init (CLAUDE.md scaffolding, no publishing). Distinct from mermaid-check (validates diagram syntax and rendering, never publishes): this skill invokes mermaid-check as its diagram-validation step rather than duplicating it. Distinct from editorial (content quality, not delivery). Orchestrates the existing delivery-info-arch-tooling build and publish scripts for one page; owns no build or publish logic of its own. The bare phrase publish page defaults here because Confluence is the only push target needing a skill; GitHub Pages deploys automatically via CI.
+
+## 9. Dependencies (retrofit)
+
+**Resolution:** depend
+**Declared:** delivery-info-arch-tooling trade-imports-documentation npm
+**Why:** the publish pipeline (ADF conversion, diagram attachment,
+generated-label safety) is actively maintained in the tooling; a port
+would fork it, and this skill's charter is the opposite — owns no build
+or publish logic.
+**Pattern reference:** patterns.md §9
+
+(6 Aug 2026) Retrofitted as the proving case when pattern 9 was
+introduced: dependencies declared in `metadata.dependencies`
+frontmatter, a `## Dependencies` body section added, and
+`start-confluence-publish.sh` gained the tooling-presence and
+npm-install pre-flights (previously a missing tooling surfaced as a raw
+npm error mid-publish).

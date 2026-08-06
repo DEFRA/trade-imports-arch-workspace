@@ -1,13 +1,13 @@
 ---
 name: skill-creator
-description: 'Meta-skill for authoring new workspace skills and auditing existing ones against the 8-pattern checklist. Two modes — CREATE scaffolds a new skill end-to-end (SKILL.md + references/ + tools/<name>/ + assets/ + .claude/settings.json allowlist), AUDIT walks an existing skill (or fans out across all skills) and produces a plan document under workareas/skills-audit/<name>.md. Use when the user wants to add a workspace skill or assess an existing one (triggers: "scaffold skill <name>", "skill-create <name>", "new workspace skill <name>", "audit skill <name>", "audit skills", "review skill <name> against patterns"). Disambiguated from Claude Code''s built-in /init (which scaffolds CLAUDE.md, not workspace skills). NOT for editing skills you already understand — open the SKILL.md and edit directly. NOT for reviewing code correctness/security — use `review`; NOT for JS lint/style review — use `code-style` (AUDIT mode assesses a skill''s own structure against the 8-pattern checklist, not the code a skill produces).'
+description: 'Meta-skill for authoring new workspace skills and auditing existing ones against the 9-pattern checklist. Two modes — CREATE scaffolds a new skill end-to-end (SKILL.md + references/ + tools/<name>/ + assets/ + .claude/settings.json allowlist), AUDIT walks an existing skill (or fans out across all skills) and produces a plan document under workareas/skills-audit/<name>.md. Use when the user wants to add a workspace skill or assess an existing one (triggers: "scaffold skill <name>", "skill-create <name>", "new workspace skill <name>", "audit skill <name>", "audit skills", "review skill <name> against patterns"). Disambiguated from Claude Code''s built-in /init (which scaffolds CLAUDE.md, not workspace skills). NOT for editing skills you already understand — open the SKILL.md and edit directly. NOT for reviewing code correctness/security — use `review`; NOT for JS lint/style review — use `code-style` (AUDIT mode assesses a skill''s own structure against the 9-pattern checklist, not the code a skill produces).'
 # context: inline — CREATE runs an interactive interview + scaffolds files in-session with the user (needs Edit/Write in the parent); AUDIT still fans out to Task workers.
 context: inline
 allowed-tools: [Bash, Read, Glob, Grep, Task, Edit, Write]
 argument-hint: '<trigger phrase including skill name>'
 ---
 
-The meta-skill. Captures the 8-pattern checklist for workspace
+The meta-skill. Captures the 9-pattern checklist for workspace
 skills under `~/trade-imports-arch-workspace/.claude/skills/`
 and applies it two ways:
 
@@ -37,7 +37,7 @@ Before either mode, Read these into context (the checklist must
 be live; anti-patterns drift over time):
 
 - `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md`
-  — the 8-pattern checklist (canonical reference).
+  — the 9-pattern checklist (canonical reference).
 - `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md`
   — known mis-applications. Grows over time.
 - `~/trade-imports-arch-workspace/.claude/best-practices/skills/scaffold-template.md`
@@ -106,10 +106,10 @@ Branch on the mode:
 The parent session loads `references/INTERVIEWER.md` and follows
 it. The interviewer:
 
-1. Walks the 8 shape questions one at a time (serial, not batched).
+1. Walks the 9 shape questions one at a time (serial, not batched).
 2. Records each answer atomically via `interview-add-answer.sh`
    into `workareas/skill-creator/<name>/decisions.json`.
-3. When all 8 are answered, invokes
+3. When all 9 are answered, invokes
    `scaffold-skill.sh --run-id <name>` which materialises the full
    scaffold (`.claude/skills/<name>/`, `tools/<name>/`, allowlist
    entries, `decisions.md` sidecar).
@@ -131,7 +131,7 @@ Paths:
   tools/<name>/start-<name>.sh                     (if dispatcher)
   tools/<name>/<other helpers>.sh
 
-Allowlist entries appended to .claude/settings.json.
+Allowlist coverage confirmed (blanket tools/ entry) or entries appended.
 Decisions sidecar: .claude/skills/<name>/decisions.md
 
 TODO markers remaining: N
@@ -209,3 +209,4 @@ All under `~/trade-imports-arch-workspace/.claude/tools/skill-creator/`:
 | `scaffold-skill.sh` | CREATE step 3 — reads `decisions.json`, writes the scaffold + allowlist entries + `decisions.md` |
 | `interview-add-answer.sh` | CREATE — atomic mutation of `decisions.json` (one shape question per call) |
 | `render-interview.sh` | CREATE — markdown view of `decisions.json` (used for `decisions.md` sidecar and mid-interview recaps) |
+| `list-project-features.sh` | CREATE Q2 — deterministic feature inventory of a child project (BIN/NPM/LIB FACT lines; ABSENT-safe) |

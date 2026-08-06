@@ -39,3 +39,4 @@ link:
 
 check:
 	@bash .claude/tools/workspace/check-workspace.sh
+	@bash .claude/tools/workspace/check-deps.sh

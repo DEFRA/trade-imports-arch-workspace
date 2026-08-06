@@ -19,10 +19,11 @@ HOME-level symlink: `ln -s <checkout> ~/trade-imports-arch-workspace`.
 Every path in the workspace is spelled against this constant, so it
 resolves identically on every machine. The trade-off is deliberate: the
 spelling is baked into many files, so renaming the root later is a mass
-find-and-replace. `trade-imports-documentation/` and
-`delivery-info-arch-tooling/` are children of the root; the workspace
-references them downward by canonical path, and they never reference the
-workspace upward (which keeps them self-contained and CI-safe).
+find-and-replace. `trade-imports-documentation/`,
+`delivery-info-arch-tooling/` and `trade-imports-schemas/` are children of
+the root; the workspace references them downward by canonical path, and
+they never reference the workspace upward (which keeps them self-contained
+and CI-safe).
 
 Skills must NOT assume the agent's current working directory. Claude Code
 can invoke a skill from anywhere, and the child repos are themselves git
@@ -133,6 +134,8 @@ inside the spawn prompt — see "Worker references" below.
 ---
 name: skill-name          # 1-64 chars [a-z0-9-]; MUST match the folder name
 description: ...          # 1-1024 chars; WHAT + WHEN + trigger keywords
+metadata:                 # OPTIONAL; only for skills with unbundled needs
+  dependencies: <token> <token>   # see "Dependencies frontmatter" below
 ---
 ```
 
@@ -141,6 +144,43 @@ description: ...          # 1-1024 chars; WHAT + WHEN + trigger keywords
 - `assets/<NAME>.md` — templates, schemas, static resources.
 - Skills do NOT carry private `scripts/` folders in this workspace: shared
   shell scripts live at `~/trade-imports-arch-workspace/.claude/tools/`.
+
+### Dependencies frontmatter
+
+A skill that cannot function from its bundled tools alone declares what it
+needs in `metadata.dependencies` — a single space-separated string. The
+agentskills.io spec routes custom properties through `metadata` (string
+keys → string values), so this stays valid under `skills-ref validate`.
+Each token is either:
+
+- a **workspace child project** — a directory name under
+  `~/trade-imports-arch-workspace/` (e.g. `delivery-info-arch-tooling`), or
+- a **non-baseline tool** — a command the skill's scripts invoke
+  (e.g. `npm`, `mmdc`).
+
+Format: two-space indent under `metadata:`, no quotes, no inline comments.
+Rules:
+
+- **Baseline is assumed, never declared**: `bash`, `curl`, `jq`, `git`.
+  `check-workspace.sh` verifies the baseline once per machine; declaring
+  it per skill would reduce declarations to boilerplate.
+- **Credentials are not dependencies** — env-var/auth needs belong to the
+  per-domain `auth.sh` checks swept by `check-auth.sh`.
+- **Declare hard dependencies only** — things the skill cannot work
+  without. A soft probe with graceful fallback (e.g. mermaid-check trying
+  the tooling's mmdc, then npx) is not declared.
+- A declaring skill also carries a `## Dependencies` body section (the
+  rationale and which features are used), names the requirement in its
+  `description`, and pre-flights each dependency in its dispatcher —
+  `MODE: BLOCKED` plus a `REASON` naming the remedy, never a raw
+  downstream error.
+
+Verification is `check-deps.sh` (the dependency doctor): project tokens
+must resolve to directories under the root, tool tokens to commands on
+PATH. Full judgment criteria: `patterns.md` §9. Preference order when a
+new skill overlaps existing external functionality — port it into local
+`tools/`, or build fresh, before depending; the upstream spec's stance is
+that most skills need no environment requirements at all.
 
 Spawn idiom inside `SKILL.md`:
 
@@ -183,11 +223,12 @@ Rationale:
   up parent directories (#26489). Launch sessions from the workspace root;
   add a `<dir>/.claude → ../.claude` symlink only if a subdirectory launch
   point becomes routine.
-- **Child repos** — `trade-imports-documentation/` and
-  `delivery-info-arch-tooling/` are nested git repos; Claude Code
-  sandboxes them off the parent workspace's `.claude/` (#31905). Do NOT
-  symlink into them. Work on them from the workspace root with `git -C` /
-  `npm --prefix` forms; a session inside one sees no workspace skills.
+- **Child repos** — `trade-imports-documentation/`,
+  `delivery-info-arch-tooling/` and `trade-imports-schemas/` are nested
+  git repos; Claude Code sandboxes them off the parent workspace's
+  `.claude/` (#31905). Do NOT symlink into them. Work on them from the
+  workspace root with `git -C` / `npm --prefix` forms; a session inside
+  one sees no workspace skills.
 
 ## Runtime workareas
 

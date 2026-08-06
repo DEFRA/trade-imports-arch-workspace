@@ -76,7 +76,7 @@ read its header) for usage.
 | `confluence-publish/` | Pre-flight and executor for publishing one docs page to Confluence |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
-| `workspace/` | `check-workspace.sh` (path contract doctor) and `check-auth.sh` (runs every domain's auth check) |
+| `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs every domain's auth check) and `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine) |
 
 ## Skills
 

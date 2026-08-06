@@ -1,4 +1,4 @@
-# Workspace skill patterns — the 8-pattern checklist
+# Workspace skill patterns — the 9-pattern checklist
 
 Workspace skills under `~/trade-imports-arch-workspace/.claude/skills/`
 share a small vocabulary of shapes. Each pattern is a judgment call,
@@ -126,19 +126,68 @@ approval is right.
 ## 8. Allowlist coverage
 
 **Question:** Does the skill introduce new `tools/<name>/` scripts?
-If yes, add:
+If yes, `.claude/settings.json` must cover them — satisfied by
+**either** the blanket prefix entry
+`Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` (the live
+settings.json shape, covering every tools/ domain) **or** the
+per-skill pair:
 
 ```
 Bash(~/trade-imports-arch-workspace/.claude/tools/<name>/*)
 Bash(~/trade-imports-arch-workspace/.claude/tools/<name>/*:*)
 ```
 
-to `.claude/settings.json`. CREATE mode generates the entries as
-part of scaffolding; AUDIT mode checks for missing entries.
+CREATE mode appends the per-skill pair only when no covering entry
+exists; AUDIT mode flags a gap only when **neither** form is
+present.
 
-## Pattern 9 (companion): Prose hygiene
+## 9. Dependencies
 
-The 8-pattern checklist focuses on shape. A ninth axis — prose
+**Question:** Does the skill need anything that isn't bundled with
+it — a workspace child project (`delivery-info-arch-tooling`,
+`trade-imports-documentation`, ...) invoked at runtime, or a tool
+beyond the workspace baseline (bash, curl, jq, git)?
+
+The preference order is local-first, and it is upstream doctrine,
+not just ours: the agentskills.io design center is a portable,
+self-contained bundle ("most skills do not need" environment
+requirements), and Anthropic's authoring guidance says to declare
+dependencies rather than assume them, and to fail with helpful
+errors rather than defer ("solve, don't defer"). When a new skill
+overlaps functionality living in a child project: **port** the
+logic into a `.claude/tools/<name>/` script, or **build** fresh,
+before **depending** — a dependency makes the skill unusable on
+machines without the child repo and couples it to that repo's
+release cycle. Depending is allowed with an explicit recorded
+justification (CREATE captures it; the `## Dependencies` body
+section repeats it).
+
+A well-formed depending skill carries (audit criteria, not
+scaffold gates):
+
+- `metadata.dependencies` frontmatter — a flat space-separated
+  string of project names and non-baseline tools (format contract:
+  `agent-skills.md` → "Dependencies frontmatter"; hard
+  dependencies only — soft probes with graceful fallback are not
+  declared).
+- A `## Dependencies` body section stating the rationale and which
+  features are used.
+- A `description` that names the requirement — descriptions are
+  pre-loaded every session, so this is the at-a-glance layer.
+- A dispatcher pre-flight for every declared token — `MODE:
+  BLOCKED` plus a `REASON` naming the remedy (dir check for
+  projects, `command -v` for tools); never a raw downstream error.
+- A clean `check-deps.sh` run (the workspace dependency doctor,
+  wired into `make check`).
+
+**Pattern-fit trap:** porting is not free either — copying an
+actively-maintained pipeline (e.g. the tooling's Confluence ADF
+conversion) forks it, and the fork rots. That is the shape of a
+good justification for depending. A one-file jq transform is not.
+
+## Pattern 10 (companion): Prose hygiene
+
+The 9-pattern checklist focuses on shape. A tenth axis — prose
 hygiene — runs orthogonally: even a correctly-shaped skill can carry
 residue. AUDIT mode evaluates it but the deliverable is a **proposed
 trim diff** (per-file deletions / collapses with line refs and short

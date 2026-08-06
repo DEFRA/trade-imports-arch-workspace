@@ -19,10 +19,15 @@ skill directories under `.claude/skills/<name>/` and
 {
   "name": "skill-name",            // kebab-case, 1-64 chars
   "started_at": "2026-05-26T...",
-  "answered_at": null,             // set when all 8 answered
+  "answered_at": null,             // reserved — currently never set
   "scaffolded_at": null,           // set when scaffold-skill.sh runs
   "answers": {
     "purpose": "One-line description of what the skill does.",
+    "dependencies": {              // Q2 — see patterns.md §9
+      "resolution": "none",        // "none" | "build" | "port" | "depend"
+      "declared": [],              // project names + non-baseline tools
+      "justification": ""          // the why, when resolution is "depend"
+    },
     "state_shape": "json",         // "json" | "prose"
     "dispatcher": true,            // boolean
     "prebake": false,              // boolean
@@ -46,18 +51,27 @@ skill directories under `.claude/skills/<name>/` and
 ## Field rules
 
 - `name` — drives every generated path. Must match
-  `^[a-z][a-z0-9-]{0,63}$`. Validated by
-  `interview-add-answer.sh --field name`.
-- `state_shape` — see [`docs/best-practices/skills/patterns.md`](../../../docs/best-practices/skills/patterns.md)
-  pattern 1. `json` triggers an `assets/<name>-schema.md` stub and
-  a `render-<name>.sh` stub.
+  `^[a-z][a-z0-9-]{0,63}$`. Set and validated by
+  `start-skill-creator.sh` when it parses the trigger phrase; not
+  an interview field.
+- `dependencies` — see pattern 9. `resolution` records the
+  project-overlap decision; `declared` tokens follow
+  `agent-skills.md` → "Dependencies frontmatter" (projects +
+  non-baseline tools). When `resolution` is `"depend"`, `declared`
+  and `justification` are expected — `scaffold-skill.sh` warns and
+  emits TODO markers when they are empty (never refuses).
+- `state_shape` — see [`patterns.md`](../../../best-practices/skills/patterns.md)
+  pattern 1. `json` triggers an `assets/<name>-schema.md` stub. A
+  render helper is generated only if the `helpers` answer lists
+  `render-<name>` (the interviewer prompts for it).
 - `dispatcher` — see pattern 2. `true` triggers a
   `start-<name>.sh` stub.
-- `prebake` — see pattern 3. `true` triggers a
-  `prepare-<name>.sh` stub.
+- `prebake` — see pattern 3. `true` means the `helpers` answer
+  should include `prepare-<name>` (the interviewer prompts for
+  it); only the helpers list drives generation.
 - `fanout.enabled` — see pattern 5. `true` requires at least one
   worker name; each becomes a `references/<NAME>.md` stub with a
-  Bash-hygiene block at the top.
+  Bash-hygiene pointer at the top.
 - `walker` — see pattern 7. Only valid when `state_shape == "json"`
   and there is a list of N items to triage. Validation in
   `interview-add-answer.sh`.

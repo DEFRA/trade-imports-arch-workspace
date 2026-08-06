@@ -52,6 +52,11 @@ if [[ "${1:-}" == "--publish" ]]; then
 fi
 
 [[ -d "$DOC_REPO" ]] || blocked "doc repo not found at $DOC_REPO (is the canonical symlink in place? ln -s <checkout> ~/trade-imports-arch-workspace)"
+# Pattern 9 pre-flight: the publisher lives in the tooling repo, reached
+# through the doc repo's file:../ npm link — check both, with remedies.
+TOOLING="$ROOT/delivery-info-arch-tooling"
+[[ -d "$TOOLING" ]] || blocked "tooling repo not found at $TOOLING - the publisher lives there (clone it: make -C ~/trade-imports-arch-workspace clone)"
+[[ -e "$DOC_REPO/node_modules/@defra/delivery-info-arch-tooling" ]] || blocked "doc repo not installed - node_modules/@defra/delivery-info-arch-tooling missing or dangling (run: npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install)"
 [[ $# -ge 1 && -n "${1:-}" ]] || blocked "usage: start-confluence-publish.sh [--publish] <page-path>"
 
 RAW="$1"

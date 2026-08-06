@@ -7,9 +7,10 @@ where the checkout lives elsewhere, set it up once:
 ln -s <your-checkout> ~/trade-imports-arch-workspace
 ```
 
-`trade-imports-documentation/` and `delivery-info-arch-tooling/` are children
-of the root. The workspace references them downward by canonical path; they
-never reference the workspace upward (keeps them self-contained and CI-safe).
+`trade-imports-documentation/`, `delivery-info-arch-tooling/` and
+`trade-imports-schemas/` are children of the root. The workspace references
+them downward by canonical path; they never reference the workspace upward
+(keeps them self-contained and CI-safe).
 
 ## Path typing (who writes which form)
 
