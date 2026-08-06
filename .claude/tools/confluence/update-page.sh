@@ -11,6 +11,12 @@
 #   --file, -f    File containing the new content (wiki markup)
 #   --title, -t   Optional new title for the page
 #   --dry-run     Show what would be sent without making changes
+#   --force       Overwrite even a pipeline-managed ('generated') page
+#
+# Refuses to update pages carrying the pipeline's generated label
+# (GENERATED_LABEL, default 'generated') unless --force is given -
+# those pages are owned by the confluence-publish pipeline and a hand
+# update is overwritten by its next publish.
 #
 # Environment variables required:
 #   JIRA_USER   - Atlassian account email
@@ -27,14 +33,16 @@ PAGE_INPUT=""
 CONTENT_FILE=""
 NEW_TITLE=""
 DRY_RUN=false
+FORCE=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         --file|-f) CONTENT_FILE="$2"; shift 2 ;;
         --title|-t) NEW_TITLE="$2"; shift 2 ;;
         --dry-run) DRY_RUN=true; shift ;;
+        --force) FORCE=true; shift ;;
         -h|--help)
-            echo "Usage: $0 PAGE_ID_OR_URL [--file <file>] [--title <title>] [--dry-run]"
+            echo "Usage: $0 PAGE_ID_OR_URL [--file <file>] [--title <title>] [--dry-run] [--force]"
             echo ""
             echo "Updates a Confluence page with content from a file (wiki markup format)."
             echo ""
@@ -42,6 +50,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --file, -f <file>   File containing wiki markup content"
             echo "  --title, -t <title> New title for the page (optional)"
             echo "  --dry-run           Show payload without making changes"
+            echo "  --force             Overwrite even a pipeline-managed ('generated') page"
             echo ""
             echo "If --file is not specified, reads from stdin."
             exit 0
@@ -106,10 +115,10 @@ fi
 
 echo "Fetching current page info..." >&2
 
-# Get current page info (need version number and title)
+# Get current page info (need version number, title and labels)
 CURRENT_PAGE=$(curl -s -u "$JIRA_USER:$JIRA_TOKEN" \
     -H "Accept: application/json" \
-    "$BASE_URL/rest/api/content/$PAGE_ID?expand=version,space")
+    "$BASE_URL/rest/api/content/$PAGE_ID?expand=version,space,metadata.labels")
 
 # Check for errors
 if echo "$CURRENT_PAGE" | jq -e '.statusCode' > /dev/null 2>&1; then
@@ -120,6 +129,25 @@ fi
 CURRENT_VERSION=$(echo "$CURRENT_PAGE" | jq -r '.version.number')
 CURRENT_TITLE=$(echo "$CURRENT_PAGE" | jq -r '.title')
 SPACE_KEY=$(echo "$CURRENT_PAGE" | jq -r '.space.key')
+
+# Clobber guard: pipeline-managed pages carry the generated label
+# (applied by the delivery-info-arch-tooling publisher; same
+# GENERATED_LABEL override as the pipeline itself). A hand update to
+# one bypasses the pipeline's conversion and diagram attachment, and
+# the next publish overwrites it.
+GENERATED="${GENERATED_LABEL:-generated}"
+if echo "$CURRENT_PAGE" | jq -e --arg l "$GENERATED" \
+    '[.metadata.labels.results[]?.name] | index($l) != null' > /dev/null; then
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "NOTE: page carries the '$GENERATED' label (pipeline-managed) - a real run would refuse without --force" >&2
+    elif [[ "$FORCE" != "true" ]]; then
+        echo "Error: page $PAGE_ID carries the '$GENERATED' label - it is managed by the confluence-publish pipeline; a hand update bypasses its conversion and diagram attachment, and the next publish overwrites it." >&2
+        echo "Use the confluence-publish skill for docs pages, or re-run with --force to overwrite anyway." >&2
+        exit 1
+    else
+        echo "WARN: overwriting a pipeline-managed page (--force)" >&2
+    fi
+fi
 
 # Use current title if no new title specified
 if [[ -z "$NEW_TITLE" ]]; then
