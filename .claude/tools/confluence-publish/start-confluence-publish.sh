@@ -57,6 +57,7 @@ fi
 TOOLING="$ROOT/delivery-info-arch-tooling"
 [[ -d "$TOOLING" ]] || blocked "tooling repo not found at $TOOLING - the publisher lives there (clone it: make -C ~/trade-imports-arch-workspace clone)"
 [[ -e "$DOC_REPO/node_modules/@defra/delivery-info-arch-tooling" ]] || blocked "doc repo not installed - node_modules/@defra/delivery-info-arch-tooling missing or dangling (run: npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install)"
+command -v npm >/dev/null 2>&1 || blocked "npm not found on PATH - the build and publish commands run through npm (install Node 22+)"
 [[ $# -ge 1 && -n "${1:-}" ]] || blocked "usage: start-confluence-publish.sh [--publish] <page-path>"
 
 RAW="$1"
