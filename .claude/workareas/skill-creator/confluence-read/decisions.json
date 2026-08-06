@@ -1,0 +1,31 @@
+{
+  "name": "confluence-read",
+  "started_at": "2026-08-06T15:30:00Z",
+  "answered_at": null,
+  "scaffolded_at": "2026-08-06T15:32:00Z",
+  "answers": {
+    "purpose": "Fetch a Confluence page by URL or page id as clean markdown (via the confluence/ hand tools) so the session can analyse it - summarise, review, extract, compare.",
+    "dependencies": {
+      "resolution": "none",
+      "declared": [],
+      "justification": ""
+    },
+    "state_shape": "prose",
+    "dispatcher": false,
+    "prebake": false,
+    "fanout": {
+      "enabled": false
+    },
+    "walker": false,
+    "helpers": [],
+    "triggers": {
+      "phrases": [
+        "read confluence page",
+        "fetch confluence page",
+        "analyse confluence page",
+        "analyze confluence page"
+      ],
+      "disambiguation": "Read-only, Confluence-to-session direction. Distinct from confluence-publish (session-to-Confluence: builds and publishes docs pages; its NOT-for clause points ad-hoc reads here). Distinct from jira (tickets, not pages). Not for pages whose markdown source lives in trade-imports-documentation - read the source file directly instead."
+    }
+  }
+}

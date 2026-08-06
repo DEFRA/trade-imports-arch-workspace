@@ -30,3 +30,6 @@ Scripts mirror the `jira/` helpers and use the same `JIRA_USER`/`JIRA_TOKEN` cre
 # Raw JSON
 ./confluence/page.sh 12345678 json
 ```
+
+The `confluence-read` skill wraps the read path (auth → `page.sh md` →
+analysis) for agent sessions.

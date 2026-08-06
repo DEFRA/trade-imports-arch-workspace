@@ -1,6 +1,6 @@
 ---
 name: confluence-publish
-description: 'Publish a single documentation page from trade-imports-documentation to Confluence by orchestrating the existing delivery-info-arch-tooling scripts: pre-flight prerequisites (credentials, API access, publishPaths entry, diagram exports), validate Mermaid via the mermaid-check skill, build missing diagrams, publish, and report the outcome with a link to the page. Stops with the reason if the publish cannot proceed. Triggers: "publish to confluence", "push to confluence", "publish page". NOT for validating diagrams alone (mermaid-check), content quality (editorial), the full-estate publish (npm run publish:confluence directly), GitHub Pages (deploys itself via CI), or ad-hoc Confluence page reads and one-off pages whose source of truth is Confluence itself (use the hand tools in .claude/tools/confluence/). Owns no build or publish logic - the tooling does the work. Requires npm (Node 22+).'
+description: 'Publish a single documentation page from trade-imports-documentation to Confluence by orchestrating the existing delivery-info-arch-tooling scripts: pre-flight prerequisites (credentials, API access, publishPaths entry, diagram exports), validate Mermaid via the mermaid-check skill, build missing diagrams, publish, and report the outcome with a link to the page. Stops with the reason if the publish cannot proceed. Triggers: "publish to confluence", "push to confluence", "publish page". NOT for validating diagrams alone (mermaid-check), content quality (editorial), the full-estate publish (npm run publish:confluence directly), GitHub Pages (deploys itself via CI), or ad-hoc Confluence page reads (use the confluence-read skill) and one-off pages whose source of truth is Confluence itself (use the hand tools in .claude/tools/confluence/). Owns no build or publish logic - the tooling does the work. Requires npm (Node 22+).'
 metadata:
   dependencies: delivery-info-arch-tooling trade-imports-documentation npm
 ---
@@ -66,9 +66,10 @@ reviewing or sharpening the page's content (use `editorial`), publishing the
 whole configured set or a whole space (run `npm run publish:confluence` /
 `publish:confluence:space` in the doc repo directly), or the GitHub Pages
 site (deploys automatically on push to main). Also NOT for ad-hoc Confluence
-work - reading a page by ID, one-off pages whose source of truth is
-Confluence itself, or mirroring Confluence trees to markdown; those are the
-hand tools in `~/trade-imports-arch-workspace/.claude/tools/confluence/`.
+work - reading a page by ID or URL is the `confluence-read` skill; one-off
+pages whose source of truth is Confluence itself, or mirroring Confluence
+trees to markdown, are the hand tools in
+`~/trade-imports-arch-workspace/.claude/tools/confluence/`.
 Pushing a `docs/` page through those hand tools bypasses the pipeline's
 ADF conversion, diagram attachment, and `generated`-label safety, and creates
 drift the next pipeline publish overwrites.
