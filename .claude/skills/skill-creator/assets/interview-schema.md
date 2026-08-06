@@ -76,7 +76,9 @@ skill directories under `.claude/skills/<name>/` and
   and there is a list of N items to triage. Validation in
   `interview-add-answer.sh`.
 - `helpers` — see pattern 6. Each becomes a `tools/<name>/<helper>.sh`
-  stub with a one-line TODO header.
+  stub with a one-line TODO header. May be an empty array when the
+  skill only reuses another domain's existing scripts (never list
+  those here — the scaffold would overwrite them with stubs).
 - `triggers.disambiguation` — anti-pattern guard. The interview
   refuses to scaffold without a one-line statement of how the
   triggers differ from neighbouring skills (and from Claude Code's

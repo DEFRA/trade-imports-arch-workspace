@@ -1,7 +1,12 @@
 #!/bin/bash
 # Get Confluence page details
 # Usage: ./page.sh PAGE_ID_OR_URL [format]
-# Formats: full (default), summary, json
+# Formats: full (default), summary, json, md
+#
+# A URL is any https://<site>/wiki/spaces/<KEY>/pages/<id>/... form -
+# the numeric page id is extracted from it. `md` converts the page body
+# to markdown via html_to_md.js when node is available, falling back to
+# the raw HTML body (with a notice) when it is not.
 
 set -e
 
@@ -17,7 +22,7 @@ fi
 
 if [[ -z "$INPUT" ]]; then
   echo "Usage: ./page.sh PAGE_ID_OR_URL [format]"
-  echo "Formats: full (default), summary, json"
+  echo "Formats: full (default), summary, json, md"
   exit 1
 fi
 
@@ -51,6 +56,19 @@ fi
 case "$FORMAT" in
   json)
     echo "$response"
+    ;;
+  md)
+    echo "$response" | jq -r '"# \(.title)"'
+    echo "$response" | jq -r '"Space: \(.space.key) | Version: \(.version.number) (\(.version.when)) | By: \(.version.by.displayName)"'
+    echo "$response" | jq -r '"Source: '"$BASE_URL"'/spaces/\(.space.key)/pages/\(.id)"'
+    echo ""
+    if command -v node >/dev/null 2>&1; then
+      echo "$response" | jq -r '.body.view.value // ""' \
+        | node "$HOME/trade-imports-arch-workspace/.claude/tools/confluence/html_to_md.js"
+    else
+      echo "NOTE: node not found on PATH - raw HTML body follows (install Node for markdown conversion)"
+      echo "$response" | jq -r '.body.view.value // "No content"'
+    fi
     ;;
   summary)
     echo "$response" | jq -r '{

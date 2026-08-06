@@ -67,7 +67,7 @@ missing=$(jq -r '
         (if ($a | has("prebake")) then empty else "prebake" end),
         (if ($a.fanout | type) == "object" and ($a.fanout | has("enabled")) then empty else "fanout.enabled" end),
         (if ($a | has("walker")) then empty else "walker" end),
-        (if (($a.helpers // []) | length) > 0 then empty else "helpers" end),
+        (if ($a.helpers | type) == "array" then empty else "helpers" end),
         (if (($a.triggers.phrases // []) | length) > 0 then empty else "triggers.phrases" end),
         (if ($a.triggers.disambiguation // "") != "" then empty else "triggers.disambiguation" end)
     ] | join(",")
@@ -193,7 +193,9 @@ helper_rows=$(jq -r '.answers.helpers[] | "| `" + . + ".sh` | TODO — one-line 
 frontmatter="---
 name: $NAME
 description: '$PURPOSE Triggers: $TRIGGERS_CSV. $DISAMBIG TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'"
-if [[ "$DEP_RESOLUTION" == "depend" ]]; then
+# Emit whenever anything is declared: a depend resolution OR
+# beyond-baseline tool tokens recorded with resolution none/build/port.
+if [[ -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ]]; then
     frontmatter="$frontmatter
 metadata:
   dependencies: ${DEP_DECLARED:-TODO-declare-tokens}"
@@ -201,22 +203,26 @@ fi
 frontmatter="$frontmatter
 ---"
 
-# Dependencies body section (pattern 9) — only when depending.
+# Dependencies body section (pattern 9) — whenever anything is declared.
 deps_section=""
-if [[ "$DEP_RESOLUTION" == "depend" ]]; then
+if [[ -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ]]; then
+    why_line="beyond the workspace baseline (bash, curl, jq, git)."
+    if [[ "$DEP_RESOLUTION" == "depend" ]]; then
+        why_line="at runtime instead of a local port.
+Why: ${DEP_WHY:-TODO — record the justification for depending}."
+    fi
     deps_section=$(cat <<EOF
 
 ## Dependencies
 
-This skill invokes ${DEP_DECLARED:-TODO — declare the project/tool tokens}
-at runtime instead of a local port.
-Why: ${DEP_WHY:-TODO — record the justification for depending}.
+This skill needs ${DEP_DECLARED:-TODO — declare the project/tool tokens}
+$why_line
 Declared in the frontmatter \`metadata.dependencies\` (format contract:
 \`best-practices/skills/agent-skills.md\` → "Dependencies frontmatter");
-verified machine-wide by \`check-deps.sh\`; pre-flighted by
-\`start-$NAME.sh\`, which reports \`MODE: BLOCKED\` with a REASON naming
-the remedy when a dependency is missing. Keep this list in sync with
-what the steps actually invoke.
+verified machine-wide by \`check-deps.sh\`; pre-flighted where the skill
+runs — \`MODE: BLOCKED\` with a REASON naming the remedy when a
+dependency is missing. Keep this list in sync with what the steps
+actually invoke.
 EOF
 )
 fi

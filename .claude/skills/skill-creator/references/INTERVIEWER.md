@@ -173,7 +173,11 @@ from `anti-patterns.md` and ask Q3 again if needed.
 > the names (one per line, no `.sh` suffix). At minimum,
 > `start-<name>` if Q4 was yes.
 
-Save as `answers.helpers` (list of strings).
+Save as `answers.helpers` (list of strings). An empty list is
+valid when the skill only reuses scripts from an existing
+`tools/<other-domain>/` (e.g. the `confluence/` hand tools) —
+never list another domain's scripts here; the scaffold would
+overwrite them with stubs.
 
 The scaffold generates exactly what this list names — nothing is
 inferred from earlier answers. Prompt for: `render-<name>` if Q3
