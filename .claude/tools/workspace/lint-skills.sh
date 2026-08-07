@@ -45,7 +45,9 @@ extract_deps() {
 }
 
 check_links() {
-    # Relative markdown links only; skip absolute URLs, anchors and ~ paths.
+    # Relative markdown links only; skip absolute URLs, anchors, ~ paths
+    # and anything inside fenced code blocks (templates carry
+    # placeholder links by design).
     local file="$1" dir target link
     dir=$(dirname "$file")
     while IFS= read -r link; do
@@ -59,7 +61,8 @@ check_links() {
             say "FAIL ${file#"$ROOT"/} — dangling link: ($link)"
             FAIL=1
         fi
-    done < <(grep -o '](\([^)]*\))' "$file" 2>/dev/null | sed 's/^](//; s/)$//')
+    done < <(awk '/^```/{f=!f; next} !f' "$file" 2>/dev/null \
+             | grep -o '](\([^)]*\))' 2>/dev/null | sed 's/^](//; s/)$//')
 }
 
 for skill_md in "$ROOT"/.claude/skills/*/SKILL.md; do
