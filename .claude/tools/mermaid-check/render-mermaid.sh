@@ -76,6 +76,12 @@ err=$(mktemp -t mermaid-check-err-XXXXXX)
 
 set +e
 if [[ "$MMDC" == "npx:mmdc" ]]; then
+    # Last rung of the fallback chain must degrade gracefully, not
+    # die raw (pattern 9 soft-probe rule).
+    if ! command -v npx >/dev/null 2>&1; then
+        echo "ERROR: no mmdc found and npx is not on PATH - install Node 22+ (or npm install in delivery-info-arch-tooling) to render Mermaid" >&2
+        exit 1
+    fi
     npx --yes @mermaid-js/mermaid-cli mmdc -i "$FILE" -o "$OUT" >/dev/null 2>"$err"
 else
     "$MMDC" -i "$FILE" -o "$OUT" >/dev/null 2>"$err"

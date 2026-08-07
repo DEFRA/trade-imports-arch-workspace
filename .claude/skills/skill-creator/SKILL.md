@@ -20,16 +20,9 @@ Stops at audit. Improvement work is judgment-heavy; the user
 resolves Open Questions on the plan and hand-writes the
 implementer prompt.
 
-## Path conventions
-
-Cross-workspace paths use the literal home-relative form —
-`~/trade-imports-arch-workspace/.claude/tools/<domain>/`,
-`~/trade-imports-arch-workspace/.claude/best-practices/`,
-`~/trade-imports-arch-workspace/.claude/workareas/`. Bash
-expands `~` automatically. Skill-internal references stay
-relative (`references/<NAME>.md`, `assets/<NAME>.md`).
-
-**Bash call hygiene** — one command per Bash call. Full rule table: [`docs/agent-skills.md`](../../../docs/agent-skills.md) → "Bash call hygiene".
+**Bash call hygiene** - one command per Bash call; paths in the literal
+`~/trade-imports-arch-workspace/...` form. Full rules:
+[`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Session start — Read these references
 

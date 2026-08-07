@@ -13,18 +13,10 @@ existing scripts in the right order, and read the publisher's output
 critically (it has two silent-failure modes, described in Step 4). The
 outcome is either a page link or a stated reason nothing was published.
 
-**Workspace layout.** The canonical root is `~/trade-imports-arch-workspace`
-(a HOME-level symlink on machines where the checkout lives elsewhere). The
-dispatcher emits every downstream command in the `~`-spelled canonical form,
-so the commands match the permission allowlist verbatim and nothing you type
-carries a variable.
-
 ## Dependencies
 
-Declared in the frontmatter `metadata.workspace-deps` (format contract:
-`agent-skills.md` → "Dependencies frontmatter"), pre-flighted by the Step 0
-dispatcher (`MODE: BLOCKED` with the remedy when one is missing), and
-verified machine-wide by `check-deps.sh`.
+Declared in `metadata.workspace-deps` and pre-flighted by the Step 0
+dispatcher (criteria: `patterns.md` §9).
 
 - `trade-imports-documentation` — the doc repo being published from: owns
   the page tree (`docs/`), the publish config and the npm wrapping
@@ -40,18 +32,9 @@ Why depend rather than port: the publish pipeline is actively maintained in
 the tooling, so a port would fork it — and this skill's charter is the
 opposite ("owns no build or publish logic; the tooling does the work").
 
-## Path conventions
-
-Cross-workspace paths use the literal home-relative form —
-`~/trade-imports-arch-workspace/.claude/tools/<domain>/`,
-`~/trade-imports-arch-workspace/.claude/best-practices/`,
-`~/trade-imports-arch-workspace/.claude/workareas/`. Bash
-expands `~` automatically. Skill-internal references stay
-relative (`references/<NAME>.md`, `assets/<NAME>.md`).
-
-**Bash call hygiene** - one command per Bash call. Full rule
-table: [`agent-skills.md`](../../best-practices/skills/agent-skills.md)
-→ "Bash call hygiene".
+**Bash call hygiene** - one command per Bash call; paths in the literal
+`~/trade-imports-arch-workspace/...` form. Full rules:
+[`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## When to use
 
@@ -97,8 +80,10 @@ stdout line is the branch:
   `PAGE` (the `docs/...` path), `SPACE` (target space key), `CONFLUENCE_BASE`,
   one line per embedded diagram with `png=present|MISSING`,
   `FENCED_MERMAID_BLOCKS`, `BUILD_NEEDED`, zero or more `BUILD_CMD` lines,
-  and `PUBLISH_CMD`. The command lines are emitted with resolved paths - run
-  them verbatim in later steps.
+  and `PUBLISH_CMD`. The command lines are emitted with resolved paths in
+  the `~`-spelled canonical form, so they match the permission allowlist
+  verbatim and nothing you type carries a variable - run them verbatim in
+  later steps.
 
 ## Step 1: Validate Mermaid sources (conditional)
 

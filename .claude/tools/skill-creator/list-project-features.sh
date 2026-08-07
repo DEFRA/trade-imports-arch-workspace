@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --project) PROJECT="$2"; shift 2 ;;
         -h|--help)
-            sed -n '2,16p' "$0" >&2
+            sed -n '2,17p' "$0" >&2
             exit 0 ;;
         *) echo "Unknown arg: $1" >&2; exit 1 ;;
     esac

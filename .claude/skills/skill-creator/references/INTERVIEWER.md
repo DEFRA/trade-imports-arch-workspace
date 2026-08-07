@@ -207,6 +207,11 @@ Then ask:
 Save as `answers.triggers.disambiguation` (string). Required —
 `scaffold-skill.sh` refuses to run if this is empty.
 
+Also sweep the other direction: grep existing skills' NOT-for
+clauses for territory the new skill now owns, and fix any that
+would misroute (e.g. a clause pointing reads at a write skill
+because the read skill didn't exist yet).
+
 ## After all 9 answered
 
 Show the user a recap:
@@ -255,7 +260,7 @@ Paths:
   .claude/skills/<name>/SKILL.md
   .claude/skills/<name>/references/<WORKER>.md   (if fan-out)
   .claude/skills/<name>/assets/<name>-schema.md   (if JSON state)
-  tools/<name>/<helper>.sh                          (one per Q7 entry)
+  tools/<name>/<helper>.sh                          (one per Q8 entry)
 
 Allowlist coverage confirmed (blanket tools/ entry) or entries appended.
 Decisions sidecar: .claude/skills/<name>/decisions.md

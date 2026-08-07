@@ -170,19 +170,14 @@ Rules:
   per-domain `auth.sh` checks swept by `check-auth.sh`.
 - **Declare hard dependencies only** — things the skill cannot work
   without. A soft probe with graceful fallback (e.g. mermaid-check trying
-  the tooling's mmdc, then npx) is not declared.
-- A declaring skill also carries a `## Dependencies` body section (the
-  rationale and which features are used), names the requirement in its
-  `description`, and pre-flights each dependency in its dispatcher —
-  `MODE: BLOCKED` plus a `REASON` naming the remedy, never a raw
-  downstream error.
+  the tooling's mmdc, then npx) is not declared — and a fallback chain
+  is soft only if its LAST rung degrades gracefully; a chain that ends
+  in a raw failure is a hard dependency wearing a costume.
 
-Verification is `check-deps.sh` (the dependency doctor): project tokens
-must resolve to directories under the root, tool tokens to commands on
-PATH. Full judgment criteria: `patterns.md` §9. Preference order when a
-new skill overlaps existing external functionality — port it into local
-`tools/`, or build fresh, before depending; the upstream spec's stance is
-that most skills need no environment requirements at all.
+Everything else about dependencies — the port/build/depend preference
+order and the well-formed criteria a declaring skill satisfies — lives
+canonically in [`patterns.md`](patterns.md) §9. Verification:
+`check-deps.sh` (machine resolution) and `lint-skills.sh` (repo lint).
 
 Spawn idiom inside `SKILL.md`:
 

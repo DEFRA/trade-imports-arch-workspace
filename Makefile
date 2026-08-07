@@ -5,7 +5,7 @@
 #   make clone      clone the child repos (no-op when already present)
 #   make pull       fast-forward the children
 #   make link       create ~/trade-imports-arch-workspace -> this checkout
-#   make check      run the workspace doctor
+#   make check      run the doctors, the skills lint and the golden tests
 #
 # Clones over HTTPS by default; override for SSH:
 #   make GIT_BASE=git@github.com:DEFRA
@@ -36,6 +36,8 @@ link:
 		ln -s $(CURDIR) $(CANONICAL); \
 		echo "link: $(CANONICAL) -> $(CURDIR)"; \
 	fi
+	@git config core.hooksPath .githooks
+	@echo "link: core.hooksPath -> .githooks (pre-commit skills lint)"
 
 check:
 	@bash .claude/tools/workspace/check-workspace.sh

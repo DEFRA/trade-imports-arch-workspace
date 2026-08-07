@@ -8,18 +8,9 @@ the `tools/confluence/` hand tools and lands it in the session as
 analysis-ready markdown, so the user can summarise, review, extract or
 compare it. Read-only: nothing is ever written back to Confluence.
 
-## Path conventions
-
-Cross-workspace paths use the literal home-relative form —
-`~/trade-imports-arch-workspace/.claude/tools/<domain>/`,
-`~/trade-imports-arch-workspace/.claude/best-practices/`,
-`~/trade-imports-arch-workspace/.claude/workareas/`. Bash
-expands `~` automatically. Skill-internal references stay
-relative (`references/<NAME>.md`, `assets/<NAME>.md`).
-
-**Bash call hygiene** - one command per Bash call. Full rule
-table: [`agent-skills.md`](../../best-practices/skills/agent-skills.md)
-→ "Bash call hygiene".
+**Bash call hygiene** - one command per Bash call; paths in the literal
+`~/trade-imports-arch-workspace/...` form. Full rules:
+[`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## When to use
 

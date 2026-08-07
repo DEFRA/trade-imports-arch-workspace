@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Pre-commit: lint the skills estate when staged changes touch .claude/.
+# Wired via `git config core.hooksPath .githooks` (make link does this).
+# Tool-agnostic by design — fires for any editor or agent. Bypassing
+# with --no-verify is denied by the workspace's own bash guard.
+
+if git diff --cached --name-only | grep -q '^\.claude/'; then
+    bash "$HOME/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh" || {
+        echo "pre-commit: skills lint failed - fix or see .claude/tools/workspace/lint-skills.sh" >&2
+        exit 1
+    }
+fi
+exit 0

@@ -34,7 +34,14 @@ dep_resolution=$(jq -r "$jq_pretty"' .answers.dependencies.resolution | show' "$
 dep_declared=$(jq -r '.answers.dependencies.declared // [] | join(" ")' "$target")
 [[ -z "$dep_declared" ]] && dep_declared="(none)"
 dep_why=$(jq -r '.answers.dependencies.justification // ""' "$target")
-[[ -z "$dep_why" ]] && dep_why="(not applicable)"
+if [[ -z "$dep_why" ]]; then
+    # A depend without a recorded why is a gap, not an N/A.
+    if [[ "$dep_resolution" == "depend" ]]; then
+        dep_why="(not recorded)"
+    else
+        dep_why="(not applicable)"
+    fi
+fi
 state_shape=$(jq -r "$jq_pretty"' .answers.state_shape | show' "$target")
 dispatcher=$(jq -r "$jq_pretty"' .answers.dispatcher | show' "$target")
 prebake=$(jq -r "$jq_pretty"' .answers.prebake | show' "$target")

@@ -37,7 +37,7 @@ while [[ $# -gt 0 ]]; do
         --run-id) RUN_ID="$2"; shift 2 ;;
         --dry-run) DRY_RUN=true; shift ;;
         -h|--help)
-            sed -n '2,18p' "$0" >&2
+            sed -n '2,28p' "$0" >&2
             exit 0 ;;
         *) echo "Unknown arg: $1" >&2; exit 1 ;;
     esac
@@ -124,7 +124,11 @@ if $DRY_RUN; then
     exit 0
 fi
 
-mkdir -p "$SKILL_DIR/references" "$SKILL_DIR/assets" "$TOOLS_DIR"
+mkdir -p "$SKILL_DIR/references" "$SKILL_DIR/assets"
+# Only create a tools domain when this skill owns scripts (zero-helper
+# skills reuse another domain; an empty dir would mislead).
+HELPER_COUNT=$(jq -r '.answers.helpers | length' "$DECISIONS")
+[[ "$HELPER_COUNT" -gt 0 ]] && mkdir -p "$TOOLS_DIR"
 
 # ---------------------------------------------------------------------
 # SKILL.md
@@ -191,8 +195,23 @@ EOF
 )
 fi
 
-# Helpers cheat-sheet.
-helper_rows=$(jq -r '.answers.helpers[] | "| `" + . + ".sh` | TODO — one-line purpose |"' "$DECISIONS")
+# Helpers cheat-sheet — a zero-helper skill reuses another domain, so
+# its sheet says so instead of pointing at an empty tools/<name>/.
+if [[ "$HELPER_COUNT" -gt 0 ]]; then
+    helper_rows=$(jq -r '.answers.helpers[] | "| `" + . + ".sh` | TODO — one-line purpose |"' "$DECISIONS")
+    cheatsheet_block="## Scripts cheat-sheet
+
+All under \`~/trade-imports-arch-workspace/.claude/tools/$NAME/\`:
+
+| Script | Purpose |
+|---|---|
+$helper_rows"
+else
+    cheatsheet_block="## Scripts cheat-sheet
+
+(none — this skill reuses an existing \`tools/<domain>/\`; TODO list
+the borrowed scripts and their home here)"
+fi
 
 # Frontmatter — metadata.workspace-deps emitted whenever anything is
 # declared: a depend resolution OR beyond-baseline tool tokens recorded
@@ -223,12 +242,10 @@ Why: ${DEP_WHY:-TODO — record the justification for depending}."
 
 This skill needs ${DEP_DECLARED:-TODO — declare the project/tool tokens}
 $why_line
-Declared in the frontmatter \`metadata.workspace-deps\` (format contract:
-\`best-practices/skills/agent-skills.md\` → "Dependencies frontmatter");
-verified machine-wide by \`check-deps.sh\`; pre-flighted where the skill
-runs — \`MODE: BLOCKED\` with a REASON naming the remedy when a
-dependency is missing. Keep this list in sync with what the steps
-actually invoke.
+Declared in \`metadata.workspace-deps\`. Format:
+\`agent-skills.md\` → "Dependencies frontmatter"; well-formed criteria
+(pre-flight, description mention, check-deps): \`patterns.md\` §9. Keep
+the list in sync with what the steps actually invoke.
 EOF
 )
 fi
@@ -239,18 +256,9 @@ $frontmatter
 <!-- TODO: one-paragraph intro. State the audience (which tickets,
      which work) and the outcome (what artifact lands where). -->
 
-## Path conventions
-
-Cross-workspace paths use the literal home-relative form —
-\`~/trade-imports-arch-workspace/.claude/tools/<domain>/\`,
-\`~/trade-imports-arch-workspace/.claude/best-practices/\`,
-\`~/trade-imports-arch-workspace/.claude/workareas/\`. Bash
-expands \`~\` automatically. Skill-internal references stay
-relative (\`references/<NAME>.md\`, \`assets/<NAME>.md\`).
-
-**Bash call hygiene** - one command per Bash call. Full rule
-table: [\`agent-skills.md\`](../../best-practices/skills/agent-skills.md)
-→ "Bash call hygiene".
+**Bash call hygiene** - one command per Bash call; paths in the literal
+\`~/trade-imports-arch-workspace/...\` form. Full rules:
+[\`agent-skills.md\`](../../best-practices/skills/agent-skills.md).
 
 ## When to use
 
@@ -280,13 +288,7 @@ Summary:
 Next: TODO hint.
 \`\`\`
 
-## Scripts cheat-sheet
-
-All under \`~/trade-imports-arch-workspace/.claude/tools/$NAME/\`:
-
-| Script | Purpose |
-|---|---|
-$helper_rows
+$cheatsheet_block
 EOF
 mv "$skill_md.tmp" "$skill_md"
 
@@ -408,7 +410,7 @@ while [[ \$# -gt 0 ]]; do
     case "\$1" in
         --run-id) RUN_ID="\$2"; shift 2 ;;
         -h|--help)
-            sed -n '2,9p' "\$0" >&2
+            sed -n '2,10p' "\$0" >&2
             exit 0 ;;
         *) echo "Unknown arg: \$1" >&2; exit 1 ;;
     esac

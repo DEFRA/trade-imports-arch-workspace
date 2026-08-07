@@ -1,6 +1,6 @@
 ---
 name: jira
-description: 'Create and read JIRA tickets via the standalone curl+jq scripts in tools/jira/: single-key or JQL batch fetch with a flat JSON projection, ticket creation with type/priority/labels/parent, and an auth pre-flight. Triggers: "create jira ticket", "fetch jira ticket", "read jira ticket", "run jql". NOT for updating, transitioning or commenting on tickets (no tools exist yet - extend tools/jira/ first), and NOT for Confluence pages - use the confluence-publish skill for those.'
+description: 'Create and read JIRA tickets via the standalone curl+jq scripts in tools/jira/: single-key or JQL batch fetch with a flat JSON projection, ticket creation with type/priority/labels/parent, and an auth pre-flight. Triggers: "create jira ticket", "fetch jira ticket", "read jira ticket", "run jql". NOT for updating, transitioning or commenting on tickets (no tools exist yet - extend tools/jira/ first), and NOT for Confluence pages - reads are the confluence-read skill, publishing is confluence-publish.'
 ---
 
 Create and read JIRA issues from any session in this workspace. Reading
@@ -10,15 +10,9 @@ the three self-contained scripts in
 `~/trade-imports-arch-workspace/.claude/tools/jira/` - this skill
 owns no logic, only the procedure.
 
-## Path conventions
-
-Cross-workspace paths use the literal home-relative form -
-`~/trade-imports-arch-workspace/.claude/tools/<domain>/`. Bash
-expands `~` automatically.
-
-**Bash call hygiene** - one command per Bash call. Full rule
-table: [`agent-skills.md`](../../best-practices/skills/agent-skills.md)
-→ "Bash call hygiene".
+**Bash call hygiene** - one command per Bash call; paths in the literal
+`~/trade-imports-arch-workspace/...` form. Full rules:
+[`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Credentials
 
