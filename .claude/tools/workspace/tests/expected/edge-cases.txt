@@ -1,5 +1,6 @@
-deps-check: FAIL empty-decl — dependencies declared but empty (fill it in or remove the line; format: agent-skills.md -> "Dependencies frontmatter")
+deps-check: FAIL empty-decl — workspace-deps declared but empty (fill it in or remove the line; format: agent-skills.md -> "Dependencies frontmatter")
 deps-check: quoted -> "sh"
-deps-check: FAIL quoted — '"sh"' is neither a workspace child directory nor a command on PATH (install "sh", or clone the project if it is one)
 deps-check: stray-dir -> straydir
+deps-check: FAIL stray-dir — 'straydir' is a directory under the root but not a Makefile child; it cannot resolve on a make-bootstrapped machine (add it to CHILDREN, or declare a real tool)
+deps-check: tab-indent -> child-a
 exit-code: 1

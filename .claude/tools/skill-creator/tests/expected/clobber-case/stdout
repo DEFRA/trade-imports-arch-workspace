@@ -1,0 +1,2 @@
+Refusing to overwrite existing helper: HOME/trade-imports-arch-workspace/.claude/tools/test-clobber/start-test-clobber.sh
+Remove the name from the helpers answer (reused scripts are never listed there), or delete the file first if a fresh stub is intended.

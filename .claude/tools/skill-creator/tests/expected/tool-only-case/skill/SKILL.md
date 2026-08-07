@@ -2,7 +2,7 @@
 name: test-toolonly
 description: 'Fixture skill declaring a tool without depending, with zero helpers. Triggers: "test tool only". Fixture only. TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'
 metadata:
-  dependencies: demo-tool
+  workspace-deps: demo-tool
 ---
 
 <!-- TODO: one-paragraph intro. State the audience (which tickets,
@@ -34,7 +34,7 @@ neighbouring skill.
 
 This skill needs demo-tool
 beyond the workspace baseline (bash, curl, jq, git).
-Declared in the frontmatter `metadata.dependencies` (format contract:
+Declared in the frontmatter `metadata.workspace-deps` (format contract:
 `best-practices/skills/agent-skills.md` → "Dependencies frontmatter");
 verified machine-wide by `check-deps.sh`; pre-flighted where the skill
 runs — `MODE: BLOCKED` with a REASON naming the remedy when a
