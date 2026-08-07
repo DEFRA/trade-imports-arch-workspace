@@ -1,0 +1,5 @@
+DRY RUN — would scaffold test-dryrun:
+  SKILL.md → HOME/trade-imports-arch-workspace/.claude/skills/test-dryrun/SKILL.md
+  state_shape=prose dispatcher=false fanout=false walker=false
+  dependencies: resolution=none declared=[]
+  helpers:

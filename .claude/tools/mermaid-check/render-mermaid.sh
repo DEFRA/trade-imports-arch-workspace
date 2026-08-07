@@ -13,7 +13,8 @@
 # in one call. No pipe needed, so it stays within Bash call hygiene.
 #
 # Exit 0 = renders. Exit 1 = does not render; the mermaid parser
-# message is printed to stdout.
+# message is printed to stdout. Exit 2 = renderer environment broken
+# (no mmdc/npx, fetch failure, missing Chrome) - not a verdict.
 #
 # Writes nothing unless --out is given (renders to a temp file and
 # discards it).
@@ -110,13 +111,18 @@ set -e
 if [[ $rc -eq 0 ]]; then
     echo "PASS  $LABEL"
 else
-    # An environment failure (npx couldn't fetch mermaid-cli: offline,
-    # registry down) is NOT a diagram failure - reporting it in the
-    # FAIL vocabulary would make a machine problem read as N broken
-    # diagrams. Exit 2 distinguishes it for sweep callers.
-    if grep -qiE 'npm err|registry|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|could not determine executable|could not find chrome|failed to launch|puppeteer' "$err"; then
-        echo "ERROR: mermaid-cli unavailable (npx fetch failed) - not a diagram problem. Install mermaid-cli (npm install in delivery-info-arch-tooling) or restore network." >&2
-        exit 2
+    # Classify PARSE failures first: every mmdc parse error prints a
+    # Node stack full of puppeteer-core frames, so any env grep that
+    # runs first would swallow genuine diagram failures.
+    if ! grep -qiE 'parse error on line|expecting |no diagram type|unknowndiagramerror|lexical error' "$err"; then
+        # Not parse vocabulary - check for an environment failure (npx
+        # fetch failed, or a local mmdc without a usable Chrome). That
+        # is NOT a diagram failure: reporting it in the FAIL vocabulary
+        # would make one machine problem read as N broken diagrams.
+        if grep -qiE 'npm err|registry|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|could not determine executable|could not find chrome|failed to launch' "$err"; then
+            echo "ERROR: renderer environment failure - not a diagram problem. If npx fetched nothing: restore network or npm install in delivery-info-arch-tooling; if a local mmdc lacks Chrome: npx puppeteer browsers install chrome." >&2
+            exit 2
+        fi
     fi
     # The parser message is the useful line; the puppeteer stack is not.
     reason=$(grep -m1 -iE 'error|expecting|unrecognized|no diagram type' "$err" || true)

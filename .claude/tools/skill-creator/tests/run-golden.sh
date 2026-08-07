@@ -40,6 +40,11 @@ for fixture in "$TESTS_DIR"/fixtures/*/; do
         mkdir -p "$FAKE/.claude/tools/$name"
         cp -R "$fixture/pre-tools/." "$FAKE/.claude/tools/$name/"
     fi
+    # Optional pre-existing skill dir (exercises the re-scaffold refusal).
+    if [[ -d "$fixture/pre-skill" ]]; then
+        mkdir -p "$FAKE/.claude/skills/$name"
+        cp -R "$fixture/pre-skill/." "$FAKE/.claude/skills/$name/"
+    fi
     cp "$REAL_WS/.claude/tools/skill-creator/scaffold-skill.sh" "$FAKE/.claude/tools/skill-creator/"
     cp "$REAL_WS/.claude/tools/skill-creator/render-interview.sh" "$FAKE/.claude/tools/skill-creator/"
     # The scaffold's lint tail runs inside the fake workspace too — so
@@ -55,7 +60,12 @@ for fixture in "$TESTS_DIR"/fixtures/*/; do
             > "$FAKE/.claude/settings.json"
     fi
 
-    out=$(HOME="$TMP" bash "$FAKE/.claude/tools/skill-creator/scaffold-skill.sh" --run-id "$name" 2>&1)
+    # Optional extra args (e.g. --dry-run) from a fixture args file.
+    EXTRA_ARGS=()
+    if [[ -f "$fixture/args" ]]; then
+        read -r -a EXTRA_ARGS < "$fixture/args"
+    fi
+    out=$(HOME="$TMP" bash "$FAKE/.claude/tools/skill-creator/scaffold-skill.sh" --run-id "$name" ${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"} 2>&1)
     rc=$?
 
     actual="$TMP/actual"

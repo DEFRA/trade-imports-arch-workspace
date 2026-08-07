@@ -1,0 +1,1 @@
+Refusing: invalid helper name '../../evil' (must match ^[a-z0-9-]+$)

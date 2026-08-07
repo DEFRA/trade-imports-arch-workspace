@@ -179,11 +179,11 @@ entries" is honoured — nothing is removed).
    per `dot-claude-layout.md` ("state written by skill runs")? The catch:
    workareas are tracked, so drafts would enter git history — is that
    audit-trail signal or noise?
-3. The dead `docs/best-practices/...` spelling in `decisions.md` also
-   appears in files outside this skill (e.g.
-   `skill-creator/references/AUDITOR.md` cites `docs/agent-skills.md` and
-   `docs/best-practices/skills/anti-patterns.md`). Fix only jira's sidecar
-   in this pass, or run a workspace-wide sweep as a separate change?
+3. The dead `docs/best-practices/...` spelling survives in the three
+   pre-dependencies `decisions.md` sidecars (jira, mermaid-check,
+   confluence-publish) — AUDITOR.md's own instances were fixed this
+   branch. Fix only jira's sidecar in this pass, or sweep all three
+   as one change?
 4. Is regenerating `decisions.md` to the current 9-question template in
    scope for the implementation pass, or is sidecar-template migration a
    skill-creator concern to handle across all pre-dependencies skills at

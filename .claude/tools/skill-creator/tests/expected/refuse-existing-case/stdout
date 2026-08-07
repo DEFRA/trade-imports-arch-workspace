@@ -1,0 +1,2 @@
+Refusing: HOME/trade-imports-arch-workspace/.claude/skills/test-existing/SKILL.md already exists.
+If it is authored content: edit it directly (never re-scaffold). If it is a partial/stale scaffold: delete HOME/trade-imports-arch-workspace/.claude/skills/test-existing (keep the workarea run - it holds the interview answers) and retry.

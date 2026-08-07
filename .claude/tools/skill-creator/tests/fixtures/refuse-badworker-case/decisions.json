@@ -1,0 +1,17 @@
+{
+  "name": "test-badworker",
+  "started_at": "2026-01-01T00:00:00Z",
+  "answered_at": null,
+  "scaffolded_at": null,
+  "answers": {
+    "purpose": "Fixture exercising the worker-name charset gate.",
+    "dependencies": { "resolution": "none", "declared": [], "justification": "" },
+    "state_shape": "prose",
+    "dispatcher": false,
+    "prebake": false,
+    "fanout": { "enabled": true, "workers": ["9FOO"] },
+    "walker": false,
+    "helpers": [],
+    "triggers": { "phrases": ["test badworker"], "disambiguation": "Fixture only." }
+  }
+}

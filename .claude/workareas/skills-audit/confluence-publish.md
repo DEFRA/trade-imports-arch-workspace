@@ -1,5 +1,12 @@
 # confluence-publish skill — audit and improvement plan
 
+> CURRENCY NOTE (7 Aug 2026): this plan is a dated snapshot. The npm
+> pre-flight gap in the TL;DR was fixed in 8da4120; all four original
+> open questions were resolved and deleted per Step A4 (BUILD_CMD
+> prompts by design — A11's documented exception; `png=STALE`
+> staleness detection implemented; trims landed estate-wide; npm named
+> in the description).
+
 Audited: 2026-08-06. Sources read: `SKILL.md` (181 lines), `decisions.md`,
 `tools/confluence-publish/start-confluence-publish.sh` (192 lines),
 `.claude/settings.json`, `check-deps.sh` output.
@@ -190,13 +197,7 @@ Not trimmed: `decisions.md:66-71` is dated retrofit history, but
 
 ## Open questions
 
-None outstanding. All four originally-raised questions were resolved
-(resolved = deleted, per Step A4; recorded 7 Aug 2026): BUILD_CMD
-prompts by design (A11 documented exception); staleness detection
-implemented (`png=STALE` folded into BUILD_NEEDED); trims landed
-estate-wide; npm named in the description. The npm pre-flight gap this
-plan's TL;DR describes was fixed in 8da4120 — sections above are a
-dated snapshot predating that fix and the A11 catalogue entry.
+None.
 
 ## Anti-pattern citations
 

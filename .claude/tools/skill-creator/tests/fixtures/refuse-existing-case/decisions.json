@@ -1,0 +1,17 @@
+{
+  "name": "test-existing",
+  "started_at": "2026-01-01T00:00:00Z",
+  "answered_at": null,
+  "scaffolded_at": null,
+  "answers": {
+    "purpose": "Fixture exercising the re-scaffold refusal.",
+    "dependencies": { "resolution": "none", "declared": [], "justification": "" },
+    "state_shape": "prose",
+    "dispatcher": false,
+    "prebake": false,
+    "fanout": { "enabled": false },
+    "walker": false,
+    "helpers": [],
+    "triggers": { "phrases": ["test existing"], "disambiguation": "Fixture only." }
+  }
+}

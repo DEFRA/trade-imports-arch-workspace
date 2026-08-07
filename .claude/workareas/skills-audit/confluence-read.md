@@ -196,9 +196,7 @@ keep.
 ## Open questions
 
 1. Should a future confluence-sync skill claim ownership of
-   `sync-docs.sh`/`clean-docs.sh`? (The mechanical half of the
-   original question — SCRIPT_DIR literals and the dead variable —
-   was fixed and deleted per Step A4.)
+   `sync-docs.sh`/`clean-docs.sh`?
 3. Do the two optional prose micro-collapses (When-to-use table,
    NOT-for restatement) meet the user's bar for a trim pass, given
    the body-restates-description pattern may be a deliberate
@@ -228,7 +226,9 @@ No catalogue entry (A1-A11) is triggered:
 
 ### Proposed new catalogue entry
 
-**A12. Runtime path discovery in tools scripts.**
+**A13. Runtime path discovery in tools scripts.** (renumbered from A12
+— mermaid-check's plan claimed that slot first; the catalogue ends at
+A11 today)
 Symptom: a `tools/<domain>/` script derives its location via
 `SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"` to
 reach a sibling script or asset (`sync-docs.sh:22`,

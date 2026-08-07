@@ -1,0 +1,1 @@
+Refusing: invalid worker name '9FOO' (must match ^[A-Z][A-Z0-9_]*$)
