@@ -189,7 +189,9 @@ Read every `workareas/skills-audit/*.md` (all of them — not just this
 run's) and collect unresolved `## Open questions` items. Resolved
 means edited out of the plan: when a question is answered, delete it
 from the plan file (the answer lands in the relevant decisions.md or
-doc) — the sweep collects whatever remains. Print them as
+doc) — the sweep collects whatever remains. Also list any
+`OWNER-ACTION-*.md` files present in the workarea: those are
+outstanding by definition until the owner deletes them. Print them as
 an **Outstanding actions** list at the end of the completion output,
 grouped by skill, so the backlog surfaces every audit run instead of
 rotting in the workarea. No external trackers — this list is the

@@ -176,7 +176,7 @@ fi
 # --- Publish mode: refuse while builds are pending, then exec the publisher ---
 if [[ "$DO_PUBLISH" == "yes" ]]; then
     if [[ "$BUILD_NEEDED" != "none" ]]; then
-        blocked "diagram exports missing ($BUILD_NEEDED) - run the build commands and re-run --publish" \
+        blocked "diagram exports missing or stale ($BUILD_NEEDED) - run the build commands and re-run --publish" \
             "builds: npm --prefix $TDOC run ${BUILD_NEEDED// / and npm --prefix $TDOC run }"
     fi
     echo "MODE: PUBLISHING"

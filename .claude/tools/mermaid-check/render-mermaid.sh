@@ -33,7 +33,7 @@ while [[ $# -gt 0 ]]; do
         --out) OUT="$2"; shift 2 ;;
         --label) LABEL="$2"; shift 2 ;;
         -h|--help)
-            sed -n '2,19p' "$0" >&2
+            sed -n '2,20p' "$0" >&2
             exit 0 ;;
         *) echo "Unknown arg: $1" >&2; exit 1 ;;
     esac

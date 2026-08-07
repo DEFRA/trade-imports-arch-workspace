@@ -1,9 +1,11 @@
 # jira skill — audit and improvement plan
 
 > CURRENCY NOTE (7 Aug 2026): the auth pre-flight now warns on a
-> missing `JIRA_PROJECT_KEY` and `fetch.sh` validates `-m` before the
-> dry-run preview — TL;DR/§6/§9 claims about those gaps are a dated
-> snapshot. Resolved questions were deleted per Step A4.
+> missing `JIRA_PROJECT_KEY`, `fetch.sh` validates `-m` before the
+> dry-run preview, and the SKILL.md:38 Confluence-routing fix landed
+> ("reads are confluence-read") — TL;DR/§6/§9 and trim-table claims
+> about those gaps are a dated snapshot. Resolved questions were
+> deleted per Step A4.
 
 Audited 2026-08-07 against
 `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md`
