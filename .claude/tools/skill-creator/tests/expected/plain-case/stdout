@@ -8,3 +8,4 @@ Scaffolded skill: test-plain
   allowlist:   appended Bash(~/trade-imports-arch-workspace/.claude/tools/test-plain/*)
 
 Open the SKILL.md and replace the TODO markers.
+bash: HOME/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh: No such file or directory

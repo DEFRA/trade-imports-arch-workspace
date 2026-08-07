@@ -5,3 +5,4 @@ Scaffolded skill: test-toolonly
   allowlist:   covered (blanket tools/ entry or per-skill pair already present; nothing appended)
 
 Open the SKILL.md and replace the TODO markers.
+bash: HOME/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh: No such file or directory

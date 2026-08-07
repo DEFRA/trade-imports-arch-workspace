@@ -8,18 +8,9 @@ metadata:
 <!-- TODO: one-paragraph intro. State the audience (which tickets,
      which work) and the outcome (what artifact lands where). -->
 
-## Path conventions
-
-Cross-workspace paths use the literal home-relative form —
-`~/trade-imports-arch-workspace/.claude/tools/<domain>/`,
-`~/trade-imports-arch-workspace/.claude/best-practices/`,
-`~/trade-imports-arch-workspace/.claude/workareas/`. Bash
-expands `~` automatically. Skill-internal references stay
-relative (`references/<NAME>.md`, `assets/<NAME>.md`).
-
-**Bash call hygiene** - one command per Bash call. Full rule
-table: [`agent-skills.md`](../../best-practices/skills/agent-skills.md)
-→ "Bash call hygiene".
+**Bash call hygiene** - one command per Bash call; paths in the literal
+`~/trade-imports-arch-workspace/...` form. Full rules:
+[`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## When to use
 
@@ -34,12 +25,10 @@ neighbouring skill.
 
 This skill needs demo-tool
 beyond the workspace baseline (bash, curl, jq, git).
-Declared in the frontmatter `metadata.workspace-deps` (format contract:
-`best-practices/skills/agent-skills.md` → "Dependencies frontmatter");
-verified machine-wide by `check-deps.sh`; pre-flighted where the skill
-runs — `MODE: BLOCKED` with a REASON naming the remedy when a
-dependency is missing. Keep this list in sync with what the steps
-actually invoke.
+Declared in `metadata.workspace-deps`. Format:
+`agent-skills.md` → "Dependencies frontmatter"; well-formed criteria
+(pre-flight, description mention, check-deps): `patterns.md` §9. Keep
+the list in sync with what the steps actually invoke.
 
 
 
@@ -61,8 +50,5 @@ Next: TODO hint.
 
 ## Scripts cheat-sheet
 
-All under `~/trade-imports-arch-workspace/.claude/tools/test-toolonly/`:
-
-| Script | Purpose |
-|---|---|
-
+(none — this skill reuses an existing `tools/<domain>/`; TODO list
+the borrowed scripts and their home here)
