@@ -4,7 +4,9 @@
 # Formats: full (default), summary, json, md
 #
 # A URL is any https://<site>/wiki/spaces/<KEY>/pages/<id>/... form -
-# the numeric page id is extracted from it. `md` converts the page body
+# the numeric page id is extracted from it. Share-button short links
+# (/wiki/x/<key>) are resolved via their authenticated redirect first.
+# `md` converts the page body
 # to markdown via html_to_md.js when node is available, falling back to
 # the raw HTML body (with a notice) when it is not.
 
@@ -28,6 +30,17 @@ fi
 
 # Extract page id if a URL was provided
 if [[ "$INPUT" =~ ^https?:// ]]; then
+  if [[ "$INPUT" == */wiki/x/* ]]; then
+    # Short link (the share button's default): the key carries no page
+    # id, so resolve the authenticated redirect to the full
+    # /pages/<id>/ URL first. A non-page target (whiteboard, blog)
+    # resolves to a URL the extraction below still rejects clearly.
+    if [[ -z "${JIRA_TOKEN:-}" ]]; then
+      echo "Error: JIRA_TOKEN environment variable not set"
+      exit 1
+    fi
+    INPUT=$(curl -s -L -o /dev/null -w '%{url_effective}' -u "$USER:$JIRA_TOKEN" "$INPUT")
+  fi
   PAGE_ID=$(echo "$INPUT" | sed -E 's#.*/pages/([0-9]+).*#\1#')
 else
   PAGE_ID="$INPUT"

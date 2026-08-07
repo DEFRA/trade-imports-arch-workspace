@@ -49,8 +49,9 @@ rejected credential. Do not print credential values.
 ~/trade-imports-arch-workspace/.claude/tools/confluence/page.sh "<url-or-id>" md
 ```
 
-- Accepts the full URL (`.../wiki/spaces/<KEY>/pages/<id>/<title>`) or a
-  bare numeric page id.
+- Accepts the full URL (`.../wiki/spaces/<KEY>/pages/<id>/<title>`), a
+  share-button short link (`.../wiki/x/<key>` — resolved via its
+  redirect automatically), or a bare numeric page id.
 - `md` converts the body to markdown via `html_to_md.js` when node is
   available, and falls back to the raw HTML body with a notice when it
   is not — either output analyses fine; markdown is just cleaner.
