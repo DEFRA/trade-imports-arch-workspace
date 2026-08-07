@@ -1,5 +1,10 @@
 # editorial skill — audit and improvement plan
 
+> CURRENCY NOTE (7 Aug 2026): cca03d3 inserted the hygiene-pointer
+> block near the top of SKILL.md, shifting line references in this
+> plan by about +4 (the file is now ~202 lines). No finding is
+> invalidated; adjust cited lines when implementing.
+
 Audited: `~/trade-imports-arch-workspace/.claude/skills/editorial/SKILL.md`
 (199 lines; the skill's entire surface — no `references/`, no `assets/`,
 no `tools/editorial/`, no workarea state).
