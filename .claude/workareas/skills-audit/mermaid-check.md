@@ -1,5 +1,11 @@
 # mermaid-check skill — audit and improvement plan
 
+> CURRENCY NOTE (7 Aug 2026): the robustness gaps described in the
+> TL;DR, §6 and §9 (temp litter, missing traps, block-name collision,
+> environment-failure-as-FAIL, the A12 instance) have all since been
+> fixed; those sections are a dated snapshot. Resolved questions were
+> deleted per Step A4.
+
 Audited 2026-08-07 against `.claude/best-practices/skills/patterns.md`
 (9-pattern checklist), `anti-patterns.md`, and `agent-skills.md`.
 
@@ -208,12 +214,6 @@ Considered and kept:
 
 ## Open questions
 
-1. RESOLVED (7 Aug 2026): environment failures now exit 2 with a
-   single ERROR; the sweep aborts instead of reporting N fake FAILs;
-   SKILL.md documents the 0/1/2 contract.
-2. RESOLVED (7 Aug 2026): temp-litter, trap cleanup and the block-name
-   collision all fixed in dc0b14c/follow-up. The TL;DR above predates
-   these fixes — it is a dated snapshot.
 3. **Trim aggressiveness** — apply the optional intro trim
    (`SKILL.md:6-12`) and the `:37-41` collapse, or only the two
    factually-stale corrections (`:124-126`, `:184-186`)?

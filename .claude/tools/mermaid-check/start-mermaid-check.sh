@@ -11,6 +11,7 @@
 #
 # Emits "MODE: VERIFY" then one line per diagram, then a summary.
 # Exit 0 = every diagram rendered. Exit 1 = at least one failed.
+# Exit 2 = renderer environment broken (sweep aborted; not a verdict).
 #
 # Markdown diagrams are extracted to temp files; source files are
 # never modified.

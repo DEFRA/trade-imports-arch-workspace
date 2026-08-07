@@ -1,5 +1,10 @@
 # jira skill — audit and improvement plan
 
+> CURRENCY NOTE (7 Aug 2026): the auth pre-flight now warns on a
+> missing `JIRA_PROJECT_KEY` and `fetch.sh` validates `-m` before the
+> dry-run preview — TL;DR/§6/§9 claims about those gaps are a dated
+> snapshot. Resolved questions were deleted per Step A4.
+
 Audited 2026-08-07 against
 `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md`
 (9-pattern checklist + prose-hygiene companion). Skill surface: `SKILL.md`
@@ -174,9 +179,6 @@ entries" is honoured — nothing is removed).
    per `dot-claude-layout.md` ("state written by skill runs")? The catch:
    workareas are tracked, so drafts would enter git history — is that
    audit-trail signal or noise?
-2. RESOLVED (7 Aug 2026): warning implemented — `auth.sh` warns that
-   creation will fail when `JIRA_PROJECT_KEY` is unset; reads
-   unaffected.
 3. The dead `docs/best-practices/...` spelling in `decisions.md` also
    appears in files outside this skill (e.g.
    `skill-creator/references/AUDITOR.md` cites `docs/agent-skills.md` and

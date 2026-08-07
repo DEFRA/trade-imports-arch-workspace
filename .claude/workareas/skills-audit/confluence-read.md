@@ -1,5 +1,11 @@
 # confluence-read skill — audit and improvement plan
 
+> CURRENCY NOTE (7 Aug 2026): the hygiene-pointer link finding (§4/
+> TL;DR) is VOID — canon now blesses relative markdown links
+> (`agent-skills.md` → "Markdown links are the one exception"); do not
+> apply it. The SCRIPT_DIR/dead-variable half of the shared-tools
+> observation was fixed. Resolved questions were deleted per Step A4.
+
 Audited 2026-08-07 against
 `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md`
 (9-pattern checklist + prose companion) and `anti-patterns.md`.
@@ -189,15 +195,10 @@ keep.
 
 ## Open questions
 
-1. PARTIALLY RESOLVED (7 Aug 2026): the `SCRIPT_DIR` runtime discovery
-   was replaced with the contract literal in `sync-docs.sh` and
-   `clean-docs.sh`, and `update-page.sh`'s dead variable deleted
-   (dc0b14c). Still open: whether a future confluence-sync skill
-   claims `sync-docs.sh`/`clean-docs.sh` ownership.
-2. RESOLVED (7 Aug 2026, superseded by canon): `agent-skills.md` →
-   "Markdown links are the one exception to the `~` rule" — relative
-   links are the correct, lint-checkable form. The finding above
-   prescribing `~`-anchored links is void; do not apply it.
+1. Should a future confluence-sync skill claim ownership of
+   `sync-docs.sh`/`clean-docs.sh`? (The mechanical half of the
+   original question — SCRIPT_DIR literals and the dead variable —
+   was fixed and deleted per Step A4.)
 3. Do the two optional prose micro-collapses (When-to-use table,
    NOT-for restatement) meet the user's bar for a trim pass, given
    the body-restates-description pattern may be a deliberate

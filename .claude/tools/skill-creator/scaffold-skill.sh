@@ -119,26 +119,12 @@ if [[ -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ]]; then
     [[ "$DISPATCHER" != "true" ]] && echo "WARN: dependencies declared without a dispatcher — no home for the pre-flight; audit pattern 9 will flag this until one exists" >&2
 fi
 
-if $DRY_RUN; then
-    echo "DRY RUN — would scaffold $NAME:"
-    echo "  SKILL.md → $SKILL_DIR/SKILL.md"
-    echo "  state_shape=$STATE_SHAPE dispatcher=$DISPATCHER fanout=$FANOUT walker=$WALKER"
-    echo "  dependencies: resolution=$DEP_RESOLUTION declared=[$DEP_DECLARED]"
-    echo "  helpers:"
-    jq -r '.answers.helpers[] | "    tools/'"$NAME"'/" + . + ".sh"' "$DECISIONS"
-    if [[ "$FANOUT" == "true" ]]; then
-        echo "  workers:"
-        jq -r '.answers.fanout.workers[] | "    references/" + . + ".md"' "$DECISIONS"
-    fi
-    exit 0
-fi
-
 # An existing SKILL.md is authored (or partial) territory: scaffolding
 # over it replaces content with TODO stubs, silently. Refuse in every
 # case — the remedy differs, the refusal doesn't.
 if [[ -f "$SKILL_DIR/SKILL.md" ]]; then
     echo "Refusing: $SKILL_DIR/SKILL.md already exists." >&2
-    echo "If it is authored content: edit it directly (never re-scaffold). If it is a partial/stale scaffold: delete $SKILL_DIR and the workarea run, then retry." >&2
+    echo "If it is authored content: edit it directly (never re-scaffold). If it is a partial/stale scaffold: delete $SKILL_DIR (keep the workarea run - it holds the interview answers) and retry." >&2
     exit 1
 fi
 
@@ -161,11 +147,27 @@ done < <(jq -r '.answers.helpers[]' "$DECISIONS")
 while IFS= read -r worker; do
     [[ -z "$worker" ]] && continue
     case "$worker" in
-        *[!A-Z0-9_]*|_*|"")
+        *[!A-Z0-9_]*|_*|[0-9]*|"")
             echo "Refusing: invalid worker name '$worker' (must match ^[A-Z][A-Z0-9_]*$)" >&2
             exit 1 ;;
     esac
 done < <(jq -r '.answers.fanout.workers // [] | .[]' "$DECISIONS")
+
+# Dry-run AFTER the refusals and name gates, so the preview is honest:
+# a run the real path would refuse must not print "would scaffold".
+if $DRY_RUN; then
+    echo "DRY RUN — would scaffold $NAME:"
+    echo "  SKILL.md → $SKILL_DIR/SKILL.md"
+    echo "  state_shape=$STATE_SHAPE dispatcher=$DISPATCHER fanout=$FANOUT walker=$WALKER"
+    echo "  dependencies: resolution=$DEP_RESOLUTION declared=[$DEP_DECLARED]"
+    echo "  helpers:"
+    jq -r '.answers.helpers[] | "    tools/'"$NAME"'/" + . + ".sh"' "$DECISIONS"
+    if [[ "$FANOUT" == "true" ]]; then
+        echo "  workers:"
+        jq -r '.answers.fanout.workers[] | "    references/" + . + ".md"' "$DECISIONS"
+    fi
+    exit 0
+fi
 
 # Only create subdirs that will hold content — git can't track empty
 # dirs and they mislead readers.

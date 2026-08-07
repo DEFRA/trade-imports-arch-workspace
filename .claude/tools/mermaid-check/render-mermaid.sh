@@ -114,7 +114,7 @@ else
     # registry down) is NOT a diagram failure - reporting it in the
     # FAIL vocabulary would make a machine problem read as N broken
     # diagrams. Exit 2 distinguishes it for sweep callers.
-    if grep -qiE 'npm err|registry|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|could not determine executable' "$err"; then
+    if grep -qiE 'npm err|registry|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|could not determine executable|could not find chrome|failed to launch|puppeteer' "$err"; then
         echo "ERROR: mermaid-cli unavailable (npx fetch failed) - not a diagram problem. Install mermaid-cli (npm install in delivery-info-arch-tooling) or restore network." >&2
         exit 2
     fi

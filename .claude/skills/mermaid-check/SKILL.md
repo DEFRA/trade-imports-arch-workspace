@@ -78,8 +78,10 @@ directory is walked recursively, skipping `node_modules`, `build`,
 `generated` and dotted directories.
 
 First stdout line is `MODE: VERIFY`. Then one line per diagram, then a
-summary. Exit code is 0 when every diagram rendered and 1 when any
-failed, so the script is usable as a gate.
+summary. Exit code is 0 when every diagram rendered, 1 when any
+failed, and 2 when the renderer environment itself is broken (the
+sweep aborts — treat as "cannot verify", never as diagram failures).
+Usable as a gate.
 
 ## Verify
 
