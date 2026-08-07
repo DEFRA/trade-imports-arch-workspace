@@ -488,3 +488,8 @@ echo "  decisions:   $SKILL_DIR/decisions.md"
 echo "  allowlist:   $ALLOWLIST_MSG"
 echo
 echo "Open the SKILL.md and replace the TODO markers."
+
+# Lint tail — surface estate problems at the moment they are created.
+# Advisory here (files are already written); the pre-commit hook and
+# make check enforce.
+bash "$WS/.claude/tools/workspace/lint-skills.sh" || true

@@ -40,3 +40,6 @@ link:
 check:
 	@bash .claude/tools/workspace/check-workspace.sh
 	@bash .claude/tools/workspace/check-deps.sh
+	@bash .claude/tools/workspace/lint-skills.sh
+	@bash .claude/tools/skill-creator/tests/run-golden.sh
+	@bash .claude/tools/workspace/tests/run-golden.sh
