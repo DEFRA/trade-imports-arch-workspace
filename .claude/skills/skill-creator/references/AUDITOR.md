@@ -44,10 +44,12 @@ for matching allowlist entries.
 
 ## The 9-pattern walkthrough
 
-For each pattern below, produce a "Findings" subsection in the
-plan with concrete file:line citations. If the pattern doesn't
-apply (e.g. no fan-out → pattern 5 is N/A), say so explicitly
-with a one-sentence reason.
+For each pattern below with findings, produce a "Findings"
+subsection with concrete file:line citations. A pattern that is
+clean or N/A gets exactly ONE line in the plan ("§N — clean" /
+"§N — N/A: <reason>"), never a subsection: plans are re-generated
+whenever the checklist changes, and their bulk is the cost of that
+policy.
 
 ### 1. State as canonical JSON
 
@@ -88,7 +90,7 @@ violations:
 - `cd <dir> && cmd` shapes.
 - `find ... -exec`.
 - `$VAR` (any) in LLM-typed paths.
-- `/Users/<you>/git/...` resolved-tilde paths.
+- `/Users/<you>/...` resolved-tilde paths.
 - `python3 -c` for JSON.
 
 Each violation: cite `file:line` and the corrected form.
@@ -100,8 +102,8 @@ For each `references/<NAME>.md`:
 - Determine if it's spawned via Task `general-purpose` (fan-out)
   or parent-loaded.
 - Fan-out workers MUST carry the one-line pointer to
-  `docs/agent-skills.md` → "Bash call hygiene" — not a full inline
-  block. The rules live once, canonically; copies drift. Flag any
+  `best-practices/skills/agent-skills.md` → "Bash call hygiene" —
+  not a full inline block. The rules live once, canonically; copies drift. Flag any
   worker that re-inlines the block instead of pointing to it.
 - Parent-loaded references MAY omit even the pointer (inherit
   SKILL.md). Don't flag absence — it's optional.
@@ -240,7 +242,7 @@ implementer prompt can be written. Examples:
 ## Anti-pattern citations
 
 Map each finding to its `A1`-`AN` entry in
-`docs/best-practices/skills/anti-patterns.md`. If you discover an
+`best-practices/skills/anti-patterns.md`. If you discover an
 anti-pattern not yet in the catalogue, propose a new entry in a
 final subsection.
 ```

@@ -42,6 +42,12 @@ for fixture in "$TESTS_DIR"/fixtures/*/; do
     fi
     cp "$REAL_WS/.claude/tools/skill-creator/scaffold-skill.sh" "$FAKE/.claude/tools/skill-creator/"
     cp "$REAL_WS/.claude/tools/skill-creator/render-interview.sh" "$FAKE/.claude/tools/skill-creator/"
+    # The scaffold's lint tail runs inside the fake workspace too — so
+    # the trigger is exercised under test instead of blessing a
+    # locale-dependent "not found" error.
+    mkdir -p "$FAKE/.claude/tools/workspace"
+    cp "$REAL_WS/.claude/tools/workspace/lint-skills.sh" "$FAKE/.claude/tools/workspace/"
+    printf 'CHILDREN := demo-project\n' > "$FAKE/Makefile"
     if [[ -f "$fixture/settings.json" ]]; then
         cp "$fixture/settings.json" "$FAKE/.claude/settings.json"
     else

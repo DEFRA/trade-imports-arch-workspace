@@ -41,94 +41,24 @@ Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*)
 Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*:*)
 ```
 
-## SKILL.md template
+## SKILL.md skeleton — the blessed golden output is the exemplar
 
-```markdown
----
-name: {{NAME}}
-description: '{{ONE_LINE_PURPOSE}} {{WHEN_TO_USE}} (triggers: "{{TRIGGER_1}}", "{{TRIGGER_2}}"). NOT for {{OUT_OF_SCOPE}} — use the {{OTHER_SKILL}} skill for that.'
-metadata:
-  workspace-deps: {{DEP_TOKENS}}
----
+There is deliberately NO hand-written copy of the emitted SKILL.md
+here: a second copy of the generator's heredoc drifts (it did, twice,
+in one branch). The living, review-gated exemplars are the golden
+expected trees — they cannot diverge from `scaffold-skill.sh` because
+`make check` and the pre-commit hook diff them against its real output:
 
-<!-- TODO: one-paragraph intro. State the audience (which tickets,
-     which work) and the outcome (what artifact lands where). -->
+- `~/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/expected/plain-case/skill/SKILL.md`
+  — dispatcher + JSON state + fan-out worker.
+- `.../expected/depend-case/skill/SKILL.md` — a declaring skill
+  (`metadata.workspace-deps` frontmatter + `## Dependencies` section).
+- `.../expected/tool-only-case/skill/SKILL.md` — zero-helper skill
+  reusing another tools domain.
 
-## Path conventions
-
-Cross-workspace paths use the literal home-relative form —
-`~/trade-imports-arch-workspace/.claude/tools/<domain>/`,
-`~/trade-imports-arch-workspace/.claude/best-practices/`,
-`~/trade-imports-arch-workspace/.claude/workareas/`. Bash
-expands `~` automatically. Skill-internal references stay
-relative (`references/<NAME>.md`, `assets/<NAME>.md`).
-
-**Bash call hygiene** - one command per Bash call; paths in the literal
-`~/trade-imports-arch-workspace/...` form. Full rules:
-[`agent-skills.md`](../../best-practices/skills/agent-skills.md).
-
-## When to use
-
-| Trigger | What to follow |
-|---------|----------------|
-| "{{TRIGGER_1}}" | this SKILL.md — {{SECTION_1}} |
-<!-- TODO: extra rows per trigger / branch -->
-
-NOT for {{OUT_OF_SCOPE}} — use the `{{OTHER_SKILL}}` skill.
-
-## Worker references
-
-<!-- TODO: drop this section if no fan-out (pattern 5).
-     Otherwise list each persona, when it runs, and what it
-     writes. Spawn idiom is `subagent_type: general-purpose`,
-     prompt begins:
-     `Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/{{NAME}}/references/<NAME>.md.` -->
-
-| Persona | Used in | Artifact |
-|---|---|---|
-| `references/{{WORKER}}.md` | {{STEP}} (one per {{UNIT}}, parallel up to N) | {{ARTIFACT}} |
-
-## Step 0: Start
-
-<!-- TODO: drop this section if no dispatcher (pattern 2). -->
-
-```bash
-~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/start-{{NAME}}.sh {{ARGS}}
-```
-
-First line of output is `MODE: <BRANCH>` — branch on it.
-
-## Step 1: {{STEP_TITLE}}
-
-<!-- TODO: per-step instructions. One step per logical
-     deliverable. -->
-
-## Completion output
-
-<!-- TODO: the final report the parent session prints. Keep it
-     tight: verdict + artifact paths + next-step hint. -->
-
-```
-{{NAME}} complete for {{ID}}.
-
-Summary:
-- {{KEY_METRIC_1}}
-- {{KEY_METRIC_2}}
-
-Artifacts: ~/trade-imports-arch-workspace/.claude/workareas/{{NAME}}/{{ID}}/...
-
-Next: {{NEXT_HINT}}
-```
-
-## Scripts cheat-sheet
-
-All under `~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/`:
-
-| Script | Purpose |
-|---|---|
-| `start-{{NAME}}.sh` | Step 0 dispatcher |
-<!-- TODO: one row per helper script. -->
-```
+To change the emitted skeleton: edit the heredoc in
+`scaffold-skill.sh`, run the golden suite, review the diff, `--bless`,
+commit both.
 
 ## decisions.md sidecar (CREATE writes alongside SKILL.md)
 

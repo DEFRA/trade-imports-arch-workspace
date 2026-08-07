@@ -76,7 +76,22 @@ read its header) for usage.
 | `confluence-publish/` | Pre-flight and executor for publishing one docs page to Confluence |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
-| `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs every domain's auth check) and `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine) |
+| `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine) and `lint-skills.sh` (repo-only estate lint) |
+
+### Enforcement map
+
+How the quality mechanisms interconnect — what fires when, and what to
+run when one fails:
+
+| Mechanism | Checks | Fires | On failure |
+| --- | --- | --- | --- |
+| `check-workspace.sh` | canonical root, child repos, baseline tools, hooksPath | `make` / `make check` | follow the remedy line (usually `make link` / `make clone`) |
+| `check-auth.sh` | every domain's credentials | on demand | fix the named env var in `.env` |
+| `check-deps.sh` | declared `workspace-deps` resolve on this machine | `make check` | clone the project / install the tool it names |
+| `lint-skills.sh` | declaration format, dangling links, undeclared-invocation sweep | pre-commit (staged index), scaffold tail, `make check` | fix and re-stage; acknowledge soft probes in `workspace-soft-deps` |
+| Golden tests (2 suites) | scaffold + doctor behavior vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
+| Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
+| Guard hooks (`.claude/hooks/`) | agent tool calls in Claude Code sessions | every tool call | follow the sanctioned alternative the denial names |
 
 ## Skills
 

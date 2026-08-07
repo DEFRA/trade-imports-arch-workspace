@@ -5,6 +5,7 @@
 #   make clone      clone the child repos (no-op when already present)
 #   make pull       fast-forward the children
 #   make link       create ~/trade-imports-arch-workspace -> this checkout
+#                   and point core.hooksPath at .githooks (pre-commit lint)
 #   make check      run the doctors, the skills lint and the golden tests
 #
 # Clones over HTTPS by default; override for SSH:

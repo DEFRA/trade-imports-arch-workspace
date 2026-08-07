@@ -41,6 +41,14 @@ for CHILD in $CHILDREN; do
     fi
 done
 
+# Pre-commit enforcement only exists once core.hooksPath points at
+# .githooks - a bare clone that never ran `make link` has none.
+HOOKSPATH=$(git -C "$ROOT" config core.hooksPath 2>/dev/null)
+if [[ "$HOOKSPATH" != ".githooks" ]]; then
+    say "WARN core.hooksPath not set to .githooks - the pre-commit skills lint is not active (run: make link)"
+    WARN=1
+fi
+
 # Workspace baseline tools - skills assume these and never declare
 # them (agent-skills.md -> "Dependencies frontmatter"); per-skill
 # extras are check-deps.sh's job.

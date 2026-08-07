@@ -35,7 +35,8 @@ unset-variable error, run the pre-flight and report its output:
 
 NOT for ticket updates, transitions or comments - those tools were
 deliberately not retained; extend `tools/jira/` before promising them.
-NOT for Confluence pages - use the `confluence-publish` skill.
+NOT for Confluence pages - reads are the `confluence-read` skill,
+publishing is `confluence-publish`.
 
 ## Reading tickets
 

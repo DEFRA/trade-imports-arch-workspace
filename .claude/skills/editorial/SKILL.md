@@ -5,6 +5,10 @@ description: Editorial review and writing process for documents that humans will
 
 Follow this process when asked to review, write, or sharpen a doc. Interrogate every sentence until what remains is what we meant. Mechanical conventions live in the style guide at the bottom - apply as you go.
 
+**Bash call hygiene** - one command per Bash call; paths in the literal
+`~/trade-imports-arch-workspace/...` form. Full rules:
+[`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+
 ## Contents
 
 - **Process** - steps 1 to 9.

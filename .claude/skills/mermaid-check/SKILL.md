@@ -1,6 +1,8 @@
 ---
 name: mermaid-check
 description: 'Authors and verifies Mermaid diagrams in Markdown files and standalone .mmd files, rendering each with mermaid-cli to confirm it parses before a doc ships. Use when adding a diagram to a document, or when checking that existing diagrams still render. Triggers: "check mermaid", "validate diagrams", "verify mermaid renders", "add a diagram". Owns Mermaid syntax, diagram-type fit and render correctness only. NOT for label wording, jargon or acronym-on-first-use, which belong to `editorial`. NOT for LikeC4 `.c4` models, which have their own `npm run validate:c4` and `npm run build:diagrams`. NOT for Claude Code CLAUDE.md scaffolding, which is the built-in /init.'
+metadata:
+  workspace-soft-deps: delivery-info-arch-tooling trade-imports-documentation npm npx mmdc
 ---
 
 A diagram that does not render is worse than no diagram: it ships as a

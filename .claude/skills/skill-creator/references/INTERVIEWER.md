@@ -53,8 +53,9 @@ functionality that already exists in a workspace child project, and
 surface any tools it will need beyond the workspace baseline (bash,
 curl, jq, git — see `agent-skills.md` → "Dependencies frontmatter").
 
-Probe each project the purpose plausibly touches (one Bash call per
-project):
+Probe EVERY Makefile child project (one Bash call each — sub-second,
+ABSENT-safe; "plausibly relevant" judgment is the failure mode the
+probe exists to remove):
 
 ```bash
 ~/trade-imports-arch-workspace/.claude/tools/skill-creator/list-project-features.sh \
@@ -177,8 +178,10 @@ from `anti-patterns.md` and ask Q3 again if needed.
 Save as `answers.helpers` (list of strings). An empty list is
 valid when the skill only reuses scripts from an existing
 `tools/<other-domain>/` (e.g. the `confluence/` hand tools) —
-never list another domain's scripts here; the scaffold would
-overwrite them with stubs.
+never list another domain's scripts here: a same-domain collision
+is refused outright (pre-pass, before any write), and another
+domain's script name would just become a misleading TODO stub in
+this skill's own tools directory.
 
 The scaffold generates exactly what this list names — nothing is
 inferred from earlier answers. Prompt for: `render-<name>` if Q3

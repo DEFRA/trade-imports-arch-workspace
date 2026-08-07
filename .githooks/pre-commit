@@ -3,11 +3,33 @@
 # Wired via `git config core.hooksPath .githooks` (make link does this).
 # Tool-agnostic by design — fires for any editor or agent. Bypassing
 # with --no-verify is denied by the workspace's own bash guard.
+#
+# Lints the STAGED INDEX, not the worktree: the content being committed
+# is checked out into a temp HOME (the same seam the golden tests use),
+# so an unstaged fix can't mask a staged break and vice versa.
 
 if git diff --cached --name-only | grep -q '^\.claude/'; then
-    bash "$HOME/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh" || {
-        echo "pre-commit: skills lint failed - fix or see .claude/tools/workspace/lint-skills.sh" >&2
+    TMP=$(mktemp -d)
+    trap 'rm -rf "$TMP"' EXIT
+    git checkout-index --prefix="$TMP/trade-imports-arch-workspace/" -a
+    if ! HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh"; then
+        echo "pre-commit: skills lint failed on the staged content - fix and re-stage" >&2
         exit 1
-    }
+    fi
+    # Golden suites run only when staged paths touch their subject —
+    # the edit-generator-forget-to-bless failure a commit gate exists
+    # to catch. Doc-only commits stay fast.
+    if git diff --cached --name-only | grep -q '^\.claude/tools/skill-creator/'; then
+        HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/run-golden.sh" || {
+            echo "pre-commit: scaffold goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
+            exit 1
+        }
+    fi
+    if git diff --cached --name-only | grep -q '^\.claude/tools/workspace/'; then
+        HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/workspace/tests/run-golden.sh" || {
+            echo "pre-commit: deps-doctor goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
+            exit 1
+        }
+    fi
 fi
 exit 0

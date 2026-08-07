@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: 'Meta-skill for authoring new workspace skills and auditing existing ones against the 9-pattern checklist. Two modes — CREATE scaffolds a new skill end-to-end (SKILL.md + references/ + tools/<name>/ + assets/ + .claude/settings.json allowlist), AUDIT walks an existing skill (or fans out across all skills) and produces a plan document under workareas/skills-audit/<name>.md. Use when the user wants to add a workspace skill or assess an existing one (triggers: "scaffold skill <name>", "skill-create <name>", "new workspace skill <name>", "audit skill <name>", "audit skills", "review skill <name> against patterns"). Disambiguated from Claude Code''s built-in /init (which scaffolds CLAUDE.md, not workspace skills). NOT for editing skills you already understand — open the SKILL.md and edit directly. NOT for reviewing code correctness/security — use `review`; NOT for JS lint/style review — use `code-style` (AUDIT mode assesses a skill''s own structure against the 9-pattern checklist, not the code a skill produces).'
+description: 'Meta-skill for authoring new workspace skills and auditing existing ones against the 9-pattern checklist. Two modes — CREATE scaffolds a new skill end-to-end (SKILL.md + references/ + tools/<name>/ + assets/ + .claude/settings.json allowlist), AUDIT walks an existing skill (or fans out across all skills) and produces a plan document under workareas/skills-audit/<name>.md. Use when the user wants to add a workspace skill or assess an existing one (triggers: "scaffold skill <name>", "skill-create <name>", "new workspace skill <name>", "audit skill <name>", "audit skills", "review skill <name> against patterns"). Disambiguated from Claude Code''s built-in /init (which scaffolds CLAUDE.md, not workspace skills). NOT for editing skills you already understand — open the SKILL.md and edit directly; further NOT-for routing in the body.'
 # context: inline — CREATE runs an interactive interview + scaffolds files in-session with the user (needs Edit/Write in the parent); AUDIT still fans out to Task workers.
 context: inline
 allowed-tools: [Bash, Read, Glob, Grep, Task, Edit, Write]
@@ -52,6 +52,9 @@ none of them match the `/init` keyword.
 NOT for hand-editing a skill you already understand — open
 `SKILL.md` and edit. NOT for adding a worker reference to an
 existing skill — edit the skill's `references/` folder directly.
+NOT for reviewing code correctness or security — AUDIT assesses a
+skill's own structure against the checklist, never the code a
+skill produces.
 
 ## Worker references
 
@@ -183,7 +186,10 @@ summary table:
 ## Step A4: Outstanding-actions sweep
 
 Read every `workareas/skills-audit/*.md` (all of them — not just this
-run's) and collect unresolved `## Open questions` items. Print them as
+run's) and collect unresolved `## Open questions` items. Resolved
+means edited out of the plan: when a question is answered, delete it
+from the plan file (the answer lands in the relevant decisions.md or
+doc) — the sweep collects whatever remains. Print them as
 an **Outstanding actions** list at the end of the completion output,
 grouped by skill, so the backlog surfaces every audit run instead of
 rotting in the workarea. No external trackers — this list is the

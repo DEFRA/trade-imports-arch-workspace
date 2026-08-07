@@ -124,6 +124,17 @@ if $DRY_RUN; then
     exit 0
 fi
 
+# Collision pre-pass: refuse BEFORE any file is written, so a partial
+# scaffold can never collide with its own retry.
+while IFS= read -r helper; do
+    [[ -z "$helper" ]] && continue
+    if [[ -e "$TOOLS_DIR/$helper.sh" ]]; then
+        echo "Refusing to scaffold: helper '$helper.sh' already exists in $TOOLS_DIR" >&2
+        echo "Reused scripts are never listed in the helpers answer; remove the name, or delete the file first if a fresh stub is intended." >&2
+        exit 1
+    fi
+done < <(jq -r '.answers.helpers[]' "$DECISIONS")
+
 mkdir -p "$SKILL_DIR/references" "$SKILL_DIR/assets"
 # Only create a tools domain when this skill owns scripts (zero-helper
 # skills reuse another domain; an empty dir would mislead).
@@ -368,14 +379,7 @@ while IFS= read -r helper; do
     [[ -z "$helper" ]] && continue
     sh="$TOOLS_DIR/$helper.sh"
 
-    # Never overwrite an existing script: a helper name colliding with
-    # a pre-existing tools/<name>/ file means the skill is reusing
-    # another domain's scripts — those must not become TODO stubs.
-    if [[ -e "$sh" ]]; then
-        echo "Refusing to overwrite existing helper: $sh" >&2
-        echo "Remove the name from the helpers answer (reused scripts are never listed there), or delete the file first if a fresh stub is intended." >&2
-        exit 1
-    fi
+    # Collisions were refused in the pre-pass above, before any write.
 
     # Pattern 9: the dispatcher stub of a declaring skill carries the
     # pre-flight TODO (declaring, not just depending — tool-only
@@ -450,7 +454,11 @@ covered=$(jq \
        or ((($cur | index($e1)) != null) and (($cur | index($e2)) != null))' \
     "$SETTINGS")
 
-if [[ "$covered" == "true" ]]; then
+if [[ "$HELPER_COUNT" -eq 0 ]]; then
+    # No owned scripts — appending entries for a directory we refused
+    # to create would be dead permissions.
+    ALLOWLIST_MSG="not applicable (no owned scripts; the reused domain's coverage is its own concern)"
+elif [[ "$covered" == "true" ]]; then
     ALLOWLIST_MSG="covered (blanket tools/ entry or per-skill pair already present; nothing appended)"
 else
     # Append entries preserving existing ordering — `unique_by`

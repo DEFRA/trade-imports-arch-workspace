@@ -74,6 +74,12 @@ references/<NAME>.md
 assets/<NAME>.md
 ```
 
+**Markdown links are the one exception to the `~` rule:** a link like
+`[agent-skills.md](../../best-practices/skills/agent-skills.md)` uses
+the relative form, because relative links are the only form
+`lint-skills.sh` can resolve and renderers can follow. The `~` form is
+for *commands and prose paths*, not link targets.
+
 ## Bash call hygiene (avoiding permission prompts)
 
 **The core principle: one command per Bash call.** The allowlist
@@ -173,6 +179,11 @@ Rules:
   the tooling's mmdc, then npx) is not declared — and a fallback chain
   is soft only if its LAST rung degrades gracefully; a chain that ends
   in a raw failure is a hard dependency wearing a costume.
+
+Acknowledged soft probes may be listed in `workspace-soft-deps` (same
+format, same `metadata:` map). That key is purely a lint-noise
+acknowledgment — never verified, never pre-flighted; it says "yes, the
+sweep saw this, and it is a graceful-fallback probe, not a hard dep".
 
 Everything else about dependencies — the port/build/depend preference
 order and the well-formed criteria a declaring skill satisfies — lives

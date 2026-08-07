@@ -35,11 +35,17 @@ if [[ "$INPUT" =~ ^https?:// ]]; then
     # id, so resolve the authenticated redirect to the full
     # /pages/<id>/ URL first. A non-page target (whiteboard, blog)
     # resolves to a URL the extraction below still rejects clearly.
+    # Credentials only ever go to our own instance: a look-alike host
+    # pasted from untrusted page content must not receive the token.
+    if [[ "$INPUT" != "${JIRA_BASE_URL}"/* ]]; then
+      echo "Error: short link is not under $JIRA_BASE_URL - refusing to send credentials to a foreign host"
+      exit 1
+    fi
     if [[ -z "${JIRA_TOKEN:-}" ]]; then
       echo "Error: JIRA_TOKEN environment variable not set"
       exit 1
     fi
-    INPUT=$(curl -s -L -o /dev/null -w '%{url_effective}' -u "$USER:$JIRA_TOKEN" "$INPUT")
+    INPUT=$(curl -sS -L --proto '=https' --max-redirs 5 -o /dev/null -w '%{url_effective}' -u "$USER:$JIRA_TOKEN" "$INPUT")
   fi
   PAGE_ID=$(echo "$INPUT" | sed -E 's#.*/pages/([0-9]+).*#\1#')
 else

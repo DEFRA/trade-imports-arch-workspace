@@ -24,7 +24,13 @@ say() { echo "skills-lint: $1"; }
 
 FAIL=0
 WARNS=0
+# Parse + fallback pinned to check-workspace.sh and check-deps.sh -
+# change all three together.
 CHILDREN=$(awk -F':=' '/^CHILDREN[[:space:]]*:?=/{print $2}' "$ROOT/Makefile" 2>/dev/null)
+if [[ -z "${CHILDREN// /}" ]]; then
+    say "WARN could not parse CHILDREN from $ROOT/Makefile - using fallback list"
+    CHILDREN="trade-imports-documentation delivery-info-arch-tooling trade-imports-schemas"
+fi
 SWEEP_TOOLS="node npm npx mmdc"
 
 is_child() {
@@ -100,13 +106,23 @@ for skill_md in "$ROOT"/.claude/skills/*/SKILL.md; do
     done
 
     # 3. Undeclared-invocation sweep (fenced code blocks only; WARN).
+    # Acknowledged soft probes (metadata.workspace-soft-deps) go quiet:
+    # permanent warnings train warn-blindness, and the sweep exists to
+    # surface NEW candidates.
+    softdeps=$(awk '
+        /^---$/{n++; next}
+        n==1 && /^metadata:[[:space:]]*$/{inmeta=1; next}
+        n==1 && inmeta && /^[^[:space:]]/{inmeta=0}
+        n==1 && inmeta && /^[[:space:]]+workspace-soft-deps:/{sub(/^[[:space:]]+workspace-soft-deps:[[:space:]]*/,""); print; exit}
+        n>=2{exit}
+    ' "$skill_md")
     fenced=$(awk '/^```/{f=!f; next} f' "$skill_md")
     for candidate in $CHILDREN $SWEEP_TOOLS; do
         if printf '%s\n' "$fenced" | grep -qw "$candidate" 2>/dev/null; then
-            case " $deps " in
+            case " $deps $softdeps " in
                 *" $candidate "*) ;;
                 *)
-                    say "WARN $skill — code block invokes '$candidate' but workspace-deps does not declare it (fine if a soft probe with graceful fallback — pattern 9)"
+                    say "WARN $skill — code block invokes '$candidate' but workspace-deps does not declare it (soft probe? acknowledge it in workspace-soft-deps — pattern 9)"
                     WARNS=$((WARNS+1))
                     ;;
             esac
