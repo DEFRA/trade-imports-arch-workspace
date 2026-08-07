@@ -83,7 +83,10 @@ stdout line is the branch:
   and `PUBLISH_CMD`. The command lines are emitted with resolved paths in
   the `~`-spelled canonical form, so they match the permission allowlist
   verbatim and nothing you type carries a variable - run them verbatim in
-  later steps.
+  later steps. Exception, by design: `BUILD_CMD` lines start with bare
+  `npm` and are not allowlist-covered, so they prompt — a deliberate
+  speed bump before the slow, estate-wide diagram rebuild (A11's
+  documented-exception path).
 
 ## Step 1: Validate Mermaid sources (conditional)
 

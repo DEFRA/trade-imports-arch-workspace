@@ -132,3 +132,22 @@ allowlisted ([GH#51001](https://github.com/anthropics/claude-code/issues/51001))
 
 **Correction:** literal `~/trade-imports-arch-workspace/...`
 paths. `~` expands transparently and doesn't trip the check.
+
+## A11. Dispatcher-emitted commands outside the allowlist
+
+**Symptom:** a dispatcher carefully emits ~-spelled FACT commands so
+they match the allowlist verbatim, but some emitted lines (e.g. bare
+`npm --prefix ... run ...`) start with a prefix no allowlist entry
+covers — so the "run verbatim, no prompt" contract silently holds for
+some emitted commands and not others.
+
+**Why it's wrong:** the whole point of emitting resolved commands is a
+prompt-free verbatim run; a partially-covered emission set trains the
+agent to expect no prompt and the user to rubber-stamp the ones that
+appear.
+
+**Correction:** route every emitted command through an allowlisted
+prefix (a tools-dir pass-through mode), or document in the skill that
+the uncovered command prompts by design. Documented instance:
+confluence-publish's `BUILD_CMD` prompts by design — a deliberate
+speed bump before the slow, estate-wide diagram rebuild.

@@ -135,6 +135,11 @@ Next: open .claude/skills/<name>/SKILL.md and fill in the TODOs.
 
 # AUDIT flow
 
+**Currency policy:** a change to the pattern checklist re-opens all
+audits — plans written against an older checklist are stale until
+re-run. Open questions never rot silently: every audit run ends with
+the Outstanding-actions sweep in Step A3.
+
 ## Step A1: Enumerate targets
 
 `AUDIT_ONE` — targets is a single skill name from the trigger.
@@ -174,6 +179,15 @@ summary table:
 |---|---|---|---|
 | <name> | [<name>.md](workareas/skills-audit/<name>.md) | <N> | <K> |
 ```
+
+## Step A4: Outstanding-actions sweep
+
+Read every `workareas/skills-audit/*.md` (all of them — not just this
+run's) and collect unresolved `## Open questions` items. Print them as
+an **Outstanding actions** list at the end of the completion output,
+grouped by skill, so the backlog surfaces every audit run instead of
+rotting in the workarea. No external trackers — this list is the
+follow-up mechanism.
 
 ## AUDIT completion output
 
