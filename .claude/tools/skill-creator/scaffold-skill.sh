@@ -6,9 +6,10 @@
 #
 # Reads workareas/skill-creator/<name>/decisions.json and writes:
 #   .claude/skills/<name>/SKILL.md             (from template, TODO markers;
-#                                               + metadata.dependencies and a
-#                                               Dependencies section when the
-#                                               dependencies answer is depend)
+#                                               + metadata.workspace-deps and a
+#                                               Dependencies section whenever
+#                                               tokens are declared or the
+#                                               resolution is depend)
 #   .claude/skills/<name>/references/<N>.md    (per fan-out worker)
 #   .claude/skills/<name>/assets/<name>-schema.md   (if state_shape=json)
 #   tools/<name>/<helper>.sh                    (per helper entry)
@@ -17,10 +18,12 @@
 #                                               when the blanket tools/ entry
 #                                               does not already cover them)
 #
-# Refuses to scaffold if any of the 9 answers is missing or if
-# triggers.disambiguation is empty. Dependency gaps (depend without
-# declared tokens / justification / dispatcher) WARN and proceed —
-# audit pattern 9 flags them; the scaffold never blocks on judgment.
+# Refuses to scaffold if any of the 9 answers is missing, if
+# triggers.disambiguation is empty, or if a helper name collides with
+# an existing tools/<name>/ script (reused scripts must not become
+# stubs). Dependency gaps (missing justification / no dispatcher for
+# the pre-flight) WARN and proceed — audit pattern 9 flags them; the
+# scaffold never blocks on judgment.
 #
 # All mutations atomic: write to .tmp then mv.
 
@@ -100,7 +103,11 @@ DEP_WHY=$(jq -r '.answers.dependencies.justification // ""' "$DECISIONS")
 if [[ "$DEP_RESOLUTION" == "depend" ]]; then
     [[ -z "$DEP_DECLARED" ]] && echo "WARN: resolution=depend with no declared tokens — frontmatter will carry a TODO; audit pattern 9 will flag it" >&2
     [[ -z "$DEP_WHY" ]] && echo "WARN: resolution=depend with no justification — the Dependencies section will carry a TODO" >&2
-    [[ "$DISPATCHER" != "true" ]] && echo "WARN: resolution=depend without a dispatcher — no home for the pre-flight; audit pattern 9 will flag this until one exists" >&2
+fi
+# Pre-flighting attaches to DECLARING, not to depending — a tool-only
+# declaration needs a pre-flight home just the same.
+if [[ -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ]]; then
+    [[ "$DISPATCHER" != "true" ]] && echo "WARN: dependencies declared without a dispatcher — no home for the pre-flight; audit pattern 9 will flag this until one exists" >&2
 fi
 
 if $DRY_RUN; then
@@ -187,18 +194,17 @@ fi
 # Helpers cheat-sheet.
 helper_rows=$(jq -r '.answers.helpers[] | "| `" + . + ".sh` | TODO — one-line purpose |"' "$DECISIONS")
 
-# Frontmatter — metadata.dependencies only when depending. Built as a
-# variable so the non-depending case leaves no blank line inside the
-# frontmatter block.
+# Frontmatter — metadata.workspace-deps emitted whenever anything is
+# declared: a depend resolution OR beyond-baseline tool tokens recorded
+# with resolution none/build/port. Built as a variable so the
+# non-declaring case leaves no blank line inside the frontmatter block.
 frontmatter="---
 name: $NAME
 description: '$PURPOSE Triggers: $TRIGGERS_CSV. $DISAMBIG TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'"
-# Emit whenever anything is declared: a depend resolution OR
-# beyond-baseline tool tokens recorded with resolution none/build/port.
 if [[ -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ]]; then
     frontmatter="$frontmatter
 metadata:
-  dependencies: ${DEP_DECLARED:-TODO-declare-tokens}"
+  workspace-deps: ${DEP_DECLARED:-TODO-declare-tokens}"
 fi
 frontmatter="$frontmatter
 ---"
@@ -217,7 +223,7 @@ Why: ${DEP_WHY:-TODO — record the justification for depending}."
 
 This skill needs ${DEP_DECLARED:-TODO — declare the project/tool tokens}
 $why_line
-Declared in the frontmatter \`metadata.dependencies\` (format contract:
+Declared in the frontmatter \`metadata.workspace-deps\` (format contract:
 \`best-practices/skills/agent-skills.md\` → "Dependencies frontmatter");
 verified machine-wide by \`check-deps.sh\`; pre-flighted where the skill
 runs — \`MODE: BLOCKED\` with a REASON naming the remedy when a
@@ -360,10 +366,20 @@ while IFS= read -r helper; do
     [[ -z "$helper" ]] && continue
     sh="$TOOLS_DIR/$helper.sh"
 
-    # Pattern 9: the dispatcher stub of a depending skill carries the
-    # pre-flight TODO.
+    # Never overwrite an existing script: a helper name colliding with
+    # a pre-existing tools/<name>/ file means the skill is reusing
+    # another domain's scripts — those must not become TODO stubs.
+    if [[ -e "$sh" ]]; then
+        echo "Refusing to overwrite existing helper: $sh" >&2
+        echo "Remove the name from the helpers answer (reused scripts are never listed there), or delete the file first if a fresh stub is intended." >&2
+        exit 1
+    fi
+
+    # Pattern 9: the dispatcher stub of a declaring skill carries the
+    # pre-flight TODO (declaring, not just depending — tool-only
+    # declarations need a pre-flight home too).
     preflight=""
-    if [[ "$helper" == "start-$NAME" && "$DEP_RESOLUTION" == "depend" ]]; then
+    if [[ "$helper" == "start-$NAME" && ( -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ) ]]; then
         preflight="
 # TODO pattern 9 — pre-flight each declared dependency before real work:
 #   projects: [[ -d \$HOME/trade-imports-arch-workspace/<project> ]]

@@ -165,7 +165,7 @@ section repeats it).
 A well-formed depending skill carries (audit criteria, not
 scaffold gates):
 
-- `metadata.dependencies` frontmatter — a flat space-separated
+- `metadata.workspace-deps` frontmatter — a flat space-separated
   string of project names and non-baseline tools (format contract:
   `agent-skills.md` → "Dependencies frontmatter"; hard
   dependencies only — soft probes with graceful fallback are not

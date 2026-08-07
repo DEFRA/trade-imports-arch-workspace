@@ -35,6 +35,11 @@ for fixture in "$TESTS_DIR"/fixtures/*/; do
              "$FAKE/.claude/tools/skill-creator" \
              "$FAKE/.claude/skills"
     cp "$fixture/decisions.json" "$FAKE/.claude/workareas/skill-creator/$name/decisions.json"
+    # Optional pre-existing tools domain (exercises the clobber guard).
+    if [[ -d "$fixture/pre-tools" ]]; then
+        mkdir -p "$FAKE/.claude/tools/$name"
+        cp -R "$fixture/pre-tools/." "$FAKE/.claude/tools/$name/"
+    fi
     cp "$REAL_WS/.claude/tools/skill-creator/scaffold-skill.sh" "$FAKE/.claude/tools/skill-creator/"
     cp "$REAL_WS/.claude/tools/skill-creator/render-interview.sh" "$FAKE/.claude/tools/skill-creator/"
     if [[ -f "$fixture/settings.json" ]]; then

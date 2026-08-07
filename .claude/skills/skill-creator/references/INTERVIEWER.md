@@ -128,10 +128,11 @@ Save as `answers.dispatcher` (boolean).
 If yes: the scaffold will create `start-<name>.sh`. If no, the
 scaffold won't.
 
-If Q2 resolved to `depend`, recommend yes — the dependency
-pre-flight (pattern 9) needs a home in `start-<name>.sh`. Without a
-dispatcher the scaffold still proceeds, but audit pattern 9 will
-flag the missing pre-flight until one exists.
+If Q2 declared any dependencies (tools included — not just a
+`depend` resolution), recommend yes: the pre-flight (pattern 9)
+needs a home in `start-<name>.sh`. Without a dispatcher the
+scaffold still proceeds, but audit pattern 9 will flag the missing
+pre-flight until one exists.
 
 ### Q5 — Pre-baked context
 
@@ -231,8 +232,9 @@ If no, scaffold:
 `scaffold-skill.sh` writes:
 
 - `.claude/skills/<name>/SKILL.md` (from the template, with TODO
-  markers; includes `metadata.dependencies` frontmatter and a
-  `## Dependencies` body section when Q2 resolved to `depend`).
+  markers; includes `metadata.workspace-deps` frontmatter and a
+  `## Dependencies` body section whenever Q2 declared any tokens or
+  resolved to `depend`).
 - `.claude/skills/<name>/references/<WORKER>.md` per Q6 worker.
 - `.claude/skills/<name>/assets/<name>-schema.md` if Q3 was
   `json`.

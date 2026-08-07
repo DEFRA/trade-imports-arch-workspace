@@ -2,7 +2,7 @@
 name: quoted
 description: 'Fixture: a quoted token that should tokenise without its quotes.'
 metadata:
-  dependencies: "sh"
+  workspace-deps: "sh"
 ---
 
 Fixture body.

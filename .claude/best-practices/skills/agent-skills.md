@@ -135,7 +135,7 @@ inside the spawn prompt — see "Worker references" below.
 name: skill-name          # 1-64 chars [a-z0-9-]; MUST match the folder name
 description: ...          # 1-1024 chars; WHAT + WHEN + trigger keywords
 metadata:                 # OPTIONAL; only for skills with unbundled needs
-  dependencies: <token> <token>   # see "Dependencies frontmatter" below
+  workspace-deps: <token> <token>   # see "Dependencies frontmatter" below
 ---
 ```
 
@@ -148,9 +148,11 @@ metadata:                 # OPTIONAL; only for skills with unbundled needs
 ### Dependencies frontmatter
 
 A skill that cannot function from its bundled tools alone declares what it
-needs in `metadata.dependencies` — a single space-separated string. The
+needs in `metadata.workspace-deps` — a single space-separated string. The
 agentskills.io spec routes custom properties through `metadata` (string
-keys → string values), so this stays valid under `skills-ref validate`.
+keys → string values), so this stays valid under `skills-ref validate`;
+the key carries a workspace prefix rather than a bare `dependencies`
+because the metadata map is a namespace shared with other consumers.
 Each token is either:
 
 - a **workspace child project** — a directory name under

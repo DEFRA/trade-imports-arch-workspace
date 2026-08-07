@@ -64,8 +64,9 @@ or publish logic.
 **Pattern reference:** patterns.md §9
 
 (6 Aug 2026) Retrofitted as the proving case when pattern 9 was
-introduced: dependencies declared in `metadata.dependencies`
-frontmatter, a `## Dependencies` body section added, and
+introduced: dependencies declared in the metadata frontmatter
+(key renamed to `workspace-deps` on 7 Aug 2026 for metadata-namespace
+uniqueness), a `## Dependencies` body section added, and
 `start-confluence-publish.sh` gained the tooling-presence and
 npm-install pre-flights (previously a missing tooling surfaced as a raw
 npm error mid-publish).

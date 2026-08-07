@@ -2,7 +2,7 @@
 name: confluence-publish
 description: 'Publish a single documentation page from trade-imports-documentation to Confluence by orchestrating the existing delivery-info-arch-tooling scripts: pre-flight prerequisites (credentials, API access, publishPaths entry, diagram exports), validate Mermaid via the mermaid-check skill, build missing diagrams, publish, and report the outcome with a link to the page. Stops with the reason if the publish cannot proceed. Triggers: "publish to confluence", "push to confluence", "publish page". NOT for validating diagrams alone (mermaid-check), content quality (editorial), the full-estate publish (npm run publish:confluence directly), GitHub Pages (deploys itself via CI), or ad-hoc Confluence page reads (use the confluence-read skill) and one-off pages whose source of truth is Confluence itself (use the hand tools in .claude/tools/confluence/). Owns no build or publish logic - the tooling does the work. Requires npm (Node 22+).'
 metadata:
-  dependencies: delivery-info-arch-tooling trade-imports-documentation npm
+  workspace-deps: delivery-info-arch-tooling trade-imports-documentation npm
 ---
 
 Publishes one markdown page from the doc repo's `docs/` tree to Confluence
@@ -21,7 +21,7 @@ carries a variable.
 
 ## Dependencies
 
-Declared in the frontmatter `metadata.dependencies` (format contract:
+Declared in the frontmatter `metadata.workspace-deps` (format contract:
 `agent-skills.md` → "Dependencies frontmatter"), pre-flighted by the Step 0
 dispatcher (`MODE: BLOCKED` with the remedy when one is missing), and
 verified machine-wide by `check-deps.sh`.

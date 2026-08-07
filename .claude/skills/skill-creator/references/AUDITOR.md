@@ -143,11 +143,11 @@ For each helper in `tools/<name>/`:
   (`~/trade-imports-arch-workspace/<child>/`, `npm --prefix`,
   `node_modules/@defra/`, tooling bin names) and beyond-baseline
   tools (anything past bash, curl, jq, git).
-- Hard invocation with no `metadata.dependencies` frontmatter →
+- Hard invocation with no `metadata.workspace-deps` frontmatter →
   flag as a hard gap (undeclared dependency).
 - Soft probe with graceful fallback (probe, then fall back, never
   block) → fine undeclared; do not flag.
-- If `metadata.dependencies` is declared, verify all of:
+- If `metadata.workspace-deps` is declared, verify all of:
   - each token resolves — run
     `bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-deps.sh`
     and read this skill's lines;

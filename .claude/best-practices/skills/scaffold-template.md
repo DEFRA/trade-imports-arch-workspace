@@ -27,9 +27,12 @@ tools/{{NAME}}/
 └── render-{{NAME}}.sh          # if JSON state has a markdown view: pattern 1
 ```
 
-A skill that declares `metadata.dependencies` (pattern 9) pre-flights each
-declared dependency in `start-{{NAME}}.sh` — `MODE: BLOCKED` plus a
-`REASON` naming the remedy when one is missing.
+A skill that declares `metadata.workspace-deps` (pattern 9) pre-flights
+each declared dependency in `start-{{NAME}}.sh` — `MODE: BLOCKED` plus a
+`REASON` naming the remedy when one is missing. The `metadata:` block in
+the frontmatter template below appears only when pattern 9 applies
+(format contract: `agent-skills.md` → "Dependencies frontmatter" — no
+quotes, no inline comments on the declaration line).
 
 `.claude/settings.json` allowlist entries (pattern 8):
 
@@ -45,8 +48,7 @@ Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*:*)
 name: {{NAME}}
 description: '{{ONE_LINE_PURPOSE}} {{WHEN_TO_USE}} (triggers: "{{TRIGGER_1}}", "{{TRIGGER_2}}"). NOT for {{OUT_OF_SCOPE}} — use the {{OTHER_SKILL}} skill for that.'
 metadata:
-  dependencies: {{DEP_TOKENS}}   # only if pattern 9 applies — format contract:
-                                 # agent-skills.md → "Dependencies frontmatter"
+  workspace-deps: {{DEP_TOKENS}}
 ---
 
 <!-- TODO: one-paragraph intro. State the audience (which tickets,
