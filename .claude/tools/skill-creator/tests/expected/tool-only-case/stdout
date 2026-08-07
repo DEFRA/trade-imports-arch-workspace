@@ -2,7 +2,7 @@ WARN: dependencies declared without a dispatcher — no home for the pre-flight;
 Scaffolded skill: test-toolonly
   SKILL.md:    HOME/trade-imports-arch-workspace/.claude/skills/test-toolonly/SKILL.md
   decisions:   HOME/trade-imports-arch-workspace/.claude/skills/test-toolonly/decisions.md
-  allowlist:   covered (blanket tools/ entry or per-skill pair already present; nothing appended)
+  allowlist:   not applicable (no owned scripts; the reused domain's coverage is its own concern)
 
 Open the SKILL.md and replace the TODO markers.
-bash: HOME/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh: No such file or directory
+skills-lint: FAIL .claude/skills/test-toolonly/SKILL.md — dangling link: (../../best-practices/skills/agent-skills.md)

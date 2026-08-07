@@ -67,6 +67,9 @@ for fixture in "$TESTS_DIR"/fixtures/*/; do
         cp -R "$FAKE/.claude/tools/$name" "$actual/tools"
     fi
     cp "$FAKE/.claude/settings.json" "$actual/settings.json"
+    # Git cannot represent empty directories, so blessed trees must not
+    # contain them — otherwise the staged-index hook sees a phantom diff.
+    find "$actual" -type d -empty -delete
     printf '%s\n' "$rc" > "$actual/exit-code"
     printf '%s\n' "$out" | sed "s|$TMP|HOME|g" > "$actual/stdout"
 
