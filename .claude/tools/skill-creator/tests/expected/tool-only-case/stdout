@@ -1,0 +1,6 @@
+Scaffolded skill: test-toolonly
+  SKILL.md:    HOME/trade-imports-arch-workspace/.claude/skills/test-toolonly/SKILL.md
+  decisions:   HOME/trade-imports-arch-workspace/.claude/skills/test-toolonly/decisions.md
+  allowlist:   covered (blanket tools/ entry or per-skill pair already present; nothing appended)
+
+Open the SKILL.md and replace the TODO markers.

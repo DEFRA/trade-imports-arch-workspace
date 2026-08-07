@@ -1,0 +1,7 @@
+Scaffolded skill: test-depend
+  SKILL.md:    HOME/trade-imports-arch-workspace/.claude/skills/test-depend/SKILL.md
+  helper:      HOME/trade-imports-arch-workspace/.claude/tools/test-depend/start-test-depend.sh
+  decisions:   HOME/trade-imports-arch-workspace/.claude/skills/test-depend/decisions.md
+  allowlist:   covered (blanket tools/ entry or per-skill pair already present; nothing appended)
+
+Open the SKILL.md and replace the TODO markers.

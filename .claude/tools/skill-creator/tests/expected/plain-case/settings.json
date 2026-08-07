@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(~/trade-imports-arch-workspace/.claude/tools/test-plain/*)",
+      "Bash(~/trade-imports-arch-workspace/.claude/tools/test-plain/*:*)"
+    ]
+  }
+}

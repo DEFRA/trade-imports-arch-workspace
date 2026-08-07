@@ -1,0 +1,5 @@
+deps-check: FAIL empty-decl — dependencies declared but empty (fill it in or remove the line; format: agent-skills.md -> "Dependencies frontmatter")
+deps-check: quoted -> "sh"
+deps-check: FAIL quoted — '"sh"' is neither a workspace child directory nor a command on PATH (install "sh", or clone the project if it is one)
+deps-check: stray-dir -> straydir
+exit-code: 1

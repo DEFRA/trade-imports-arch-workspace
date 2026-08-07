@@ -1,0 +1,3 @@
+deps-check: declaring -> child-a
+deps-check: FAIL declaring — project missing: HOME/trade-imports-arch-workspace/child-a (clone it: make -C ~/trade-imports-arch-workspace clone)
+exit-code: 1

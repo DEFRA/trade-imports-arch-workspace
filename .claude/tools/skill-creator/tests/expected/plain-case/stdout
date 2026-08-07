@@ -1,0 +1,10 @@
+Scaffolded skill: test-plain
+  SKILL.md:    HOME/trade-imports-arch-workspace/.claude/skills/test-plain/SKILL.md
+  reference:   HOME/trade-imports-arch-workspace/.claude/skills/test-plain/references/FIXTURE_WORKER.md
+  schema:      HOME/trade-imports-arch-workspace/.claude/skills/test-plain/assets/test-plain-schema.md
+  helper:      HOME/trade-imports-arch-workspace/.claude/tools/test-plain/start-test-plain.sh
+  helper:      HOME/trade-imports-arch-workspace/.claude/tools/test-plain/render-test-plain.sh
+  decisions:   HOME/trade-imports-arch-workspace/.claude/skills/test-plain/decisions.md
+  allowlist:   appended Bash(~/trade-imports-arch-workspace/.claude/tools/test-plain/*)
+
+Open the SKILL.md and replace the TODO markers.
