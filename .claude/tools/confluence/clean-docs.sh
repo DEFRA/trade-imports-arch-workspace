@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$HOME/trade-imports-arch-workspace/.claude/tools/confluence"
 OUTPUT_DIR="$HOME/trade-imports-arch-workspace/.claude/workareas/confluence-sync"
 
 if [[ -d "$OUTPUT_DIR" ]]; then

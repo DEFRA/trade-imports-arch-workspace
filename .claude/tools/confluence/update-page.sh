@@ -25,7 +25,6 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_URL="${JIRA_BASE_URL:?JIRA_BASE_URL is not set - see README.md}/wiki"
 
 # Options

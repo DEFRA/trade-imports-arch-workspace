@@ -196,10 +196,10 @@ keep.
    variable) land as a separate `tools/confluence/` hand-tools pass?
    `SKILL.md:80-81` states the skill owns no scripts, and a future
    confluence-sync skill may claim `sync-docs.sh`/`clean-docs.sh`.
-2. Should the `SKILL.md:13` link fix be applied only here, or is the
-   relative `../../best-practices/...` link form shared by other
-   skills' hygiene pointers — i.e. normalise workspace-wide in one
-   pass rather than skill-by-skill?
+2. RESOLVED (7 Aug 2026, superseded by canon): `agent-skills.md` →
+   "Markdown links are the one exception to the `~` rule" — relative
+   links are the correct, lint-checkable form. The finding above
+   prescribing `~`-anchored links is void; do not apply it.
 3. Do the two optional prose micro-collapses (When-to-use table,
    NOT-for restatement) meet the user's bar for a trim pass, given
    the body-restates-description pattern may be a deliberate

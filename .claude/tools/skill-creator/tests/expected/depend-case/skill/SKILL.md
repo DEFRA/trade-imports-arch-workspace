@@ -1,6 +1,6 @@
 ---
 name: test-depend
-description: 'Fixture skill exercising the depend path. Triggers: "test depend". Fixture only. TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'
+description: 'Fixture skill exercising the depend path and YAML\'\'s apostrophe escaping. Triggers: "test depend". Fixture only. TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'
 metadata:
   workspace-deps: demo-project demo-tool
 ---
@@ -24,14 +24,12 @@ neighbouring skill.
 ## Dependencies
 
 This skill needs demo-project demo-tool
-at runtime instead of a local port.
+— invoked at runtime instead of a local port.
 Why: fixture justification.
 Declared in `metadata.workspace-deps`. Format:
 `agent-skills.md` → "Dependencies frontmatter"; well-formed criteria
 (pre-flight, description mention, check-deps): `patterns.md` §9. Keep
 the list in sync with what the steps actually invoke.
-
-
 
 ## Step 0: Start
 

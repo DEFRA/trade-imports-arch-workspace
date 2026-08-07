@@ -4,7 +4,7 @@
   "answered_at": null,
   "scaffolded_at": null,
   "answers": {
-    "purpose": "Fixture skill exercising the depend path.",
+    "purpose": "Fixture skill exercising the depend path and YAML's apostrophe escaping.",
     "dependencies": {
       "resolution": "depend",
       "declared": ["demo-project", "demo-tool"],

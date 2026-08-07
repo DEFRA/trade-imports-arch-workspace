@@ -123,6 +123,11 @@ AUTH="$USER:$TOKEN"
 PAGES=$(mktemp -d -t jira-fetch-XXXXXX)
 trap 'rm -rf "$PAGES"' EXIT
 
+if ! [[ "$MAX" =~ ^[0-9]+$ ]] || [[ "$MAX" -lt 1 ]]; then
+    echo "Error: -m must be a positive integer (got: $MAX)" >&2
+    exit 1
+fi
+
 fetched=0
 page=0
 token=""

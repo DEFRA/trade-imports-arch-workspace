@@ -19,7 +19,6 @@ description: 'Fixture skill with JSON state, fan-out and no dependencies. Trigge
 NOT for TODO — name out-of-scope cases pointing at the right
 neighbouring skill.
 
-
 ## Worker references
 
 | Persona | Used in | Artifact |

@@ -46,9 +46,10 @@ esac
 target="$HOME/trade-imports-arch-workspace/.claude/workareas/skill-creator/$RUN_ID/decisions.json"
 [[ -f "$target" ]] || { echo "No decisions.json at $target — run start-skill-creator.sh first" >&2; exit 1; }
 
-# Cross-field guard: walker=true on prose state is anti-pattern A1
-# (walker on a single-artifact flow) — the one cross-field rule
-# interview-schema.md documents this helper enforcing.
+# Cross-field guard, BOTH directions: walker=true on prose state is
+# anti-pattern A1 (walker on a single-artifact flow) — the one
+# cross-field rule interview-schema.md documents this helper enforcing.
+# Order-independent: the recap-edit flow can re-answer either field.
 if [[ "$FIELD" == "walker" && "$VALUE" == "true" ]]; then
     state_shape=$(jq -r '.answers.state_shape // ""' "$target")
     if [[ "$state_shape" == "prose" ]]; then
@@ -56,6 +57,23 @@ if [[ "$FIELD" == "walker" && "$VALUE" == "true" ]]; then
         exit 1
     fi
 fi
+if [[ "$FIELD" == "state_shape" && "$VALUE" == '"prose"' ]]; then
+    walker=$(jq -r '.answers.walker // false' "$target")
+    if [[ "$walker" == "true" ]]; then
+        echo "Refused: state_shape=prose while walker=true is anti-pattern A1. Re-answer the walker question first." >&2
+        exit 1
+    fi
+fi
+
+# Field paths are built into a jq program by concatenation — keep the
+# segments to a safe charset so a stray quote can't mangle it.
+IFS='.' read -r -a segcheck <<<"$FIELD"
+for seg in "${segcheck[@]}"; do
+    if ! [[ "$seg" =~ ^[a-zA-Z_][a-zA-Z0-9_-]*$ ]]; then
+        echo "Invalid field segment: $seg (allowed: ^[a-zA-Z_][a-zA-Z0-9_-]*$)" >&2
+        exit 1
+    fi
+done
 
 # Build the jq path expression from a dotted field (e.g. fanout.enabled
 # -> .answers.fanout.enabled). Each segment becomes a quoted key.

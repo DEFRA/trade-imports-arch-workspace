@@ -5,7 +5,7 @@ changes; do not delete entries.
 
 ## 1. Purpose
 
-Fixture skill exercising the depend path.
+Fixture skill exercising the depend path and YAML's apostrophe escaping.
 
 ## 2. Dependencies
 

@@ -19,7 +19,7 @@ set -euo pipefail
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$HOME/trade-imports-arch-workspace/.claude/tools/confluence"
 ROOT_FOLDER_ID="6447269328"
 OUTPUT_DIR="$HOME/trade-imports-arch-workspace/.claude/workareas/confluence-sync"
 INDEX_FILE="$OUTPUT_DIR/_index.md"

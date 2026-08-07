@@ -37,7 +37,7 @@ if [[ "$INPUT" =~ ^https?:// ]]; then
     # resolves to a URL the extraction below still rejects clearly.
     # Credentials only ever go to our own instance: a look-alike host
     # pasted from untrusted page content must not receive the token.
-    if [[ "$INPUT" != "${JIRA_BASE_URL}"/* ]]; then
+    if [[ "$INPUT" != "${JIRA_BASE_URL%/}"/* ]]; then
       echo "Error: short link is not under $JIRA_BASE_URL - refusing to send credentials to a foreign host"
       exit 1
     fi

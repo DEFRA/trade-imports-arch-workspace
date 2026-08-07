@@ -25,6 +25,7 @@ RENDER="$WS/.claude/tools/mermaid-check/render-mermaid.sh"
 [[ -x "$RENDER" ]] || { echo "Missing helper: $RENDER" >&2; exit 1; }
 
 workdir=$(mktemp -d -t mermaid-check-XXXXXX)
+trap 'rm -rf "$workdir"' EXIT
 
 collect_files() {
     local p="$1"
@@ -74,7 +75,9 @@ for f in "${targets[@]}"; do
             idx=0
             for start in "${starts[@]}"; do
                 idx=$((idx + 1))
-                safe=$(echo "$f" | tr '/.' '__')
+                # tr alone collides (a/b.md vs a_b.md) - suffix with a
+                # checksum of the untranslated path.
+                safe="$(echo "$f" | tr '/.' '__')_$(printf '%s' "$f" | cksum | cut -d' ' -f1)"
                 block="$workdir/${safe}_$idx.mmd"
                 awk -v s="$start" '
                     NR > s {

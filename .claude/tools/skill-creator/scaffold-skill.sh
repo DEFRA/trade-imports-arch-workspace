@@ -69,6 +69,7 @@ missing=$(jq -r '
         (if ($a | has("dispatcher")) then empty else "dispatcher" end),
         (if ($a | has("prebake")) then empty else "prebake" end),
         (if ($a.fanout | type) == "object" and ($a.fanout | has("enabled")) then empty else "fanout.enabled" end),
+        (if ($a.fanout.enabled != true) or ((($a.fanout.workers // []) | length) > 0) then empty else "fanout.workers" end),
         (if ($a | has("walker")) then empty else "walker" end),
         (if ($a.helpers | type) == "array" then empty else "helpers" end),
         (if (($a.triggers.phrases // []) | length) > 0 then empty else "triggers.phrases" end),
@@ -94,6 +95,12 @@ WALKER=$(jq -r '.answers.walker' "$DECISIONS")
 PURPOSE=$(jq -r '.answers.purpose' "$DECISIONS")
 DISAMBIG=$(jq -r '.answers.triggers.disambiguation' "$DECISIONS")
 TRIGGERS_CSV=$(jq -r '.answers.triggers.phrases | map("\"" + . + "\"") | join(", ")' "$DECISIONS")
+# These three land inside a single-quoted YAML scalar: escape ' as ''
+# (YAML's own escape) or any apostrophe in interview prose truncates
+# the description and emits invalid frontmatter.
+PURPOSE="${PURPOSE//\'/\'\'}"
+DISAMBIG="${DISAMBIG//\'/\'\'}"
+TRIGGERS_CSV="${TRIGGERS_CSV//\'/\'\'}"
 DEP_RESOLUTION=$(jq -r '.answers.dependencies.resolution // "none"' "$DECISIONS")
 DEP_DECLARED=$(jq -r '.answers.dependencies.declared // [] | join(" ")' "$DECISIONS")
 DEP_WHY=$(jq -r '.answers.dependencies.justification // ""' "$DECISIONS")
@@ -124,6 +131,18 @@ if $DRY_RUN; then
     exit 0
 fi
 
+# A completed scaffold is authored territory: re-running against it
+# would replace hand-written content with TODO stubs. The dispatcher
+# guards CREATE; this guards the direct invocation path.
+if [[ -f "$SKILL_DIR/SKILL.md" ]]; then
+    SCAFFOLDED_AT=$(jq -r '.scaffolded_at // ""' "$DECISIONS")
+    if [[ -n "$SCAFFOLDED_AT" ]]; then
+        echo "Refusing: $SKILL_DIR/SKILL.md exists and this run already scaffolded (scaffolded_at=$SCAFFOLDED_AT)." >&2
+        echo "Edit the skill directly; a re-scaffold would overwrite authored content with stubs." >&2
+        exit 1
+    fi
+fi
+
 # Collision pre-pass: refuse BEFORE any file is written, so a partial
 # scaffold can never collide with its own retry.
 while IFS= read -r helper; do
@@ -135,7 +154,11 @@ while IFS= read -r helper; do
     fi
 done < <(jq -r '.answers.helpers[]' "$DECISIONS")
 
-mkdir -p "$SKILL_DIR/references" "$SKILL_DIR/assets"
+# Only create subdirs that will hold content — git can't track empty
+# dirs and they mislead readers.
+mkdir -p "$SKILL_DIR"
+[[ "$FANOUT" == "true" ]] && mkdir -p "$SKILL_DIR/references"
+[[ "$STATE_SHAPE" == "json" ]] && mkdir -p "$SKILL_DIR/assets"
 # Only create a tools domain when this skill owns scripts (zero-helper
 # skills reuse another domain; an empty dir would mislead).
 HELPER_COUNT=$(jq -r '.answers.helpers | length' "$DECISIONS")
@@ -242,9 +265,9 @@ frontmatter="$frontmatter
 # Dependencies body section (pattern 9) — whenever anything is declared.
 deps_section=""
 if [[ -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ]]; then
-    why_line="beyond the workspace baseline (bash, curl, jq, git)."
+    why_line="— tools beyond the workspace baseline (bash, curl, jq, git)."
     if [[ "$DEP_RESOLUTION" == "depend" ]]; then
-        why_line="at runtime instead of a local port.
+        why_line="— invoked at runtime instead of a local port.
 Why: ${DEP_WHY:-TODO — record the justification for depending}."
     fi
     deps_section=$(cat <<EOF
@@ -261,7 +284,8 @@ EOF
 )
 fi
 
-cat > "$skill_md.tmp" <<EOF
+# cat -s squeezes the blank runs left by empty optional blocks.
+cat <<EOF | cat -s > "$skill_md.tmp"
 $frontmatter
 
 <!-- TODO: one-paragraph intro. State the audience (which tickets,

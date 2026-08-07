@@ -190,24 +190,13 @@ Not trimmed: `decisions.md:66-71` is dated retrofit history, but
 
 ## Open questions
 
-1. **Build prompts:** should `BUILD_CMD` route through the dispatcher
-   (e.g. `start-confluence-publish.sh --build <page>`) so builds match
-   the allowlist like `PUBLISH_CMD` does — or is the permission prompt a
-   deliberate speed bump before the slow, estate-wide `build:diagrams`?
-   Adding a third mode also grows the single script; the A3 line is
-   worth watching.
-2. **Staleness detection:** should the diagram gate compare PNG mtime
-   against its `.mmd`/`.c4` source and report `png=STALE`? The
-   counter-argument: neither build has a single-file mode
-   (`SKILL.md:119`), so staleness detection would trigger full rebuilds
-   often — the user may prefer presence-only plus manual judgment.
-3. **Trim timing:** land the pattern-10 trims with the npm pre-flight
-   fix, or batch them into a workspace-wide trim pass across skills
-   (the same lines 16-20 / 43-51 boilerplate shape likely exists in
-   sibling skills)?
-4. Should `npm` (Node 22+) be named in the `description` as a
-   requirement, or is the body `## Dependencies` section sufficient
-   given both repos are already named at-a-glance?
+None outstanding. All four originally-raised questions were resolved
+(resolved = deleted, per Step A4; recorded 7 Aug 2026): BUILD_CMD
+prompts by design (A11 documented exception); staleness detection
+implemented (`png=STALE` folded into BUILD_NEEDED); trims landed
+estate-wide; npm named in the description. The npm pre-flight gap this
+plan's TL;DR describes was fixed in 8da4120 — sections above are a
+dated snapshot predating that fix and the A11 catalogue entry.
 
 ## Anti-pattern citations
 

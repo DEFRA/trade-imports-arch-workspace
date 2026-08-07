@@ -91,7 +91,7 @@ run when one fails:
 | `lint-skills.sh` | declaration format, dangling links, undeclared-invocation sweep | pre-commit (staged index), scaffold tail, `make check` | fix and re-stage; acknowledge soft probes in `workspace-soft-deps` |
 | Golden tests (2 suites) | scaffold + doctor behavior vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
 | Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
-| Guard hooks (`.claude/hooks/`) | agent tool calls in Claude Code sessions | every tool call | follow the sanctioned alternative the denial names |
+| Guard hooks (`.claude/hooks/`) | agent Bash and file-edit calls in Claude Code sessions | every matched tool call | follow the sanctioned alternative the denial names |
 
 ## Skills
 

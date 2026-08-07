@@ -101,8 +101,10 @@ if [[ "$STATUS" != "200" ]]; then
     blocked "Confluence API check failed: HTTP $STATUS from $CONFLUENCE_URL/wiki/rest/api/space (401/403 = credentials rejected, 000 = network/timeout)"
 fi
 
-# --- Config present, page listed in publishPaths (exact match or glob entry) ---
+# --- Config present, valid JSON, page listed in publishPaths ---
 [[ -f "$CONFIG" ]] || blocked "config not found: $CONFIG"
+jq empty "$CONFIG" 2>/dev/null || blocked "config is not valid JSON: $CONFIG (fix the syntax; a malformed config must never read as 'page not listed')"
+[[ "$(jq -r '.spaceMapping | type' "$CONFIG")" == "object" ]] || blocked "config spaceMapping is missing or not an object: $CONFIG"
 MEMBER="no"
 while IFS= read -r ENTRY; do
     # Unquoted RHS makes [[ == ]] glob-match, so wildcard entries in
@@ -136,16 +138,26 @@ NEED_MMD="no"
 NEED_C4="no"
 DIAGRAM_LINES=()
 for ID in $LIKEC4_IDS; do
-    if [[ -f "$DOC_REPO/generated/diagrams/$ID.png" ]]; then
-        DIAGRAM_LINES+=("LIKEC4_VIEW: $ID png=present")
-    else
+    PNG="$DOC_REPO/generated/diagrams/$ID.png"
+    if [[ ! -s "$PNG" ]]; then
         DIAGRAM_LINES+=("LIKEC4_VIEW: $ID png=MISSING")
         NEED_C4="yes"
+    elif [[ -n $(find "$DOC_REPO" -name '*.c4' -newer "$PNG" -print -quit 2>/dev/null) ]]; then
+        # A model file changed after this export - stale exports would
+        # publish silently otherwise.
+        DIAGRAM_LINES+=("LIKEC4_VIEW: $ID png=STALE")
+        NEED_C4="yes"
+    else
+        DIAGRAM_LINES+=("LIKEC4_VIEW: $ID png=present")
     fi
 done
 for ID in $MERMAID_IDS; do
-    if [[ -f "$DOC_REPO/generated/diagrams/$ID.png" ]]; then
+    PNG="$DOC_REPO/generated/diagrams/$ID.png"
+    if [[ -s "$PNG" ]] && [[ -z $(find "$DOC_REPO" -name '*.mmd' -newer "$PNG" -print -quit 2>/dev/null) ]]; then
         DIAGRAM_LINES+=("MERMAID_COMPONENT: $ID png=present")
+    elif [[ -s "$PNG" ]]; then
+        DIAGRAM_LINES+=("MERMAID_COMPONENT: $ID png=STALE")
+        NEED_MMD="yes"
     else
         DIAGRAM_LINES+=("MERMAID_COMPONENT: $ID png=MISSING")
         NEED_MMD="yes"

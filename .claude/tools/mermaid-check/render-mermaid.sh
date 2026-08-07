@@ -39,9 +39,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 tmp_src=""
+tmp_src_base=""
 if [[ -n "$TEXT" ]]; then
     [[ -n "$FILE" ]] && { echo "Give --file or --text, not both" >&2; exit 1; }
-    tmp_src=$(mktemp -t mermaid-check-src-XXXXXX).mmd
+    tmp_src_base=$(mktemp -t mermaid-check-src-XXXXXX)
+    tmp_src="$tmp_src_base.mmd"
     printf '%s\n' "$TEXT" > "$tmp_src"
     FILE="$tmp_src"
     [[ -z "$LABEL" ]] && LABEL="(inline)"
@@ -67,12 +69,25 @@ find_mmdc() {
 MMDC=$(find_mmdc)
 
 tmp_out=""
+tmp_out_base=""
 if [[ -z "$OUT" ]]; then
-    tmp_out=$(mktemp -t mermaid-check-XXXXXX).svg
+    tmp_out_base=$(mktemp -t mermaid-check-XXXXXX)
+    tmp_out="$tmp_out_base.svg"
     OUT="$tmp_out"
 fi
 
 err=$(mktemp -t mermaid-check-err-XXXXXX)
+
+# Clean every temp (including extensionless mktemp bases) on any exit,
+# interrupts included.
+cleanup() {
+    [[ -n "${tmp_out:-}" ]] && rm -f "$tmp_out"
+    [[ -n "$tmp_out_base" ]] && rm -f "$tmp_out_base"
+    [[ -n "${tmp_src:-}" ]] && rm -f "$tmp_src"
+    [[ -n "${tmp_src_base:-}" ]] && rm -f "$tmp_src_base"
+    rm -f "$err"
+}
+trap cleanup EXIT
 
 set +e
 if [[ "$MMDC" == "npx:mmdc" ]]; then
@@ -95,15 +110,19 @@ set -e
 if [[ $rc -eq 0 ]]; then
     echo "PASS  $LABEL"
 else
+    # An environment failure (npx couldn't fetch mermaid-cli: offline,
+    # registry down) is NOT a diagram failure - reporting it in the
+    # FAIL vocabulary would make a machine problem read as N broken
+    # diagrams. Exit 2 distinguishes it for sweep callers.
+    if grep -qiE 'npm err|registry|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|could not determine executable' "$err"; then
+        echo "ERROR: mermaid-cli unavailable (npx fetch failed) - not a diagram problem. Install mermaid-cli (npm install in delivery-info-arch-tooling) or restore network." >&2
+        exit 2
+    fi
     # The parser message is the useful line; the puppeteer stack is not.
     reason=$(grep -m1 -iE 'error|expecting|unrecognized|no diagram type' "$err" || true)
     [[ -z "$reason" ]] && reason="render failed (exit $rc)"
     echo "FAIL  $LABEL"
     echo "      $reason"
 fi
-
-[[ -n "$tmp_out" && -f "$tmp_out" ]] && rm -f "$tmp_out"
-[[ -n "$tmp_src" && -f "$tmp_src" ]] && rm -f "$tmp_src"
-rm -f "$err"
 
 exit $rc

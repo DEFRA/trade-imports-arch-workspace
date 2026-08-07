@@ -141,7 +141,7 @@ Next: open .claude/skills/<name>/SKILL.md and fill in the TODOs.
 **Currency policy:** a change to the pattern checklist re-opens all
 audits — plans written against an older checklist are stale until
 re-run. Open questions never rot silently: every audit run ends with
-the Outstanding-actions sweep in Step A3.
+the Outstanding-actions sweep in Step A4.
 
 ## Step A1: Enumerate targets
 

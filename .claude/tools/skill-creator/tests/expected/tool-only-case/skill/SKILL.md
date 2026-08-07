@@ -24,14 +24,11 @@ neighbouring skill.
 ## Dependencies
 
 This skill needs demo-tool
-beyond the workspace baseline (bash, curl, jq, git).
+— tools beyond the workspace baseline (bash, curl, jq, git).
 Declared in `metadata.workspace-deps`. Format:
 `agent-skills.md` → "Dependencies frontmatter"; well-formed criteria
 (pre-flight, description mention, check-deps): `patterns.md` §9. Keep
 the list in sync with what the steps actually invoke.
-
-
-
 
 ## Step 1: TODO
 
