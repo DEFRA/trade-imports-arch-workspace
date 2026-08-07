@@ -78,7 +78,8 @@ stdout line is the branch:
   variable, add the `publishPaths` entry, fix the path).
 - `MODE: READY` - continue. The FACT lines carry everything later steps need:
   `PAGE` (the `docs/...` path), `SPACE` (target space key), `CONFLUENCE_BASE`,
-  one line per embedded diagram with `png=present|MISSING`,
+  one line per embedded diagram with `png=present|MISSING|STALE`
+  (STALE = a model/diagram source changed after the export),
   `FENCED_MERMAID_BLOCKS`, `BUILD_NEEDED`, zero or more `BUILD_CMD` lines,
   and `PUBLISH_CMD`. The command lines are emitted with resolved paths in
   the `~`-spelled canonical form, so they match the permission allowlist
@@ -91,7 +92,7 @@ stdout line is the branch:
 ## Step 1: Validate Mermaid sources (conditional)
 
 If `FENCED_MERMAID_BLOCKS` is greater than 0, or any `MERMAID_COMPONENT` line
-says `png=MISSING` (its `.mmd` source is about to be rebuilt), invoke the
+says `png=MISSING` or `png=STALE` (its source is about to be rebuilt), invoke the
 `mermaid-check` skill on the page before building: it renders each diagram
 with mermaid-cli and confirms it parses. Fix what it reports before
 continuing - the Mermaid build exits on the first failing file, so validating

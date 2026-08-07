@@ -160,8 +160,12 @@ if $DRY_RUN; then
     echo "  SKILL.md → $SKILL_DIR/SKILL.md"
     echo "  state_shape=$STATE_SHAPE dispatcher=$DISPATCHER fanout=$FANOUT walker=$WALKER"
     echo "  dependencies: resolution=$DEP_RESOLUTION declared=[$DEP_DECLARED]"
-    echo "  helpers:"
-    jq -r '.answers.helpers[] | "    tools/'"$NAME"'/" + . + ".sh"' "$DECISIONS"
+    if [[ $(jq -r '.answers.helpers | length' "$DECISIONS") -gt 0 ]]; then
+        echo "  helpers:"
+        jq -r '.answers.helpers[] | "    tools/'"$NAME"'/" + . + ".sh"' "$DECISIONS"
+    else
+        echo "  helpers: (none — reuses an existing tools domain)"
+    fi
     if [[ "$FANOUT" == "true" ]]; then
         echo "  workers:"
         jq -r '.answers.fanout.workers[] | "    references/" + . + ".md"' "$DECISIONS"

@@ -142,7 +142,7 @@ for ID in $LIKEC4_IDS; do
     if [[ ! -s "$PNG" ]]; then
         DIAGRAM_LINES+=("LIKEC4_VIEW: $ID png=MISSING")
         NEED_C4="yes"
-    elif [[ -n $(find "$DOC_REPO" -name '*.c4' -newer "$PNG" -print -quit 2>/dev/null) ]]; then
+    elif [[ -n $(find "$DOC_REPO" -not -path '*/node_modules/*' -not -path '*/generated/*' -name '*.c4' -newer "$PNG" -print -quit 2>/dev/null) ]]; then
         # A model file changed after this export - stale exports would
         # publish silently otherwise.
         DIAGRAM_LINES+=("LIKEC4_VIEW: $ID png=STALE")
@@ -153,7 +153,7 @@ for ID in $LIKEC4_IDS; do
 done
 for ID in $MERMAID_IDS; do
     PNG="$DOC_REPO/generated/diagrams/$ID.png"
-    if [[ -s "$PNG" ]] && [[ -z $(find "$DOC_REPO" -name '*.mmd' -newer "$PNG" -print -quit 2>/dev/null) ]]; then
+    if [[ -s "$PNG" ]] && [[ -z $(find "$DOC_REPO" -not -path '*/node_modules/*' -not -path '*/generated/*' -name '*.mmd' -newer "$PNG" -print -quit 2>/dev/null) ]]; then
         DIAGRAM_LINES+=("MERMAID_COMPONENT: $ID png=present")
     elif [[ -s "$PNG" ]]; then
         DIAGRAM_LINES+=("MERMAID_COMPONENT: $ID png=STALE")

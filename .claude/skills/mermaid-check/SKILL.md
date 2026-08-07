@@ -79,8 +79,10 @@ directory is walked recursively, skipping `node_modules`, `build`,
 
 First stdout line is `MODE: VERIFY`. Then one line per diagram, then a
 summary. Exit code is 0 when every diagram rendered, 1 when any
-failed, and 2 when the renderer environment itself is broken (the
-sweep aborts — treat as "cannot verify", never as diagram failures).
+failed, and 2 when the renderer environment itself is broken — no
+mmdc/npx, a failed mermaid-cli fetch, or a Chrome-less local mmdc
+(the sweep aborts — treat as "cannot verify", never as diagram
+failures).
 Usable as a gate.
 
 ## Verify
@@ -120,8 +122,9 @@ without writing it into the repository first:
 ```
 
 Exit 0 means it parses, exit 1 prints the parser message, exit 2 means
-the renderer environment itself is broken (no mmdc/npx, or npx cannot
-fetch mermaid-cli) — an environment ERROR, never a diagram verdict; the
+the renderer environment itself is broken (no mmdc/npx, npx cannot
+fetch mermaid-cli, or a local mmdc has no usable Chrome) — an
+environment ERROR, never a diagram verdict; the
 sweep aborts rather than reporting N fake failures. Nothing is
 written and the temp source is removed. `--label` is free text and
 only affects the report line, so use it to say which diagram this is.

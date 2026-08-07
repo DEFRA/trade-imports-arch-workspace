@@ -119,7 +119,7 @@ else
         # fetch failed, or a local mmdc without a usable Chrome). That
         # is NOT a diagram failure: reporting it in the FAIL vocabulary
         # would make one machine problem read as N broken diagrams.
-        if grep -qiE 'npm err|registry|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|could not determine executable|could not find chrome|failed to launch' "$err"; then
+        if grep -qiE 'npm err|registry|ENOTFOUND|ETIMEDOUT|EAI_AGAIN|could not determine executable|could not find chrome|failed to launch|timed out.*browser|protocolerror|browser was not found' "$err"; then
             echo "ERROR: renderer environment failure - not a diagram problem. If npx fetched nothing: restore network or npm install in delivery-info-arch-tooling; if a local mmdc lacks Chrome: npx puppeteer browsers install chrome." >&2
             exit 2
         fi
