@@ -46,6 +46,13 @@ esac
 target="$HOME/trade-imports-arch-workspace/.claude/workareas/skill-creator/$RUN_ID/decisions.json"
 [[ -f "$target" ]] || { echo "No decisions.json at $target — run start-skill-creator.sh first" >&2; exit 1; }
 
+# Canonicalise the value first (also fails fast on invalid JSON) so
+# whitespace-padded forms like ' true' can't slip past the guards.
+VALUE=$(jq -nc --argjson v "$VALUE" '$v' 2>/dev/null) || {
+    echo "Invalid JSON value: $VALUE" >&2
+    exit 1
+}
+
 # Cross-field guard, BOTH directions: walker=true on prose state is
 # anti-pattern A1 (walker on a single-artifact flow) — the one
 # cross-field rule interview-schema.md documents this helper enforcing.

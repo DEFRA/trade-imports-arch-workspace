@@ -106,6 +106,12 @@ fi
 
 [[ "$RAW" == "true" ]] && FIELDS="*all"
 
+# Validate before the dry-run preview so the preview is honest.
+if ! [[ "$MAX" =~ ^[0-9]+$ ]] || [[ "$MAX" -lt 1 ]]; then
+    echo "Error: -m must be a positive integer (got: $MAX)" >&2
+    exit 1
+fi
+
 if [[ "$DRY_RUN" == "true" ]]; then
     echo "DRY RUN" >&2
     echo "endpoint: \${JIRA_BASE_URL}/rest/api/2/search/jql" >&2
@@ -122,11 +128,6 @@ AUTH="$USER:$TOKEN"
 
 PAGES=$(mktemp -d -t jira-fetch-XXXXXX)
 trap 'rm -rf "$PAGES"' EXIT
-
-if ! [[ "$MAX" =~ ^[0-9]+$ ]] || [[ "$MAX" -lt 1 ]]; then
-    echo "Error: -m must be a positive integer (got: $MAX)" >&2
-    exit 1
-fi
 
 fetched=0
 page=0

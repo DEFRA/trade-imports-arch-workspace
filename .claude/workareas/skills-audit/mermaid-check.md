@@ -208,17 +208,12 @@ Considered and kept:
 
 ## Open questions
 
-1. **Harden the npx rung or accept it?** Fixing the
-   environment-failure-as-FAIL shape (pattern 6, first bullet) means
-   `render-mermaid.sh` grows a distinct `ERROR:` output line. Is that
-   report-format change acceptable to `confluence-publish`, the one
-   external consumer? (It invokes the skill, not the scripts directly —
-   `confluence-publish/SKILL.md:95-96` — so prose there likely needs no
-   change, but the "Fix what it reports" step would meet a new line
-   shape.)
-2. **Bundle the helper robustness fixes?** Temp-litter, `trap`
-   cleanup, and the collision fix are mechanical and low-risk — land
-   them in the same pass as question 1, or separately?
+1. RESOLVED (7 Aug 2026): environment failures now exit 2 with a
+   single ERROR; the sweep aborts instead of reporting N fake FAILs;
+   SKILL.md documents the 0/1/2 contract.
+2. RESOLVED (7 Aug 2026): temp-litter, trap cleanup and the block-name
+   collision all fixed in dc0b14c/follow-up. The TL;DR above predates
+   these fixes — it is a dated snapshot.
 3. **Trim aggressiveness** — apply the optional intro trim
    (`SKILL.md:6-12`) and the `:37-41` collapse, or only the two
    factually-stale corrections (`:124-126`, `:184-186`)?

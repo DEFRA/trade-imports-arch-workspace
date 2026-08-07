@@ -60,8 +60,15 @@ for f in "${targets[@]}"; do
             total=$((total + 1))
             set +e
             "$RENDER" --file "$f" --label "$f"
-            [[ $? -ne 0 ]] && failed=$((failed + 1))
+            rc=$?
             set -e
+            if [[ $rc -eq 2 ]]; then
+                # Environment failure, not a diagram failure - every
+                # later render would fail identically. Abort the sweep.
+                echo "Sweep aborted: renderer environment failure (see ERROR above)." >&2
+                exit 2
+            fi
+            [[ $rc -ne 0 ]] && failed=$((failed + 1))
             ;;
         *.md)
             # Extract each ```mermaid fenced block to its own temp file,
@@ -89,8 +96,13 @@ for f in "${targets[@]}"; do
                 total=$((total + 1))
                 set +e
                 "$RENDER" --file "$block" --label "$f:$start"
-                [[ $? -ne 0 ]] && failed=$((failed + 1))
+                rc=$?
                 set -e
+                if [[ $rc -eq 2 ]]; then
+                    echo "Sweep aborted: renderer environment failure (see ERROR above)." >&2
+                    exit 2
+                fi
+                [[ $rc -ne 0 ]] && failed=$((failed + 1))
             done
             ;;
     esac

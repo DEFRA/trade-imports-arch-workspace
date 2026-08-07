@@ -117,7 +117,10 @@ without writing it into the repository first:
     FrontDoor-->>Browser: 200' --label 'draft: login sequence'
 ```
 
-Exit 0 means it parses, exit 1 prints the parser message. Nothing is
+Exit 0 means it parses, exit 1 prints the parser message, exit 2 means
+the renderer environment itself is broken (no mmdc/npx, or npx cannot
+fetch mermaid-cli) — an environment ERROR, never a diagram verdict; the
+sweep aborts rather than reporting N fake failures. Nothing is
 written and the temp source is removed. `--label` is free text and
 only affects the report line, so use it to say which diagram this is.
 
@@ -179,7 +182,7 @@ All under `~/trade-imports-arch-workspace/.claude/tools/mermaid-check/`:
 | Script | Purpose |
 |---|---|
 | `start-mermaid-check.sh` | Sweep paths, extract fenced blocks from Markdown, render every diagram, report pass/fail with source line |
-| `render-mermaid.sh` | Render one diagram, from `--file` on disk or `--text` held in context; exit 0 if it parses, 1 with the parser message if not |
+| `render-mermaid.sh` | Render one diagram, from `--file` on disk or `--text` held in context; exit 0 if it parses, 1 with the parser message, 2 on renderer-environment failure |
 
 `render-mermaid.sh` resolves `mmdc` the same way
 `delivery-info-arch-tooling/lib/diagrams/convert-mmd.js` does: the

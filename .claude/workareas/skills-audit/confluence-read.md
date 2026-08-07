@@ -189,13 +189,11 @@ keep.
 
 ## Open questions
 
-1. Are the off-path shared-domain scripts (`sync-docs.sh`,
-   `clean-docs.sh`, `update-page.sh`, `create-page.sh`) in scope for
-   remediation via this skill's plan, or should the `SCRIPT_DIR`
-   runtime-discovery cleanup (and `update-page.sh:28`'s dead
-   variable) land as a separate `tools/confluence/` hand-tools pass?
-   `SKILL.md:80-81` states the skill owns no scripts, and a future
-   confluence-sync skill may claim `sync-docs.sh`/`clean-docs.sh`.
+1. PARTIALLY RESOLVED (7 Aug 2026): the `SCRIPT_DIR` runtime discovery
+   was replaced with the contract literal in `sync-docs.sh` and
+   `clean-docs.sh`, and `update-page.sh`'s dead variable deleted
+   (dc0b14c). Still open: whether a future confluence-sync skill
+   claims `sync-docs.sh`/`clean-docs.sh` ownership.
 2. RESOLVED (7 Aug 2026, superseded by canon): `agent-skills.md` →
    "Markdown links are the one exception to the `~` rule" — relative
    links are the correct, lint-checkable form. The finding above

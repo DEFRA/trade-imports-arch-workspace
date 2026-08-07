@@ -174,10 +174,9 @@ entries" is honoured — nothing is removed).
    per `dot-claude-layout.md` ("state written by skill runs")? The catch:
    workareas are tracked, so drafts would enter git history — is that
    audit-trail signal or noise?
-2. Should `auth.sh` treat a missing `JIRA_PROJECT_KEY` as a failure or a
-   creation-only warning? Read flows never need it, so a hard failure
-   would falsely block read-only machines; a warning line keeps the
-   pre-flight honest for both flows.
+2. RESOLVED (7 Aug 2026): warning implemented — `auth.sh` warns that
+   creation will fail when `JIRA_PROJECT_KEY` is unset; reads
+   unaffected.
 3. The dead `docs/best-practices/...` spelling in `decisions.md` also
    appears in files outside this skill (e.g.
    `skill-creator/references/AUDITOR.md` cites `docs/agent-skills.md` and

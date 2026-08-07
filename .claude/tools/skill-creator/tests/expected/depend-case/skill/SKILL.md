@@ -1,6 +1,6 @@
 ---
 name: test-depend
-description: 'Fixture skill exercising the depend path and YAML\'\'s apostrophe escaping. Triggers: "test depend". Fixture only. TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'
+description: 'Fixture skill exercising the depend path and YAML''s apostrophe escaping. Triggers: "test depend". Fixture only. TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'
 metadata:
   workspace-deps: demo-project demo-tool
 ---

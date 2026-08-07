@@ -98,6 +98,14 @@ for skill_md in "$ROOT"/.claude/skills/*/SKILL.md; do
         fi
     done
 
+    # 1b. Frontmatter must never carry backslash-escaped quotes — the
+    # signature of the broken-YAML-escaping regression class (YAML
+    # doubles quotes; it never backslashes them).
+    if awk '/^---$/{n++; next} n==1' "$skill_md" | grep -q "\\\\'"; then
+        say "FAIL $skill — backslash-quote in frontmatter (invalid YAML escaping; expected doubled '')"
+        FAIL=1
+    fi
+
     # 2. Link lint across the skill's markdown.
     check_links "$skill_md"
     for ref in "$ROOT/.claude/skills/$skill"/references/*.md; do

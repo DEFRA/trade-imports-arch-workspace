@@ -98,9 +98,11 @@ TRIGGERS_CSV=$(jq -r '.answers.triggers.phrases | map("\"" + . + "\"") | join(",
 # These three land inside a single-quoted YAML scalar: escape ' as ''
 # (YAML's own escape) or any apostrophe in interview prose truncates
 # the description and emits invalid frontmatter.
-PURPOSE="${PURPOSE//\'/\'\'}"
-DISAMBIG="${DISAMBIG//\'/\'\'}"
-TRIGGERS_CSV="${TRIGGERS_CSV//\'/\'\'}"
+# Unquoted assignment form: inside double quotes, \' is literal
+# backslash-quote and would emit invalid YAML.
+PURPOSE=${PURPOSE//\'/\'\'}
+DISAMBIG=${DISAMBIG//\'/\'\'}
+TRIGGERS_CSV=${TRIGGERS_CSV//\'/\'\'}
 DEP_RESOLUTION=$(jq -r '.answers.dependencies.resolution // "none"' "$DECISIONS")
 DEP_DECLARED=$(jq -r '.answers.dependencies.declared // [] | join(" ")' "$DECISIONS")
 DEP_WHY=$(jq -r '.answers.dependencies.justification // ""' "$DECISIONS")
@@ -131,28 +133,39 @@ if $DRY_RUN; then
     exit 0
 fi
 
-# A completed scaffold is authored territory: re-running against it
-# would replace hand-written content with TODO stubs. The dispatcher
-# guards CREATE; this guards the direct invocation path.
+# An existing SKILL.md is authored (or partial) territory: scaffolding
+# over it replaces content with TODO stubs, silently. Refuse in every
+# case — the remedy differs, the refusal doesn't.
 if [[ -f "$SKILL_DIR/SKILL.md" ]]; then
-    SCAFFOLDED_AT=$(jq -r '.scaffolded_at // ""' "$DECISIONS")
-    if [[ -n "$SCAFFOLDED_AT" ]]; then
-        echo "Refusing: $SKILL_DIR/SKILL.md exists and this run already scaffolded (scaffolded_at=$SCAFFOLDED_AT)." >&2
-        echo "Edit the skill directly; a re-scaffold would overwrite authored content with stubs." >&2
-        exit 1
-    fi
+    echo "Refusing: $SKILL_DIR/SKILL.md already exists." >&2
+    echo "If it is authored content: edit it directly (never re-scaffold). If it is a partial/stale scaffold: delete $SKILL_DIR and the workarea run, then retry." >&2
+    exit 1
 fi
 
-# Collision pre-pass: refuse BEFORE any file is written, so a partial
-# scaffold can never collide with its own retry.
+# Name + collision pre-pass: refuse BEFORE any file is written. Names
+# come from agent-authored answers, so charset-gate them like run-ids —
+# a stray ../ must not write outside the owned tree.
 while IFS= read -r helper; do
     [[ -z "$helper" ]] && continue
+    case "$helper" in
+        *[!a-z0-9-]*|-*|"")
+            echo "Refusing: invalid helper name '$helper' (must match ^[a-z0-9-]+$)" >&2
+            exit 1 ;;
+    esac
     if [[ -e "$TOOLS_DIR/$helper.sh" ]]; then
         echo "Refusing to scaffold: helper '$helper.sh' already exists in $TOOLS_DIR" >&2
         echo "Reused scripts are never listed in the helpers answer; remove the name, or delete the file first if a fresh stub is intended." >&2
         exit 1
     fi
 done < <(jq -r '.answers.helpers[]' "$DECISIONS")
+while IFS= read -r worker; do
+    [[ -z "$worker" ]] && continue
+    case "$worker" in
+        *[!A-Z0-9_]*|_*|"")
+            echo "Refusing: invalid worker name '$worker' (must match ^[A-Z][A-Z0-9_]*$)" >&2
+            exit 1 ;;
+    esac
+done < <(jq -r '.answers.fanout.workers // [] | .[]' "$DECISIONS")
 
 # Only create subdirs that will hold content — git can't track empty
 # dirs and they mislead readers.

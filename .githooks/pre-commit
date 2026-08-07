@@ -8,7 +8,7 @@
 # is checked out into a temp HOME (the same seam the golden tests use),
 # so an unstaged fix can't mask a staged break and vice versa.
 
-if git diff --cached --name-only | grep -q '^\.claude/'; then
+if git diff --cached --name-only | grep -Eq '^(\.claude/|Makefile$)'; then
     TMP=$(mktemp -d)
     trap 'rm -rf "$TMP"' EXIT
     git checkout-index --prefix="$TMP/trade-imports-arch-workspace/" -a
