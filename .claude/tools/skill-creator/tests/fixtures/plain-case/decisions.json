@@ -1,0 +1,24 @@
+{
+  "name": "test-plain",
+  "started_at": "2026-01-01T00:00:00Z",
+  "answered_at": null,
+  "scaffolded_at": null,
+  "answers": {
+    "purpose": "Fixture skill with JSON state, fan-out and no dependencies.",
+    "dependencies": {
+      "resolution": "none",
+      "declared": [],
+      "justification": ""
+    },
+    "state_shape": "json",
+    "dispatcher": true,
+    "prebake": false,
+    "fanout": { "enabled": true, "workers": ["FIXTURE_WORKER"] },
+    "walker": false,
+    "helpers": ["start-test-plain", "render-test-plain"],
+    "triggers": {
+      "phrases": ["test plain"],
+      "disambiguation": "Fixture only."
+    }
+  }
+}

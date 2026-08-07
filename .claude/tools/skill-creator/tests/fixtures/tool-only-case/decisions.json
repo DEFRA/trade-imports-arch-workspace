@@ -1,0 +1,24 @@
+{
+  "name": "test-toolonly",
+  "started_at": "2026-01-01T00:00:00Z",
+  "answered_at": null,
+  "scaffolded_at": null,
+  "answers": {
+    "purpose": "Fixture skill declaring a tool without depending, with zero helpers.",
+    "dependencies": {
+      "resolution": "build",
+      "declared": ["demo-tool"],
+      "justification": ""
+    },
+    "state_shape": "prose",
+    "dispatcher": false,
+    "prebake": false,
+    "fanout": { "enabled": false },
+    "walker": false,
+    "helpers": [],
+    "triggers": {
+      "phrases": ["test tool only"],
+      "disambiguation": "Fixture only."
+    }
+  }
+}
