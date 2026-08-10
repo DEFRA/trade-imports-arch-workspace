@@ -2,7 +2,8 @@
 # See CLAUDE.md and .claude/rules/workspace-paths.md for the layout contract.
 #
 #   make            clone missing children, create the canonical symlink, verify
-#   make clone      clone the child repos (no-op when already present)
+#   make clone      clone the child repos; wires origin on any that
+#                   exist without one (idempotent)
 #   make pull       fast-forward the children
 #   make link       create ~/trade-imports-arch-workspace -> this checkout
 #                   and point core.hooksPath at .githooks (pre-commit lint)
@@ -19,10 +20,19 @@ CANONICAL := $(HOME)/trade-imports-arch-workspace
 
 setup: clone link check
 
-clone: $(CHILDREN)
-
-$(CHILDREN):
-	git clone $(GIT_BASE)/$@.git $@
+# Converges each child to the correct state: present AND origin wired.
+# A bare directory target would treat any pre-existing directory as
+# "cloned" and silently skip it - which is how children ended up with
+# no remote at all.
+clone:
+	@for repo in $(CHILDREN); do \
+		if [ ! -d $$repo ]; then \
+			git clone $(GIT_BASE)/$$repo.git $$repo; \
+		elif ! git -C $$repo remote get-url origin >/dev/null 2>&1; then \
+			git -C $$repo remote add origin $(GIT_BASE)/$$repo.git; \
+			echo "clone: $$repo existed without origin - wired $(GIT_BASE)/$$repo.git"; \
+		fi; \
+	done
 
 pull:
 	@for repo in $(CHILDREN); do \
