@@ -29,6 +29,9 @@ trade-imports-documentation/
 # Child repo: shared trade imports schemas (its own git repository)
 trade-imports-schemas/
 
+# Child repo: defra development standards (its own git repository)
+software-development-standards/
+
 # Installed npm dependencies
 node_modules/
 

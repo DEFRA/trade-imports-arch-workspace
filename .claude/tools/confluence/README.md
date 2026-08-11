@@ -3,17 +3,20 @@
 Scripts mirror the `jira/` helpers and use the same `JIRA_USER`/`JIRA_TOKEN` credentials (API token for Atlassian Cloud).
 
 ## Auth variables
+
 - `JIRA_USER` (email) – required
 - `JIRA_TOKEN` – required
 - `JIRA_BASE_URL` (e.g. `https://eaflood.atlassian.net`) – required by `page.sh`
 
 ## Scripts
+
 - `auth.sh` – verify Confluence auth
 - `page.sh` – fetch page details/content by page ID **or full page URL** (the numeric id is extracted from `/pages/<id>/` URLs)
 - `html_to_md.js` – Confluence HTML → markdown, stdin→stdout, no npm dependencies (used by `page.sh md`; needs node)
 - `create-page.sh` / `update-page.sh` – create/update a page from wiki markup. `update-page.sh` refuses pages carrying the pipeline's `generated` label (override name via `GENERATED_LABEL`; `--force` to overwrite anyway) so hand edits can't clobber confluence-publish-managed pages.
 
 ## Examples
+
 ```bash
 # Check auth
 ./confluence/auth.sh
@@ -32,5 +35,4 @@ Scripts mirror the `jira/` helpers and use the same `JIRA_USER`/`JIRA_TOKEN` cre
 ./confluence/page.sh 12345678 json
 ```
 
-The `confluence-read` skill wraps the read path (auth → `page.sh md` →
-analysis) for agent sessions.
+The `confluence-read` skill wraps the read path (auth → `page.sh md` → analysis) for agent sessions.

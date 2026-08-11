@@ -1,9 +1,6 @@
-TODO — one-paragraph statement of what this worker does and what
-single artifact it produces.
+TODO — one-paragraph statement of what this worker does and what single artifact it produces.
 
-**Bash call hygiene** — one command per Bash call. Full rule table:
-`~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md`
-→ "Bash call hygiene".
+**Bash call hygiene** — one command per Bash call. Full rule table: `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md` → "Bash call hygiene".
 
 ## Inputs
 

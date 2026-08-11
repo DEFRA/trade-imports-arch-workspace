@@ -5,9 +5,7 @@ description: Editorial review and writing process for documents that humans will
 
 Follow this process when asked to review, write, or sharpen a doc. Interrogate every sentence until what remains is what we meant. Mechanical conventions live in the style guide at the bottom - apply as you go.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal
-`~/trade-imports-arch-workspace/...` form. Full rules:
-[`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Contents
 
@@ -39,25 +37,24 @@ When the question feels answered, ask once more. The first answer is usually the
 
 **Worked example A.** A statement is written "adds typeCode + urlId (D23B unece:typeCode)":
 
-- *Why is this a question?* What am I trying to say? Why would a reader care? Does my reader know about typeCodes, or D23B? 
-- *What should have been written*: Vet handling and inspection regimes differ for live animals vs semen vs embryos vs ova. The CN commodity code does not always discriminate form, the urlId is added to the typeCode so we can tell the difference. UN/CEFACT uses these properties within the TradeProduct to convey this information.
+- _Why is this a question?_ What am I trying to say? Why would a reader care? Does my reader know about typeCodes, or D23B?
+- _What should have been written_: Vet handling and inspection regimes differ for live animals vs semen vs embryos vs ova. The CN commodity code does not always discriminate form, the urlId is added to the typeCode so we can tell the difference. UN/CEFACT uses these properties within the TradeProduct to convey this information.
 
 **Worked example B.** An open question started as "is `private_transporter_approval_number` a real Defra scheme?". Drilling:
 
-- *Why is this a question?* We used the name in samples without registering it.
-- *Why does that matter?* Consumers can't dereference an unregistered scheme name.
-- *Why is there no way?* No mechanism exists for Defra-side scheme IDs that aren't in TRACES.
-- *Other examples?* `cph_number`, `bcp_reference`, per-animal identifier types.
+- _Why is this a question?_ We used the name in samples without registering it.
+- _Why does that matter?_ Consumers can't dereference an unregistered scheme name.
+- _Why is there no way?_ No mechanism exists for Defra-side scheme IDs that aren't in TRACES.
+- _Other examples?_ `cph_number`, `bcp_reference`, per-animal identifier types.
 
 The surface question was about one scheme. The real question was the codelist mechanism.
 
-
 **Worked example C.** The App Registration has an **FIC** (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to the same Entra `/oauth2/v2.0/token` endpoint. The same access token comes back.
 
-- *what is a FIC?* — I have to find out what a FIC is? Is it a real term, is it ubiquitous language?
-- *what is the same?* - Ambiguous!
+- _what is a FIC?_ — I have to find out what a FIC is? Is it a real term, is it ubiquitous language?
+- _what is the same?_ - Ambiguous!
 
-The App Registration has a Microsoft Federated Identity Credential (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to Entra's `/oauth2/v2.0/token` endpoint. Entra validates the JWT against the FIC and returns a Microsoft Entra access token. The gateway sends that token to Service Bus in the `Authorization: Bearer header`. 
+The App Registration has a Microsoft Federated Identity Credential (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to Entra's `/oauth2/v2.0/token` endpoint. Entra validates the JWT against the FIC and returns a Microsoft Entra access token. The gateway sends that token to Service Bus in the `Authorization: Bearer header`.
 
 **Unpack load-bearing compression.** When a conclusion rests on a compressed phrase - a summary line, "by construction", "holds structurally", "passes through it" - the phrase is a pointer, not an explanation. Unpack it in the section that uses it: restate each clause as "means" plus the mechanism that makes it true (named components, real attributes), and close with one plain sentence stating the consequence. The compressed form may stay where a nearby unpacking backs it; a conclusion resting on a compressed phrase that is never mechanically grounded is an unverified assertion. Fund the words by culling decoration, not by growing the section: unpacking is what the words were for.
 
@@ -70,11 +67,9 @@ Unpacking is iterative: unpack, then reason about the simpler statements, unpack
 
 Each clause became a mechanism plus a consequence sentence; "holds by construction" is now checkable instead of asserted. This phrase would be better unpacked as:
 
-
 - the front door is the only public origin e.g. a url like `ins.defra.gov.uk` resolves to the front door and nothing else, journey frontends keep internal-only URLs, and the front door reverse-proxies path prefixes (`/plants/*`, `/animals/*`) to the relevant place. The browser's only credential is an opaque session id in a host-only cookie, resolving to a single record in the front door's Redis which holds the tokens, claims and active organisation. Every request from every tab re-reads that record, so deleting or updating it is the propagation mechanism. There is nothing to synchronise because nothing else holds state
 
 **Worked example E - unpacking dissolves a false open question.** A draft hedged "whether reverse proxying across tenant frontends is supported on the platform is undocumented" and raised it as a question to the platform team. Unpacked, the claim is: the front door makes an outbound HTTP call to a journey frontend's internal URL (`{service}.{env}.cdp-int.defra.cloud`) and streams the response back. Reasoning about that simpler statement: service-to-service HTTP is documented platform behaviour, and everything else (route mapping, header forwarding, streaming) is code inside the front door. No platform grant is consumed, so there was no question to ask; the compressed phrase had hidden a facet of the solution that the unpacking made visible. What genuinely remained (rate-limit sizing at estate volume) was a different, narrower question.
-
 
 ## 3. Hunt jargon and opaque labels
 
@@ -176,8 +171,8 @@ Mechanical rules. Apply without thinking.
 
 ### Code examples
 
-- JSON with `//` comments → unmarked code fence ``` ``` ``` (a ```` ```json ```` fence trips linters).
-- Pure JSON → ```` ```json ```` is fine.
+- JSON with `//` comments → unmarked code fence ` ` ` (a ```` `json ```` fence trips linters).
+- Pure JSON → ` ```json ` is fine.
 
 ### References
 

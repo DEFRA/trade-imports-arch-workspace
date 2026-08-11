@@ -1,9 +1,6 @@
-Audit **one** workspace skill against the 9-pattern checklist and
-write a plan document.
+Audit **one** workspace skill against the 9-pattern checklist and write a plan document.
 
-Your spawn prompt names a target skill, its `SKILL.md` path, and
-the output plan path. Walk the checklist; produce the plan. Do not
-make in-place edits to the target skill.
+Your spawn prompt names a target skill, its `SKILL.md` path, and the output plan path. Walk the checklist; produce the plan. Do not make in-place edits to the target skill.
 
 **Bash call hygiene** — one command per Bash call. Full rule table: `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md` → "Bash call hygiene".
 
@@ -17,74 +14,50 @@ Your spawn prompt gives you:
 
 ## Read first
 
-Read these into context before walking the checklist (these are
-the canonical references the audit cites):
+Read these into context before walking the checklist (these are the canonical references the audit cites):
 
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md`
-  — the 9-pattern checklist.
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md`
-  — known mis-applications. Cite the matching entry (`A1`–`AN`)
-  whenever you flag one.
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md`
-  — workspace-wide hygiene rules.
+- `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md` — the 9-pattern checklist.
+- `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md` — known mis-applications. Cite the matching entry (`A1`–`AN`) whenever you flag one.
+- `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md` — workspace-wide hygiene rules.
 
 Then Read the target skill exhaustively:
 
 - The `SKILL.md` (offset 0, full length).
-- Every file under
-  `~/trade-imports-arch-workspace/.claude/skills/<name>/references/`.
-- Every file under
-  `~/trade-imports-arch-workspace/.claude/skills/<name>/assets/`
-  (if present).
-- The owning `tools/<name>/` directory (use Glob to list, Read
-  each helper).
+- Every file under `~/trade-imports-arch-workspace/.claude/skills/<name>/references/`.
+- Every file under `~/trade-imports-arch-workspace/.claude/skills/<name>/assets/` (if present).
+- The owning `tools/<name>/` directory (use Glob to list, Read each helper).
 
-Inspect `~/trade-imports-arch-workspace/.claude/settings.json`
-for matching allowlist entries.
+Inspect `~/trade-imports-arch-workspace/.claude/settings.json` for matching allowlist entries.
 
 ## The 9-pattern walkthrough
 
-For each pattern below with findings, produce a "Findings"
-subsection with concrete file:line citations. A pattern that is
-clean or N/A gets exactly ONE line in the plan ("§N — clean" /
-"§N — N/A: <reason>"), never a subsection: plans are re-generated
-whenever the checklist changes, and their bulk is the cost of that
-policy.
+For each pattern below with findings, produce a "Findings" subsection with concrete file:line citations. A pattern that is clean or N/A gets exactly ONE line in the plan ("§N — clean" / "§N — N/A: <reason>"), never a subsection: plans are re-generated whenever the checklist changes, and their bulk is the cost of that policy.
 
 ### 1. State as canonical JSON
 
-Is state JSON or prose? Does the choice match the workflow?
-Specifically check:
+Is state JSON or prose? Does the choice match the workflow? Specifically check:
 
-- Does `<workareas>/<skill>/...` contain a JSON file the helpers
-  mutate atomically?
+- Does `<workareas>/<skill>/...` contain a JSON file the helpers mutate atomically?
 - Or does the LLM write markdown directly?
 - If JSON: is there a `render-X.sh` for the markdown view?
-- If prose: is the artifact a narrative the user reads end-to-end
-  (acceptable) or a list of N queryable items (mismatch — flag
-  `A2`)?
+- If prose: is the artifact a narrative the user reads end-to-end (acceptable) or a list of N queryable items (mismatch — flag `A2`)?
 
 ### 2. Scripts call other scripts (single dispatcher)
 
 - Does the skill have a `start-<name>.sh` dispatcher?
 - If yes: does it print `MODE: <BRANCH>` as the first stdout line?
 - If yes and only 1-2 setup steps: flag as overkill.
-- If no but the skill has 3+ deterministic setup steps in
-  SKILL.md prose: flag as missing.
+- If no but the skill has 3+ deterministic setup steps in SKILL.md prose: flag as missing.
 
 ### 3. Pre-baked context at prepare time
 
-- Does the skill pre-bake context (per-repo bundles, PR diff
-  caches)?
-- If yes: count how many places read each bundle. If only 1,
-  flag `A7`.
-- If no but fan-out workers refetch the same data N times: flag
-  as missing.
+- Does the skill pre-bake context (per-repo bundles, PR diff caches)?
+- If yes: count how many places read each bundle. If only 1, flag `A7`.
+- If no but fan-out workers refetch the same data N times: flag as missing.
 
 ### 4. Bash call hygiene (LLM-typed)
 
-Walk the SKILL.md and each `references/*.md` for hygiene
-violations:
+Walk the SKILL.md and each `references/*.md` for hygiene violations:
 
 - `&&` / `;` / `|` chains in Bash blocks.
 - `cd <dir> && cmd` shapes.
@@ -99,90 +72,57 @@ Each violation: cite `file:line` and the corrected form.
 
 For each `references/<NAME>.md`:
 
-- Determine if it's spawned via Task `general-purpose` (fan-out)
-  or parent-loaded.
-- Fan-out workers MUST carry the one-line pointer to
-  `best-practices/skills/agent-skills.md` → "Bash call hygiene" —
-  not a full inline block. The rules live once, canonically; copies drift. Flag any
-  worker that re-inlines the block instead of pointing to it.
-- Parent-loaded references MAY omit even the pointer (inherit
-  SKILL.md). Don't flag absence — it's optional.
+- Determine if it's spawned via Task `general-purpose` (fan-out) or parent-loaded.
+- Fan-out workers MUST carry the one-line pointer to `best-practices/skills/agent-skills.md` → "Bash call hygiene" — not a full inline block. The rules live once, canonically; copies drift. Flag any worker that re-inlines the block instead of pointing to it.
+- Parent-loaded references MAY omit even the pointer (inherit SKILL.md). Don't flag absence — it's optional.
 
 ### 6. Idempotent + atomic helpers
 
 For each helper in `tools/<name>/`:
 
-- Does it mutate state? If yes, does it use the
-  `jq ... > tmp; mv tmp file` pattern (or equivalent atomic
-  shape)? Or does it partial-write?
-- Do coverage gates check JSON fields (`jq -e`) or file
-  presence/non-emptiness (`[[ -s file ]]`)? Latter is brittle —
-  flag.
-- Where re-running might re-process done work, is there a
-  `processed_at` / `reconciled_at` marker?
+- Does it mutate state? If yes, does it use the `jq ... > tmp; mv tmp file` pattern (or equivalent atomic shape)? Or does it partial-write?
+- Do coverage gates check JSON fields (`jq -e`) or file presence/non-emptiness (`[[ -s file ]]`)? Latter is brittle — flag.
+- Where re-running might re-process done work, is there a `processed_at` / `reconciled_at` marker?
 
 ### 7. Walker UX (N-item triage)
 
 - Does the skill produce a list of N items the user triages?
 - If yes: is there a `WALKER.md` reference + batch-keystroke UX?
-- If no list (single artifact): no walker needed. If a walker
-  exists anyway, flag `A1`.
+- If no list (single artifact): no walker needed. If a walker exists anyway, flag `A1`.
 
 ### 8. Allowlist coverage
 
-- Does `.claude/settings.json` cover the skill's `tools/<name>/`
-  scripts — via **either** the blanket
-  `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` entry
-  (the live settings.json shape) **or** the per-skill
-  `Bash(.../tools/<name>/*)` + `:*` pair?
-- Flag a hard gap only when **neither** form is present (skill is
-  unusable without coverage).
+- Does `.claude/settings.json` cover the skill's `tools/<name>/` scripts — via **either** the blanket `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` entry (the live settings.json shape) **or** the per-skill `Bash(.../tools/<name>/*)` + `:*` pair?
+- Flag a hard gap only when **neither** form is present (skill is unusable without coverage).
 
 ### 9. Dependencies
 
-- Grep the SKILL.md, `references/*.md`, and `tools/<name>/`
-  scripts for unbundled invocations: child-project paths
-  (`~/trade-imports-arch-workspace/<child>/`, `npm --prefix`,
-  `node_modules/@defra/`, tooling bin names) and beyond-baseline
-  tools (anything past bash, curl, jq, git).
-- Hard invocation with no `metadata.workspace-deps` frontmatter →
-  flag as a hard gap (undeclared dependency).
-- Soft probe with graceful fallback (probe, then fall back, never
-  block) → fine undeclared; do not flag.
+- Grep the SKILL.md, `references/*.md`, and `tools/<name>/` scripts for unbundled invocations: child-project paths (`~/trade-imports-arch-workspace/<child>/`, `npm --prefix`, `node_modules/@defra/`, tooling bin names) and beyond-baseline tools (anything past bash, curl, jq, git).
+- Hard invocation with no `metadata.workspace-deps` frontmatter → flag as a hard gap (undeclared dependency).
+- Soft probe with graceful fallback (probe, then fall back, never block) → fine undeclared; do not flag.
 - If `metadata.workspace-deps` is declared, verify all of:
-  - each token resolves — run
-    `bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-deps.sh`
-    and read this skill's lines;
+  - each token resolves — run `bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-deps.sh` and read this skill's lines;
   - a `## Dependencies` body section states the rationale;
   - the `description` names the requirement;
-  - the dispatcher pre-flights each declared token (`MODE:
-    BLOCKED` + REASON naming the remedy) — a declared dependency
-    without a pre-flight is a gap.
-- Declared tokens nothing in the skill actually invokes → flag as
-  stale.
+  - the dispatcher pre-flights each declared token (`MODE: BLOCKED` + REASON naming the remedy) — a declared dependency without a pre-flight is a gap.
+- Declared tokens nothing in the skill actually invokes → flag as stale.
 
 ### 10. Prose hygiene (companion)
 
-Scan the SKILL.md and `references/*.md` for trim candidates per
-the categories in `patterns.md` "Pattern 10 (companion)". This
-deliverable is a **proposed trim diff** — per-file list of
-deletions / collapses with line refs and short rationale — NOT
-in-place edits.
+Scan the SKILL.md and `references/*.md` for trim candidates per the categories in `patterns.md` "Pattern 10 (companion)". This deliverable is a **proposed trim diff** — per-file list of deletions / collapses with line refs and short rationale — NOT in-place edits.
 
 If the prose is already tight, say so and skip the trim diff.
 
 ## Output: write the plan
 
-Write to the output path your spawn prompt named (path under
-`workareas/skills-audit/<name>.md`). Shape:
+Write to the output path your spawn prompt named (path under `workareas/skills-audit/<name>.md`). Shape:
 
 ```markdown
 # <name> skill — audit and improvement plan
 
 ## TL;DR
 
-Two-to-four sentences. What's the biggest gap, what's smaller,
-what's already fine.
+Two-to-four sentences. What's the biggest gap, what's smaller, what's already fine.
 
 ## Findings by pattern
 
@@ -217,34 +157,26 @@ form.>
 
 ### 8. Allowlist coverage
 
-<covering entry present (blanket or per-skill)? if neither, exact
-text to add.>
+<covering entry present (blanket or per-skill)? if neither, exact text to add.>
 
 ### 9. Dependencies
 
-<declared vs invoked; check-deps.sh result; pre-flight, body
-section and description criteria; stale tokens.>
+<declared vs invoked; check-deps.sh result; pre-flight, body section and description criteria; stale tokens.>
 
 ### 10. Prose hygiene (trim diff)
 
-<per-file deletions / collapses with line refs and short
-rationale. NOT in-place edits.>
+<per-file deletions / collapses with line refs and short rationale. NOT in-place edits.>
 
 ## Open questions
 
-Numbered list. Anything that needs the user's judgment before an
-implementer prompt can be written. Examples:
+Numbered list. Anything that needs the user's judgment before an implementer prompt can be written. Examples:
 
 1. Should pattern X land before pattern Y, or together?
-2. Is helper Z used anywhere outside this skill? (grep ran clean
-   in this skill but may have external callers.)
+2. Is helper Z used anywhere outside this skill? (grep ran clean in this skill but may have external callers.)
 
 ## Anti-pattern citations
 
-Map each finding to its `A1`-`AN` entry in
-`best-practices/skills/anti-patterns.md`. If you discover an
-anti-pattern not yet in the catalogue, propose a new entry in a
-final subsection.
+Map each finding to its `A1`-`AN` entry in `best-practices/skills/anti-patterns.md`. If you discover an anti-pattern not yet in the catalogue, propose a new entry in a final subsection.
 ```
 
 ## Return value
@@ -262,15 +194,9 @@ The parent session aggregates this into the audit summary table.
 
 ## Return value on failure
 
-If you cannot produce the plan — the target `SKILL.md` is unreadable, the
-reference files are missing, or the output path can't be written — do
-**not** return an empty or silent result. A silently-empty return (no plan
-path, no pattern-gap count) is indistinguishable from a clean audit that
-found nothing, and the parent's audit summary table will carry a silent
-hole for this skill.
+If you cannot produce the plan — the target `SKILL.md` is unreadable, the reference files are missing, or the output path can't be written — do **not** return an empty or silent result. A silently-empty return (no plan path, no pattern-gap count) is indistinguishable from a clean audit that found nothing, and the parent's audit summary table will carry a silent hole for this skill.
 
-Every termination MUST use the success shape above **or** this explicit
-failure shape — never a bare, empty return:
+Every termination MUST use the success shape above **or** this explicit failure shape — never a bare, empty return:
 
 ```
 FAILED: {skill} — {what failed}; tried: {channels}; audit summary row will be missing.
