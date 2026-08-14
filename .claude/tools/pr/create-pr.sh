@@ -6,17 +6,19 @@
 #   bash create-pr.sh --edit <number> --body-file <path> [--repo <owner/name>] [--dry-run]
 #   bash create-pr.sh --help
 #
-# Refuses (exit 2) any title or body containing AI attribution — the rule in
-# best-practices/git/pull-requests.md — naming the offending line. --dry-run
-# prints the gh command it would run instead of running it. Requires gh
-# (authenticated); body must be passed as a file, never inline.
+# Refuses (exit 2) any title or body containing AI attribution (the rule in
+# best-practices/git/pull-requests.md) or editorial style-guide violations
+# (em-dash, curly quotes, GDS banned words - via tools/editorial/check-prose.sh),
+# naming the offending line. --dry-run prints the gh command it would run
+# instead of running it. Requires gh (authenticated); body must be passed as
+# a file, never inline.
 
 set -euo pipefail
 
 ATTRIBUTION_PATTERN='Generated with|Co-Authored-By|Claude Code|Signed-off-by|🤖'
 
 usage() {
-  sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 fail() {
@@ -54,6 +56,16 @@ if [ -n "$OFFENDING" ]; then
   fail "body contains AI attribution — forbidden by best-practices/git/pull-requests.md; remove these line(s) from $BODY_FILE and re-run:
 $OFFENDING" 2
 fi
+
+# The prose gate: editorial style-guide mechanical rules, same refusal
+# contract as the attribution guard above.
+PROSE_GATE="$HOME/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh"
+[ -f "$PROSE_GATE" ] || fail "prose gate missing: $PROSE_GATE (incomplete checkout - run make check)" 1
+if [ -n "$TITLE" ] && ! printf '%s\n' "$TITLE" | bash "$PROSE_GATE" --stdin --label "title"; then
+  fail "title fails the editorial style gate (lines above) - fix and re-run" 2
+fi
+bash "$PROSE_GATE" "$BODY_FILE" \
+  || fail "body fails the editorial style gate (lines above) - fix $BODY_FILE and re-run" 2
 
 if [ -n "$EDIT" ]; then
   set -- pr edit "$EDIT" --body-file "$BODY_FILE"

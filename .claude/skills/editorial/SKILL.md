@@ -1,6 +1,18 @@
 ---
 name: editorial
 description: Editorial review and writing process for documents that humans will read - PR descriptions, READMEs, design docs, commit bodies, RFCs. Recursively drills from surface text to essence by asking what we're trying to say and why; includes a style guide of mechanical rules. Use when the user asks to review, sharpen, edit, or write a doc.
+hooks:
+  PostToolUse:
+    - matcher: Write|Edit|MultiEdit
+      hooks:
+        - type: command
+          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh" --record
+          timeout: 10
+  Stop:
+    - hooks:
+        - type: command
+          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-stop.sh"
+          timeout: 30
 ---
 
 Follow this process when asked to review, write, or sharpen a doc. Interrogate every sentence until what remains is what we meant. Mechanical conventions live in the style guide at the bottom - apply as you go.
@@ -11,7 +23,7 @@ This SKILL builds on the foundational best-practices laid out in [writing.md](..
 
 ## Contents
 
-- **Process** - steps 1 to 9.
+- **Process** - steps 1 to 10.
 - **Output behaviour**.
 - **Style guide**.
 
@@ -53,7 +65,7 @@ The surface question was about one scheme. The real question was the codelist me
 
 **Worked example C.** The App Registration has an **FIC** (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to the same Entra `/oauth2/v2.0/token` endpoint. The same access token comes back.
 
-- _what is a FIC?_ — I have to find out what a FIC is? Is it a real term, is it ubiquitous language?
+- _what is a FIC?_ - I have to find out what a FIC is? Is it a real term, is it ubiquitous language?
 - _what is the same?_ - Ambiguous!
 
 The App Registration has a Microsoft Federated Identity Credential (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to Entra's `/oauth2/v2.0/token` endpoint. Entra validates the JWT against the FIC and returns a Microsoft Entra access token. The gateway sends that token to Service Bus in the `Authorization: Bearer header`.
@@ -87,7 +99,7 @@ Internal labels mean nothing to a cold reader. Watch for:
 
 For each, replace with substance or introduce on first use.
 
-Close the pass with the hard-avoid sweep from the style guide's Metaphor section: run its grep over the draft, judge each hit, and replace every figurative use with the specific mechanism it stands for.
+Close the pass with the mechanical sweep: `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <file>`. Judge each WARN hit (the metaphor hard-avoid list), and replace every figurative use with the specific mechanism it stands for. FAIL hits are not judgment calls - fix them.
 
 ## 4. Verifiability check
 
@@ -127,6 +139,18 @@ Common decoration:
 
 When something feels hand-wavy, paste the JSON, name the property, give the actual scheme ID.
 
+## 10. Mechanical close-out (mandatory)
+
+Run the style gate on every document this session touched:
+
+```
+bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <file>
+```
+
+Fix every FAIL (banned punctuation, GDS banned words - no judgment involved). Judge every WARN (the metaphor list - literal technical uses stay). The document is not finished until the gate passes.
+
+This step describes the gate; it is not the gate. Enforcement is deterministic: a PostToolUse hook checks each write as it happens, a Stop hook re-runs this check and blocks the turn from ending while a touched file still fails, `create-pr.sh` refuses violating PR titles and bodies, and the pre-commit hook refuses violating staged markdown.
+
 ## Output behaviour
 
 - Non-trivial restructures (whole sections, reordering, framing shifts) - describe before editing.
@@ -143,6 +167,7 @@ Mechanical rules. Apply without thinking.
 
 - No em-dashes. Use a plain hyphen `-` (with a space on each side for a sentence break).
 - Plain `"` and `'` quotes, not curly variants.
+- Enforced deterministically by `check-prose.sh` at write time (PostToolUse hook), turn end (Stop hook), PR creation (`create-pr.sh`) and commit time (pre-commit) - see step 10.
 
 ### Code identifiers
 
@@ -192,9 +217,17 @@ Mechanical rules. Apply without thinking.
 - These terms are banned wherever the verb's literal sense is not what happens, the same way em-dashes are banned - no judgment call, replace on sight: "prices" / "priced", "rides" / "rides in", "bites", "spends", "buys", "kills", "hangs on", "collapses", "leaks", "lands", "forecloses".
 - A term used in its literal technical sense stays: a cookie carries a value (HTTP semantics), a request times out. For anything not on the list, the test: could a reader new to the document say precisely what happens from this sentence alone? If the verb needs decoding, replace it.
 - Replacement is unpacking: state the specific mechanism in precise, non-jargon language. This is not a synonym swap; the sentence usually needs rewriting around the mechanism.
-- Sweep mechanically before finishing: `grep -niE '\b(prices?|priced|rides?|bites?|spends?|spent|buys?|kills?|collapses?|leaks?|lands?|forecloses?)\b|hangs? on' <file>`, then judge each hit; literal uses stay, every figurative hit is replaced.
+- Sweep mechanically before finishing: `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <file>` reports each hit as a WARN; judge each - literal uses stay, every figurative hit is replaced.
 - Observed failures and their replacements (4 Aug 2026):
   - "never rides in the session artefact" -> "is not stored in the session record or the session cookie"
   - "whether a frontend may forward page traffic to another prices the proxying front door" -> "if the platform does not let one frontend forward page requests to another, the proxying front door needs a platform change before it can be built, and that need counts against it in the comparison"
   - "whether the picker interrupts a returning user prices per-journey login" -> "if the organisation picker appears each time a journey signs a returning user in silently, patterns where every journey runs its own login show the user the picker repeatedly"
   - "sign-out and organisation switch bite on the next request" -> "sign-out and organisation switch take effect on the user's next request"
+
+## Scripts cheat-sheet
+
+| Script | Home | Purpose |
+|--------|------|---------|
+| `check-prose.sh` | `~/trade-imports-arch-workspace/.claude/tools/editorial/` | Deterministic style gate: FAIL on banned punctuation and GDS banned words, WARN on the metaphor list; `--stdin --label`, `--help` |
+| `hook-check-written.sh` | `~/trade-imports-arch-workspace/.claude/tools/editorial/` | PostToolUse hook: gates the text each Write/Edit just produced; `--record` tracks touched files for the Stop hook |
+| `hook-stop.sh` | `~/trade-imports-arch-workspace/.claude/tools/editorial/` | Stop hook: blocks turn-end while a touched file still fails the gate |
