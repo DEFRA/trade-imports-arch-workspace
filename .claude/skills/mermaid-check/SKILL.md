@@ -48,7 +48,7 @@ The mechanical rules in the third row are borrowed deliberately, not duplicated:
 
 `<path>` is a file or a directory, and more than one may be given. A directory is walked recursively, skipping `node_modules`, `build`, `generated` and dotted directories.
 
-First stdout line is `MODE: VERIFY`. Then one line per diagram, then a summary. Exit code is 0 when every diagram rendered, 1 when any failed, and 2 when the renderer environment itself is broken — no mmdc/npx, a failed mermaid-cli fetch, or a Chrome-less local mmdc (the sweep aborts — treat as "cannot verify", never as diagram failures). Usable as a gate.
+First stdout line is `MODE: VERIFY`. Then one line per diagram, then a summary. Exit code is 0 when every diagram rendered, 1 when any failed, and 2 when the renderer environment itself is broken - no mmdc/npx, a failed mermaid-cli fetch, or a Chrome-less local mmdc (the sweep aborts - treat as "cannot verify", never as diagram failures). Usable as a gate.
 
 ## Verify
 
@@ -74,7 +74,7 @@ Any agent with Bash can validate a diagram it is holding in context, without wri
     FrontDoor-->>Browser: 200' --label 'draft: login sequence'
 ```
 
-Exit 0 means it parses, exit 1 prints the parser message, exit 2 means the renderer environment itself is broken (no mmdc/npx, npx cannot fetch mermaid-cli, or a local mmdc has no usable Chrome) — an environment ERROR, never a diagram verdict. Nothing is written and the temp source is removed. `--label` is free text and only affects the report line, so use it to say which diagram this is.
+Exit 0 means it parses, exit 1 prints the parser message, exit 2 means the renderer environment itself is broken (no mmdc/npx, npx cannot fetch mermaid-cli, or a local mmdc has no usable Chrome) - an environment ERROR, never a diagram verdict. Nothing is written and the temp source is removed. `--label` is free text and only affects the report line, so use it to say which diagram this is.
 
 This is the entry point for subagents and for any skill that drafts a diagram as part of a larger task. It needs no pipe and no temp file of the caller's own, so it stays within Bash call hygiene. Both scripts are covered by the allowlist entries added when this skill was scaffolded, so a subagent can call them without a permission prompt.
 

@@ -1,6 +1,6 @@
 #!/bin/bash
-# TODO — one-line purpose of this helper.
-# Boundary (only if this helper has a sibling) — TODO: when to use this vs that sibling.
+# TODO - one-line purpose of this helper.
+# Boundary (only if this helper has a sibling) - TODO: when to use this vs that sibling.
 #
 # Usage:
 #   render-test-plain.sh --run-id <id> [TODO other flags]
@@ -25,6 +25,6 @@ done
 
 [[ -z "$RUN_ID" ]] && { echo "Missing --run-id" >&2; exit 1; }
 
-# TODO — implement.
+# TODO - implement.
 echo "TODO: render-test-plain.sh not yet implemented" >&2
 exit 1

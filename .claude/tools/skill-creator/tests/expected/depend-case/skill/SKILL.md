@@ -1,6 +1,6 @@
 ---
 name: test-depend
-description: 'Fixture skill exercising the depend path and YAML''s apostrophe escaping. Triggers: "test depend". Fixture only. TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'
+description: 'Fixture skill exercising the depend path and YAML''s apostrophe escaping. Triggers: "test depend". Fixture only. TODO - refine description and add NOT-for clauses pointing at neighbouring skills.'
 metadata:
   workspace-deps: demo-project demo-tool
 ---
@@ -13,13 +13,13 @@ metadata:
 
 | Trigger | What to follow |
 |---------|----------------|
-| "test depend" | TODO — section name |
+| "test depend" | TODO - section name |
 
-NOT for TODO — name out-of-scope cases pointing at the right neighbouring skill.
+NOT for TODO - name out-of-scope cases pointing at the right neighbouring skill.
 
 ## Dependencies
 
-This skill needs demo-project demo-tool — invoked at runtime instead of a local port. Why: fixture justification. Declared in `metadata.workspace-deps`. Format: `agent-skills.md` → "Dependencies frontmatter"; well-formed criteria (pre-flight, description mention, check-deps): `patterns.md` §9. Keep the list in sync with what the steps actually invoke.
+This skill needs demo-project demo-tool  - invoked at runtime instead of a local port. Why: fixture justification. Declared in `metadata.workspace-deps`. Format: `agent-skills.md` → "Dependencies frontmatter"; well-formed criteria (pre-flight, description mention, check-deps): `patterns.md` §9. Keep the list in sync with what the steps actually invoke.
 
 ## Step 0: Start
 
@@ -50,4 +50,4 @@ All under `~/trade-imports-arch-workspace/.claude/tools/test-depend/`:
 
 | Script | Purpose |
 |---|---|
-| `start-test-depend.sh` | TODO — one-line purpose |
+| `start-test-depend.sh` | TODO - one-line purpose |

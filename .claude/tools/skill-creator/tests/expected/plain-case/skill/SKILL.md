@@ -1,6 +1,6 @@
 ---
 name: test-plain
-description: 'Fixture skill with JSON state, fan-out and no dependencies. Triggers: "test plain". Fixture only. TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'
+description: 'Fixture skill with JSON state, fan-out and no dependencies. Triggers: "test plain". Fixture only. TODO - refine description and add NOT-for clauses pointing at neighbouring skills.'
 ---
 
 <!-- TODO: one-paragraph intro. State the audience (which tickets, which work) and the outcome (what artifact lands where). -->
@@ -11,9 +11,9 @@ description: 'Fixture skill with JSON state, fan-out and no dependencies. Trigge
 
 | Trigger | What to follow |
 |---------|----------------|
-| "test plain" | TODO — section name |
+| "test plain" | TODO - section name |
 
-NOT for TODO — name out-of-scope cases pointing at the right neighbouring skill.
+NOT for TODO - name out-of-scope cases pointing at the right neighbouring skill.
 
 ## Worker references
 
@@ -21,7 +21,7 @@ NOT for TODO — name out-of-scope cases pointing at the right neighbouring skil
 |---|---|---|
 | `references/FIXTURE_WORKER.md` | TODO step | TODO artifact |
 
-Spawn idiom — Task tool, `subagent_type: general-purpose`, prompt begins:
+Spawn idiom - Task tool, `subagent_type: general-purpose`, prompt begins:
 
 ```
 Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/test-plain/references/<NAME>.md.
@@ -62,5 +62,5 @@ All under `~/trade-imports-arch-workspace/.claude/tools/test-plain/`:
 
 | Script | Purpose |
 |---|---|
-| `start-test-plain.sh` | TODO — one-line purpose |
-| `render-test-plain.sh` | TODO — one-line purpose |
+| `start-test-plain.sh` | TODO - one-line purpose |
+| `render-test-plain.sh` | TODO - one-line purpose |

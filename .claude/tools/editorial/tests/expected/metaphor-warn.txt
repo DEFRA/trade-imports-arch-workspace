@@ -1,0 +1,3 @@
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/metaphor-warn.md:3: The fix lands next week and the cost bites in the second quarter.
+check-prose: WARN hits are the metaphor hard-avoid list - judge each: literal technical uses stay, figurative uses are unpacked (~/trade-imports-arch-workspace/.claude/skills/editorial/SKILL.md (Style guide), "Metaphor: hard avoids").
+exit-code: 0

@@ -1,4 +1,4 @@
-# confluence-publish skill — decisions
+# confluence-publish skill - decisions
 
 Recorded during CREATE interview. Update if a shape choice
 changes; do not delete entries.
@@ -59,7 +59,7 @@ Publish a single documentation page to Confluence by orchestrating the existing 
 **Declared:** delivery-info-arch-tooling trade-imports-documentation npm
 **Why:** the publish pipeline (ADF conversion, diagram attachment,
 generated-label safety) is actively maintained in the tooling; a port
-would fork it, and this skill's charter is the opposite — owns no build
+would fork it, and this skill's charter is the opposite - owns no build
 or publish logic.
 **Pattern reference:** patterns.md §9
 

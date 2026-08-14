@@ -1,7 +1,7 @@
 ---
 name: skill-creator
-description: 'Meta-skill for authoring new workspace skills and auditing existing ones against the 9-pattern checklist. Two modes — CREATE scaffolds a new skill end-to-end (SKILL.md + references/ + tools/<name>/ + assets/ + .claude/settings.json allowlist), AUDIT walks an existing skill (or fans out across all skills) and produces a plan document under workareas/skills-audit/<name>.md. Use when the user wants to add a workspace skill or assess an existing one (triggers: "scaffold skill <name>", "skill-create <name>", "new workspace skill <name>", "audit skill <name>", "audit skills", "review skill <name> against patterns"). Disambiguated from Claude Code''s built-in /init (which scaffolds CLAUDE.md, not workspace skills). NOT for editing skills you already understand — open the SKILL.md and edit directly; further NOT-for routing in the body.'
-# context: inline — CREATE runs an interactive interview + scaffolds files in-session with the user (needs Edit/Write in the parent); AUDIT still fans out to Task workers.
+description: 'Meta-skill for authoring new workspace skills and auditing existing ones against the 9-pattern checklist. Two modes - CREATE scaffolds a new skill end-to-end (SKILL.md + references/ + tools/<name>/ + assets/ + .claude/settings.json allowlist), AUDIT walks an existing skill (or fans out across all skills) and produces a plan document under workareas/skills-audit/<name>.md. Use when the user wants to add a workspace skill or assess an existing one (triggers: "scaffold skill <name>", "skill-create <name>", "new workspace skill <name>", "audit skill <name>", "audit skills", "review skill <name> against patterns"). Disambiguated from Claude Code''s built-in /init (which scaffolds CLAUDE.md, not workspace skills). NOT for editing skills you already understand - open the SKILL.md and edit directly; further NOT-for routing in the body.'
+# context: inline - CREATE runs an interactive interview + scaffolds files in-session with the user (needs Edit/Write in the parent); AUDIT still fans out to Task workers.
 context: inline
 allowed-tools: [Bash, Read, Glob, Grep, Task, Edit, Write]
 argument-hint: "<trigger phrase including skill name>"
@@ -9,20 +9,20 @@ argument-hint: "<trigger phrase including skill name>"
 
 The meta-skill. Captures the 9-pattern checklist for workspace skills under `~/trade-imports-arch-workspace/.claude/skills/` and applies it two ways:
 
-- **CREATE** — interview the user, produce a full scaffold with TODO placeholders.
-- **AUDIT** — walk the checklist against existing skill(s), write plan documents under `workareas/skills-audit/`.
+- **CREATE** - interview the user, produce a full scaffold with TODO placeholders.
+- **AUDIT** - walk the checklist against existing skill(s), write plan documents under `workareas/skills-audit/`.
 
 Stops at audit. Improvement work is judgment-heavy; the user resolves Open Questions on the plan and hand-writes the implementer prompt.
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
-## Session start — Read these references
+## Session start - Read these references
 
 Before either mode, Read these into context (the checklist must be live; anti-patterns drift over time):
 
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md` — the 9-pattern checklist (canonical reference).
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md` — known mis-applications. Grows over time.
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/scaffold-template.md` — only Read in CREATE mode (the SKILL.md skeleton + decisions.md sidecar).
+- `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md` - the 9-pattern checklist (canonical reference).
+- `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md` - known mis-applications. Grows over time.
+- `~/trade-imports-arch-workspace/.claude/best-practices/skills/scaffold-template.md` - only Read in CREATE mode (the SKILL.md skeleton + decisions.md sidecar).
 
 ## When to use
 
@@ -32,9 +32,9 @@ Before either mode, Read these into context (the checklist must be live; anti-pa
 | "audit skill `<name>`", "review skill `<name>` against patterns" | AUDIT (single) | Step 0 dispatch → spawn one AUDITOR worker |
 | "audit skills" (no name) | AUDIT (all) | Step 0 dispatch → enumerate skills, fan out one AUDITOR per skill |
 
-Disambiguated from Claude Code's built-in `/init` (which scaffolds `CLAUDE.md`). Use one of the trigger phrases above — none of them match the `/init` keyword.
+Disambiguated from Claude Code's built-in `/init` (which scaffolds `CLAUDE.md`). Use one of the trigger phrases above - none of them match the `/init` keyword.
 
-NOT for hand-editing a skill you already understand — open `SKILL.md` and edit. NOT for adding a worker reference to an existing skill — edit the skill's `references/` folder directly. NOT for reviewing code correctness or security — AUDIT assesses a skill's own structure against the checklist, never the code a skill produces.
+NOT for hand-editing a skill you already understand - open `SKILL.md` and edit. NOT for adding a worker reference to an existing skill - edit the skill's `references/` folder directly. NOT for reviewing code correctness or security - AUDIT assesses a skill's own structure against the checklist, never the code a skill produces.
 
 ## Worker references
 
@@ -43,7 +43,7 @@ NOT for hand-editing a skill you already understand — open `SKILL.md` and edit
 | `references/INTERVIEWER.md` | CREATE mode parent session | parent-loaded (no Task spawn) | populates `decisions.json` then invokes `scaffold-skill.sh` |
 | `references/AUDITOR.md` | AUDIT mode parent session | Task `subagent_type: general-purpose`, one per skill | per-skill plan at `workareas/skills-audit/<name>.md` |
 
-Spawn idiom for AUDITOR — prompt begins:
+Spawn idiom for AUDITOR - prompt begins:
 
 ```
 Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/skill-creator/references/AUDITOR.md.
@@ -53,7 +53,7 @@ Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/skill-c
 **Output path:** ~/trade-imports-arch-workspace/.claude/workareas/skills-audit/<name>.md
 ```
 
-`general-purpose` carries `Tools: *` so the worker can Read / Write / Bash freely — required because the AUDITOR doesn't see this SKILL.md (it has its own hygiene block at the top of `AUDITOR.md`).
+`general-purpose` carries `Tools: *` so the worker can Read / Write / Bash freely - required because the AUDITOR doesn't see this SKILL.md (it has its own hygiene block at the top of `AUDITOR.md`).
 
 ## Step 0: Dispatch
 
@@ -104,19 +104,19 @@ Next: open .claude/skills/<name>/SKILL.md and fill in the TODOs.
 
 # AUDIT flow
 
-**Currency policy:** a change to the pattern checklist re-opens all audits — plans written against an older checklist are stale until re-run. Open questions never rot silently: every audit run ends with the Outstanding-actions sweep in Step A4.
+**Currency policy:** a change to the pattern checklist re-opens all audits - plans written against an older checklist are stale until re-run. Open questions never rot silently: every audit run ends with the Outstanding-actions sweep in Step A4.
 
 ## Step A1: Enumerate targets
 
-`AUDIT_ONE` — targets is a single skill name from the trigger.
+`AUDIT_ONE` - targets is a single skill name from the trigger.
 
-`AUDIT_ALL` — `start-skill-creator.sh` already listed every `.claude/skills/*/SKILL.md` (excluding `skill-creator` itself) in the JSON payload's `targets[]`.
+`AUDIT_ALL` - `start-skill-creator.sh` already listed every `.claude/skills/*/SKILL.md` (excluding `skill-creator` itself) in the JSON payload's `targets[]`.
 
 ## Step A2: Spawn one AUDITOR per target
 
 Spawn `general-purpose` Task subagents in parallel (up to one per target). Each spawn prompt:
 
-Emit ALL Task calls in a single assistant response — do NOT spawn one, await the result, then spawn the next. Parallelism only works when calls are batched in one turn.
+Emit ALL Task calls in a single assistant response - do NOT spawn one, await the result, then spawn the next. Parallelism only works when calls are batched in one turn.
 
 ```
 Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/skill-creator/references/AUDITOR.md.
@@ -126,7 +126,7 @@ Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/skill-c
 **Output path:** ~/trade-imports-arch-workspace/.claude/workareas/skills-audit/<name>.md
 ```
 
-Wait for all workers to finish (the harness emits `task-notification` per worker — wait for the `completed` set, do not poll).
+Wait for all workers to finish (the harness emits `task-notification` per worker - wait for the `completed` set, do not poll).
 
 ## Step A3: Aggregate
 
@@ -142,7 +142,7 @@ Read each `workareas/skills-audit/<name>.md` produced. Emit a summary table:
 
 ## Step A4: Outstanding-actions sweep
 
-Read every `workareas/skills-audit/*.md` (all of them — not just this run's) and collect unresolved `## Open questions` items. Resolved means edited out of the plan: when a question is answered, delete it from the plan file (the answer lands in the relevant decisions.md or doc) — the sweep collects whatever remains. Also list any `OWNER-ACTION-*.md` files present in the workarea: those are outstanding by definition until the owner deletes them. Print them as an **Outstanding actions** list at the end of the completion output, grouped by skill, so the backlog surfaces every audit run instead of rotting in the workarea. No external trackers — this list is the follow-up mechanism.
+Read every `workareas/skills-audit/*.md` (all of them - not just this run's) and collect unresolved `## Open questions` items. Resolved means edited out of the plan: when a question is answered, delete it from the plan file (the answer lands in the relevant decisions.md or doc) - the sweep collects whatever remains. Also list any `OWNER-ACTION-*.md` files present in the workarea: those are outstanding by definition until the owner deletes them. Print them as an **Outstanding actions** list at the end of the completion output, grouped by skill, so the backlog surfaces every audit run instead of rotting in the workarea. No external trackers - this list is the follow-up mechanism.
 
 ## AUDIT completion output
 
@@ -167,8 +167,8 @@ All under `~/trade-imports-arch-workspace/.claude/tools/skill-creator/`:
 
 | Script | Purpose |
 | --- | --- |
-| `start-skill-creator.sh` | Step 0 dispatcher — parses trigger, emits `MODE: ...` + JSON payload |
-| `scaffold-skill.sh` | CREATE step 3 — reads `decisions.json`, writes the scaffold + allowlist entries + `decisions.md` |
-| `interview-add-answer.sh` | CREATE — atomic mutation of `decisions.json` (one shape question per call) |
-| `render-interview.sh` | CREATE — markdown view of `decisions.json` (used for `decisions.md` sidecar and mid-interview recaps) |
-| `list-project-features.sh` | CREATE Q2 — deterministic feature inventory of a child project (BIN/NPM/LIB FACT lines; ABSENT-safe) |
+| `start-skill-creator.sh` | Step 0 dispatcher - parses trigger, emits `MODE: ...` + JSON payload |
+| `scaffold-skill.sh` | CREATE step 3 - reads `decisions.json`, writes the scaffold + allowlist entries + `decisions.md` |
+| `interview-add-answer.sh` | CREATE - atomic mutation of `decisions.json` (one shape question per call) |
+| `render-interview.sh` | CREATE - markdown view of `decisions.json` (used for `decisions.md` sidecar and mid-interview recaps) |
+| `list-project-features.sh` | CREATE Q2 - deterministic feature inventory of a child project (BIN/NPM/LIB FACT lines; ABSENT-safe) |

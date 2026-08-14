@@ -1,0 +1,3 @@
+check-prose: FAIL title:1: Bad — title
+check-prose: banned punctuation (em-dash / spaced en-dash / curly quote) - rule: ~/trade-imports-arch-workspace/.claude/skills/editorial/SKILL.md (Style guide). Replace with a plain hyphen " - " or straight quotes and re-run.
+exit-code: 2

@@ -11,11 +11,11 @@ Publishes one markdown page from the doc repo's `docs/` tree to Confluence (`eaf
 
 Declared in `metadata.workspace-deps` and pre-flighted by the Step 0 dispatcher (criteria: `patterns.md` §9).
 
-- `trade-imports-documentation` — the doc repo being published from: owns the page tree (`docs/`), the publish config and the npm wrapping (`publish:confluence`, `build:mmd`, `build:diagrams`).
-- `delivery-info-arch-tooling` — the library behind those npm scripts: owns the publish pipeline (ADF conversion, diagram attachment, `generated`-label safety). Reached through the doc repo's `file:../delivery-info-arch-tooling` npm dependency, so the pre-flight also checks the doc repo has been `npm install`ed.
-- `npm` — runs the wrapping scripts (Node 22+ per the doc repo's README).
+- `trade-imports-documentation` - the doc repo being published from: owns the page tree (`docs/`), the publish config and the npm wrapping (`publish:confluence`, `build:mmd`, `build:diagrams`).
+- `delivery-info-arch-tooling` - the library behind those npm scripts: owns the publish pipeline (ADF conversion, diagram attachment, `generated`-label safety). Reached through the doc repo's `file:../delivery-info-arch-tooling` npm dependency, so the pre-flight also checks the doc repo has been `npm install`ed.
+- `npm` - runs the wrapping scripts (Node 22+ per the doc repo's README).
 
-Why depend rather than port: the publish pipeline is actively maintained in the tooling, so a port would fork it — and this skill's charter is the opposite ("owns no build or publish logic; the tooling does the work").
+Why depend rather than port: the publish pipeline is actively maintained in the tooling, so a port would fork it - and this skill's charter is the opposite ("owns no build or publish logic; the tooling does the work").
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
@@ -40,7 +40,7 @@ Prerequisites the user's shell must hold: credentials in either convention - `CO
 `<page-path>` may be absolute, repo-relative, or `docs/`-relative. First stdout line is the branch:
 
 - `MODE: BLOCKED` - relay every `REASON:` line to the user verbatim and stop. Do not work around a blocker; each reason names its remedy (export the variable, add the `publishPaths` entry, fix the path).
-- `MODE: READY` - continue. The FACT lines carry everything later steps need: `PAGE` (the `docs/...` path), `SPACE` (target space key), `CONFLUENCE_BASE`, one line per embedded diagram with `png=present|MISSING|STALE` (STALE = a model/diagram source changed after the export), `FENCED_MERMAID_BLOCKS`, `BUILD_NEEDED`, zero or more `BUILD_CMD` lines, and `PUBLISH_CMD`. The command lines are emitted with resolved paths in the `~`-spelled canonical form, so they match the permission allowlist verbatim and nothing you type carries a variable - run them verbatim in later steps. Exception, by design: `BUILD_CMD` lines start with bare `npm` and are not allowlist-covered, so they prompt — a deliberate speed bump before the slow, estate-wide diagram rebuild (A11's documented-exception path).
+- `MODE: READY` - continue. The FACT lines carry everything later steps need: `PAGE` (the `docs/...` path), `SPACE` (target space key), `CONFLUENCE_BASE`, one line per embedded diagram with `png=present|MISSING|STALE` (STALE = a model/diagram source changed after the export), `FENCED_MERMAID_BLOCKS`, `BUILD_NEEDED`, zero or more `BUILD_CMD` lines, and `PUBLISH_CMD`. The command lines are emitted with resolved paths in the `~`-spelled canonical form, so they match the permission allowlist verbatim and nothing you type carries a variable - run them verbatim in later steps. Exception, by design: `BUILD_CMD` lines start with bare `npm` and are not allowlist-covered, so they prompt - a deliberate speed bump before the slow, estate-wide diagram rebuild (A11's documented-exception path).
 
 ## Step 1: Validate Mermaid sources (conditional)
 

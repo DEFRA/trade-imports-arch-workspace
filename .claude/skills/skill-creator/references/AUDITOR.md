@@ -2,7 +2,7 @@ Audit **one** workspace skill against the 9-pattern checklist and write a plan d
 
 Your spawn prompt names a target skill, its `SKILL.md` path, and the output plan path. Walk the checklist; produce the plan. Do not make in-place edits to the target skill.
 
-**Bash call hygiene** — one command per Bash call. Full rule table: `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md` → "Bash call hygiene".
+**Bash call hygiene** - one command per Bash call. Full rule table: `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md` → "Bash call hygiene".
 
 ## Inputs
 
@@ -16,9 +16,9 @@ Your spawn prompt gives you:
 
 Read these into context before walking the checklist (these are the canonical references the audit cites):
 
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md` — the 9-pattern checklist.
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md` — known mis-applications. Cite the matching entry (`A1`–`AN`) whenever you flag one.
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md` — workspace-wide hygiene rules.
+- `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md` - the 9-pattern checklist.
+- `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md` - known mis-applications. Cite the matching entry (`A1`–`AN`) whenever you flag one.
+- `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md` - workspace-wide hygiene rules.
 
 Then Read the target skill exhaustively:
 
@@ -31,7 +31,7 @@ Inspect `~/trade-imports-arch-workspace/.claude/settings.json` for matching allo
 
 ## The 9-pattern walkthrough
 
-For each pattern below with findings, produce a "Findings" subsection with concrete file:line citations. A pattern that is clean or N/A gets exactly ONE line in the plan ("§N — clean" / "§N — N/A: <reason>"), never a subsection: plans are re-generated whenever the checklist changes, and their bulk is the cost of that policy.
+For each pattern below with findings, produce a "Findings" subsection with concrete file:line citations. A pattern that is clean or N/A gets exactly ONE line in the plan ("§N - clean" / "§N - N/A: <reason>"), never a subsection: plans are re-generated whenever the checklist changes, and their bulk is the cost of that policy.
 
 ### 1. State as canonical JSON
 
@@ -40,7 +40,7 @@ Is state JSON or prose? Does the choice match the workflow? Specifically check:
 - Does `<workareas>/<skill>/...` contain a JSON file the helpers mutate atomically?
 - Or does the LLM write markdown directly?
 - If JSON: is there a `render-X.sh` for the markdown view?
-- If prose: is the artifact a narrative the user reads end-to-end (acceptable) or a list of N queryable items (mismatch — flag `A2`)?
+- If prose: is the artifact a narrative the user reads end-to-end (acceptable) or a list of N queryable items (mismatch - flag `A2`)?
 
 ### 2. Scripts call other scripts (single dispatcher)
 
@@ -73,15 +73,15 @@ Each violation: cite `file:line` and the corrected form.
 For each `references/<NAME>.md`:
 
 - Determine if it's spawned via Task `general-purpose` (fan-out) or parent-loaded.
-- Fan-out workers MUST carry the one-line pointer to `best-practices/skills/agent-skills.md` → "Bash call hygiene" — not a full inline block. The rules live once, canonically; copies drift. Flag any worker that re-inlines the block instead of pointing to it.
-- Parent-loaded references MAY omit even the pointer (inherit SKILL.md). Don't flag absence — it's optional.
+- Fan-out workers MUST carry the one-line pointer to `best-practices/skills/agent-skills.md` → "Bash call hygiene" - not a full inline block. The rules live once, canonically; copies drift. Flag any worker that re-inlines the block instead of pointing to it.
+- Parent-loaded references MAY omit even the pointer (inherit SKILL.md). Don't flag absence - it's optional.
 
 ### 6. Idempotent + atomic helpers
 
 For each helper in `tools/<name>/`:
 
 - Does it mutate state? If yes, does it use the `jq ... > tmp; mv tmp file` pattern (or equivalent atomic shape)? Or does it partial-write?
-- Do coverage gates check JSON fields (`jq -e`) or file presence/non-emptiness (`[[ -s file ]]`)? Latter is brittle — flag.
+- Do coverage gates check JSON fields (`jq -e`) or file presence/non-emptiness (`[[ -s file ]]`)? Latter is brittle - flag.
 - Where re-running might re-process done work, is there a `processed_at` / `reconciled_at` marker?
 
 ### 7. Walker UX (N-item triage)
@@ -92,7 +92,7 @@ For each helper in `tools/<name>/`:
 
 ### 8. Allowlist coverage
 
-- Does `.claude/settings.json` cover the skill's `tools/<name>/` scripts — via **either** the blanket `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` entry (the live settings.json shape) **or** the per-skill `Bash(.../tools/<name>/*)` + `:*` pair?
+- Does `.claude/settings.json` cover the skill's `tools/<name>/` scripts - via **either** the blanket `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` entry (the live settings.json shape) **or** the per-skill `Bash(.../tools/<name>/*)` + `:*` pair?
 - Flag a hard gap only when **neither** form is present (skill is unusable without coverage).
 
 ### 9. Dependencies
@@ -101,15 +101,15 @@ For each helper in `tools/<name>/`:
 - Hard invocation with no `metadata.workspace-deps` frontmatter → flag as a hard gap (undeclared dependency).
 - Soft probe with graceful fallback (probe, then fall back, never block) → fine undeclared; do not flag.
 - If `metadata.workspace-deps` is declared, verify all of:
-  - each token resolves — run `bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-deps.sh` and read this skill's lines;
+  - each token resolves - run `bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-deps.sh` and read this skill's lines;
   - a `## Dependencies` body section states the rationale;
   - the `description` names the requirement;
-  - the dispatcher pre-flights each declared token (`MODE: BLOCKED` + REASON naming the remedy) — a declared dependency without a pre-flight is a gap.
+  - the dispatcher pre-flights each declared token (`MODE: BLOCKED` + REASON naming the remedy) - a declared dependency without a pre-flight is a gap.
 - Declared tokens nothing in the skill actually invokes → flag as stale.
 
 ### 10. Prose hygiene (companion)
 
-Scan the SKILL.md and `references/*.md` for trim candidates per the categories in `patterns.md` "Pattern 10 (companion)". This deliverable is a **proposed trim diff** — per-file list of deletions / collapses with line refs and short rationale — NOT in-place edits.
+Scan the SKILL.md and `references/*.md` for trim candidates per the categories in `patterns.md` "Pattern 10 (companion)". This deliverable is a **proposed trim diff** - per-file list of deletions / collapses with line refs and short rationale - NOT in-place edits.
 
 If the prose is already tight, say so and skip the trim diff.
 
@@ -194,9 +194,9 @@ The parent session aggregates this into the audit summary table.
 
 ## Return value on failure
 
-If you cannot produce the plan — the target `SKILL.md` is unreadable, the reference files are missing, or the output path can't be written — do **not** return an empty or silent result. A silently-empty return (no plan path, no pattern-gap count) is indistinguishable from a clean audit that found nothing, and the parent's audit summary table will carry a silent hole for this skill.
+If you cannot produce the plan - the target `SKILL.md` is unreadable, the reference files are missing, or the output path can't be written - do **not** return an empty or silent result. A silently-empty return (no plan path, no pattern-gap count) is indistinguishable from a clean audit that found nothing, and the parent's audit summary table will carry a silent hole for this skill.
 
-Every termination MUST use the success shape above **or** this explicit failure shape — never a bare, empty return:
+Every termination MUST use the success shape above **or** this explicit failure shape - never a bare, empty return:
 
 ```
 FAILED: {skill} — {what failed}; tried: {channels}; audit summary row will be missing.

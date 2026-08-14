@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Pre-commit: lint the skills estate when staged changes touch .claude/.
+# Pre-commit: lint the skills estate when staged changes touch .claude/,
+# and gate all staged markdown through the editorial style check.
 # Wired via `git config core.hooksPath .githooks` (make link does this).
 # Tool-agnostic by design — fires for any editor or agent. Bypassing
 # with --no-verify is denied by the workspace's own bash guard.
@@ -8,21 +9,31 @@
 # is checked out into a temp HOME (the same seam the golden tests use),
 # so an unstaged fix can't mask a staged break and vice versa.
 
-if git diff --cached --name-only | grep -Eq '^(\.claude/|Makefile$)'; then
-    TMP=$(mktemp -d)
-    trap 'rm -rf "$TMP"' EXIT
-    git checkout-index --prefix="$TMP/trade-imports-arch-workspace/" -a
+STAGED=$(git diff --cached --name-only)
+MD_STAGED=$(git diff --cached --name-only --diff-filter=ACMR \
+    | grep -E '\.md$' | grep -v '^\.claude/tools/[^/]*/tests/')
+
+NEED_TMP=0
+echo "$STAGED" | grep -Eq '^(\.claude/|Makefile$)' && NEED_TMP=1
+[ -n "$MD_STAGED" ] && NEED_TMP=1
+[ "$NEED_TMP" -eq 0 ] && exit 0
+
+TMP=$(mktemp -d)
+trap 'rm -rf "$TMP"' EXIT
+git checkout-index --prefix="$TMP/trade-imports-arch-workspace/" -a
+
+if echo "$STAGED" | grep -Eq '^(\.claude/|Makefile$)'; then
     if ! HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh"; then
         echo "pre-commit: skills lint failed on the staged content - fix and re-stage" >&2
         exit 1
     fi
-    # Golden suites run when staged paths touch either tools domain —
+    # Golden suites run when staged paths touch a gated tools domain —
     # the edit-generator-forget-to-bless failure a commit gate exists
-    # to catch. BOTH suites run for either domain: the scaffold's
+    # to catch. ALL suites run for any gated domain: the scaffold's
     # blessed stdout embeds lint-skills.sh output, so a workspace-side
     # lint change can break scaffold goldens too. Doc-only commits
     # stay fast.
-    if git diff --cached --name-only | grep -Eq '^\.claude/tools/(skill-creator|workspace)/'; then
+    if echo "$STAGED" | grep -Eq '^\.claude/tools/(skill-creator|workspace|editorial|pr)/'; then
         HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/run-golden.sh" || {
             echo "pre-commit: scaffold goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
             exit 1
@@ -31,6 +42,32 @@ if git diff --cached --name-only | grep -Eq '^(\.claude/|Makefile$)'; then
             echo "pre-commit: deps-doctor goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
             exit 1
         }
+        HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/editorial/tests/run-golden.sh" || {
+            echo "pre-commit: prose-gate goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
+            exit 1
+        }
+    fi
+fi
+
+# Editorial style gate on every staged markdown file (estate-wide), run
+# against the STAGED content with the STAGED gate script. The gate's own
+# test fixtures legitimately hold banned bytes and are excluded above.
+if [ -n "$MD_STAGED" ]; then
+    GATE="$TMP/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh"
+    if [ ! -f "$GATE" ]; then
+        echo "pre-commit: prose gate missing from staged tree ($GATE)" >&2
+        exit 1
+    fi
+    RC=0
+    while IFS= read -r f; do
+        [ -n "$f" ] || continue
+        [ -f "$TMP/trade-imports-arch-workspace/$f" ] || continue
+        bash "$GATE" "$TMP/trade-imports-arch-workspace/$f" \
+            2> >(sed "s|$TMP/trade-imports-arch-workspace/||g" >&2) || RC=1
+    done <<< "$MD_STAGED"
+    if [ "$RC" -ne 0 ]; then
+        echo "pre-commit: editorial style gate failed on staged markdown - fix the FAIL lines and re-stage" >&2
+        exit 1
     fi
 fi
 exit 0

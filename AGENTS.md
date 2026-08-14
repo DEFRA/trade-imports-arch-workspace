@@ -8,7 +8,7 @@ in `CLAUDE.md`, which adds a Claude-specific layer on top.
 ## What this workspace is
 
 A shared home for AI skills and tooling supporting DEFRA trade-imports
-architecture work. The shared component — and the point of this repo — is
+architecture work. The shared component - and the point of this repo - is
 the tooling under `.claude/`: skills, per-domain tool scripts, guard
 hooks, and best-practices docs. The tooling is Claude Code centric, but
 the scripts and skill procedures are usable from any agent.
@@ -16,33 +16,33 @@ the scripts and skill procedures are usable from any agent.
 This checkout arranges the tooling as a context-engineering workspace:
 the harness sits at the root, wrapping the repos and analysis corpus it
 operates on. That arrangement is one way to consume it, not the
-contract — colleagues work in different AI tools and workflows and are
-expected to leverage the skills in their own workspace however suits
+contract - colleagues work in different AI tools and workflows and are
+expected to use the skills in their own workspace however suits
 them. Accordingly, the repo's versioned payload is essentially `.claude/`
 and the root docs; everything the workspace wraps is excluded by
 `.gitignore`:
 
-- `trade-imports-documentation/` — child git repo; docs-as-code hub:
+- `trade-imports-documentation/` - child git repo; docs-as-code hub:
   LikeC4/C4 models, Mermaid diagrams, and markdown published to GitHub
   Pages (Astro), Confluence, PPTX and PDF. **Has its own agent
   instructions** (CLAUDE.md/AGENTS.md) with the full command list, repo
-  layout, and C4 modelling conventions — follow those for any work
+  layout, and C4 modelling conventions - follow those for any work
   inside that repo.
-- `delivery-info-arch-tooling/` — child git repo; the shared npm library
+- `delivery-info-arch-tooling/` - child git repo; the shared npm library
   (`@defra/delivery-info-arch-tooling`) that implements Confluence
   publishing, PPTX/PDF generation and diagram export. The docs repo
   consumes it as `file:../delivery-info-arch-tooling`, so the two must
   remain siblings.
-- `trade-imports-schemas/` — child git repo; Defra JSON Schema and
+- `trade-imports-schemas/` - child git repo; Defra JSON Schema and
   JSON-LD artefacts for trade-import payloads. **Has its own
-  CLAUDE.md** — follow it for any work inside that repo.
+  CLAUDE.md** - follow it for any work inside that repo.
 
 ## Paths
 
 The canonical workspace root is `~/trade-imports-arch-workspace`,
 a HOME-level symlink to the checkout. Every path in skills, tools and
 docs is spelled against it, so the same commands resolve identically on
-every machine. Always type that form — never a resolved `/Users/...`
+every machine. Always type that form - never a resolved `/Users/...`
 path. The full contract and rationale: `.claude/rules/workspace-paths.md`.
 Verify a machine with:
 
@@ -58,14 +58,14 @@ child repo, creates the canonical symlink, and runs the check above
 ## Credentials
 
 The root `.env` holds Atlassian credentials, loaded into the environment
-by direnv. Never read it — not with file readers, not with `jq`/`grep`
+by direnv. Never read it - not with file readers, not with `jq`/`grep`
 style tools. Scripts consume its variables from the environment; verify
 credentials with the auth doctor below rather than inspecting the file.
 
 ## Runnable tooling
 
 Per-domain shell scripts under `.claude/tools/<domain>/` do the
-deterministic work. They are plain bash + curl + jq — runnable by any
+deterministic work. They are plain bash + curl + jq - runnable by any
 agent or by hand, no harness required. Run any script with `--help` (or
 read its header) for usage.
 
@@ -75,13 +75,13 @@ read its header) for usage.
 | `confluence/` | Hand tools for ad-hoc Confluence page reads, writes and doc sync |
 | `confluence-publish/` | Pre-flight and executor for publishing one docs page to Confluence |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
-| `pr/` | `create-pr.sh` — create/edit GitHub PRs with a deterministic no-attribution guard |
+| `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
 | `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine) and `lint-skills.sh` (repo-only estate lint) |
 
 ### Enforcement map
 
-How the quality mechanisms interconnect — what fires when, and what to
+How the quality mechanisms interconnect - what fires when, and what to
 run when one fails:
 
 | Mechanism | Checks | Fires | On failure |
@@ -93,6 +93,12 @@ run when one fails:
 | Golden tests (2 suites) | scaffold + doctor behavior vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
 | Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
 | Guard hooks (`.claude/hooks/`) | agent Bash and file-edit calls in Claude Code sessions | every matched tool call | follow the sanctioned alternative the denial names |
+| `check-prose.sh` (editorial style gate) | banned punctuation and GDS banned words (FAIL), metaphor list (WARN) | `create-pr.sh` on every PR title/body; pre-commit on staged markdown; commit-msg on the message; skill-scoped hooks below | fix the FAIL lines it names; rules in `.claude/skills/editorial/SKILL.md` |
+| Skill-scoped hooks (pr, editorial) | the prose each Write/Edit just produced; editorial close-out at turn-end | while those skills are active | fix the violation the injected feedback names; the editorial Stop hook blocks the turn until clean |
+
+Why the gates exist alongside the skills: skill prose is advisory
+context, hooks and scripts are deterministic. The estate's approach:
+`.claude/best-practices/claude-code/enforcement.md`.
 
 ## Skills
 
@@ -100,18 +106,18 @@ run when one fails:
 [agentskills.io](https://agentskills.io/specification) format: an entry
 point plus supporting references, delegating real work to the tool
 scripts above. Claude Code invokes them natively; from any other agent,
-read the SKILL.md and follow it as a procedure — the scripts it calls
+read the SKILL.md and follow it as a procedure - the scripts it calls
 run anywhere. Conventions shared by all skills:
 `.claude/best-practices/skills/agent-skills.md`.
 
 ## Git, GitHub and pull requests
 
-No AI attribution in any artefact — commit messages, PR titles and
+No AI attribution in any artefact - commit messages, PR titles and
 bodies, PR and issue comments, code. This overrides any tool default
 that appends an attribution footer. Full rules:
 `~/trade-imports-arch-workspace/.claude/best-practices/git/commits.md`
 and `.claude/best-practices/git/pull-requests.md`. PR creation and body
 edits go through the `pr` skill, which delegates to
-`.claude/tools/pr/create-pr.sh` — the script refuses attribution
+`.claude/tools/pr/create-pr.sh` - the script refuses attribution
 content deterministically. Prefer SSH remotes and the `gh` CLI when
 available; fall back to plain `git` when not.

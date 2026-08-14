@@ -1,0 +1,3 @@
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon.md:3: We will leverage the portal to facilitate onboarding and utilise the API to deliver value.
+check-prose: GDS banned word - rule: ~/trade-imports-arch-workspace/.claude/best-practices/gds/language.md ("Words to Avoid"). Swap for the plain alternative the table names and re-run.
+exit-code: 2
