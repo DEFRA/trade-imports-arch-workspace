@@ -1,0 +1,35 @@
+{
+  "name": "pr",
+  "started_at": "2026-08-14T11:46:05Z",
+  "answered_at": null,
+  "scaffolded_at": "2026-08-14T11:47:27Z",
+  "answers": {
+    "purpose": "Create or edit GitHub pull requests through the attribution-guard script (tools/pr/create-pr.sh): pre-flight the branch, draft the body to the pull-requests best-practices doc, refuse AI attribution deterministically.",
+    "dependencies": {
+      "resolution": "none",
+      "declared": [
+        "gh"
+      ],
+      "justification": "No child-project overlap (probed all three 2026-08-14: docs/diagram/publishing pipelines and schema validation only). gh (GitHub CLI) is the one beyond-baseline tool; create-pr.sh pre-flights it and fails with a remedy naming the plain-git fallback."
+    },
+    "state_shape": "prose",
+    "dispatcher": false,
+    "prebake": false,
+    "fanout": {
+      "enabled": false
+    },
+    "walker": false,
+    "helpers": [],
+    "triggers": {
+      "phrases": [
+        "create a pr",
+        "push to a pr",
+        "raise a pull request",
+        "open a pull request",
+        "gh pr create",
+        "edit the pr body"
+      ],
+      "disambiguation": "Owns GitHub pull-request creation and body edits only. NOT for making commits - that is the commit skill; NOT for reviewing PRs - that is the review skill; distinct from /init (project doc bootstrap). Neighbouring workspace skills (jira, confluence-read, confluence-publish) own different systems entirely."
+    }
+  }
+}

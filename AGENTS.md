@@ -75,6 +75,7 @@ read its header) for usage.
 | `confluence/` | Hand tools for ad-hoc Confluence page reads, writes and doc sync |
 | `confluence-publish/` | Pre-flight and executor for publishing one docs page to Confluence |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
+| `pr/` | `create-pr.sh` — create/edit GitHub PRs with a deterministic no-attribution guard |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
 | `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine) and `lint-skills.sh` (repo-only estate lint) |
 
@@ -102,3 +103,15 @@ scripts above. Claude Code invokes them natively; from any other agent,
 read the SKILL.md and follow it as a procedure — the scripts it calls
 run anywhere. Conventions shared by all skills:
 `.claude/best-practices/skills/agent-skills.md`.
+
+## Git, GitHub and pull requests
+
+No AI attribution in any artefact — commit messages, PR titles and
+bodies, PR and issue comments, code. This overrides any tool default
+that appends an attribution footer. Full rules:
+`~/trade-imports-arch-workspace/.claude/best-practices/git/commits.md`
+and `.claude/best-practices/git/pull-requests.md`. PR creation and body
+edits go through the `pr` skill, which delegates to
+`.claude/tools/pr/create-pr.sh` — the script refuses attribution
+content deterministically. Prefer SSH remotes and the `gh` CLI when
+available; fall back to plain `git` when not.

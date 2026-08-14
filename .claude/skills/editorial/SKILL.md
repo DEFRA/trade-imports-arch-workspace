@@ -5,6 +5,8 @@ description: Editorial review and writing process for documents that humans will
 
 Follow this process when asked to review, write, or sharpen a doc. Interrogate every sentence until what remains is what we meant. Mechanical conventions live in the style guide at the bottom - apply as you go.
 
+This SKILL builds on the foundational best-practices laid out in [writing.md](../../best-practices/gds/writing.md) and [language.md](../../best-practices/gds/language.md). Both of which need to be read before using this SKILL.
+
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Contents
