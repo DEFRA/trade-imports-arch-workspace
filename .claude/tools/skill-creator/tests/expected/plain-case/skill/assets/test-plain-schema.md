@@ -14,7 +14,7 @@ Mutated only via `tools/test-plain/*.sh` helpers. A markdown view is regenerated
   "items": [
     {
       "id": 1,
-      "TODO": "TODO — fill in the per-item shape"
+      "TODO": "TODO - fill in the per-item shape"
     }
   ]
 }
@@ -22,4 +22,4 @@ Mutated only via `tools/test-plain/*.sh` helpers. A markdown view is regenerated
 
 ## Field rules
 
-- TODO — document each field, validation rules, and which helper mutates it.
+- TODO - document each field, validation rules, and which helper mutates it.

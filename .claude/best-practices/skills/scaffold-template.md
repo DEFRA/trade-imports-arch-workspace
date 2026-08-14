@@ -21,7 +21,7 @@ tools/{{NAME}}/
 └── render-{{NAME}}.sh          # if JSON state has a markdown view: pattern 1
 ```
 
-A skill that declares `metadata.workspace-deps` (pattern 9) pre-flights each declared dependency in `start-{{NAME}}.sh` — `MODE: BLOCKED` plus a `REASON` naming the remedy when one is missing. The `metadata:` block in the frontmatter template below appears only when pattern 9 applies (format contract: `agent-skills.md` → "Dependencies frontmatter" — no quotes, no inline comments on the declaration line).
+A skill that declares `metadata.workspace-deps` (pattern 9) pre-flights each declared dependency in `start-{{NAME}}.sh` - `MODE: BLOCKED` plus a `REASON` naming the remedy when one is missing. The `metadata:` block in the frontmatter template below appears only when pattern 9 applies (format contract: `agent-skills.md` → "Dependencies frontmatter" - no quotes, no inline comments on the declaration line).
 
 `.claude/settings.json` allowlist entries (pattern 8):
 
@@ -30,13 +30,13 @@ Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*)
 Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*:*)
 ```
 
-## SKILL.md skeleton — the blessed golden output is the exemplar
+## SKILL.md skeleton - the blessed golden output is the exemplar
 
-There is deliberately NO hand-written copy of the emitted SKILL.md here: a second copy of the generator's heredoc drifts (it did, twice, in one branch). The living, review-gated exemplars are the golden expected trees — they cannot diverge from `scaffold-skill.sh` because `make check` and the pre-commit hook diff them against its real output:
+There is deliberately NO hand-written copy of the emitted SKILL.md here: a second copy of the generator's heredoc drifts (it did, twice, in one branch). The living, review-gated exemplars are the golden expected trees - they cannot diverge from `scaffold-skill.sh` because `make check` and the pre-commit hook diff them against its real output:
 
-- `~/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/expected/plain-case/skill/SKILL.md` — dispatcher + JSON state + fan-out worker.
-- `.../expected/depend-case/skill/SKILL.md` — a declaring skill (`metadata.workspace-deps` frontmatter + `## Dependencies` section).
-- `.../expected/tool-only-case/skill/SKILL.md` — zero-helper skill reusing another tools domain.
+- `~/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/expected/plain-case/skill/SKILL.md` - dispatcher + JSON state + fan-out worker.
+- `.../expected/depend-case/skill/SKILL.md` - a declaring skill (`metadata.workspace-deps` frontmatter + `## Dependencies` section).
+- `.../expected/tool-only-case/skill/SKILL.md` - zero-helper skill reusing another tools domain.
 
 To change the emitted skeleton: edit the heredoc in `scaffold-skill.sh`, run the golden suite, review the diff, `--bless`, commit both.
 

@@ -7,12 +7,12 @@ Based on [UK Government Style Guide](https://www.gov.uk/guidance/style-guide).
 ### Words to Avoid
 | Avoid | Use |
 |-------|-----|
-| deliver | create, provide |
-| leverage | use |
-| empower | allow, let |
-| facilitate | help, allow |
-| utilise | use |
-| portal | website, service |
+| `deliver` | create, provide |
+| `leverage` | use |
+| `empower` | allow, let |
+| `facilitate` | help, allow |
+| `utilise` | use |
+| `portal` | website, service |
 
 ## Voice and Tone
 

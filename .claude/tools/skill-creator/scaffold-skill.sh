@@ -22,7 +22,7 @@
 # triggers.disambiguation is empty, or if a helper name collides with
 # an existing tools/<name>/ script (reused scripts must not become
 # stubs). Dependency gaps (missing justification / no dispatcher for
-# the pre-flight) WARN and proceed — audit pattern 9 flags them; the
+# the pre-flight) WARN and proceed - audit pattern 9 flags them; the
 # scaffold never blocks on judgment.
 #
 # All mutations atomic: write to .tmp then mv.
@@ -78,7 +78,7 @@ missing=$(jq -r '
 ' "$DECISIONS")
 
 if [[ -n "$missing" ]]; then
-    echo "Cannot scaffold — missing answers: $missing" >&2
+    echo "Cannot scaffold - missing answers: $missing" >&2
     echo "Run interview-add-answer.sh for each missing field, then retry." >&2
     exit 1
 fi
@@ -110,18 +110,18 @@ DEP_WHY=$(jq -r '.answers.dependencies.justification // ""' "$DECISIONS")
 # Advisory warnings, not gates (pattern 9 is audit criteria; the
 # scaffold never blocks on judgment calls).
 if [[ "$DEP_RESOLUTION" == "depend" ]]; then
-    [[ -z "$DEP_DECLARED" ]] && echo "WARN: resolution=depend with no declared tokens — frontmatter will carry a TODO; audit pattern 9 will flag it" >&2
-    [[ -z "$DEP_WHY" ]] && echo "WARN: resolution=depend with no justification — the Dependencies section will carry a TODO" >&2
+    [[ -z "$DEP_DECLARED" ]] && echo "WARN: resolution=depend with no declared tokens - frontmatter will carry a TODO; audit pattern 9 will flag it" >&2
+    [[ -z "$DEP_WHY" ]] && echo "WARN: resolution=depend with no justification - the Dependencies section will carry a TODO" >&2
 fi
-# Pre-flighting attaches to DECLARING, not to depending — a tool-only
+# Pre-flighting attaches to DECLARING, not to depending - a tool-only
 # declaration needs a pre-flight home just the same.
 if [[ -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ]]; then
-    [[ "$DISPATCHER" != "true" ]] && echo "WARN: dependencies declared without a dispatcher — no home for the pre-flight; audit pattern 9 will flag this until one exists" >&2
+    [[ "$DISPATCHER" != "true" ]] && echo "WARN: dependencies declared without a dispatcher - no home for the pre-flight; audit pattern 9 will flag this until one exists" >&2
 fi
 
 # An existing SKILL.md is authored (or partial) territory: scaffolding
 # over it replaces content with TODO stubs, silently. Refuse in every
-# case — the remedy differs, the refusal doesn't.
+# case - the remedy differs, the refusal doesn't.
 if [[ -f "$SKILL_DIR/SKILL.md" ]]; then
     echo "Refusing: $SKILL_DIR/SKILL.md already exists." >&2
     echo "If it is authored content: edit it directly (never re-scaffold). If it is a partial/stale scaffold: delete $SKILL_DIR (keep the workarea run - it holds the interview answers) and retry." >&2
@@ -129,7 +129,7 @@ if [[ -f "$SKILL_DIR/SKILL.md" ]]; then
 fi
 
 # Name + collision pre-pass: refuse BEFORE any file is written. Names
-# come from agent-authored answers, so charset-gate them like run-ids —
+# come from agent-authored answers, so charset-gate them like run-ids - 
 # a stray ../ must not write outside the owned tree.
 while IFS= read -r helper; do
     [[ -z "$helper" ]] && continue
@@ -156,7 +156,7 @@ done < <(jq -r '.answers.fanout.workers // [] | .[]' "$DECISIONS")
 # Dry-run AFTER the refusals and name gates, so the preview is honest:
 # a run the real path would refuse must not print "would scaffold".
 if $DRY_RUN; then
-    echo "DRY RUN — would scaffold $NAME:"
+    echo "DRY RUN - would scaffold $NAME:"
     echo "  SKILL.md → $SKILL_DIR/SKILL.md"
     echo "  state_shape=$STATE_SHAPE dispatcher=$DISPATCHER fanout=$FANOUT walker=$WALKER"
     echo "  dependencies: resolution=$DEP_RESOLUTION declared=[$DEP_DECLARED]"
@@ -164,7 +164,7 @@ if $DRY_RUN; then
         echo "  helpers:"
         jq -r '.answers.helpers[] | "    tools/'"$NAME"'/" + . + ".sh"' "$DECISIONS"
     else
-        echo "  helpers: (none — reuses an existing tools domain)"
+        echo "  helpers: (none - reuses an existing tools domain)"
     fi
     if [[ "$FANOUT" == "true" ]]; then
         echo "  workers:"
@@ -173,7 +173,7 @@ if $DRY_RUN; then
     exit 0
 fi
 
-# Only create subdirs that will hold content — git can't track empty
+# Only create subdirs that will hold content - git can't track empty
 # dirs and they mislead readers.
 mkdir -p "$SKILL_DIR"
 [[ "$FANOUT" == "true" ]] && mkdir -p "$SKILL_DIR/references"
@@ -221,7 +221,7 @@ if [[ "$FANOUT" == "true" ]]; then
 |---|---|---|
 $worker_rows
 
-Spawn idiom — Task tool, \`subagent_type: general-purpose\`, prompt begins:
+Spawn idiom - Task tool, \`subagent_type: general-purpose\`, prompt begins:
 
 \`\`\`
 Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/$NAME/references/<NAME>.md.
@@ -244,10 +244,10 @@ EOF
 )
 fi
 
-# Helpers cheat-sheet — a zero-helper skill reuses another domain, so
+# Helpers cheat-sheet - a zero-helper skill reuses another domain, so
 # its sheet says so instead of pointing at an empty tools/<name>/.
 if [[ "$HELPER_COUNT" -gt 0 ]]; then
-    helper_rows=$(jq -r '.answers.helpers[] | "| `" + . + ".sh` | TODO — one-line purpose |"' "$DECISIONS")
+    helper_rows=$(jq -r '.answers.helpers[] | "| `" + . + ".sh` | TODO - one-line purpose |"' "$DECISIONS")
     cheatsheet_block="## Scripts cheat-sheet
 
 All under \`~/trade-imports-arch-workspace/.claude/tools/$NAME/\`:
@@ -258,16 +258,16 @@ $helper_rows"
 else
     cheatsheet_block="## Scripts cheat-sheet
 
-(none — this skill reuses an existing \`tools/<domain>/\`; TODO list the borrowed scripts and their home here)"
+(none - this skill reuses an existing \`tools/<domain>/\`; TODO list the borrowed scripts and their home here)"
 fi
 
-# Frontmatter — metadata.workspace-deps emitted whenever anything is
+# Frontmatter - metadata.workspace-deps emitted whenever anything is
 # declared: a depend resolution OR beyond-baseline tool tokens recorded
 # with resolution none/build/port. Built as a variable so the
 # non-declaring case leaves no blank line inside the frontmatter block.
 frontmatter="---
 name: $NAME
-description: '$PURPOSE Triggers: $TRIGGERS_CSV. $DISAMBIG TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'"
+description: '$PURPOSE Triggers: $TRIGGERS_CSV. $DISAMBIG TODO - refine description and add NOT-for clauses pointing at neighbouring skills.'"
 if [[ -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ]]; then
     frontmatter="$frontmatter
 metadata:
@@ -276,18 +276,18 @@ fi
 frontmatter="$frontmatter
 ---"
 
-# Dependencies body section (pattern 9) — whenever anything is declared.
+# Dependencies body section (pattern 9) - whenever anything is declared.
 deps_section=""
 if [[ -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ]]; then
-    why_line="— tools beyond the workspace baseline (bash, curl, jq, git)."
+    why_line=" - tools beyond the workspace baseline (bash, curl, jq, git)."
     if [[ "$DEP_RESOLUTION" == "depend" ]]; then
-        why_line="— invoked at runtime instead of a local port. Why: ${DEP_WHY:-TODO — record the justification for depending}."
+        why_line=" - invoked at runtime instead of a local port. Why: ${DEP_WHY:-TODO - record the justification for depending}."
     fi
     deps_section=$(cat <<EOF
 
 ## Dependencies
 
-This skill needs ${DEP_DECLARED:-TODO — declare the project/tool tokens} $why_line Declared in \`metadata.workspace-deps\`. Format: \`agent-skills.md\` → "Dependencies frontmatter"; well-formed criteria (pre-flight, description mention, check-deps): \`patterns.md\` §9. Keep the list in sync with what the steps actually invoke.
+This skill needs ${DEP_DECLARED:-TODO - declare the project/tool tokens} $why_line Declared in \`metadata.workspace-deps\`. Format: \`agent-skills.md\` → "Dependencies frontmatter"; well-formed criteria (pre-flight, description mention, check-deps): \`patterns.md\` §9. Keep the list in sync with what the steps actually invoke.
 EOF
 )
 fi
@@ -304,9 +304,9 @@ $frontmatter
 
 | Trigger | What to follow |
 |---------|----------------|
-$(jq -r '.answers.triggers.phrases[] | "| \"" + . + "\" | TODO — section name |"' "$DECISIONS")
+$(jq -r '.answers.triggers.phrases[] | "| \"" + . + "\" | TODO - section name |"' "$DECISIONS")
 
-NOT for TODO — name out-of-scope cases pointing at the right neighbouring skill.
+NOT for TODO - name out-of-scope cases pointing at the right neighbouring skill.
 $deps_section
 $worker_block
 $state_block
@@ -339,21 +339,21 @@ if [[ "$FANOUT" == "true" ]]; then
         [[ -z "$worker" ]] && continue
         ref="$SKILL_DIR/references/$worker.md"
         cat > "$ref.tmp" <<EOF
-TODO — one-paragraph statement of what this worker does and what single artifact it produces.
+TODO - one-paragraph statement of what this worker does and what single artifact it produces.
 
-**Bash call hygiene** — one command per Bash call. Full rule table: \`~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md\` → "Bash call hygiene".
+**Bash call hygiene** - one command per Bash call. Full rule table: \`~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md\` → "Bash call hygiene".
 
 ## Inputs
 
-TODO — describe the per-spawn context the parent provides.
+TODO - describe the per-spawn context the parent provides.
 
 ## Workflow
 
-TODO — numbered steps. Read X, decide Y, write Z.
+TODO - numbered steps. Read X, decide Y, write Z.
 
 ## Return value
 
-TODO — one-line summary the parent aggregates.
+TODO - one-line summary the parent aggregates.
 EOF
         mv "$ref.tmp" "$ref"
     done < <(jq -r '.answers.fanout.workers[]' "$DECISIONS")
@@ -381,7 +381,7 @@ Mutated only via \`tools/$NAME/*.sh\` helpers. A markdown view is regenerated by
   "items": [
     {
       "id": 1,
-      "TODO": "TODO — fill in the per-item shape"
+      "TODO": "TODO - fill in the per-item shape"
     }
   ]
 }
@@ -389,7 +389,7 @@ Mutated only via \`tools/$NAME/*.sh\` helpers. A markdown view is regenerated by
 
 ## Field rules
 
-- TODO — document each field, validation rules, and which helper mutates it.
+- TODO - document each field, validation rules, and which helper mutates it.
 EOF
     mv "$asset.tmp" "$asset"
 fi
@@ -404,12 +404,12 @@ while IFS= read -r helper; do
     # Collisions were refused in the pre-pass above, before any write.
 
     # Pattern 9: the dispatcher stub of a declaring skill carries the
-    # pre-flight TODO (declaring, not just depending — tool-only
+    # pre-flight TODO (declaring, not just depending - tool-only
     # declarations need a pre-flight home too).
     preflight=""
     if [[ "$helper" == "start-$NAME" && ( -n "$DEP_DECLARED" || "$DEP_RESOLUTION" == "depend" ) ]]; then
         preflight="
-# TODO pattern 9 — pre-flight each declared dependency before real work:
+# TODO pattern 9 - pre-flight each declared dependency before real work:
 #   projects: [[ -d \$HOME/trade-imports-arch-workspace/<project> ]]
 #   tools:    command -v <tool>
 # On failure print MODE: BLOCKED plus REASON: <remedy> (model:
@@ -418,8 +418,8 @@ while IFS= read -r helper; do
     fi
     cat > "$sh.tmp" <<EOF
 #!/bin/bash
-# TODO — one-line purpose of this helper.
-# Boundary (only if this helper has a sibling) — TODO: when to use this vs that sibling.
+# TODO - one-line purpose of this helper.
+# Boundary (only if this helper has a sibling) - TODO: when to use this vs that sibling.
 #
 # Usage:
 #   $helper.sh --run-id <id> [TODO other flags]
@@ -444,7 +444,7 @@ done
 
 [[ -z "\$RUN_ID" ]] && { echo "Missing --run-id" >&2; exit 1; }
 
-# TODO — implement.
+# TODO - implement.
 echo "TODO: $helper.sh not yet implemented" >&2
 exit 1
 EOF
@@ -459,14 +459,14 @@ done < <(jq -r '.answers.helpers[]' "$DECISIONS")
 mv "$SKILL_DIR/decisions.md.tmp" "$SKILL_DIR/decisions.md"
 
 # ---------------------------------------------------------------------
-# .claude/settings.json — allowlist coverage (pattern 8).
+# .claude/settings.json - allowlist coverage (pattern 8).
 # ---------------------------------------------------------------------
 entry1="Bash(~/trade-imports-arch-workspace/.claude/tools/$NAME/*)"
 entry2="Bash(~/trade-imports-arch-workspace/.claude/tools/$NAME/*:*)"
 blanket="Bash(~/trade-imports-arch-workspace/.claude/tools/:*)"
 
 # The blanket tools/ entry (the live settings.json shape) already
-# covers every tools/<name>/ script — appending per-skill entries
+# covers every tools/<name>/ script - appending per-skill entries
 # under it would be redundant from birth. Append only when neither
 # the blanket nor the per-skill pair is present.
 covered=$(jq \
@@ -477,13 +477,13 @@ covered=$(jq \
     "$SETTINGS")
 
 if [[ "$HELPER_COUNT" -eq 0 ]]; then
-    # No owned scripts — appending entries for a directory we refused
+    # No owned scripts - appending entries for a directory we refused
     # to create would be dead permissions.
     ALLOWLIST_MSG="not applicable (no owned scripts; the reused domain's coverage is its own concern)"
 elif [[ "$covered" == "true" ]]; then
     ALLOWLIST_MSG="covered (blanket tools/ entry or per-skill pair already present; nothing appended)"
 else
-    # Append entries preserving existing ordering — `unique_by`
+    # Append entries preserving existing ordering - `unique_by`
     # would sort as a side effect.
     jq \
         --arg e1 "$entry1" \
@@ -521,7 +521,7 @@ echo "  allowlist:   $ALLOWLIST_MSG"
 echo
 echo "Open the SKILL.md and replace the TODO markers."
 
-# Lint tail — surface estate problems at the moment they are created.
+# Lint tail - surface estate problems at the moment they are created.
 # Advisory here (files are already written); the pre-commit hook and
 # make check enforce.
 bash "$WS/.claude/tools/workspace/lint-skills.sh" || true

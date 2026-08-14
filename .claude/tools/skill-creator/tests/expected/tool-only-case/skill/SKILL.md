@@ -1,6 +1,6 @@
 ---
 name: test-toolonly
-description: 'Fixture skill declaring a tool without depending, with zero helpers. Triggers: "test tool only". Fixture only. TODO — refine description and add NOT-for clauses pointing at neighbouring skills.'
+description: 'Fixture skill declaring a tool without depending, with zero helpers. Triggers: "test tool only". Fixture only. TODO - refine description and add NOT-for clauses pointing at neighbouring skills.'
 metadata:
   workspace-deps: demo-tool
 ---
@@ -13,13 +13,13 @@ metadata:
 
 | Trigger | What to follow |
 |---------|----------------|
-| "test tool only" | TODO — section name |
+| "test tool only" | TODO - section name |
 
-NOT for TODO — name out-of-scope cases pointing at the right neighbouring skill.
+NOT for TODO - name out-of-scope cases pointing at the right neighbouring skill.
 
 ## Dependencies
 
-This skill needs demo-tool — tools beyond the workspace baseline (bash, curl, jq, git). Declared in `metadata.workspace-deps`. Format: `agent-skills.md` → "Dependencies frontmatter"; well-formed criteria (pre-flight, description mention, check-deps): `patterns.md` §9. Keep the list in sync with what the steps actually invoke.
+This skill needs demo-tool  - tools beyond the workspace baseline (bash, curl, jq, git). Declared in `metadata.workspace-deps`. Format: `agent-skills.md` → "Dependencies frontmatter"; well-formed criteria (pre-flight, description mention, check-deps): `patterns.md` §9. Keep the list in sync with what the steps actually invoke.
 
 ## Step 1: TODO
 
@@ -38,4 +38,4 @@ Next: TODO hint.
 
 ## Scripts cheat-sheet
 
-(none — this skill reuses an existing `tools/<domain>/`; TODO list the borrowed scripts and their home here)
+(none - this skill reuses an existing `tools/<domain>/`; TODO list the borrowed scripts and their home here)

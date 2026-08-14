@@ -1,4 +1,4 @@
-# confluence-read skill — decisions
+# confluence-read skill - decisions
 
 Recorded during CREATE interview. Update if a shape choice
 changes; do not delete entries.
@@ -42,7 +42,7 @@ Fetch a Confluence page by URL or page id as clean markdown (via the confluence/
 
 ## 8. Helpers introduced
 
-None — the skill orchestrates the pre-existing `tools/confluence/`
+None - the skill orchestrates the pre-existing `tools/confluence/`
 hand-tool domain (`auth.sh`, `page.sh`, `html_to_md.js`; `page.sh`
 gained an `md` format for this skill). The scaffold's helper stubs were
 deliberately skipped so the existing hand tools would not be

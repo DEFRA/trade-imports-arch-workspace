@@ -26,13 +26,13 @@ Each entry: the anti-pattern, the symptom that catches it, and the correction.
 
 **Why it's wrong:** the surface area exceeds the workflow. The helper count signals state complexity; mismatched count signals over-engineering.
 
-**Correction:** collapse to one mutation helper (or none — let the LLM edit the artifact directly if there is no contract to enforce).
+**Correction:** collapse to one mutation helper (or none - let the LLM edit the artifact directly if there is no contract to enforce).
 
 ## A4. FRESH / REFRESH dispatcher where re-running fresh is the same thing
 
 **Symptom:** `start-<skill>.sh` branches FRESH vs REFRESH based on workspace state, but the REFRESH branch does the same work as FRESH minus a couple of guards.
 
-**Why it's wrong:** the dual-state adds branches, schemas, and docs without earning idempotency the user actually feels. Often "FRESH" already merges into prior state idempotently — REFRESH is the same code path.
+**Why it's wrong:** the dual-state adds branches, schemas, and docs without earning idempotency the user actually feels. Often "FRESH" already merges into prior state idempotently - REFRESH is the same code path.
 
 **Correction:** drop the mode branching. Make every invocation fresh; have consumers idempotently merge into prior state.
 
@@ -46,7 +46,7 @@ Each entry: the anti-pattern, the symptom that catches it, and the correction.
 
 ## A6. Render helper for artifacts the LLM writes directly
 
-**Symptom:** `render-X.sh` exists but nothing else writes the JSON — the LLM writes the markdown, the render helper rewrites it from a JSON the LLM also writes.
+**Symptom:** `render-X.sh` exists but nothing else writes the JSON - the LLM writes the markdown, the render helper rewrites it from a JSON the LLM also writes.
 
 **Why it's wrong:** the render layer should compile JSON the helpers mutate (atomic, contract-checked) into a read-only markdown view. If the LLM is the only writer, there is no JSON contract to protect.
 
@@ -64,9 +64,9 @@ Each entry: the anti-pattern, the symptom that catches it, and the correction.
 
 **Symptom:** SKILL.md or a helper script tells the LLM to run `mvn clean test && mvn clean verify` (or any chain where one command subsumes the other).
 
-**Why it's wrong:** breaks Bash call hygiene (`&&` chain) AND the two-command sequence is wrong — `mvn verify` runs `test` already.
+**Why it's wrong:** breaks Bash call hygiene (`&&` chain) AND the two-command sequence is wrong - `mvn verify` runs `test` already.
 
-**Correction:** one command per Bash call AND check the build tool semantics — usually one phase subsumes another.
+**Correction:** one command per Bash call AND check the build tool semantics - usually one phase subsumes another.
 
 ## A9. Custom subagent_type for fan-out
 
@@ -86,8 +86,8 @@ Each entry: the anti-pattern, the symptom that catches it, and the correction.
 
 ## A11. Dispatcher-emitted commands outside the allowlist
 
-**Symptom:** a dispatcher carefully emits ~-spelled FACT commands so they match the allowlist verbatim, but some emitted lines (e.g. bare `npm --prefix ... run ...`) start with a prefix no allowlist entry covers — so the "run verbatim, no prompt" contract silently holds for some emitted commands and not others.
+**Symptom:** a dispatcher carefully emits ~-spelled FACT commands so they match the allowlist verbatim, but some emitted lines (e.g. bare `npm --prefix ... run ...`) start with a prefix no allowlist entry covers - so the "run verbatim, no prompt" contract silently holds for some emitted commands and not others.
 
 **Why it's wrong:** the whole point of emitting resolved commands is a prompt-free verbatim run; a partially-covered emission set trains the agent to expect no prompt and the user to rubber-stamp the ones that appear.
 
-**Correction:** route every emitted command through an allowlisted prefix (a tools-dir pass-through mode), or document in the skill that the uncovered command prompts by design. Documented instance: confluence-publish's `BUILD_CMD` prompts by design — a deliberate speed bump before the slow, estate-wide diagram rebuild.
+**Correction:** route every emitted command through an allowlisted prefix (a tools-dir pass-through mode), or document in the skill that the uncovered command prompts by design. Documented instance: confluence-publish's `BUILD_CMD` prompts by design - a deliberate speed bump before the slow, estate-wide diagram rebuild.

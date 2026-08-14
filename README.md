@@ -35,7 +35,7 @@ The layout follows Claude Code's [project `.claude` directory](https://code.clau
 | `workflows/` | Saved dynamic-workflow scripts - JavaScript files that orchestrate many subagents, each becoming a `/name` command. Saved from a session via `/workflows` rather than authored from scratch. |
 | `hooks/` *(workspace convention)* | The guard scripts (`guard-bash.sh`, `guard-edits.sh`) that `settings.json` wires to run before tool calls. Claude Code reads the wiring from `settings.json`; keeping the scripts in a dedicated directory, protected from agent edits by `guard-edits.sh` itself, is this workspace's choice. |
 | `tools/` *(workspace convention)* | Per-domain shell scripts that do the deterministic work behind skills - Confluence page operations and publish pre-flight, Jira ticket creation and JQL fetch, Mermaid rendering, skill scaffolding, the workspace, auth and dependency doctors. Runnable by hand or from any agent. |
-| `best-practices/` *(workspace convention)* | Convention docs the skills cite instead of duplicating - currently the skill-authoring conventions in `best-practices/skills/`. |
+| `best-practices/` *(workspace convention)* | Convention docs the skills cite instead of duplicating: skill authoring (`skills/`), git and pull requests (`git/`), GDS writing (`gds/`), and Claude Code enforcement mechanisms (`claude-code/`). |
 | `workareas/` *(workspace convention)* | Persistent working state written by skill runs, such as skill-creator interview decisions and audit plans. |
 
 There is deliberately no `commands/` directory. Claude Code has folded commands and skills into one mechanism - same `/name` invocation - and skills are the recommended form because they can bundle supporting files, so this workspace defines everything as skills.

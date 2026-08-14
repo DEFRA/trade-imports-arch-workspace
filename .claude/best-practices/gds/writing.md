@@ -1,4 +1,4 @@
-# GDS writing — short form for Jira tickets
+# GDS writing - short form for Jira tickets
 
 Skill-facing summary of the GDS writing rules that apply when drafting
 Jira ticket summaries, descriptions, and acceptance criteria. For the
@@ -27,6 +27,6 @@ inclusive language), see [`language.md`](language.md).
 ## Words to avoid
 
 `deliver` → create, provide. `leverage` → use. `utilise` → use.
-`facilitate` → help, allow. `quick`/`easy`/`simple` — demoralising
+`facilitate` → help, allow. `quick`/`easy`/`simple` - demoralising
 for users who struggle. See [`language.md`](language.md) for the full
 list.
