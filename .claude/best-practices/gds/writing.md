@@ -3,7 +3,9 @@
 Skill-facing summary of the GDS writing rules that apply when drafting
 Jira ticket summaries, descriptions, and acceptance criteria. For the
 full guide (vocabulary, capitalisation, numbers, dates, abbreviations,
-inclusive language), see [`language.md`](language.md).
+inclusive language), see [`language.md`](language.md). For the writing
+process itself (brief, house voice, outline before drafting), the
+editorial skill's Writing path applies.
 
 ## The four rules
 

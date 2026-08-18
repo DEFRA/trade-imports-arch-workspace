@@ -1,6 +1,6 @@
 ---
 name: editorial
-description: Editorial review and writing process for documents that humans will read - PR descriptions, READMEs, design docs, commit bodies, RFCs. Recursively drills from surface text to essence by asking what we're trying to say and why; includes a style guide of mechanical rules. Use when the user asks to review, sharpen, edit, or write a doc.
+description: Writing and editorial process for documents that humans will read - PR descriptions, READMEs, design docs, commit bodies, RFCs. For new writing it establishes the brief (document mode, audience, allowed jargon, scope sentence), a house voice and an outline before drafting. For existing prose it recursively drills from surface text to essence by asking what we're trying to say and why. Includes a cold-reader editor pass and a style guide of mechanical rules. Use when the user asks to write, draft, review, sharpen, or edit a doc.
 hooks:
   PostToolUse:
     - matcher: Write|Edit|MultiEdit
@@ -15,19 +15,56 @@ hooks:
           timeout: 30
 ---
 
-Follow this process when asked to review, write, or sharpen a doc. Interrogate every sentence until what remains is what we meant. Mechanical conventions live in the style guide at the bottom - apply as you go.
+Two paths, chosen up front:
+
+- **Writing something new** - follow the Writing path first, then run the Review path on your own draft.
+- **Reviewing or sharpening existing prose** - go straight to the Review path.
 
 This SKILL builds on the foundational best-practices laid out in [writing.md](../../best-practices/gds/writing.md) and [language.md](../../best-practices/gds/language.md). Both of which need to be read before using this SKILL.
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
-## Contents
+## House voice
 
-- **Process** - steps 1 to 10.
-- **Output behaviour**.
-- **Style guide**.
+Hold this as identity while writing, not as a checklist applied afterwards:
 
-## 1. Frame the reader
+- Plain English at the GOV.UK register, in the reader's own vocabulary.
+- Short sentences, one idea each. Main point first: in the document, in each section, in each sentence.
+- Active voice naming the actor - who does what.
+- Statements, not pronouncements ("X retains `schemeId`", not "Each is justified by real TRACES data carrying schemeId").
+- Plain constructions over clause-speak: "the adopted pattern should support it as a future requirement", not "no pattern may foreclose it". If a sentence sounds like a legal clause, rewrite it as what a colleague would say.
+- Factual, no self-congratulation, no motivational language, no metaphor standing in for a mechanism.
+- Concrete nouns and named mechanisms over abstraction: paste the JSON, name the property, give the actual scheme ID.
+- Acronyms and domain terms introduced on first use.
+
+## Writing path
+
+Complete W1 and W2 before drafting a word.
+
+### W1. The brief
+
+- **Document mode.** Name which of the four modes this document is - tutorial, how-to, reference, or explanation - and hold it; each mode has its own voice, person and structure, and mixing modes is what makes documents muddy. Full guidance: [document-types.md](references/document-types.md). Fixed-shape artefacts skip this: PR bodies, commit bodies and Jira tickets have owning docs, listed in the same reference.
+- **Audience.** Frame the reader exactly as Review step 1 does: role and context, concepts they hold, concepts needing first-use introduction, the action they must take.
+- **Allowed jargon.** List the terms the named audience verifiably holds; everything else gets introduced on first use or replaced.
+- **Scope sentence.** One sentence stating what this document describes and for whom. It becomes the opening line.
+- **Missing inputs.** If the mode or the audience is not stated and not derivable from the request, ask the user before drafting - one focused question, not a form.
+
+### W2. The outline
+
+- Open with the scope sentence.
+- Headings that answer the reader's questions, named concretely.
+- Numbered steps for actions, bullets for options, tables for same-shape items.
+- The document is what the audience needs to know minus what they already know - plan the sections against the audience from W1 and cut the rest.
+
+### W3. Draft, then review
+
+Draft to the brief, the voice and the outline. Then run the Review path on your own draft; the editor pass (step 10) is where a cold reader checks it.
+
+## Review path
+
+Interrogate every sentence until what remains is what we meant. Mechanical conventions live in the style guide at the bottom - apply as you go.
+
+### 1. Frame the reader
 
 Decide who is reading this cold:
 
@@ -35,11 +72,11 @@ Decide who is reading this cold:
 - Concepts they already hold.
 - Concepts that need first-use introduction.
 - What action they need to take (approve, replicate, decide).
-- Never assume the reader is a machine or has any visibility of the intermediate material used to generate an output
+- Never assume the reader is a machine or has any visibility of the intermediate material used to generate an output.
 
-This frame is the lens for every later decision. Assume your audience is a cold reader.
+This frame is the lens for every later decision.
 
-## 2. Drill from surface to essence
+### 2. Drill from surface to essence
 
 For each section, paragraph, sentence, recursively ask:
 
@@ -51,7 +88,7 @@ When the question feels answered, ask once more. The first answer is usually the
 
 **Worked example A.** A statement is written "adds typeCode + urlId (D23B unece:typeCode)":
 
-- _Why is this a question?_ What am I trying to say? Why would a reader care? Does my reader know about typeCodes, or D23B?
+- _What am I trying to say?_ Why would a reader care? Does my reader know about typeCodes, or D23B?
 - _What should have been written_: Vet handling and inspection regimes differ for live animals vs semen vs embryos vs ova. The CN commodity code does not always discriminate form, the urlId is added to the typeCode so we can tell the difference. UN/CEFACT uses these properties within the TradeProduct to convey this information.
 
 **Worked example B.** An open question started as "is `private_transporter_approval_number` a real Defra scheme?". Drilling:
@@ -63,12 +100,12 @@ When the question feels answered, ask once more. The first answer is usually the
 
 The surface question was about one scheme. The real question was the codelist mechanism.
 
-**Worked example C.** The App Registration has an **FIC** (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to the same Entra `/oauth2/v2.0/token` endpoint. The same access token comes back.
+**Worked example C.** Before: "The App Registration has an **FIC** (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to the same Entra `/oauth2/v2.0/token` endpoint. The same access token comes back."
 
 - _what is a FIC?_ - I have to find out what a FIC is? Is it a real term, is it ubiquitous language?
 - _what is the same?_ - Ambiguous!
 
-The App Registration has a Microsoft Federated Identity Credential (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to Entra's `/oauth2/v2.0/token` endpoint. Entra validates the JWT against the FIC and returns a Microsoft Entra access token. The gateway sends that token to Service Bus in the `Authorization: Bearer header`.
+After: "The App Registration has a Microsoft Federated Identity Credential (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to Entra's `/oauth2/v2.0/token` endpoint. Entra validates the JWT against the FIC and returns a Microsoft Entra access token. The gateway sends that token to Service Bus in the `Authorization: Bearer` header."
 
 **Unpack load-bearing compression.** When a conclusion rests on a compressed phrase - a summary line, "by construction", "holds structurally", "passes through it" - the phrase is a pointer, not an explanation. Unpack it in the section that uses it: restate each clause as "means" plus the mechanism that makes it true (named components, real attributes), and close with one plain sentence stating the consequence. The compressed form may stay where a nearby unpacking backs it; a conclusion resting on a compressed phrase that is never mechanically grounded is an unverified assertion. Fund the words by culling decoration, not by growing the section: unpacking is what the words were for.
 
@@ -79,13 +116,11 @@ Unpacking is iterative: unpack, then reason about the simpler statements, unpack
 - "Every journey request passes through it" means the front door is the only public origin: `ins.defra.gov.uk` resolves to the front door and nothing else, journey frontends keep internal-only URLs, and the front door reverse-proxies path prefixes (`/plants/*`, `/animals/*`) to them as internal upstreams. The browser never has a second place to go.
 - "Against one server-side session" means the browser's only credential is an opaque session id in a host-only cookie, resolving to a single record in the front door's Redis holding the tokens, claims and active organisation. Every request from every tab re-reads that record, so deleting or updating it is the propagation mechanism. There is nothing to synchronise because nothing else holds state.
 
-Each clause became a mechanism plus a consequence sentence; "holds by construction" is now checkable instead of asserted. This phrase would be better unpacked as:
-
-- the front door is the only public origin e.g. a url like `ins.defra.gov.uk` resolves to the front door and nothing else, journey frontends keep internal-only URLs, and the front door reverse-proxies path prefixes (`/plants/*`, `/animals/*`) to the relevant place. The browser's only credential is an opaque session id in a host-only cookie, resolving to a single record in the front door's Redis which holds the tokens, claims and active organisation. Every request from every tab re-reads that record, so deleting or updating it is the propagation mechanism. There is nothing to synchronise because nothing else holds state
+Each clause became a mechanism plus a consequence sentence; "holds by construction" is now checkable instead of asserted.
 
 **Worked example E - unpacking dissolves a false open question.** A draft hedged "whether reverse proxying across tenant frontends is supported on the platform is undocumented" and raised it as a question to the platform team. Unpacked, the claim is: the front door makes an outbound HTTP call to a journey frontend's internal URL (`{service}.{env}.cdp-int.defra.cloud`) and streams the response back. Reasoning about that simpler statement: service-to-service HTTP is documented platform behaviour, and everything else (route mapping, header forwarding, streaming) is code inside the front door. No platform grant is consumed, so there was no question to ask; the compressed phrase had hidden a facet of the solution that the unpacking made visible. What genuinely remained (rate-limit sizing at estate volume) was a different, narrower question.
 
-## 3. Hunt jargon and opaque labels
+### 3. Hunt jargon and opaque labels
 
 Internal labels mean nothing to a cold reader. Watch for:
 
@@ -95,28 +130,29 @@ Internal labels mean nothing to a cold reader. Watch for:
 - Acronyms or product names used before first introduction.
 - Positional references where the thing has a name: "whether pattern 4 meets single sign-out" when the document names it Backend for Frontend. The name is usually no longer than the number, and the number breaks the moment sections reorder.
 - Requirement fragments pasted without context: "bounded stated staleness, audit logged" floating in a cell or sentence. Restate what the requirement demands here, in this sentence's own terms, not as a shorthand quotation of the requirements list.
+- Sentences that hide who acts. Rewrite any sentence where the reader cannot tell who does what - the active-voice table in [language.md](../../best-practices/gds/language.md) shows the swap. Judgment work, never a regex.
 - Figurative verbs standing in for mechanisms: "prices", "rides in", "bites", "spends", "hangs on". The verb's literal sense is not what happens, so the reader must decode the sentence to recover the mechanism it exists to state. Replace each with the literal statement (see Metaphor in the style guide).
 
-For each, replace with substance or introduce on first use.
+For each, replace with substance or introduce on first use. The close-out gate (step 11) sweeps the mechanical part of this list; judge its WARN hits there.
 
-Close the pass with the mechanical sweep: `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <file>`. Judge each WARN hit (the metaphor hard-avoid list), and replace every figurative use with the specific mechanism it stands for. FAIL hits are not judgment calls - fix them.
-
-## 4. Verifiability check
+### 4. Verifiability check
 
 Don't cite what a reader can't verify - gitignored files, local-only data, named schemes that don't exist. If a claim depends on inaccessible data, restate it inline as a standalone fact ("Some commodities are measured in weight") instead of citing the source ("Defra refdata says X").
 
-## 5. Honesty on open questions
+The same rule covers unshared context: if a statement depends on another document or a prior decision, name that document or decision in the sentence. A cold reader cannot know it exists.
+
+### 5. Honesty on open questions
 
 Before listing a question as open, ask: could a grep or read answer it?
 
 - If yes - do it; bring back the answer.
 - If partly - lead with the finding, propose a position, narrow what remains open.
 
-## 6. Anti-circularity
+### 6. Anti-circularity
 
 If a change's source and its justification are the same authority, the "why" is empty. "TIG naming alignment" when TIG owns the schema is a tautology. Trace to the real why: canonical vocabulary, source data, or use case.
 
-## 7. Decoration cull
+### 7. Decoration cull
 
 For each sentence, ask: would removing this confuse the reader? If no, cut.
 
@@ -128,18 +164,19 @@ Common decoration:
 - Restating what property names already say.
 - Section intros that repeat the heading.
 
-## 8. Structural pass
+### 8. Structural pass
 
-- Related items with the same shape → table.
-- Short unrelated items → bullets.
-- Don't comma-cram a paragraph that wants to be enumerated.
-- Headings name what's below concretely ("Extensions to existing types"), not generically ("Overview").
+Apply the style guide's mechanical shapes - "Lists and enumerations" and "Section headings" below are the canonical rules. Don't comma-cram a paragraph that wants to be enumerated.
 
-## 9. Concrete over abstract
+### 9. Concrete over abstract
 
 When something feels hand-wavy, paste the JSON, name the property, give the actual scheme ID.
 
-## 10. Mechanical close-out (mandatory)
+### 10. Editor pass (cold reader)
+
+Follow [editor-pass.md](references/editor-pass.md): a findings-only critique of the draft - hard-to-parse sentences, unexplained terms, unstated assumptions, hidden actors, mode violations, vague words. For a small artefact (a commit body, a short PR body) run it inline. For a full draft (a docs page, an RFC, a solution overview) spawn a fresh `general-purpose` subagent with the prompt the reference names - the writing session cannot un-know its own context, so a cold subagent is the closest thing to the cold reader step 1 frames. Apply the findings yourself; the pass never edits.
+
+### 11. Mechanical close-out (mandatory)
 
 Run the style gate on every document this session touched:
 
@@ -147,9 +184,9 @@ Run the style gate on every document this session touched:
 bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <file>
 ```
 
-Fix every FAIL (banned punctuation, GDS banned words - no judgment involved). Judge every WARN (the metaphor list - literal technical uses stay). The document is not finished until the gate passes.
+Fix every FAIL: banned punctuation and GDS banned words - no judgment involved. Judge every WARN: vague words get the specific behaviour, quantity or criterion they gesture at; metaphor-list hits in a literal technical sense stay, figurative ones are unpacked. The document is not finished until the gate passes.
 
-This step describes the gate; it is not the gate. Enforcement is deterministic: a PostToolUse hook checks each write as it happens, a Stop hook re-runs this check and blocks the turn from ending while a touched file still fails, `create-pr.sh` refuses violating PR titles and bodies, and the pre-commit hook refuses violating staged markdown.
+This step describes the gate; it is not the gate. Enforcement is deterministic and introduction-only - it polices what the session writes, not what the corpus already says: a PostToolUse hook checks each write as it happens, a Stop hook blocks the turn from ending while a touched file carries FAIL lines the session introduced (pre-existing violations in a legacy file do not block), `create-pr.sh` refuses violating PR titles and bodies, and the pre-commit hook refuses violating staged markdown.
 
 ## Output behaviour
 
@@ -167,7 +204,7 @@ Mechanical rules. Apply without thinking.
 
 - No em-dashes. Use a plain hyphen `-` (with a space on each side for a sentence break).
 - Plain `"` and `'` quotes, not curly variants.
-- Enforced deterministically by `check-prose.sh` at write time (PostToolUse hook), turn end (Stop hook), PR creation (`create-pr.sh`) and commit time (pre-commit) - see step 10.
+- Enforced deterministically by `check-prose.sh` - see step 11 for the layers.
 
 ### Code identifiers
 
@@ -181,7 +218,7 @@ Mechanical rules. Apply without thinking.
 
 ### Section headings
 
-- Name what's below concretely.
+- Name what's below concretely ("Extensions to existing types"), not generically ("Overview").
 - Prefer "**Bold lead-in**" paragraphs over deeper heading levels.
 
 ### Schema `$def` names vs property names
@@ -205,20 +242,17 @@ Mechanical rules. Apply without thinking.
 
 - Don't reference files that are gitignored. If context is needed, provide an inline summary.
 
-### Tone
+### Vague words
 
-- Statements, not pronouncements ("X retains `schemeId`", not "Each is justified by real TRACES data carrying schemeId").
-- Factual, not personality-driven.
-- No self-congratulation.
-- Plain constructions over clause-speak: "the adopted pattern should support it as a future requirement", not "no pattern may foreclose it". If a sentence sounds like a legal clause, rewrite it as what a colleague would say.
+- `robust`, `appropriate`, `overarching`, `foster` - state the specific behaviour, quantity or criterion instead; the gate reports each as a WARN to judge. Full table and alternatives: [language.md](../../best-practices/gds/language.md), "Words to Avoid".
 
 ### Metaphor: hard avoids
 
 - These terms are banned wherever the verb's literal sense is not what happens, the same way em-dashes are banned - no judgment call, replace on sight: "prices" / "priced", "rides" / "rides in", "bites", "spends", "buys", "kills", "hangs on", "collapses", "leaks", "lands", "forecloses".
 - A term used in its literal technical sense stays: a cookie carries a value (HTTP semantics), a request times out. For anything not on the list, the test: could a reader new to the document say precisely what happens from this sentence alone? If the verb needs decoding, replace it.
 - Replacement is unpacking: state the specific mechanism in precise, non-jargon language. This is not a synonym swap; the sentence usually needs rewriting around the mechanism.
-- Sweep mechanically before finishing: `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <file>` reports each hit as a WARN; judge each - literal uses stay, every figurative hit is replaced.
-- Observed failures and their replacements (4 Aug 2026):
+- The close-out gate (step 11) reports each hit as a WARN; judge each - literal uses stay, every figurative hit is replaced.
+- Observed failures and their replacements:
   - "never rides in the session artefact" -> "is not stored in the session record or the session cookie"
   - "whether a frontend may forward page traffic to another prices the proxying front door" -> "if the platform does not let one frontend forward page requests to another, the proxying front door needs a platform change before it can be built, and that need counts against it in the comparison"
   - "whether the picker interrupts a returning user prices per-journey login" -> "if the organisation picker appears each time a journey signs a returning user in silently, patterns where every journey runs its own login show the user the picker repeatedly"
@@ -228,6 +262,6 @@ Mechanical rules. Apply without thinking.
 
 | Script | Home | Purpose |
 |--------|------|---------|
-| `check-prose.sh` | `~/trade-imports-arch-workspace/.claude/tools/editorial/` | Deterministic style gate: FAIL on banned punctuation and GDS banned words, WARN on the metaphor list; `--stdin --label`, `--help` |
+| `check-prose.sh` | `~/trade-imports-arch-workspace/.claude/tools/editorial/` | Deterministic style gate: FAIL on banned punctuation and GDS banned words, WARN on vague words and the metaphor list; `--stdin --label`, `--print-fail-lines`, `--help` |
 | `hook-check-written.sh` | `~/trade-imports-arch-workspace/.claude/tools/editorial/` | PostToolUse hook: gates the text each Write/Edit just produced; `--record` tracks touched files for the Stop hook |
-| `hook-stop.sh` | `~/trade-imports-arch-workspace/.claude/tools/editorial/` | Stop hook: blocks turn-end while a touched file still fails the gate |
+| `hook-stop.sh` | `~/trade-imports-arch-workspace/.claude/tools/editorial/` | Stop hook: blocks turn-end while a touched file carries FAIL lines the session introduced (git HEAD is the baseline) |

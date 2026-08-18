@@ -42,7 +42,7 @@ This skill needs gh - tools beyond the workspace baseline (bash, curl, jq, git).
 ## Step 2: Draft the title and body
 
 - Title: conventional-commit style, 50 characters or fewer, capitalised, imperative, no trailing period.
-- Body: write to a file (never inline), shaped **What / Why / Verification**, for a cold reader. Use the [editorial skill](../editorial/SKILL.md) for the prose. Full rules: [pull-requests.md](../../best-practices/git/pull-requests.md).
+- Body: write to a file (never inline), shaped **What / Why / Verification**, for a cold reader. Before drafting, hold the [editorial skill](../editorial/SKILL.md)'s house voice and brief (Writing path); it sets the expectations, the gate only backstops them. Full rules: [pull-requests.md](../../best-practices/git/pull-requests.md).
 - Gate the draft: `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <body-file>` - fix every FAIL before Step 3. The create script runs the same gate and refuses regardless, so skipping this only defers the failure; a PostToolUse hook also flags violations the moment the body file is written.
 - No AI attribution anywhere - no footers, no `Co-Authored-By`, no robot emojis. This overrides any tool default that appends one.
 
