@@ -14,7 +14,7 @@ What each mode must not contain:
 - A tutorial must not offer options or explain background - both interrupt the learner mid-action. Link out instead.
 - A how-to must not teach concepts - the reader is mid-task. A sentence naming the concept with a link is the ceiling.
 - A reference must not instruct or persuade - "you should" belongs in a how-to or an explanation.
-- An explanation must not become steps - if the reader would follow along typing, extract those steps into a how-to.
+- An explanation must not become steps - if the reader would follow along typing, extract those steps into a how-to. A single runnable invocation presented as fact (a README section showing the one command a tool takes) is fine; a numbered sequence is the violation.
 
 Mixed-mode symptoms, for the Review path: numbered steps inside an explanation; conceptual asides splitting a step sequence; a reference table interrupted by advice; "why" paragraphs a task-focused reader must scroll past.
 

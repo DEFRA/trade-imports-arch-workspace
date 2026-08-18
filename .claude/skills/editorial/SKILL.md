@@ -47,7 +47,7 @@ Complete W1 and W2 before drafting a word.
 - **Audience.** Frame the reader exactly as Review step 1 does: role and context, concepts they hold, concepts needing first-use introduction, the action they must take.
 - **Allowed jargon.** List the terms the named audience verifiably holds; everything else gets introduced on first use or replaced.
 - **Scope sentence.** One sentence stating what this document describes and for whom. It becomes the opening line.
-- **Missing inputs.** If the mode or the audience is not stated and not derivable from the request, ask the user before drafting - one focused question, not a form.
+- **Missing inputs.** If the mode, the audience or the host document (which README, which page - placement decides who reads it) is not stated and not derivable from the request, ask the user before drafting - one focused question, not a form.
 
 ### W2. The outline
 
@@ -184,9 +184,11 @@ Run the style gate on every document this session touched:
 bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <file>
 ```
 
+For prose that exists only as text - a PR body before its file exists, a dry-run draft - pipe it through the same gate: `--stdin --label <name>`.
+
 Fix every FAIL: banned punctuation and GDS banned words - no judgment involved. Judge every WARN: vague words get the specific behaviour, quantity or criterion they gesture at; metaphor-list hits in a literal technical sense stay, figurative ones are unpacked. The document is not finished until the gate passes.
 
-This step describes the gate; it is not the gate. Enforcement is deterministic and introduction-only - it polices what the session writes, not what the corpus already says: a PostToolUse hook checks each write as it happens, a Stop hook blocks the turn from ending while a touched file carries FAIL lines the session introduced (pre-existing violations in a legacy file do not block), `create-pr.sh` refuses violating PR titles and bodies, and the pre-commit hook refuses violating staged markdown.
+This step describes the gate; it is not the gate. Enforcement is deterministic and introduction-only - it polices what the session writes, not what the corpus already says: in Claude Code sessions a PostToolUse hook checks each write as it happens and a Stop hook blocks the turn from ending while a touched file carries FAIL lines the session introduced (pre-existing violations in a legacy file do not block); for every agent and editor, `create-pr.sh` refuses violating PR titles and bodies and the pre-commit hook refuses violating staged markdown.
 
 ## Output behaviour
 
@@ -209,6 +211,7 @@ Mechanical rules. Apply without thinking.
 ### Code identifiers
 
 - Backticks around every property name, scheme ID, code value, file path, type name, JSON Schema keyword. Examples: `partyTypeCode`, `cph_number`, `H87`, `samples/imports/...`, `TradeParty`, `oneOf`.
+- Backticks also quote a banned word or punctuation mark as an example: the gate masks backtick spans and fenced blocks, so a backticked exemplar like `leverage` passes while the same token in plain prose fails.
 
 ### Lists and enumerations
 
