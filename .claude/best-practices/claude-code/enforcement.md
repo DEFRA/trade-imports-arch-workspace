@@ -31,7 +31,8 @@ Scripts under `tools/` are the agent-agnostic layer: colleagues on other AI tool
 
 - Exit vocabulary: 0 pass, 1 usage or environment error, 2 policy violation (`create-pr.sh`, `check-prose.sh`).
 - Refusals name the offending line, the governing doc and the remedy - the model self-corrects in one retry instead of stalling.
-- Mask data before matching: blank fenced code blocks and backtick spans (and, in bash guards, quoted spans) so exemplar text in docs that teach a rule never trips its gate.
+- Mask data before matching: blank fenced code blocks, backtick spans, blockquoted verbatim text and URLs (and, in bash guards, quoted spans) so exemplar text, quotes of external documents and real-world names never trip a gate.
+- Gates police what the session writes, not what the corpus already says: the write-time hooks scan only the new text, and the editorial Stop hook baselines each touched file against its git HEAD version (`check-prose.sh --print-fail-lines` on both), blocking only FAIL lines the session introduced. Word bans exist to stop the model writing the word, never to fail a legacy file or a proper noun for existing.
 - Target choke points (PR creation, turn end, commit) rather than every file operation.
 
 ## References
@@ -40,4 +41,4 @@ Scripts under `tools/` are the agent-agnostic layer: colleagues on other AI tool
 - Hooks guide and patterns: https://code.claude.com/docs/en/hooks-guide
 - Skills (frontmatter incl. `hooks:`): https://code.claude.com/docs/en/skills
 - The `.claude/` directory: https://code.claude.com/docs/en/claude-directory
-- The worked example: the editorial gate layers in [`../../skills/editorial/SKILL.md`](../../skills/editorial/SKILL.md) (step 10) and `.claude/tools/editorial/`
+- The worked example: the editorial gate layers in [`../../skills/editorial/SKILL.md`](../../skills/editorial/SKILL.md) (the mechanical close-out step) and `.claude/tools/editorial/`

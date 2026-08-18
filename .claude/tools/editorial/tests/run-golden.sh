@@ -64,6 +64,10 @@ record "stdin-title-viol" "$out" "$rc"
 out=$(printf 'feat: A clean title\n' | bash "$GATE" --stdin --label title 2>&1); rc=$?
 record "stdin-title-clean" "$out" "$rc"
 
+out=$(printf 'A seamless launch %s done.\nA clean line stays out.\nSign in to the portal.\n' "$EMDASH" \
+    | bash "$GATE" --stdin --label plines --print-fail-lines 2>&1); rc=$?
+record "stdin-print-fail-lines" "$out" "$rc"
+
 out=$(bash "$GATE" "$TESTS_DIR/fixtures/does-not-exist.md" 2>&1); rc=$?
 record "missing-file" "$out" "$rc"
 

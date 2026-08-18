@@ -90,11 +90,11 @@ run when one fails:
 | `check-auth.sh` | every domain's credentials | on demand | fix the named env var in `.env` |
 | `check-deps.sh` | declared `workspace-deps` resolve on this machine | `make check` | clone the project / install the tool it names |
 | `lint-skills.sh` | declaration format, dangling links, undeclared-invocation sweep | pre-commit (staged index), scaffold tail, `make check` | fix and re-stage; acknowledge soft probes in `workspace-soft-deps` |
-| Golden tests (2 suites) | scaffold + doctor behavior vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
+| Golden tests (3 suites) | scaffold + doctor + prose-gate behavior vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
 | Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
 | Guard hooks (`.claude/hooks/`) | agent Bash and file-edit calls in Claude Code sessions | every matched tool call | follow the sanctioned alternative the denial names |
-| `check-prose.sh` (editorial style gate) | banned punctuation and GDS banned words (FAIL), metaphor list (WARN) | `create-pr.sh` on every PR title/body; pre-commit on staged markdown; commit-msg on the message; skill-scoped hooks below | fix the FAIL lines it names; rules in `.claude/skills/editorial/SKILL.md` |
-| Skill-scoped hooks (pr, editorial) | the prose each Write/Edit just produced; editorial close-out at turn-end | while those skills are active | fix the violation the injected feedback names; the editorial Stop hook blocks the turn until clean |
+| `check-prose.sh` (editorial style gate) | banned punctuation and GDS banned words (FAIL), vague words and metaphor list (WARN) | `create-pr.sh` on every PR title/body; pre-commit on staged markdown; commit-msg on the message; skill-scoped hooks below | fix the FAIL lines it names; rules in `.claude/skills/editorial/SKILL.md` |
+| Skill-scoped hooks (pr, editorial) | the prose each Write/Edit just produced; editorial close-out at turn-end | while those skills are active | fix the violation the injected feedback names; the editorial Stop hook blocks the turn while a FAIL line the session introduced remains |
 
 Why the gates exist alongside the skills: skill prose is advisory
 context, hooks and scripts are deterministic. The estate's approach:

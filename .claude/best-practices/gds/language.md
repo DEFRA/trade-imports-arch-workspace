@@ -5,14 +5,28 @@ Based on [UK Government Style Guide](https://www.gov.uk/guidance/style-guide).
 ## Plain English
 
 ### Words to Avoid
-| Avoid | Use |
-|-------|-----|
-| `deliver` | create, provide |
-| `leverage` | use |
-| `empower` | allow, let |
-| `facilitate` | help, allow |
-| `utilise` | use |
-| `portal` | website, service |
+
+The Gate column is how `.claude/tools/editorial/check-prose.sh` treats the word: FAIL blocks the artefact, WARN reports the line for judgment, prose means this guidance only.
+
+| Avoid | Use | Gate |
+|-------|-----|------|
+| `deliver` | create, provide | FAIL |
+| `leverage` | use | FAIL |
+| `empower` | allow, let | FAIL |
+| `facilitate` | help, allow | FAIL |
+| `utilise` | use | FAIL |
+| `seamless` | state what the reader does not have to do | FAIL |
+| `user-friendly` | state the behaviour that helps the user | FAIL |
+| `streamline` | state what was removed or shortened | FAIL |
+| `portal` | website, service | FAIL - lowercase generic only; proper nouns ("CDP Portal") and URLs pass |
+| `robust` | state what it withstands (retries, redelivery, malformed input) | WARN |
+| `appropriate` | state the criterion | WARN |
+| `overarching` | name the thing it spans | WARN |
+| `foster` | state the action taken | WARN |
+| `tackle` | state the action taken | prose |
+| `strengthen` | state the change | prose |
+
+`transform` stays available: data transformation is this domain's vocabulary (TRACES mapping, jq transforms). Challenge it only where it means vague improvement rather than a data operation.
 
 ## Voice and Tone
 
@@ -101,7 +115,7 @@ Use backticks for: classes, methods, functions, commands, filenames, paths, HTML
 - Use "page" for web and app
 
 ### Words to Minimise
-Avoid "quick", "easy", "simple" - demoralising for users who struggle.
+Avoid "quick", "easy", "simple" - demoralising for users who struggle. Never gated: literal uses ("AWS Simple Queue Service", "Quick reference") are everywhere, so this stays a judgment call.
 
 ## Inclusive Language
 

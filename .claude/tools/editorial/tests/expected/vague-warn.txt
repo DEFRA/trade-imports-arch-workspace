@@ -1,0 +1,4 @@
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/vague-warn.md:3: A robust design makes appropriate choices.
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/vague-warn.md:5: The overarching goal is to foster collaboration.
+check-prose: WARN hits are vague words - judge each: state the specific behaviour, quantity or criterion instead, or keep the word where it truly is the criterion (~/trade-imports-arch-workspace/.claude/best-practices/gds/language.md, "Words to Avoid").
+exit-code: 0

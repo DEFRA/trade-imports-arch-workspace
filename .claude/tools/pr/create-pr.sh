@@ -8,10 +8,10 @@
 #
 # Refuses (exit 2) any title or body containing AI attribution (the rule in
 # best-practices/git/pull-requests.md) or editorial style-guide violations
-# (em-dash, curly quotes, GDS banned words - via tools/editorial/check-prose.sh),
-# naming the offending line. --dry-run prints the gh command it would run
-# instead of running it. Requires gh (authenticated); body must be passed as
-# a file, never inline.
+# (banned punctuation and GDS banned words - the FAIL tiers of
+# tools/editorial/check-prose.sh), naming the offending line. --dry-run
+# prints the gh command it would run instead of running it. Requires gh
+# (authenticated); body must be passed as a file, never inline.
 
 set -euo pipefail
 
