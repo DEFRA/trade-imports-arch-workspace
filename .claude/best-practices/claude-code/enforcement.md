@@ -32,7 +32,7 @@ Scripts under `tools/` are the agent-agnostic layer: colleagues on other AI tool
 - Exit vocabulary: 0 pass, 1 usage or environment error, 2 policy violation (`create-pr.sh`, `check-prose.sh`).
 - Refusals name the offending line, the governing doc and the remedy - the model self-corrects in one retry instead of stalling.
 - Mask data before matching: blank fenced code blocks, backtick spans, blockquoted verbatim text and URLs (and, in bash guards, quoted spans) so exemplar text, quotes of external documents and real-world names never trip a gate.
-- Gates police what the session writes, not what the corpus already says: the write-time hooks scan only the new text, and the editorial Stop hook baselines each touched file against its git HEAD version (`check-prose.sh --print-fail-lines` on both), blocking only FAIL lines the session introduced. Word bans exist to stop the model writing the word, never to fail a legacy file or a proper noun for existing.
+- Gates police what the session writes, not what the corpus already says: both the editorial write-time hook and the Stop hook baseline against the file's git HEAD version (`check-prose.sh --print-fail-lines` on both sides) and act only on FAIL lines the session introduced. The baseline is load-bearing at write time too - the harness can hand a PostToolUse hook the whole updated file, not just the new text, so "scan only what was written" cannot be assumed. Word bans exist to stop the model writing the word, never to fail a legacy file or a proper noun for existing.
 - Target choke points (PR creation, turn end, commit) rather than every file operation.
 
 ## References
