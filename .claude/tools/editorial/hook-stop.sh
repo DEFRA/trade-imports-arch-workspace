@@ -43,6 +43,11 @@ BAD=0
 REPORT=""
 while IFS= read -r f; do
   [ -f "$f" ] || continue
+  # Golden-test fixtures legitimately hold banned bytes - same exemption
+  # as the pre-commit gate and the write-time hook.
+  case "$f" in
+    */.claude/tools/*/tests/*) continue ;;
+  esac
   CURRENT=$(bash "$GATE" --print-fail-lines "$f" 2>/dev/null)
   [ -n "$CURRENT" ] || continue
   BASELINE=$(baseline_fail_lines "$f")

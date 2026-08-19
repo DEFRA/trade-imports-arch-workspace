@@ -2,7 +2,7 @@
 
 The skeleton CREATE mode emits at `.claude/skills/<name>/SKILL.md`. Substitution placeholders are written in ALL-CAPS double-brace form (`{{NAME}}`). TODO markers flag prose the user must replace before the skill is shippable.
 
-The companion [`patterns.md`](patterns.md) explains when each section is load-bearing; [`anti-patterns.md`](anti-patterns.md) is read at session start by `skill-creator` so the patterns stay current.
+The companion [`patterns.md`](patterns.md) explains when each section is needed; [`anti-patterns.md`](anti-patterns.md) is read at session start by `skill-creator` so the patterns stay current.
 
 ## Skill directory layout (full)
 

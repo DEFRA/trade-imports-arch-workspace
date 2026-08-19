@@ -29,6 +29,12 @@ case "$FP" in
   *) exit 0 ;;
 esac
 
+# Golden-test fixtures legitimately hold banned bytes - same exemption as
+# the pre-commit staged-markdown gate. Never gated, never recorded.
+case "$FP" in
+  */.claude/tools/*/tests/*) exit 0 ;;
+esac
+
 if [ "${1:-}" = "--record" ]; then
   SESSION=$(printf '%s' "$INPUT" | jq -r '.session_id // "nosession"')
   STATE="${TMPDIR:-/tmp}/claude-editorial-${SESSION}.paths"

@@ -1,4 +1,5 @@
 check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon-new.md:3: The rollout was seamless and the tool is user-friendly.
 check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon-new.md:5: We streamlined the process so onboarding feels seamless.
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon-new.md:7: That sentence is load-bearing for the argument.
 check-prose: GDS banned word - rule: ~/trade-imports-arch-workspace/.claude/best-practices/gds/language.md ("Words to Avoid"). Swap for the plain alternative the table names and re-run.
 exit-code: 2

@@ -72,7 +72,7 @@ One polish gap in the credential story: `SKILL.md:20-22` names `JIRA_PROJECT_KEY
 
 ### 10. Prose hygiene (trim diff)
 
-The prose is tight - 105 lines, scaffold-conformant ("When to use" table and "Scripts cheat-sheet" are the scaffold-template shapes, not duplication; the intro's "owns no logic, only the procedure" is a single load-bearing phrase). Three micro-items, one of which is a correctness fix rather than a trim:
+The prose is tight - 105 lines, scaffold-conformant ("When to use" table and "Scripts cheat-sheet" are the scaffold-template shapes, not duplication; the intro's "owns no logic, only the procedure" is a single phrase that carries the point). Three micro-items, one of which is a correctness fix rather than a trim:
 
 | File:lines | Change | Rationale |
 | --- | --- | --- |

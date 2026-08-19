@@ -79,11 +79,11 @@ Declared: `delivery-info-arch-tooling trade-imports-documentation npm` (`SKILL.m
 
 ### 10. Prose hygiene (trim diff)
 
-The prose is close to tight - steps are load-bearing, Step 4's log-line decode table is exactly the anti-pattern-guardrail content the checklist says not to cut. Three trim candidates, all duplicated-workspace-content or repeated-example category:
+The prose is close to tight - every step is necessary, Step 4's log-line decode table is exactly the anti-pattern-guardrail content the checklist says not to cut. Three trim candidates, all duplicated-workspace-content or repeated-example category:
 
 | File | Lines | Action | Rationale |
 | --- | --- | --- | --- |
-| `SKILL.md` | 16-20 ("**Workspace layout.**" paragraph) | Delete; fold the one load-bearing clause ("the dispatcher emits every downstream command in the `~`-spelled canonical form so it matches the allowlist verbatim") into the Step 0 section | Canonical-root prose is workspace-wide content owned by `agent-skills.md` → "Workspace root resolution"; per-skill copies drift |
+| `SKILL.md` | 16-20 ("**Workspace layout.**" paragraph) | Delete; fold the one essential clause ("the dispatcher emits every downstream command in the `~`-spelled canonical form so it matches the allowlist verbatim") into the Step 0 section | Canonical-root prose is workspace-wide content owned by `agent-skills.md` → "Workspace root resolution"; per-skill copies drift |
 | `SKILL.md` | 43-51 ("## Path conventions" body, keeping 52-54) | Collapse to the existing one-line hygiene pointer (52-54) plus a single "Path conventions: `agent-skills.md`" reference | Verbatim restatement of `agent-skills.md` → "Path conventions"; the pointer is the pattern, the copy is the residue |
 | `SKILL.md` | 174-181 ("## Scripts cheat-sheet") | Optional collapse to one row or delete | Two rows describing one script's two modes, both already described at Step 0 (`:92-100`), Step 3 (`:133-140`) and in the script header; repeated-example category |
 

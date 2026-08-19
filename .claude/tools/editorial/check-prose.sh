@@ -7,9 +7,10 @@
 #   bash check-prose.sh --print-fail-lines <file>   # raw FAIL line contents only
 #
 # Hard failures (exit 2): em-dash; spaced en-dash (sentence-break usage);
-# curly quotes; GDS banned words (utilise, leverage, facilitate, empower,
-# deliver, seamless, user-friendly, streamline); lowercase generic
-# "portal" (proper nouns like "CDP Portal" pass). Warnings (exit 0):
+# curly quotes; banned words from the language.md table (utilise, leverage,
+# facilitate, empower, deliver, seamless, user-friendly, streamline,
+# load-bearing); lowercase generic "portal" (proper nouns like
+# "CDP Portal" pass). Warnings (exit 0):
 # vague words (robust, appropriate, overarching, foster) - state the
 # behaviour or criterion instead - and the metaphor hard-avoid list -
 # literal uses stay, figurative uses are replaced. Both judgments stay
@@ -37,7 +38,7 @@ LDQ=$(printf '\342\200\234')      # U+201C
 RDQ=$(printf '\342\200\235')      # U+201D
 
 PUNCT_PATTERN="$EMDASH|[[:space:]]$ENDASH[[:space:]]|$LSQ|$RSQ|$LDQ|$RDQ"
-JARGON_PATTERN='\b(utili[sz]e[sd]?|utili[sz]ing|leverage[sd]?|leveraging|facilitate[sd]?|facilitating|empower(s|ed|ing)?|deliver(s|ed|ing)?|seamless(ly)?|user-friendly|streamlin(es?|ed|ing))\b'
+JARGON_PATTERN='\b(utili[sz]e[sd]?|utili[sz]ing|leverage[sd]?|leveraging|facilitate[sd]?|facilitating|empower(s|ed|ing)?|deliver(s|ed|ing)?|seamless(ly)?|user-friendly|streamlin(es?|ed|ing)|load-bearing)\b'
 # Case-sensitive on purpose: "CDP Portal" is a product name, "the portal"
 # is the GDS-banned generic. Matched with plain grep, not grep -i.
 PORTAL_PATTERN='\bportal\b'

@@ -8,23 +8,24 @@ Based on [UK Government Style Guide](https://www.gov.uk/guidance/style-guide).
 
 The Gate column is how `.claude/tools/editorial/check-prose.sh` treats the word: FAIL blocks the artefact, WARN reports the line for judgment, prose means this guidance only.
 
-| Avoid | Use | Gate |
-|-------|-----|------|
-| `deliver` | create, provide | FAIL |
-| `leverage` | use | FAIL |
-| `empower` | allow, let | FAIL |
-| `facilitate` | help, allow | FAIL |
-| `utilise` | use | FAIL |
-| `seamless` | state what the reader does not have to do | FAIL |
-| `user-friendly` | state the behaviour that helps the user | FAIL |
-| `streamline` | state what was removed or shortened | FAIL |
-| `portal` | website, service | FAIL - lowercase generic only; proper nouns ("CDP Portal") and URLs pass |
-| `robust` | state what it withstands (retries, redelivery, malformed input) | WARN |
-| `appropriate` | state the criterion | WARN |
-| `overarching` | name the thing it spans | WARN |
-| `foster` | state the action taken | WARN |
-| `tackle` | state the action taken | prose |
-| `strengthen` | state the change | prose |
+| Avoid | Use                                                             | Gate                                                                     |
+|-------|-----------------------------------------------------------------|--------------------------------------------------------------------------|
+| `deliver` | create, provide                                                 | FAIL                                                                     |
+| `leverage` | use                                                             | FAIL                                                                     |
+| `empower` | allow, let                                                      | FAIL                                                                     |
+| `facilitate` | help, allow                                                     | FAIL                                                                     |
+| `utilise` | use                                                             | FAIL                                                                     |
+| `seamless` | state what the reader does not have to do                       | FAIL                                                                     |
+| `user-friendly` | state the behaviour that helps the user                         | FAIL                                                                     |
+| `streamline` | state what was removed or shortened                             | FAIL                                                                     |
+| `portal` | website, service                                                | FAIL - lowercase generic only; proper nouns ("CDP Portal") and URLs pass |
+| `robust` | state what it withstands (retries, redelivery, malformed input) | WARN                                                                     |
+| `appropriate` | state the criterion                                             | WARN                                                                     |
+| `overarching` | name the thing it spans                                         | WARN                                                                     |
+| `foster` | state the action taken                                          | WARN                                                                     |
+| `tackle` | state the action taken                                          | prose                                                                    |
+| `strengthen` | state the change                                                | prose                                                                    |
+| `load-bearing` | state why the concept is pivotal                                | FAIL                                                                     |
 
 `transform` stays available: data transformation is this domain's vocabulary (TRACES mapping, jq transforms). Challenge it only where it means vague improvement rather than a data operation.
 
