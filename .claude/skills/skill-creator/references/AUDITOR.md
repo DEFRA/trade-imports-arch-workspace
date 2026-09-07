@@ -31,7 +31,7 @@ Inspect `~/trade-imports-arch-workspace/.claude/settings.json` for matching allo
 
 ## The 9-pattern walkthrough
 
-For each pattern below with findings, produce a "Findings" subsection with concrete file:line citations. A pattern that is clean or N/A gets exactly ONE line in the plan ("§N - clean" / "§N - N/A: <reason>"), never a subsection: plans are re-generated whenever the checklist changes, and their bulk is the cost of that policy.
+For each pattern below with findings, produce a "Findings" subsection with concrete file:line citations. A pattern that is clean or not applicable gets exactly ONE line in the plan (`§N - clean` / `§N - N/A: <reason>`), never a subsection: plans are re-generated whenever the checklist changes, and their bulk is the cost of that policy.
 
 ### 1. State as canonical JSON
 
@@ -73,7 +73,7 @@ Each violation: cite `file:line` and the corrected form.
 For each `references/<NAME>.md`:
 
 - Determine if it's spawned via Task `general-purpose` (fan-out) or parent-loaded.
-- Fan-out workers MUST carry the one-line pointer to `best-practices/skills/agent-skills.md` → "Bash call hygiene" - not a full inline block. The rules live once, canonically; copies drift. Flag any worker that re-inlines the block instead of pointing to it.
+- Fan-out workers MUST carry the one-line pointer to `best-practices/skills/agent-skills.md` → "Bash call hygiene" - not a full inline block. The rules live once, canonically; copies drift. Flag any worker that re-inlines the block instead of pointing to the canonical rules.
 - Parent-loaded references MAY omit even the pointer (inherit SKILL.md). Don't flag absence - it's optional.
 
 ### 6. Idempotent + atomic helpers

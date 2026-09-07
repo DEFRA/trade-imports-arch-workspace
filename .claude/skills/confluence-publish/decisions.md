@@ -51,7 +51,7 @@ Publish a single documentation page to Confluence by orchestrating the existing 
 - "push to confluence"
 - "publish page"
 
-**Disambiguation:** Distinct from Claude Code built-in /init (CLAUDE.md scaffolding, no publishing). Distinct from mermaid-check (validates diagram syntax and rendering, never publishes): this skill invokes mermaid-check as its diagram-validation step rather than duplicating it. Distinct from editorial (content quality, not delivery). Orchestrates the existing delivery-info-arch-tooling build and publish scripts for one page; owns no build or publish logic of its own. The bare phrase publish page defaults here because Confluence is the only push target needing a skill; GitHub Pages deploys automatically via CI.
+**Disambiguation:** Distinct from Claude Code built-in /init (CLAUDE.md scaffolding, no publishing). Distinct from mermaid-check (validates diagram syntax and rendering, never publishes): this skill invokes mermaid-check as its diagram-validation step rather than duplicating that validation. Distinct from editorial (content quality, not delivery). Orchestrates the existing delivery-info-arch-tooling build and publish scripts for one page; owns no build or publish logic of its own. The bare phrase publish page defaults here because Confluence is the only push target needing a skill; GitHub Pages deploys automatically via CI.
 
 ## 9. Dependencies (retrofit)
 

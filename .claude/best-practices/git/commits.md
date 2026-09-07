@@ -13,7 +13,7 @@ Rules for every commit in this workspace and its child repos, whether written by
 
 - Omit by default. Add one only when the subject cannot carry the meaning: a non-obvious why, a multi-area diff, a trade-off or follow-up worth recording.
 - The body explains why, not what - the diff already shows the what.
-- Tone: imperative, plain, factual. For prose style, hold the [editorial skill](../../skills/editorial/SKILL.md)'s house voice, which builds on [writing.md](../gds/writing.md) and [language.md](../gds/language.md).
+- Tone: imperative, plain and factual. Follow the [editorial skill](../../skills/editorial/SKILL.md) and its authoritative [language guide](../writing/language.md).
 
 ## Never add
 

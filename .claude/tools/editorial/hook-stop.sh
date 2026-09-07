@@ -69,6 +69,6 @@ done < "$STATE"
 {
   [ "$ACTIVE" = "true" ] && echo "hook-stop: editorial close-out STILL failing after a previous block."
   printf '%s' "$REPORT"
-  echo "hook-stop: the turn cannot end while a touched file carries editorial FAIL lines this session introduced. Fix the lines above (run check-prose.sh on the file for the governing rule per line; WARNs are judgment calls), then finish. Rules: ~/trade-imports-arch-workspace/.claude/skills/editorial/SKILL.md (Style guide)."
+  echo "hook-stop: the turn cannot end while a touched file carries editorial FAIL lines this session introduced. Fix the lines above (run check-prose.sh on the file for the governing rule per line; WARNs are judgment calls), then finish. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md."
 } >&2
 exit 2

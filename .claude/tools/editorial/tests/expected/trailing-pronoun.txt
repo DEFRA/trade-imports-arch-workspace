@@ -1,0 +1,4 @@
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/trailing-pronoun.md:3: The routing service provides it.
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/trailing-pronoun.md:5: - The proxy forwards the request and the journey trusts it
+check-prose: sentence ends on the pronoun "it" - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Reader-pays compression"). Name the noun the pronoun stands for; the subject the pronoun hides usually belongs at the front of the sentence.
+exit-code: 2

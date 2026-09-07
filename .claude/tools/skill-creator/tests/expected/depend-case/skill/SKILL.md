@@ -27,7 +27,7 @@ This skill needs demo-project demo-tool  - invoked at runtime instead of a local
 ~/trade-imports-arch-workspace/.claude/tools/test-depend/start-test-depend.sh TODO_ARGS
 ```
 
-First stdout line is `MODE: <BRANCH>`. Branch on it.
+First stdout line is `MODE: <BRANCH>`. Branch on that value.
 
 ## Step 1: TODO
 

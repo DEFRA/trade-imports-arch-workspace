@@ -7,8 +7,8 @@
 #   bash create-pr.sh --help
 #
 # Refuses (exit 2) any title or body containing AI attribution (the rule in
-# best-practices/git/pull-requests.md) or editorial style-guide violations
-# (banned punctuation and GDS banned words - the FAIL tiers of
+# best-practices/git/pull-requests.md) or editorial language-guide violations
+# (banned punctuation and words - the FAIL tiers of
 # tools/editorial/check-prose.sh), naming the offending line. --dry-run
 # prints the gh command it would run instead of running it. Requires gh
 # (authenticated); body must be passed as a file, never inline.
@@ -57,7 +57,7 @@ if [ -n "$OFFENDING" ]; then
 $OFFENDING" 2
 fi
 
-# The prose gate: editorial style-guide mechanical rules, same refusal
+# The prose gate: editorial language-guide mechanical rules, same refusal
 # contract as the attribution guard above.
 PROSE_GATE="$HOME/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh"
 [ -f "$PROSE_GATE" ] || fail "prose gate missing: $PROSE_GATE (incomplete checkout - run make check)" 1

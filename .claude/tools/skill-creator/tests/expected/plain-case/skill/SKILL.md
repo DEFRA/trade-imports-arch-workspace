@@ -39,7 +39,7 @@ Canonical state is JSON at `~/trade-imports-arch-workspace/.claude/workareas/tes
 ~/trade-imports-arch-workspace/.claude/tools/test-plain/start-test-plain.sh TODO_ARGS
 ```
 
-First stdout line is `MODE: <BRANCH>`. Branch on it.
+First stdout line is `MODE: <BRANCH>`. Branch on that value.
 
 ## Step 1: TODO
 

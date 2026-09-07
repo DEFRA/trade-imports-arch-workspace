@@ -72,6 +72,6 @@ fi
 {
   printf 'hook-check-written: %s - FAIL line(s) introduced by this write (pre-existing violations are excused):\n' "$FP"
   while IFS= read -r l; do printf '  %s\n' "$l"; done <<< "$NEW"
-  printf 'hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/skills/editorial/SKILL.md (Style guide).\n'
+  printf 'hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.\n'
 } >&2
 exit 2

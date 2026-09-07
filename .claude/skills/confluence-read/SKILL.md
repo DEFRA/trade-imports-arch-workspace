@@ -3,7 +3,7 @@ name: confluence-read
 description: 'Fetch a Confluence page by URL or page id as clean markdown (via the confluence/ hand tools) so the session can analyse it - summarise, review, extract, compare. Triggers: "read confluence page", "fetch confluence page", "analyse confluence page", "analyze confluence page". Read-only, Confluence-to-session direction. NOT for publishing docs pages (confluence-publish), creating or updating Confluence pages (the create-page/update-page hand tools directly), Jira tickets (jira), or pages whose markdown source lives in trade-imports-documentation - read the source file directly instead.'
 ---
 
-Fetches one Confluence page - given a full URL or a bare page id - through the `tools/confluence/` hand tools and lands it in the session as analysis-ready markdown, so the user can summarise, review, extract or compare it. Read-only: nothing is ever written back to Confluence.
+Fetches one Confluence page - given a full URL or a bare page id - through the `tools/confluence/` hand tools and lands it in the session as analysis-ready markdown, so the user can summarise, review, extract or compare the page. Read-only: nothing is ever written back to Confluence.
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
@@ -15,7 +15,7 @@ Fetches one Confluence page - given a full URL or a bare page id - through the `
 | "fetch confluence page" | Steps 1-2 (stop after presenting the page) |
 | "analyse/analyze confluence page" | Steps 1-3 |
 
-NOT for: publishing a docs page (use `confluence-publish`), creating or updating Confluence pages (use the `create-page.sh` / `update-page.sh` hand tools directly), Jira tickets (use `jira`), or pages whose markdown source lives in `trade-imports-documentation` - read the source file from disk instead; the Confluence copy is a rendered artifact of it.
+NOT for: publishing a docs page (use `confluence-publish`), creating or updating Confluence pages (use the `create-page.sh` / `update-page.sh` hand tools directly), Jira tickets (use `jira`), or pages whose markdown source lives in `trade-imports-documentation` - read the source file from disk instead; the Confluence copy is a rendered artifact of that source file.
 
 Prerequisites: `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL` in the environment (direnv loads them from the root `.env` - never read that file; verify with the auth check below). Markdown conversion needs `node` - a soft dependency: when node is absent, `md` falls back to the raw HTML body with a notice, which analyses fine.
 

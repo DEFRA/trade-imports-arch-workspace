@@ -1,0 +1,3 @@
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/compression-ledger.md:3: The scope question is held open under Session decisions. The rejection is argued under Cookie design. Its case is made once, and later sections point back to the decision. The bound is stated below the table. All 4 decisions are collected under one heading.
+check-prose: WARN hits are ledger voice - document bookkeeping written as prose. State the status in plain words: "that is still an open question (see X)" (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Reader-pays compression").
+exit-code: 0

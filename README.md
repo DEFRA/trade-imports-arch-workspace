@@ -2,7 +2,7 @@
 
 AI skills and tooling shared across DEFRA trade-imports architecture work. The versioned content is the `.claude/` directory - agent skills, per-domain shell tools, guard hooks and best-practices notes. Everything else in a working checkout (the documentation repos below, local analysis material) is cloned in beside it and excluded from version control.
 
-## Two ways to use it
+## Two ways to use this workspace
 
 **As a parent workspace for Claude Code - the sweet spot.** Clone this repo and open it as the root of a Claude Code session. The arrangement is deliberate context engineering: the tooling sits at the root, the repos it operates on sit inside it as children, and Claude Code loads the conventions automatically (`CLAUDE.md`, rules, skills). Guard hooks enforce the working agreements - one command per Bash call, no reads of credential files, no agent edits to its own permission config - and the skills orchestrate the documentation tooling end to end.
 
@@ -34,8 +34,8 @@ The layout follows Claude Code's [project `.claude` directory](https://code.clau
 | `agent-memory/` | Persistent memory for subagents that declare `memory: project` in their frontmatter - each maintains its own `MEMORY.md`, loaded into its system prompt when it runs. Claude Code creates and populates it; nothing to author by hand. |
 | `workflows/` | Saved dynamic-workflow scripts - JavaScript files that orchestrate many subagents, each becoming a `/name` command. Saved from a session via `/workflows` rather than authored from scratch. |
 | `hooks/` *(workspace convention)* | The guard scripts (`guard-bash.sh`, `guard-edits.sh`) that `settings.json` wires to run before tool calls. Claude Code reads the wiring from `settings.json`; keeping the scripts in a dedicated directory, protected from agent edits by `guard-edits.sh` itself, is this workspace's choice. |
-| `tools/` *(workspace convention)* | Per-domain shell scripts that do the deterministic work behind skills - Confluence page operations and publish pre-flight, Jira ticket creation and JQL fetch, Mermaid rendering, skill scaffolding, the workspace, auth and dependency doctors. Runnable by hand or from any agent. |
-| `best-practices/` *(workspace convention)* | Convention docs the skills cite instead of duplicating: skill authoring (`skills/`), git and pull requests (`git/`), GDS writing (`gds/`), and Claude Code enforcement mechanisms (`claude-code/`). |
+| `tools/` *(workspace convention)* | Per-domain shell scripts that do the deterministic work behind skills - Confluence page operations and publish pre-flight, Jira ticket creation, description update and JQL fetch, Mermaid rendering, skill scaffolding, the workspace, auth and dependency doctors. Runnable by hand or from any agent. |
+| `best-practices/` *(workspace convention)* | Convention docs the skills cite instead of duplicating: skill authoring (`skills/`), git and pull requests (`git/`), editorial writing (`writing/`), and Claude Code enforcement mechanisms (`claude-code/`). |
 | `workareas/` *(workspace convention)* | Persistent working state written by skill runs, such as skill-creator interview decisions and audit plans. |
 
 There is deliberately no `commands/` directory. Claude Code has folded commands and skills into one mechanism - same `/name` invocation - and skills are the recommended form because they can bundle supporting files, so this workspace defines everything as skills.

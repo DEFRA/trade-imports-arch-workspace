@@ -1,12 +1,12 @@
 # Enforcement - making rules deterministic in Claude Code
 
-Skill content, CLAUDE.md and rules files are advisory context: the model weighs them and can deviate, as the em-dash that reached a PR body on 13 Aug 2026 proved despite the pr skill pointing at the editorial style guide. Hooks and scripts are deterministic: they always run. The working principle for this estate: **every mechanical rule needs a deterministic check on the path to the artefact**; prose in a SKILL.md documents the gate, it is never the gate.
+Skill content, CLAUDE.md and rules files are advisory context: the model weighs them and can deviate, as the em-dash that reached a PR body on 13 Aug 2026 proved despite the pr skill pointing at the editorial language guide. Hooks and scripts are deterministic: they always run. The working principle for this estate: **every mechanical rule needs a deterministic check on the path to the artefact**; written guidance documents the gate, it is never the gate.
 
 ## Hook events and their powers
 
 | Event | Fires | Power |
 | --- | --- | --- |
-| `PreToolUse` | before a tool call | can deny it. Estate idiom (see `hooks/guard-bash.sh`): print `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":...}}` and exit 0, with the reason naming the sanctioned alternative |
+| `PreToolUse` | before a tool call | can deny the call. Estate idiom (see `hooks/guard-bash.sh`): print `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":...}}` and exit 0, with the reason naming the sanctioned alternative |
 | `PostToolUse` | after a tool call completes | cannot undo it; exit 2 + stderr injects the message as corrective feedback the model must address next turn |
 | `Stop` | when the model tries to end its turn | exit 2 + stderr blocks the turn from ending, with the reason telling the model what to fix; `stop_hook_active` in the input JSON marks repeat blocks |
 | `UserPromptSubmit`, `SessionStart`, `PreCompact`, `SubagentStop`, ... | prompt/session lifecycle | context injection and gating at those points |
@@ -41,4 +41,4 @@ Scripts under `tools/` are the agent-agnostic layer: colleagues on other AI tool
 - Hooks guide and patterns: https://code.claude.com/docs/en/hooks-guide
 - Skills (frontmatter incl. `hooks:`): https://code.claude.com/docs/en/skills
 - The `.claude/` directory: https://code.claude.com/docs/en/claude-directory
-- The worked example: the editorial gate layers in [`../../skills/editorial/SKILL.md`](../../skills/editorial/SKILL.md) (the mechanical close-out step) and `.claude/tools/editorial/`
+- The worked example: the editorial gate layers in [`../../skills/editorial/SKILL.md`](../../skills/editorial/SKILL.md), the authoritative [`../writing/language.md`](../writing/language.md) rules and `.claude/tools/editorial/`

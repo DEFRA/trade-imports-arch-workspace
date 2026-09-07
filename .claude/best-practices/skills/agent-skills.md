@@ -45,8 +45,8 @@ assets/<NAME>.md
 
 - `&&` / `;` / `|` - turns N commands into one string the matcher doesn't recognise. Run them as separate Bash calls instead.
 - `cd <dir> && cmd ...` - special case of `&&`. Use `cmd -C <dir>` / full paths instead.
-- `find ... -exec cmd {} \;` - `-exec` runs an arbitrary embedded command. Claude Code refuses to prefix-allowlist it. Use Glob + Read for "find then read" workflows.
-- `$VAR` in the command - Claude Code's "Contains simple_expansion" check ([GH#51001](https://github.com/anthropics/claude-code/issues/51001)) trips before the allowlist matcher sees it. Use literal `~/trade-imports-arch-workspace/...` paths.
+- `find ... -exec cmd {} \;` - `-exec` runs an arbitrary embedded command. Claude Code refuses to prefix-allowlist any command containing `-exec`. Use Glob + Read for "find then read" workflows.
+- `$VAR` in the command - Claude Code's "Contains simple_expansion" check ([GH#51001](https://github.com/anthropics/claude-code/issues/51001)) trips before the allowlist matcher sees the command. Use literal `~/trade-imports-arch-workspace/...` paths.
 - `/Users/<you>/...` resolved-tilde form - the matcher compares literal strings, so `~/trade-imports-arch-workspace/...` and its resolved `/Users/<you>/...` form are _different_ prefixes. Always type the `~/` form, never resolve it to your home path.
 - Ad-hoc text utilities (`awk`, `sed`, `find`) on files outside the workspace - scoped to workspace paths in the allowlist; system paths still prompt.
 
@@ -55,7 +55,7 @@ assets/<NAME>.md
 - File inspection → Read (with `offset` + `limit`), not `awk`, `sed -n`, `grep -n`.
 - File location by name → Glob, not `find -exec` or `find ... | xargs`.
 - JSON queries → `jq` against a workspace file, not `python3 -c "import json"`.
-- Filtering script output → add a `--filter` / `--file` / `--repo` flag to the helper, not `| awk`. If the helper lacks the flag, propose extending it.
+- Filtering script output → add a `--filter` / `--file` / `--repo` flag to the helper, not `| awk`. If the helper lacks the flag, propose extending the helper.
 
 **Quick reference:**
 

@@ -12,7 +12,7 @@ hooks:
           timeout: 10
 ---
 
-Create or edit a GitHub pull request for the workspace or any child repo. The outcome is a PR whose title and body follow [pull-requests.md](../../best-practices/git/pull-requests.md), created through the guard script so AI attribution is refused deterministically - the rule holds regardless of which agent or session runs it.
+Create or edit a GitHub pull request for the workspace or any child repo. The outcome is a PR whose title and body follow [pull-requests.md](../../best-practices/git/pull-requests.md), created through the guard script so AI attribution is refused deterministically - the rule holds regardless of which agent or session runs this skill.
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
@@ -52,9 +52,9 @@ This skill needs gh - tools beyond the workspace baseline (bash, curl, jq, git).
 bash ~/trade-imports-arch-workspace/.claude/tools/pr/create-pr.sh --title "<title>" --body-file <path> --base main
 ```
 
-Add `--repo <owner/name>` / `--head <branch>` when needed; use `--edit <number> --body-file <path>` to replace an existing PR's body; `--dry-run` prints the command without running it.
+Add `--repo <owner/name>` / `--head <branch>` when needed; use `--edit <number> --body-file <path>` to replace an existing PR's body; `--dry-run` prints the `gh` command and exits without running anything.
 
-If the script refuses (exit 2), it names the offending line(s) - AI attribution or editorial style-guide violations (em-dash, curly quotes, GDS banned words): fix the body file and re-run. Never bypass the refusal with a raw `gh pr create`.
+If the script refuses (exit 2), it names the offending line(s) - AI attribution or violations from the editorial [language guide](../../best-practices/writing/language.md), such as em-dashes, curly quotes or banned words. Fix the body file and re-run. Never bypass the refusal with a raw `gh pr create`.
 
 ## Completion output
 

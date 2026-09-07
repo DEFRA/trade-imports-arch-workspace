@@ -21,7 +21,7 @@ Conventional-commit style, same mechanics as a commit subject ([commits.md](comm
 
 ## Bodies
 
-Clarity is the governing requirement: write for a cold reader who has not seen the branch or the conversation that produced it. Establish the brief and house voice before drafting - the [editorial skill](../../skills/editorial/SKILL.md) Writing path - rather than fixing the prose afterwards.
+Clarity is the governing requirement: write for a cold reader who has not seen the branch or the conversation that produced the change. Establish the brief and house voice before drafting - the [editorial skill](../../skills/editorial/SKILL.md) Writing path - rather than fixing the prose afterwards.
 
 Shape:
 

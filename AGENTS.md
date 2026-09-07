@@ -14,13 +14,13 @@ hooks, and best-practices docs. The tooling is Claude Code centric, but
 the scripts and skill procedures are usable from any agent.
 
 This checkout arranges the tooling as a context-engineering workspace:
-the harness sits at the root, wrapping the repos and analysis corpus it
-operates on. That arrangement is one way to consume it, not the
-contract - colleagues work in different AI tools and workflows and are
-expected to use the skills in their own workspace however suits
-them. Accordingly, the repo's versioned payload is essentially `.claude/`
-and the root docs; everything the workspace wraps is excluded by
-`.gitignore`:
+the harness sits at the root, wrapping the repos and analysis corpus
+that the tooling operates on. That arrangement is one way to consume
+it, not the contract - colleagues work in different AI tools and
+workflows and are expected to use the skills in their own workspace
+however suits them. Accordingly, the repo's versioned payload is
+essentially `.claude/` and the root docs; everything the workspace
+wraps is excluded by `.gitignore`:
 
 - `trade-imports-documentation/` - child git repo; docs-as-code hub:
   LikeC4/C4 models, Mermaid diagrams, and markdown published to GitHub
@@ -71,7 +71,7 @@ read its header) for usage.
 
 | Domain | What it provides |
 | --- | --- |
-| `jira/` | `fetch.sh` (JQL or batch-key fetch, flat JSON projection), `create-ticket.sh`, `auth.sh` pre-flight |
+| `jira/` | `fetch.sh` (JQL or batch-key fetch, flat JSON projection), `create-ticket.sh`, `update-description.sh`, `auth.sh` pre-flight |
 | `confluence/` | Hand tools for ad-hoc Confluence page reads, writes and doc sync |
 | `confluence-publish/` | Pre-flight and executor for publishing one docs page to Confluence |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
@@ -93,7 +93,7 @@ run when one fails:
 | Golden tests (3 suites) | scaffold + doctor + prose-gate behavior vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
 | Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
 | Guard hooks (`.claude/hooks/`) | agent Bash and file-edit calls in Claude Code sessions | every matched tool call | follow the sanctioned alternative the denial names |
-| `check-prose.sh` (editorial style gate) | banned punctuation and GDS banned words (FAIL), vague words and metaphor list (WARN) | `create-pr.sh` on every PR title/body; pre-commit on staged markdown; commit-msg on the message; skill-scoped hooks below | fix the FAIL lines it names; rules in `.claude/skills/editorial/SKILL.md` |
+| `check-prose.sh` (editorial style gate) | banned punctuation and words (FAIL), vague words and metaphor list (WARN) | `create-pr.sh` on every PR title/body; pre-commit on staged markdown; commit-msg on the message; skill-scoped hooks below | fix the FAIL lines it names; rules in `.claude/best-practices/writing/language.md` |
 | Skill-scoped hooks (pr, editorial) | the prose each Write/Edit just produced; editorial close-out at turn-end | while those skills are active | fix the violation the injected feedback names; the editorial Stop hook blocks the turn while a FAIL line the session introduced remains |
 
 Why the gates exist alongside the skills: skill prose is advisory
@@ -109,6 +109,11 @@ scripts above. Claude Code invokes them natively; from any other agent,
 read the SKILL.md and follow it as a procedure - the scripts it calls
 run anywhere. Conventions shared by all skills:
 `.claude/best-practices/skills/agent-skills.md`.
+
+When creating or revising human-facing technical prose, follow
+`.claude/skills/editorial/SKILL.md`, including its review and close-out
+steps. This also applies when substantial documentation is part of a
+coding, modelling or analysis task.
 
 ## Git, GitHub and pull requests
 

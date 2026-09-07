@@ -58,7 +58,7 @@ Each entry: the anti-pattern, the symptom that catches it, and the correction.
 
 **Why it's wrong:** the pre-bake adds a script + a workarea path + a step; the saving is one re-fetch the parent could just do inline.
 
-**Correction:** inline the fetch in the step that consumes it. Keep pre-bake only when fan-out workers each re-read it, or when the data is expensive (network, computed) AND read >1 times.
+**Correction:** inline the fetch in the step that consumes the data. Keep pre-bake only when fan-out workers each re-read it, or when the data is expensive (network, computed) AND read >1 times.
 
 ## A8. Hardcoded sub-command chains in script prose
 

@@ -73,7 +73,7 @@ Branch on the mode:
 
 # CREATE flow
 
-The parent session loads `references/INTERVIEWER.md` and follows it. The interviewer:
+The parent session loads `references/INTERVIEWER.md` and follows that procedure. The interviewer:
 
 1. Walks the 9 shape questions one at a time (serial, not batched).
 2. Records each answer atomically via `interview-add-answer.sh` into `workareas/skill-creator/<name>/decisions.json`.

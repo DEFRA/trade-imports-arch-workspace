@@ -1,4 +1,4 @@
-# New GDS banned words
+# New banned words
 
 The rollout was seamless and the tool is user-friendly.
 

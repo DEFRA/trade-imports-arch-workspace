@@ -1,0 +1,4 @@
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/jargon-shape.md:3: The shape is settled and both shapes align.
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/jargon-shape.md:4: The cache interval bounds how quickly a session lapses.
+check-prose: WARN hits are context-sensitive words - keep literal technical uses; replace vague uses with the specific outcome, limit or structure (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
+exit-code: 0
