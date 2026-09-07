@@ -1,6 +1,6 @@
 #!/bin/bash
-# TODO — one-line purpose of this helper.
-# Boundary (only if this helper has a sibling) — TODO: when to use this vs that sibling.
+# TODO - one-line purpose of this helper.
+# Boundary (only if this helper has a sibling) - TODO: when to use this vs that sibling.
 #
 # Usage:
 #   start-test-depend.sh --run-id <id> [TODO other flags]
@@ -9,7 +9,7 @@
 # Solve, don't defer: handle missing prerequisites with a specific
 # remedy in the error message, never a raw failure.
 
-# TODO pattern 9 — pre-flight each declared dependency before real work:
+# TODO pattern 9 - pre-flight each declared dependency before real work:
 #   projects: [[ -d $HOME/trade-imports-arch-workspace/<project> ]]
 #   tools:    command -v <tool>
 # On failure print MODE: BLOCKED plus REASON: <remedy> (model:
@@ -31,6 +31,6 @@ done
 
 [[ -z "$RUN_ID" ]] && { echo "Missing --run-id" >&2; exit 1; }
 
-# TODO — implement.
+# TODO - implement.
 echo "TODO: start-test-depend.sh not yet implemented" >&2
 exit 1

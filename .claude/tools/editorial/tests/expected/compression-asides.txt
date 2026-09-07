@@ -1,0 +1,3 @@
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/compression-asides.md:3: The front door - the only OIDC client - signs importers in against IDM - the customer identity service - and writes the session record.
+check-prose: WARN hits are aside stacking - 3 or more " - " separators in one sentence. At most one dash-aside per sentence; split the rest into their own sentences (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Reader-pays compression").
+exit-code: 0

@@ -1,4 +1,4 @@
-WARN: dependencies declared without a dispatcher — no home for the pre-flight; audit pattern 9 will flag this until one exists
+WARN: dependencies declared without a dispatcher - no home for the pre-flight; audit pattern 9 will flag this until one exists
 Scaffolded skill: test-toolonly
   SKILL.md:    HOME/trade-imports-arch-workspace/.claude/skills/test-toolonly/SKILL.md
   decisions:   HOME/trade-imports-arch-workspace/.claude/skills/test-toolonly/decisions.md

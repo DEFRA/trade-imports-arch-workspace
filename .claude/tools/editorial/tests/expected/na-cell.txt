@@ -1,0 +1,5 @@
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/na-cell.md:1: # N/A in table cells
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/na-cell.md:5: | Guest access | Used | N/A |
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/na-cell.md:7: The field is n/a for this profile.
+check-prose: "N/A" - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Punctuation and formatting"). State the fact instead: "not applicable", "no data" or "not used".
+exit-code: 2

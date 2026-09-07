@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# commit-msg: refuse commit messages that break the editorial style gate.
+# Wired via `git config core.hooksPath .githooks` (make link does this).
+# Commit bodies are editorial-governed artefacts (.claude/skills/editorial/
+# SKILL.md). Comment lines are stripped before gating, as git itself strips
+# them on commit. A missing gate (incomplete checkout) never blocks commits.
+
+set -u
+
+GATE="$HOME/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh"
+[ -f "$GATE" ] || exit 0
+
+if ! grep -v '^#' "$1" | bash "$GATE" --stdin --label "commit message"; then
+    echo "commit-msg: the commit message fails the editorial style gate (lines above) - reword and re-commit" >&2
+    exit 1
+fi
+exit 0

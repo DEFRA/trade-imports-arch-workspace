@@ -1,200 +1,160 @@
 ---
 name: editorial
-description: Editorial review and writing process for documents that humans will read - PR descriptions, READMEs, design docs, commit bodies, RFCs. Recursively drills from surface text to essence by asking what we're trying to say and why; includes a style guide of mechanical rules. Use when the user asks to review, sharpen, edit, or write a doc.
+description: Writing, revising and reviewing human-facing technical documentation in the workspace editorial voice. Use for architecture documents, solution overviews, design docs, explanations, how-to guides, reference pages, READMEs, ADRs, Confluence pages, PR descriptions, commit bodies and Jira tickets. Also use when a coding, modelling or analysis task produces substantial documentation or explanatory prose. Establishes the reader brief and structure, drills from surface text to meaning, and applies a cold-reader review and mechanical style gate. Not for code comments or ordinary conversational replies.
+hooks:
+  PostToolUse:
+    - matcher: Write|Edit|MultiEdit
+      hooks:
+        - type: command
+          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh" --record
+          timeout: 10
+  Stop:
+    - hooks:
+        - type: command
+          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-stop.sh"
+          timeout: 30
 ---
 
-Follow this process when asked to review, write, or sharpen a doc. Interrogate every sentence until what remains is what we meant. Mechanical conventions live in the style guide at the bottom - apply as you go.
+Use one of 2 paths:
 
-This SKILL builds on the foundational best-practices laid out in [writing.md](../../best-practices/gds/writing.md) and [language.md](../../best-practices/gds/language.md). Both of which need to be read before using this SKILL.
+- **New writing** - establish the brief and outline, draft, then review the result.
+- **Existing prose** - establish the reader, then start with the review path.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+## Sources of truth
 
-## Contents
+Read only the guidance needed for the current path:
 
-- **Process** - steps 1 to 9.
-- **Output behaviour**.
-- **Style guide**.
+- Always read [language.md](../../best-practices/writing/language.md). It owns the workspace voice, grammar, terminology, formatting and compression tests.
+- Always read [snapshot-authoring.md](../../best-practices/writing/snapshot-authoring.md) when editing an existing document. It explains how to incorporate changes without leaving revision residue.
+- Read [ubiquitous-language.md](../../best-practices/writing/ubiquitous-language.md) when the document uses workspace terms or an abbreviation may be a registered name.
+- Read [document-types.md](references/document-types.md) when choosing or checking a document's mode or fixed format.
+- Read [voice-examples.md](references/voice-examples.md) before drafting a full technical document or when prose sounds compressed or mechanical.
+- Read [review-brief.md](references/review-brief.md) only when running a cold-reader pass or the whole-document review workflow.
 
-## 1. Frame the reader
+Other files should point to these authorities rather than copy their rules.
 
-Decide who is reading this cold:
+**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [agent-skills.md](../../best-practices/skills/agent-skills.md).
 
-- Role and context.
-- Concepts they already hold.
-- Concepts that need first-use introduction.
-- What action they need to take (approve, replicate, decide).
-- Never assume the reader is a machine or has any visibility of the intermediate material used to generate an output
+## House voice
 
-This frame is the lens for every later decision. Assume your audience is a cold reader.
+Write as a knowledgeable colleague speaking directly and precisely to another colleague. The tone is conversational, brisk but not terse, serious without becoming pompous, and confident only where the evidence supports confidence.
 
-## 2. Drill from surface to essence
+Lead with the point. Name actors and mechanisms. Prefer concrete facts to judgments about those facts. Let the reader see what happens, why it happens and what follows from that behaviour. Preserve natural cadence rather than forcing every sentence into the same short pattern.
 
-For each section, paragraph, sentence, recursively ask:
+Do not invent missing meaning, rationale or evidence. A named gap is better than a fluent guess.
 
-- **What am I trying to say?**
-- **Why am I saying it?**
-- **Is this the real reason, or a surface gloss?**
+## Writing path
 
-When the question feels answered, ask once more. The first answer is usually the framing, the second is the substance, the third is the core.
+For substantial documents, complete the brief and outline before drafting. Fixed-format artefacts follow their owning guidance.
 
-**Worked example A.** A statement is written "adds typeCode + urlId (D23B unece:typeCode)":
+### 1. Establish the brief
 
-- _Why is this a question?_ What am I trying to say? Why would a reader care? Does my reader know about typeCodes, or D23B?
-- _What should have been written_: Vet handling and inspection regimes differ for live animals vs semen vs embryos vs ova. The CN commodity code does not always discriminate form, the urlId is added to the typeCode so we can tell the difference. UN/CEFACT uses these properties within the TradeProduct to convey this information.
+- **Document form.** Choose the dominant mode or fixed-format artefact in [document-types.md](references/document-types.md). Preserve an existing document's established structure unless the user asks to change that structure.
+- **Audience.** Name the reader's role and context, what they already know, which concepts need introduction, and what they must understand or do after reading.
+- **Allowed terminology.** Check the ubiquitous-language register when the document uses workspace terms. Add only terms the named audience verifiably knows. Introduce or replace everything else.
+- **Scope sentence.** Write one sentence stating what the document covers and who it is for. Use it to test the opening, and include its substance early unless the fixed format supplies the opening.
+- **Missing inputs.** Ask one focused question only when the document, audience or intended outcome cannot be derived safely from the request and available context.
 
-**Worked example B.** An open question started as "is `private_transporter_approval_number` a real Defra scheme?". Drilling:
+### 2. Build the outline
 
-- _Why is this a question?_ We used the name in samples without registering it.
-- _Why does that matter?_ Consumers can't dereference an unregistered scheme name.
-- _Why is there no way?_ No mechanism exists for Defra-side scheme IDs that aren't in TRACES.
-- _Other examples?_ `cph_number`, `bcp_reference`, per-animal identifier types.
+- Open with the information the reader needs first. This is usually the document's scope or the fixed format's required opening.
+- Use concrete headings that answer the reader's questions.
+- Put each fact in one place. Link or point to that place instead of restating the fact.
+- Choose prose, steps, bullets and tables using the structure rules in [document-types.md](references/document-types.md).
+- Include what the reader needs and remove what the reader already knows.
 
-The surface question was about one scheme. The real question was the codelist mechanism.
+### 3. Draft and self-review
 
-**Worked example C.** The App Registration has an **FIC** (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to the same Entra `/oauth2/v2.0/token` endpoint. The same access token comes back.
+Draft to the brief, outline and house voice. Use [voice-examples.md](references/voice-examples.md) as patterns, not as text to imitate mechanically. Then follow the review path on the draft.
 
-- _what is a FIC?_ — I have to find out what a FIC is? Is it a real term, is it ubiquitous language?
-- _what is the same?_ - Ambiguous!
+## Review path
 
-The App Registration has a Microsoft Federated Identity Credential (no secret). The gateway gets a short-lived AWS Cognito OIDC token and presents it as `client_assertion` to Entra's `/oauth2/v2.0/token` endpoint. Entra validates the JWT against the FIC and returns a Microsoft Entra access token. The gateway sends that token to Service Bus in the `Authorization: Bearer header`.
+### 1. Frame the reader
 
-**Unpack load-bearing compression.** When a conclusion rests on a compressed phrase - a summary line, "by construction", "holds structurally", "passes through it" - the phrase is a pointer, not an explanation. Unpack it in the section that uses it: restate each clause as "means" plus the mechanism that makes it true (named components, real attributes), and close with one plain sentence stating the consequence. The compressed form may stay where a nearby unpacking backs it; a conclusion resting on a compressed phrase that is never mechanically grounded is an unverified assertion. Fund the words by culling decoration, not by growing the section: unpacking is what the words were for.
+Write down the reader frame before judging the text:
 
-Unpacking is iterative: unpack, then reason about the simpler statements, unpacking again where one is still ambiguous. Stop only where further unpacking would be guessing; name the missing piece of knowledge there, and that residue is the open question (see Honesty on open questions). Do not raise a question a completed unpacking would dissolve. And unpacking is not addition: more words, more cross-references, or a dive into low-level detail trade one complexity for another. The test of a real unpacking is that each resulting statement is simpler than its parent and carries one unambiguous intent.
+- role and context
+- concepts already known
+- concepts needing introduction
+- action or decision the document supports
 
-**Worked example D.** A pattern summary reads "every journey request passes through it against one server-side session", and a trade-off later claims sign-out "holds by construction". Unpacked clause by clause:
+Never assume the reader saw the branch, conversation, source notes or intermediate analysis.
 
-- "Every journey request passes through it" means the front door is the only public origin: `ins.defra.gov.uk` resolves to the front door and nothing else, journey frontends keep internal-only URLs, and the front door reverse-proxies path prefixes (`/plants/*`, `/animals/*`) to them as internal upstreams. The browser never has a second place to go.
-- "Against one server-side session" means the browser's only credential is an opaque session id in a host-only cookie, resolving to a single record in the front door's Redis holding the tokens, claims and active organisation. Every request from every tab re-reads that record, so deleting or updating it is the propagation mechanism. There is nothing to synchronise because nothing else holds state.
+### 2. Recover the intended meaning
 
-Each clause became a mechanism plus a consequence sentence; "holds by construction" is now checkable instead of asserted. This phrase would be better unpacked as:
+For each section, paragraph and sentence, ask:
 
-- the front door is the only public origin e.g. a url like `ins.defra.gov.uk` resolves to the front door and nothing else, journey frontends keep internal-only URLs, and the front door reverse-proxies path prefixes (`/plants/*`, `/animals/*`) to the relevant place. The browser's only credential is an opaque session id in a host-only cookie, resolving to a single record in the front door's Redis which holds the tokens, claims and active organisation. Every request from every tab re-reads that record, so deleting or updating it is the propagation mechanism. There is nothing to synchronise because nothing else holds state
+1. What is this trying to say?
+2. Why does the reader need this information?
+3. Has compression hidden an actor, mechanism, condition or consequence?
+4. Can this point be stated more simply without losing meaning?
 
-**Worked example E - unpacking dissolves a false open question.** A draft hedged "whether reverse proxying across tenant frontends is supported on the platform is undocumented" and raised it as a question to the platform team. Unpacked, the claim is: the front door makes an outbound HTTP call to a journey frontend's internal URL (`{service}.{env}.cdp-int.defra.cloud`) and streams the response back. Reasoning about that simpler statement: service-to-service HTTP is documented platform behaviour, and everything else (route mapping, header forwarding, streaming) is code inside the front door. No platform grant is consumed, so there was no question to ask; the compressed phrase had hidden a facet of the solution that the unpacking made visible. What genuinely remained (rate-limit sizing at estate volume) was a different, narrower question.
+Unpack before cutting. Several plain statements are better than one dense statement. Later, remove whole units the reader does not need; do not compress the surviving explanation back into shorthand.
 
-## 3. Hunt jargon and opaque labels
+Stop where further explanation would require a guess. Name the missing information instead. If the author clearly holds an omitted rationale, ask for it rather than supplying a plausible one.
 
-Internal labels mean nothing to a cold reader. Watch for:
+When a conclusion rests on phrases such as "by construction" or "holds structurally", state the mechanism that makes each part true and then state the consequence.
 
-- Phase names, path names, ticket codes ("Path A / Path B", "Phase 2").
-- Pattern names without explanation ("by-reference attachment pattern").
-- Tag names where the tag was just invented (`schemeId: foo` where `foo` does not exist anywhere).
-- Acronyms or product names used before first introduction.
-- Positional references where the thing has a name: "whether pattern 4 meets single sign-out" when the document names it Backend for Frontend. The name is usually no longer than the number, and the number breaks the moment sections reorder.
-- Requirement fragments pasted without context: "bounded stated staleness, audit logged" floating in a cell or sentence. Restate what the requirement demands here, in this sentence's own terms, not as a shorthand quotation of the requirements list.
-- Figurative verbs standing in for mechanisms: "prices", "rides in", "bites", "spends", "hangs on". The verb's literal sense is not what happens, so the reader must decode the sentence to recover the mechanism it exists to state. Replace each with the literal statement (see Metaphor in the style guide).
+### 3. Apply the language tests
 
-For each, replace with substance or introduce on first use.
+Use [language.md](../../best-practices/writing/language.md) to check:
 
-Close the pass with the hard-avoid sweep from the style guide's Metaphor section: run its grep over the draft, judge each hit, and replace every figurative use with the specific mechanism it stands for.
+- actor and action clarity
+- established information before new information
+- explicit cause, sequence and dependency
+- stable subjects and unambiguous references
+- nominalisations, noun stacks and other reader-pays compression
+- jargon, metaphors, vague claims and internal labels
+- sentence cadence and paragraph progression
+- formatting and terminology conventions
 
-## 4. Verifiability check
+A reader should be able to read each sentence aloud once and restate it accurately. Rewrite only when the result becomes easier for the named reader to understand or verify.
 
-Don't cite what a reader can't verify - gitignored files, local-only data, named schemes that don't exist. If a claim depends on inaccessible data, restate it inline as a standalone fact ("Some commodities are measured in weight") instead of citing the source ("Defra refdata says X").
+### 4. Verify the content
 
-## 5. Honesty on open questions
+- Check every internal link and cross-reference.
+- Do not cite gitignored files, local-only data or sources the reader cannot access. State the supporting fact inline when the source cannot be shared.
+- Name any external document or prior decision on which a claim depends.
+- Before calling something an open question, search the available sources. Lead with what is already known and narrow what remains.
+- Reject circular reasons. Trace a decision to the use case, source data or constraint rather than to the authority making the decision.
+- When a correct statement invites a likely false inference, add the boundary explicitly: state what does not happen.
 
-Before listing a question as open, ask: could a grep or read answer it?
+### 5. Remove waste and fix the structure
 
-- If yes - do it; bring back the answer.
-- If partly - lead with the finding, propose a position, narrow what remains open.
+Ask what the reader loses if each sentence, paragraph or section disappears. Remove units whose loss changes nothing.
 
-## 6. Anti-circularity
+Give repeated facts one home. Merge sections when their overlap causes repetition. Keep connective prose that carries the reader between points; shorter but harder to follow is not an improvement.
 
-If a change's source and its justification are the same authority, the "why" is empty. "TIG naming alignment" when TIG owns the schema is a tautology. Trace to the real why: canonical vocabulary, source data, or use case.
+Apply the structural rules in [document-types.md](references/document-types.md). Do not turn prose into bullets merely to shorten the passage.
 
-## 7. Decoration cull
+### 6. Run the cold-reader and mechanical checks
 
-For each sentence, ask: would removing this confuse the reader? If no, cut.
+For a small artefact, apply the cold-editor role in [review-brief.md](references/review-brief.md) yourself. For a full draft, give that role to a fresh-context reviewer. The reviewer returns findings only and never edits the document. Apply accepted findings in the writing session.
 
-Common decoration:
+For a full document or document set, run the saved `editorial-review` workflow only when the user asks to "run the editorial-review workflow" on a path. It uses [review-brief.md](references/review-brief.md) for drill, structural and cold-editor passes. The workflow reviews without editing. After applying accepted findings, run one final cold-reader check on the revised result.
 
-- Line counts and refactor narrative ("370 lines, down from 770").
-- Pattern-matching observations ("matches the pattern X uses").
-- Self-congratulation ("All N schemas compile").
-- Restating what property names already say.
-- Section intros that repeat the heading.
+Run the style gate on every document touched:
 
-## 8. Structural pass
+```
+bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <file>
+```
 
-- Related items with the same shape → table.
-- Short unrelated items → bullets.
-- Don't comma-cram a paragraph that wants to be enumerated.
-- Headings name what's below concretely ("Extensions to existing types"), not generically ("Overview").
+For prose held only in text, use `--stdin --label <name>` and supply the text through standard input. Empty input proves nothing.
 
-## 9. Concrete over abstract
+Fix every FAIL. Judge every WARN against [language.md](../../best-practices/writing/language.md): literal technical uses may stay; vague or figurative uses must become the specific behaviour, condition or mechanism. The work is not finished until the gate passes.
 
-When something feels hand-wavy, paste the JSON, name the property, give the actual scheme ID.
+## Applying edits
 
-## Output behaviour
+- When editing living documentation, rewrite it as a current snapshot and remove dated corrections or revision commentary. For change records and decision records, preserve the lifecycle described in [snapshot-authoring.md](../../best-practices/writing/snapshot-authoring.md).
+- Describe a non-trivial restructure before making the change.
+- Apply ordinary cuts, wording repairs and terminology fixes directly.
+- Review connective prose introduced by a restructure; it has not passed through the earlier review.
+- Re-read the result using the reader frame after substantive changes.
 
-- Non-trivial restructures (whole sections, reordering, framing shifts) - describe before editing.
-- Tightening passes (cuts, swaps, jargon replacement) - just edit and summarise.
-- After substantive edits, re-read with the reader frame from step 1.
+## Scripts
 
----
-
-## Style guide
-
-Mechanical rules. Apply without thinking.
-
-### Punctuation
-
-- No em-dashes. Use a plain hyphen `-` (with a space on each side for a sentence break).
-- Plain `"` and `'` quotes, not curly variants.
-
-### Code identifiers
-
-- Backticks around every property name, scheme ID, code value, file path, type name, JSON Schema keyword. Examples: `partyTypeCode`, `cph_number`, `H87`, `samples/imports/...`, `TradeParty`, `oneOf`.
-
-### Lists and enumerations
-
-- Related items with the same shape → table.
-- Short unrelated items → bullets.
-- Don't comma-cram.
-
-### Section headings
-
-- Name what's below concretely.
-- Prefer "**Bold lead-in**" paragraphs over deeper heading levels.
-
-### Schema `$def` names vs property names
-
-- A `$def` name lives in the schema; it's invisible in a JSON instance.
-- A property name appears in instance data and is what the reader will grep for.
-- When both matter, name both: `gbnAgTradeProduct` `$def` (property: `specifiedTradeProduct[]`).
-- Never substitute one for the other.
-
-### Acronyms and domain terms
-
-- Introduce on first use. TRACES, TIG, IPAFFS, CHED-A, UNTDID 1001, BSP, BCP, CPH - none are self-explanatory cold.
-- Internal labels (Path A, Phase 2) are banned. Describe in domain terms.
-
-### Code examples
-
-- JSON with `//` comments → unmarked code fence ` ` ` (a ```` `json ```` fence trips linters).
-- Pure JSON → ` ```json ` is fine.
-
-### References
-
-- Don't reference files that are gitignored. If context is needed, provide an inline summary.
-
-### Tone
-
-- Statements, not pronouncements ("X retains `schemeId`", not "Each is justified by real TRACES data carrying schemeId").
-- Factual, not personality-driven.
-- No self-congratulation.
-- Plain constructions over clause-speak: "the adopted pattern should support it as a future requirement", not "no pattern may foreclose it". If a sentence sounds like a legal clause, rewrite it as what a colleague would say.
-
-### Metaphor: hard avoids
-
-- These terms are banned wherever the verb's literal sense is not what happens, the same way em-dashes are banned - no judgment call, replace on sight: "prices" / "priced", "rides" / "rides in", "bites", "spends", "buys", "kills", "hangs on", "collapses", "leaks", "lands", "forecloses".
-- A term used in its literal technical sense stays: a cookie carries a value (HTTP semantics), a request times out. For anything not on the list, the test: could a reader new to the document say precisely what happens from this sentence alone? If the verb needs decoding, replace it.
-- Replacement is unpacking: state the specific mechanism in precise, non-jargon language. This is not a synonym swap; the sentence usually needs rewriting around the mechanism.
-- Sweep mechanically before finishing: `grep -niE '\b(prices?|priced|rides?|bites?|spends?|spent|buys?|kills?|collapses?|leaks?|lands?|forecloses?)\b|hangs? on' <file>`, then judge each hit; literal uses stay, every figurative hit is replaced.
-- Observed failures and their replacements (4 Aug 2026):
-  - "never rides in the session artefact" -> "is not stored in the session record or the session cookie"
-  - "whether a frontend may forward page traffic to another prices the proxying front door" -> "if the platform does not let one frontend forward page requests to another, the proxying front door needs a platform change before it can be built, and that need counts against it in the comparison"
-  - "whether the picker interrupts a returning user prices per-journey login" -> "if the organisation picker appears each time a journey signs a returning user in silently, patterns where every journey runs its own login show the user the picker repeatedly"
-  - "sign-out and organisation switch bite on the next request" -> "sign-out and organisation switch take effect on the user's next request"
+| Script | Purpose |
+| --- | --- |
+| `~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh` | Check deterministic failures and judgment warnings; supports `--stdin --label`, `--print-fail-lines` and `--help` |
+| `~/trade-imports-arch-workspace/.claude/tools/editorial/hook-check-written.sh` | Check each write while the skill is active and record touched files |
+| `~/trade-imports-arch-workspace/.claude/tools/editorial/hook-stop.sh` | Prevent the session from ending while a touched file contains a newly introduced failure |

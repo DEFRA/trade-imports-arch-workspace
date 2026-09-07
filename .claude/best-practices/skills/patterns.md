@@ -1,11 +1,11 @@
-# Workspace skill patterns — the 9-pattern checklist
+# Workspace skill patterns - the 9-pattern checklist
 
-Workspace skills under `~/trade-imports-arch-workspace/.claude/skills/` share a small vocabulary of shapes. Each pattern is a judgment call, not a default — the same skill rarely uses all of them. This doc is the canonical reference cited by `skill-creator` (CREATE mode applies it, AUDIT mode checks it) and by anyone reviewing a skill by hand.
+Workspace skills under `~/trade-imports-arch-workspace/.claude/skills/` share a small vocabulary of shapes. Each pattern is a judgment call, not a default - the same skill rarely uses all of them. This doc is the canonical reference cited by `skill-creator` (CREATE mode applies it, AUDIT mode checks it) and by anyone reviewing a skill by hand.
 
 Companion docs in this directory:
 
-- [`anti-patterns.md`](anti-patterns.md) — known mis-applications, one entry per recurring trap.
-- [`scaffold-template.md`](scaffold-template.md) — the `SKILL.md` skeleton CREATE mode emits.
+- [`anti-patterns.md`](anti-patterns.md) - known mis-applications, one entry per recurring trap.
+- [`scaffold-template.md`](scaffold-template.md) - the `SKILL.md` skeleton CREATE mode emits.
 
 ## 1. State as canonical JSON (or not)
 
@@ -37,19 +37,19 @@ Examples: per-repo best-practices bundles, PR diff caches, per- version CHANGELO
 The hard rules, all enforced via the project allowlist:
 
 - One command per Bash call. No `&&` / `;` / `|` chains.
-- No `cd <dir> && cmd` — use `-C` (git), `--prefix` (npm), `-f` (mvn), or direct paths to binaries (`<dir>/node_modules/.bin/...`).
+- No `cd <dir> && cmd` - use `-C` (git), `--prefix` (npm), `-f` (mvn), or direct paths to binaries (`<dir>/node_modules/.bin/...`).
 - No `find ... -exec`. Use Glob + Read for find-then-read.
-- No env vars (`$VAR`) in LLM-typed Bash — Claude Code prompts on expansion. Use literal `~/trade-imports-arch-workspace/...` paths.
-- No `/Users/<you>/...` resolved form either — the matcher treats `~/trade-imports-arch-workspace/...` and its resolved `/Users/...` form as different prefixes.
-- No `python3 -c` for JSON — use `jq` or workspace helpers.
-- No `awk` / `sed -n` / `grep -n` to inspect files — use Read with offset+limit.
+- No env vars (`$VAR`) in LLM-typed Bash - Claude Code prompts on expansion. Use literal `~/trade-imports-arch-workspace/...` paths.
+- No `/Users/<you>/...` resolved form either - the matcher treats `~/trade-imports-arch-workspace/...` and its resolved `/Users/...` form as different prefixes.
+- No `python3 -c` for JSON - use `jq` or workspace helpers.
+- No `awk` / `sed -n` / `grep -n` to inspect files - use Read with offset+limit.
 - Filter at the script (`--filter`, `--file`, `--repo` flag), not at the pipe.
 
 This is workspace-wide; the full rule table lives in [`agent-skills.md`](agent-skills.md) → "Bash call hygiene". Skill prose must comply; AUDIT mode flags violations.
 
 ## 5. Hygiene pointer inside worker personas
 
-**Question:** Does the skill fan out workers via `general-purpose` Task subagents that follow `references/<NAME>.md`? If yes, every worker reference file needs a one-line pointer to the canonical source ([`agent-skills.md`](agent-skills.md) → "Bash call hygiene") — subagents only read their reference file, not the parent `SKILL.md`. Point, don't inline: the full rule table lives once, canonically, so copies can't drift.
+**Question:** Does the skill fan out workers via `general-purpose` Task subagents that follow `references/<NAME>.md`? If yes, every worker reference file needs a one-line pointer to the canonical source ([`agent-skills.md`](agent-skills.md) → "Bash call hygiene") - subagents only read their reference file, not the parent `SKILL.md`. Point, don't inline: the full rule table lives once, canonically, so copies can't drift.
 
 **Pattern-fit trap:** if the skill has no fan-out (parent session follows the reference inline), even the pointer is optional. Add it by default; skip only for very small single-file references.
 
@@ -67,11 +67,11 @@ This is workspace-wide; the full rule table lives in [`agent-skills.md`](agent-s
 
 **Question:** Does the skill produce a list of decisions the user needs to make one-at-a-time (findings, items, packages)? If yes, batch the presentation: present all items in one markdown block, take a single batch keystroke string (`FFWFFWSSF`), apply via parallel helper calls, slow-track only `D`s.
 
-**Pattern-fit trap:** walkers are for N items. A single artifact (a plan, a verdict, a draft) doesn't get a walker — natural-language approval is right.
+**Pattern-fit trap:** walkers are for N items. A single artifact (a plan, a verdict, a draft) doesn't get a walker - natural-language approval is right.
 
 ## 8. Allowlist coverage
 
-**Question:** Does the skill introduce new `tools/<name>/` scripts? If yes, `.claude/settings.json` must cover them — satisfied by **either** the blanket prefix entry `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` (the live settings.json shape, covering every tools/ domain) **or** the per-skill pair:
+**Question:** Does the skill introduce new `tools/<name>/` scripts? If yes, `.claude/settings.json` must cover them - satisfied by **either** the blanket prefix entry `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` (the live settings.json shape, covering every tools/ domain) **or** the per-skill pair:
 
 ```
 Bash(~/trade-imports-arch-workspace/.claude/tools/<name>/*)
@@ -82,40 +82,40 @@ CREATE mode appends the per-skill pair only when no covering entry exists; AUDIT
 
 ## 9. Dependencies
 
-**Question:** Does the skill need anything that isn't bundled with it — a workspace child project (`delivery-info-arch-tooling`, `trade-imports-documentation`, ...) invoked at runtime, or a tool beyond the workspace baseline (bash, curl, jq, git)?
+**Question:** Does the skill need anything that isn't bundled with it - a workspace child project (`delivery-info-arch-tooling`, `trade-imports-documentation`, ...) invoked at runtime, or a tool beyond the workspace baseline (bash, curl, jq, git)?
 
-The preference order is local-first, and it is upstream doctrine, not just ours: the agentskills.io design center is a portable, self-contained bundle ("most skills do not need" environment requirements), and Anthropic's authoring guidance says to declare dependencies rather than assume them, and to fail with helpful errors rather than defer ("solve, don't defer"). When a new skill overlaps functionality living in a child project: **port** the logic into a `.claude/tools/<name>/` script, or **build** fresh, before **depending** — a dependency makes the skill unusable on machines without the child repo and couples it to that repo's release cycle. Depending is allowed with an explicit recorded justification (CREATE captures it; the `## Dependencies` body section repeats it).
+The preference order is local-first, and it is upstream doctrine, not just ours: the agentskills.io design center is a portable, self-contained bundle ("most skills do not need" environment requirements), and Anthropic's authoring guidance says to declare dependencies rather than assume them, and to fail with helpful errors rather than defer ("solve, don't defer"). When a new skill overlaps functionality living in a child project: **port** the logic into a `.claude/tools/<name>/` script, or **build** fresh, before **depending** - a dependency makes the skill unusable on machines without the child repo and couples it to that repo's release cycle. Depending is allowed with an explicit recorded justification (CREATE captures it; the `## Dependencies` body section repeats it).
 
 A well-formed depending skill carries (audit criteria, not scaffold gates):
 
-- `metadata.workspace-deps` frontmatter — a flat space-separated string of project names and non-baseline tools (format contract: `agent-skills.md` → "Dependencies frontmatter"; hard dependencies only — soft probes with graceful fallback are not declared).
+- `metadata.workspace-deps` frontmatter - a flat space-separated string of project names and non-baseline tools (format contract: `agent-skills.md` → "Dependencies frontmatter"; hard dependencies only - soft probes with graceful fallback are not declared).
 - A `## Dependencies` body section stating the rationale and which features are used.
-- A `description` that names the requirement — descriptions are pre-loaded every session, so this is the at-a-glance layer.
-- A dispatcher pre-flight for every declared token — `MODE: BLOCKED` plus a `REASON` naming the remedy (dir check for projects, `command -v` for tools); never a raw downstream error.
+- A `description` that names the requirement - descriptions are pre-loaded every session, so this is the at-a-glance layer.
+- A dispatcher pre-flight for every declared token - `MODE: BLOCKED` plus a `REASON` naming the remedy (dir check for projects, `command -v` for tools); never a raw downstream error.
 - A clean `check-deps.sh` run (the workspace dependency doctor, wired into `make check`).
 
-**Pattern-fit trap:** porting is not free either — copying an actively-maintained pipeline (e.g. the tooling's Confluence ADF conversion) forks it, and the fork rots. That is the shape of a good justification for depending. A one-file jq transform is not.
+**Pattern-fit trap:** porting is not free either - copying an actively-maintained pipeline (e.g. the tooling's Confluence ADF conversion) forks it, and the fork rots. That is the shape of a good justification for depending. A one-file jq transform is not.
 
 ## Pattern 10 (companion): Prose hygiene
 
-The 9-pattern checklist focuses on shape. A tenth axis — prose hygiene — runs orthogonally: even a correctly-shaped skill can carry residue. AUDIT mode evaluates it but the deliverable is a **proposed trim diff** (per-file deletions / collapses with line refs and short rationale), not in-place edits. Trims land via a separate implementation pass after the user reviews.
+The 9-pattern checklist focuses on shape. A tenth axis - prose hygiene - runs orthogonally: even a correctly-shaped skill can carry residue. AUDIT mode evaluates it but the deliverable is a **proposed trim diff** (per-file deletions / collapses with line refs and short rationale), not in-place edits. Trims land via a separate implementation pass after the user reviews.
 
 Trim categories to scan for:
 
 - Historical / migration residue ("previously ...", "migrated from ...", "used to live at ..."). Commit log owns the rationale.
-- Workspace-wide content duplicated per skill — collapse to a one- line reference to `agent-skills.md`.
+- Workspace-wide content duplicated per skill - collapse to a one- line reference to `agent-skills.md`.
 - Hygiene pointer placement: workers spawned as `general-purpose` subagents need the one-line pointer to `agent-skills.md` (never a re-inlined full block); parent-loaded references inherit `SKILL.md`.
 - Over-defensive bullets making the same point.
-- Verbose rationale ("why" beyond a single phrase) — belongs in commits / audit plans, not skill prose.
+- Verbose rationale ("why" beyond a single phrase) - belongs in commits / audit plans, not skill prose.
 - Stale references to scripts, paths, helpers that no longer exist.
 - Forward-looking notes that aren't actionable.
-- Repeated examples — pick one canonical location.
+- Repeated examples - pick one canonical location.
 
 **Don't cut:** anti-pattern guardrails, worker spawn-prompt templates, per-step instructions, decision rationale that informs edge cases, cross-skill handoff prose, concrete file/line citations.
 
 ## Cross-cutting conventions
 
-- **Path conventions** — literal `~/trade-imports-arch-workspace/...` in LLM-typed prose. No env vars. See [`agent-skills.md`](agent-skills.md).
-- **Worker fan-out** — `subagent_type: general-purpose` with a `Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/<owner>/references/<NAME>.md.` prompt. Not custom subagent types (they trigger the no-write guardrail).
-- **Rendered markdown from JSON** — when state is JSON, the markdown view (e.g. `## Items` table) is generated by a `render-X.sh` helper. Hand-edits to the markdown are overwritten.
-- **Cross-skill conventions** live under `best-practices/...` — single source of truth for things multiple skills cite.
+- **Path conventions** - literal `~/trade-imports-arch-workspace/...` in LLM-typed prose. No env vars. See [`agent-skills.md`](agent-skills.md).
+- **Worker fan-out** - `subagent_type: general-purpose` with a `Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/<owner>/references/<NAME>.md.` prompt. Not custom subagent types (they trigger the no-write guardrail).
+- **Rendered markdown from JSON** - when state is JSON, the markdown view (e.g. `## Items` table) is generated by a `render-X.sh` helper. Hand-edits to the markdown are overwritten.
+- **Cross-skill conventions** live under `best-practices/...` - single source of truth for things multiple skills cite.

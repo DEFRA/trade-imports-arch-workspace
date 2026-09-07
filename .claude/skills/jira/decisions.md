@@ -1,4 +1,4 @@
-# jira skill — decisions
+# jira skill - decisions
 
 Recorded during CREATE interview. Update if a shape choice
 changes; do not delete entries.

@@ -20,6 +20,11 @@ trade-imports-documentation
 # Ongoing architecture analysis corpus (findings, requirements, source exports)
 analysis/
 
+# Task-local skill run state (individual work, derived from the ignored analysis corpus).
+# Estate-state workareas (skills-audit, skill-creator) stay tracked - they are the payload.
+.claude/workareas/editorial/
+.claude/workareas/confluence-sync/
+
 # Child repo: shared docs-generation tooling library (its own git repository)
 delivery-info-arch-tooling/
 

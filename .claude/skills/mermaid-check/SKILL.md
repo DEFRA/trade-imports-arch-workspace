@@ -26,19 +26,19 @@ NOT for label wording, acronym introduction, or jargon in diagram text - that is
 
 ## Working with `editorial`
 
-The two skills split on a clean line: **`mermaid-check` owns whether the diagram parses and whether the diagram type fits; `editorial` owns the words inside it.**
+The two skills split on a clean line: **`mermaid-check` owns whether the diagram parses and whether the diagram type fits; `editorial` owns the words inside the diagram.**
 
 | Concern | Owner |
 | --- | --- |
 | Does it render | `mermaid-check` |
 | Right diagram type for what is being shown | `mermaid-check` |
-| Backticked identifiers, no em-dashes in labels | `mermaid-check` (mechanical rules from the editorial style guide) |
+| Exact identifiers, no em-dashes in labels | `mermaid-check` (mechanical rules from the editorial [language guide](../../best-practices/writing/language.md)) |
 | Label wording, jargon, acronym on first use | `editorial` |
 | Whether the diagram earns its place in the document | `editorial` |
 
 In practice: when `editorial` is reviewing a document that contains diagrams, run Verify as part of the pass and report render failures alongside the prose findings. When this skill authors a diagram whose labels introduce a term the document has not used before, say so and hand that to `editorial` rather than settling the wording here.
 
-The mechanical rules in the third row are borrowed deliberately, not duplicated: they are the subset of the editorial style guide that can be checked without reading the surrounding prose. Everything requiring document context stays with `editorial`.
+The mechanical rules in the third row are borrowed deliberately, not duplicated. They are the subset of the editorial language guide that can be checked without reading the surrounding prose. Everything requiring document context stays with `editorial`.
 
 ## Step 0: Start
 
@@ -48,7 +48,7 @@ The mechanical rules in the third row are borrowed deliberately, not duplicated:
 
 `<path>` is a file or a directory, and more than one may be given. A directory is walked recursively, skipping `node_modules`, `build`, `generated` and dotted directories.
 
-First stdout line is `MODE: VERIFY`. Then one line per diagram, then a summary. Exit code is 0 when every diagram rendered, 1 when any failed, and 2 when the renderer environment itself is broken — no mmdc/npx, a failed mermaid-cli fetch, or a Chrome-less local mmdc (the sweep aborts — treat as "cannot verify", never as diagram failures). Usable as a gate.
+First stdout line is `MODE: VERIFY`. Then one line per diagram, then a summary. Exit code is 0 when every diagram rendered, 1 when any failed, and 2 when the renderer environment itself is broken - no mmdc/npx, a failed mermaid-cli fetch, or a Chrome-less local mmdc (the sweep aborts - treat as "cannot verify", never as diagram failures). Usable as a gate.
 
 ## Verify
 
@@ -74,7 +74,7 @@ Any agent with Bash can validate a diagram it is holding in context, without wri
     FrontDoor-->>Browser: 200' --label 'draft: login sequence'
 ```
 
-Exit 0 means it parses, exit 1 prints the parser message, exit 2 means the renderer environment itself is broken (no mmdc/npx, npx cannot fetch mermaid-cli, or a local mmdc has no usable Chrome) — an environment ERROR, never a diagram verdict. Nothing is written and the temp source is removed. `--label` is free text and only affects the report line, so use it to say which diagram this is.
+Exit 0 means it parses, exit 1 prints the parser message, exit 2 means the renderer environment itself is broken (no mmdc/npx, npx cannot fetch mermaid-cli, or a local mmdc has no usable Chrome) - an environment ERROR, never a diagram verdict. Nothing is written and the temp source is removed. `--label` is free text and only affects the report line, so use it to say which diagram this is.
 
 This is the entry point for subagents and for any skill that drafts a diagram as part of a larger task. It needs no pipe and no temp file of the caller's own, so it stays within Bash call hygiene. Both scripts are covered by the allowlist entries added when this skill was scaffolded, so a subagent can call them without a permission prompt.
 
@@ -87,7 +87,8 @@ When adding a diagram:
 1. **Pick the type from what is being shown**, not from habit. Ordered interaction between parties over time is `sequenceDiagram`. Choice and branching is `flowchart`. Lifecycle of one entity is `stateDiagram-v2`. Structure and relationships is `erDiagram` or `classDiagram`. If a flowchart is being used to show a request/response exchange, a sequence diagram is almost always clearer.
 2. **Name participants as they appear in the code or the estate**, so a reader can grep for them. Prefer the real service name over a role description.
 3. **Apply the mechanical rules**: backticks are not rendered inside Mermaid labels, so write identifiers plainly and keep them exact. No em-dashes. Introduce nothing in a label the document has not introduced in prose.
-4. **Render before moving on** via Step 0 on the file. A diagram that has not been rendered is not finished.
+4. **Keep a subgraph's title to one line (under ~24 characters) when it nests other subgraphs.** Mermaid caps subgraph titles at a hardcoded 200px and wraps longer ones; the wrapped second line is painted over by nested subgraph boxes (upstream bug - `flowchart.wrappingWidth` is not passed to cluster titles). The estate render config's `subGraphTitleMargin` clears one-line titles only. Put the detail in a node label or the surrounding prose instead.
+5. **Render before moving on** via Step 0 on the file. A diagram that has not been rendered is not finished.
 
 For a diagram destined for the documentation pipeline rather than a single document, write it as a `.mmd` file under `trade-imports-documentation/architecture/` so `npm run build:mmd` picks it up.
 
