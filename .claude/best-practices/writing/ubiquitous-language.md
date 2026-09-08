@@ -20,7 +20,7 @@ The Expansion column is a reference record, not a first-use instruction - it is 
 | `INS` | The service taking over UK import notification capture | Imports Notification Service. The corpus also carries "Import Notification Service"; the canonical spelling is not yet settled - match the document set you are editing |
 | `TIG` | The gateway between the UK estate and TRACES | TRACES Integration Gateway |
 | `PIMS` | The destination and BCP inspection workflow system | None recorded anywhere in the corpus - do not invent |
-| `PHNNS` | A plants-side notification scheme; the letters are unconfirmed even within the team | None recorded - prefer wording like "the plants journey" |
+| `PHNNS` | A plants-side notification scheme; the letters are unconfirmed even within the team | Plant Health National Notification Scheme |
 | `IDM` | Defra's customer identity provider, also called Defra ID | Identity Management |
 | `CDS` | HMRC's customs declaration system | Customs Declaration Service |
 | `MDM` | Defra's reference-data platform (Semarchy) | Master Data Management |
