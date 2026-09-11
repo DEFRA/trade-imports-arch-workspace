@@ -114,7 +114,7 @@ A reader should be able to read each sentence aloud once and restate it accurate
 
 - Check every internal link and cross-reference.
 - Do not cite gitignored files, local-only data or sources the reader cannot access. State the supporting fact inline when the source cannot be shared.
-- Name any external document or prior decision on which a claim depends.
+- A claim about the world (an RFC section, a vendor's behaviour, a platform fact) is out of scope for the review; a separate process fact-checks. Flag only a contradiction between the document set's own statements.
 - Before calling something an open question, search the available sources. Lead with what is already known and narrow what remains.
 - Reject circular reasons. Trace a decision to the use case, source data or constraint rather than to the authority making the decision.
 - When a correct statement invites a likely false inference, add the boundary explicitly: state what does not happen.
@@ -122,6 +122,8 @@ A reader should be able to read each sentence aloud once and restate it accurate
 ### 5. Remove waste and fix the structure
 
 Ask what the reader loses if each sentence, paragraph or section disappears. Remove units whose loss changes nothing.
+
+Try removal first for every defect ([language.md](../../best-practices/writing/language.md), "Concentrate and distil"). A question that is easy to raise but whose answer would not strengthen the passage's point is a tangent: remove the text that invites the question rather than answer the question. Judgements standing in for facts, undecided mechanisms, pointers and the document's own tallies go by default.
 
 Give repeated facts one home. Merge sections when their overlap causes repetition. Keep connective prose that carries the reader between points; shorter but harder to follow is not an improvement.
 
@@ -131,7 +133,7 @@ Apply the structural rules in [document-types.md](references/document-types.md).
 
 For a small artefact, apply the cold-editor role in [review-brief.md](references/review-brief.md) yourself. For a full draft, give that role to a fresh-context reviewer. The reviewer returns findings only and never edits the document. Apply accepted findings in the writing session.
 
-For a full document or document set, run the saved `editorial-review` workflow only when the user asks to "run the editorial-review workflow" on a path. It uses [review-brief.md](references/review-brief.md) for drill, structural and cold-editor passes. The workflow reviews without editing. After applying accepted findings, run one final cold-reader check on the revised result.
+For a full document or document set, run the saved `editorial-review` workflow only when the user asks to "run the editorial-review workflow" on a path. It uses [review-brief.md](references/review-brief.md) for drill, structural and cold-editor passes. The workflow reviews without editing. Triage its findings with the `editorial-triage` skill (`~/trade-imports-arch-workspace/.claude/skills/editorial-triage/SKILL.md`), which grades every finding into one closing move against the calibrated rubric and writes the closing plan. Apply the remove, correct and reword batch after the plan's spot check, put the keep-one-side and tell-me items to the user, send the open lines to the register, then run one final cold-reader check on the revised result.
 
 Run the style gate on every document touched:
 

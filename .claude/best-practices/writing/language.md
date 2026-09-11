@@ -70,6 +70,19 @@ Common forms:
 
 The gate reports the following metaphor candidates as WARNs: `prices`, `priced`, `rides`, `rides in`, `bites`, `spends`, `spent`, `buys`, `kills`, `hangs on`, `collapses`, `leaks`, `lands`, `forecloses`, `softens`, `bootstraps`, `axis` and `posture`. A literal technical use may stay. A figurative use must be rewritten around the mechanism, not swapped for another metaphor.
 
+## Concentrate and distil
+
+Before adding to a passage, ask what the passage is trying to establish and whether the addition would materially strengthen that point. A question that is easy to raise ("who decides this?", "what is the process?") but whose answer would not strengthen the point is a tangent: answering the question adds text and dilutes the central material. Resolve a tangent by removing the text that invites the question, not by answering the question.
+
+Try removal first for every defect, and remove whole units. Delete the sentence, bullet or paragraph that carries the defect; or, when that unit has to stay, rewrite the sentence so the defective part is gone. Do not cut a fragment out of a sentence and leave the rest standing, which strands a subject or breaks the line. Qualify or expand only when neither deletion nor rewording works, and then name what the reader would otherwise infer wrongly or be unable to verify. Shorter but harder to follow is not an improvement, so keep the connective prose that carries the reader between points.
+
+The following go by default, and the removal is the whole fix:
+
+- A judgement standing in for a fact ("cheap", "easy", "safe", "simple"). State the fact when the passage needs one; otherwise cut the judgement. Never qualify the judgement.
+- A description of a mechanism the design has not decided. Keep only the statement that the design must handle the consideration.
+- A pointer or cross-reference. Pointers atrophy as their targets move, get renamed or vanish, so keep one only when the reader could not find the reason behind a rule without the pointer. A one-line fact may be restated in the pointer's place.
+- The document's own tallies (how many families, rows, updates or decisions). The reader needs the things, not the count, and the count is what goes wrong when the things change.
+
 ## Terms and abbreviations
 
 Use the reader brief to decide which terms need introduction.

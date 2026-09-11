@@ -70,8 +70,12 @@ fail() {
 # preserving line count, so matches inside exemplar text, verbatim quotes
 # of external documents, and real-world names in links are treated as
 # data. Same rationale as the quoted-span stripping in hooks/guard-bash.sh.
+# Double-backtick spans (the Markdown form for a span that itself contains
+# a backtick) go first: the single-backtick pass would read the opening
+# pair as an empty span and expose the text up to the inner backtick.
 strip_masked() {
   awk '/^[[:space:]]*(```|~~~)/{f=!f; print ""; next} f{print ""; next} /^[[:space:]]*>/{print ""; next} {print}' "$1" \
+    | sed -E 's/``([^`]|`[^`])*``//g' \
     | sed 's/`[^`]*`//g' \
     | sed -E 's|https?://[^[:space:]<>")]+||g'
 }
