@@ -1,0 +1,35 @@
+{
+  "seed": 42,
+  "requested": 3,
+  "size": 3,
+  "of": 6,
+  "items": [
+    {
+      "n": 1,
+      "cluster": "C-02-003",
+      "page": "02-sample-routing.md",
+      "line": 13,
+      "move": "R",
+      "before": "the front door",
+      "after": ""
+    },
+    {
+      "n": 2,
+      "cluster": "C-02-001",
+      "page": "02-sample-routing.md",
+      "line": 7,
+      "move": "C",
+      "before": "sections 4.7 and 4.11",
+      "after": "sections 4.7 and 4.5"
+    },
+    {
+      "n": 3,
+      "cluster": "C-02-006",
+      "page": "02-sample-routing.md",
+      "line": 11,
+      "move": "R",
+      "before": "and validate the return URL",
+      "after": ""
+    }
+  ]
+}

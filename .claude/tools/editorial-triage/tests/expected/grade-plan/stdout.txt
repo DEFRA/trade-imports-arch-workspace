@@ -1,0 +1,15 @@
+plan: wrote WORK/closing/plan.md
+plan: 13 clusters: R 3, C 2, W 1, K 1, O 1, I 1, T 1; closed without the user 6, left to the user 1, problems 3
+exit-code: 0
+plan: wrote WORK/closing/plan.md
+plan: 13 clusters: R 3, C 2, W 1, K 1, O 1, I 1, T 1; closed without the user 6, left to the user 1, problems 3
+plan: spot check (seed 7) of 2 of 6 apply entries in WORK/closing/spot-check.json: C-02-003, C-02-001
+exit-code: 0
+grade-triage: plan takes no --round; it plans every cluster in WORK/triage.json
+exit-code: 1
+grade-triage: --sample must be a whole number from 1, got '0'
+exit-code: 1
+plan: wrote WORK/closing/plan.md
+plan: 13 clusters: R 3, C 2, W 1, K 1, O 1, I 1, T 1; closed without the user 6, left to the user 1, problems 3
+plan: spot check (seed 42) of 3 of 6 apply entries in WORK/closing/spot-check.json: C-02-003, C-02-001, C-02-006
+exit-code: 0

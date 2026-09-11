@@ -1,0 +1,8 @@
+{
+  "run": "equivalent-run",
+  "commit": "0000000",
+  "pages": [
+    {"page": "02-sample-routing.md", "path": "trade-imports-documentation/docs/sample/02-sample-routing.md"},
+    {"page": "03-sample-session.md", "path": "trade-imports-documentation/docs/sample/03-sample-session.md"}
+  ]
+}

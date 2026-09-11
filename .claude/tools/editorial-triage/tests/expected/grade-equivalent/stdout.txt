@@ -1,0 +1,42 @@
+sample: wrote WORK/calibration/round-1.md
+sample: round 1 mix (7 items): author/author 1, fix/verified 1, propose/dispersion 1, propose/grows 1, propose/no-rewrite 1, propose/removal 1, propose/tangent 1
+exit-code: 0
+label: recorded 7 labels for round 1
+exit-code: 0
+agree: round 1, 7 of 7 items compared
+agree: move 6 of 7 (0.86); side where both chose K 3 of 3 (1.00)
+agree: equivalent moves: 6
+  1. C-03-001: user K:B, grader R, both K:B
+  3. C-04-001: user K:B, grader R, both K:B
+  4. C-03-003: user C, grader R, both R
+  5. C-02-001: user C, grader R, both R
+  6. C-02-003: user C, grader R, both R
+  7. C-03-002: user R, grader K:A, both K:A
+  category            n      move
+  author/author       1  1 (1.00)
+  fix/verified        1  0 (0.00)
+  propose/dispersion  1  1 (1.00)
+  propose/grows       1  1 (1.00)
+  propose/no-rewrite  1  1 (1.00)
+  propose/removal     1  1 (1.00)
+  propose/tangent     1  1 (1.00)
+agree: move confusion (user rows, grader columns, as said)
+     R  C  W  K  O  I  T
+  R  0  0  0  1  0  0  0
+  C  4  0  0  0  0  0  0
+  W  0  0  0  0  0  0  0
+  K  2  0  0  0  0  0  0
+  O  0  0  0  0  0  0  0
+  I  0  0  0  0  0  0  0
+  T  0  0  0  0  0  0  0
+agree: disagreements
+  2. C-02-002 fix/verified: user C | grader R (H-14: The section numbers are a claim about an external document, so they go rather than being corrected.)
+exit-code: 0
+score: 7 of 7 clusters graded (coverage 1.00)
+  scope                 graded  R  C  W  K  O  I  T  closed  ignored  load
+  overall                  7/7  6  0  0  1  0  0  0    0.86     0.00     1
+  02-sample-routing.md     3/3  3  0  0  0  0  0  0    1.00     0.00     0
+  03-sample-session.md     3/3  2  0  0  1  0  0  0    0.67     0.00     1
+  04-sample-cookies.md     1/1  1  0  0  0  0  0  0    1.00     0.00     0
+score: agreement on 7 labelled clusters: move 6 of 7 (0.86); side where both chose K 3 of 3 (1.00); equivalent moves 6
+exit-code: 0

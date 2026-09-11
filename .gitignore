@@ -22,6 +22,8 @@ analysis/
 
 # Task-local skill run state (individual work, derived from the ignored analysis corpus).
 # Estate-state workareas (skills-audit, skill-creator) stay tracked - they are the payload.
+# Task-local run state of the editorial-triage skill (findings, clusters, reports)
+.claude/workareas/editorial-triage/
 .claude/workareas/editorial/
 .claude/workareas/confluence-sync/
 

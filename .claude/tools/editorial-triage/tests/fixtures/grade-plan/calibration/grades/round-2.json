@@ -1,0 +1,8 @@
+{
+  "gradedBy": "GRADER v1",
+  "mode": "seen",
+  "round": 2,
+  "items": [
+    {"cluster": "C-03-004", "move": "I", "side": null, "confidence": "high", "heuristic": "H-11", "why": "The record carries no rewrite, so the move it supports is to leave the opening as it stands."}
+  ]
+}

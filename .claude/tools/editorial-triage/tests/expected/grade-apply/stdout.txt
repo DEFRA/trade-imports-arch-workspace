@@ -1,0 +1,67 @@
+grade-triage: no closing plan at WORK/closing/plan.json. Write one first: bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/grade-triage.sh plan --dir WORK
+exit-code: 1
+plan: wrote WORK/closing/plan.md
+plan: 13 clusters: R 3, C 2, W 1, K 1, O 1, I 1, T 1; closed without the user 6, left to the user 1, problems 3
+plan: spot check (seed 42) of 3 of 6 apply entries in WORK/closing/spot-check.json: C-02-003, C-02-001, C-02-006
+exit-code: 0
+apply: dry run, no page written
+apply: 6 entries selected (moves RCW): would apply 3, skipped 3, gate FAIL 1
+apply: 02-sample-routing.md: would apply 2 of 5 entries, gate pass
+apply:   C-02-003 R skipped-multiple: the phrase occurs 2 times in the page
+apply:   C-02-006 R skipped-fragment: the span is not a whole sentence, bullet or paragraph; a removal deletes a whole unit, so this finding needs a reword instead
+apply:   C-02-004 C skipped-absent: the phrase is not in the page
+apply: 03-sample-session.md: would apply 1 of 1 entry, gate FAIL
+apply:   check-prose: FAIL 03-sample-session.md:7: Sessions utilise the same store in every environment.
+apply: see the change with git -C 'WORK/pages' diff -- .
+exit-code: 2
+apply: dry run, no page written
+apply: 2 entries selected (moves C): would apply 1, skipped 1, gate FAIL 0
+apply: 02-sample-routing.md: would apply 1 of 2 entries, gate pass
+apply:   C-02-004 C skipped-absent: the phrase is not in the page
+apply: see the change with git -C 'WORK/pages' diff -- .
+exit-code: 0
+grade-triage: the working tree already holds uncommitted changes under WORK/pages. Commit or stash them first so the diff shows only what apply did, or re-run with --force. See them with: git -C 'WORK/pages' status -- .
+exit-code: 1
+apply: 6 entries selected (moves RCW): applied 3, skipped 3, gate FAIL 1
+apply: 02-sample-routing.md: applied 2 of 5 entries, gate pass
+apply:   C-02-003 R skipped-multiple: the phrase occurs 2 times in the page
+apply:   C-02-006 R skipped-fragment: the span is not a whole sentence, bullet or paragraph; a removal deletes a whole unit, so this finding needs a reword instead
+apply:   C-02-004 C skipped-absent: the phrase is not in the page
+apply: 03-sample-session.md: applied 1 of 1 entry, gate FAIL
+apply:   check-prose: FAIL 03-sample-session.md:7: Sessions utilise the same store in every environment.
+apply: see the change with git -C 'WORK/pages' diff -- .
+apply: wrote WORK/closing/applied.json
+exit-code: 2
+apply: dry run, no page written
+apply: 6 entries selected (moves RCW): would apply 0, skipped 6, gate FAIL 0
+apply: 02-sample-routing.md: would apply 0 of 5 entries
+apply:   C-02-002 R skipped-absent: the phrase is not in the page
+apply:   C-02-003 R skipped-multiple: the phrase occurs 2 times in the page
+apply:   C-02-006 R skipped-fragment: the span is not a whole sentence, bullet or paragraph; a removal deletes a whole unit, so this finding needs a reword instead
+apply:   C-02-001 C skipped-absent: the phrase is not in the page
+apply:   C-02-004 C skipped-absent: the phrase is not in the page
+apply: 03-sample-session.md: would apply 0 of 1 entry
+apply:   C-03-001 W skipped-absent: the phrase is not in the page
+apply: see the change with git -C 'WORK/pages' diff -- .
+exit-code: 0
+grade-triage: --moves takes letters from R, C and W, got 'K'. K, O, T and I are decisions for the user and are never applied.
+exit-code: 1
+plan: wrote WORK/closing/plan.md
+plan: 13 clusters: R 3, C 2, W 1, K 1, O 1, I 1, T 1; closed without the user 6, left to the user 1, problems 3
+exit-code: 0
+grade-triage: the spot check at WORK/closing/spot-check.json is older than the plan, so it does not show what would be applied. Draw a fresh one and review it: bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/grade-triage.sh plan --dir WORK --sample 10. Use --no-spot-check to apply anyway.
+exit-code: 1
+grade-triage: the spot check at WORK/closing/spot-check.json is older than the plan, so it does not show what would be applied. Draw a fresh one and review it: bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/grade-triage.sh plan --dir WORK --sample 10. Use --no-spot-check to apply anyway.
+exit-code: 1
+apply: 6 entries selected (moves RCW): applied 0, skipped 6, gate FAIL 0
+apply: 02-sample-routing.md: applied 0 of 5 entries
+apply:   C-02-002 R skipped-absent: the phrase is not in the page
+apply:   C-02-003 R skipped-multiple: the phrase occurs 2 times in the page
+apply:   C-02-006 R skipped-fragment: the span is not a whole sentence, bullet or paragraph; a removal deletes a whole unit, so this finding needs a reword instead
+apply:   C-02-001 C skipped-absent: the phrase is not in the page
+apply:   C-02-004 C skipped-absent: the phrase is not in the page
+apply: 03-sample-session.md: applied 0 of 1 entry
+apply:   C-03-001 W skipped-absent: the phrase is not in the page
+apply: see the change with git -C 'WORK/pages' diff -- .
+apply: wrote WORK/closing/applied.json
+exit-code: 0

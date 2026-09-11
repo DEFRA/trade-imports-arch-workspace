@@ -1,0 +1,10 @@
+{
+  "run": "plan-run",
+  "commit": "0000000",
+  "pages": [
+    {"page": "02-sample-routing.md", "path": "pages/02-sample-routing.md", "no": "02"},
+    {"page": "03-sample-session.md", "path": "pages/03-sample-session.md", "no": "03"}
+  ],
+  "legacy": false,
+  "builder": "build-triage v1"
+}

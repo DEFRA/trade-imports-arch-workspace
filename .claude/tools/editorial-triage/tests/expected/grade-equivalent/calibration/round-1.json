@@ -1,0 +1,446 @@
+{
+  "round": 1,
+  "seed": 7,
+  "size": 7,
+  "requested": 7,
+  "targets": {
+    "author/author": {
+      "target": 8,
+      "drawnBefore": 0,
+      "remaining": 8,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "fix/verified": {
+      "target": 8,
+      "drawnBefore": 0,
+      "remaining": 8,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "propose/dispersion": {
+      "target": 2,
+      "drawnBefore": 0,
+      "remaining": 2,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "propose/grows": {
+      "target": 8,
+      "drawnBefore": 0,
+      "remaining": 8,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "propose/no-rewrite": {
+      "target": 2,
+      "drawnBefore": 0,
+      "remaining": 2,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "propose/removal": {
+      "target": 6,
+      "drawnBefore": 0,
+      "remaining": 6,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "propose/tangent": {
+      "target": 7,
+      "drawnBefore": 0,
+      "remaining": 7,
+      "candidates": 1,
+      "drawn": 1
+    }
+  },
+  "items": [
+    {
+      "n": 1,
+      "cluster": "C-03-001",
+      "category": "author/author",
+      "page": "03-sample-session.md",
+      "title": "sample session",
+      "line": 5,
+      "severity": "S2",
+      "kind": "contradiction",
+      "basis": "author",
+      "action": "reconcile",
+      "bearing": "central",
+      "removes": "none: the lifetime is the point of the paragraph",
+      "point": "The passage states the session lifetime.",
+      "defect": "The record states an eight-hour session while the routing page states twelve; which value does the IDM policy set?",
+      "quote": "the session lasts eight hours",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": "Which session lifetime is current, eight hours or twelve?",
+      "owner": "Ben",
+      "cites": [],
+      "related": [
+        {
+          "page": "02-sample-routing.md",
+          "line": 20,
+          "quote": "the session lasts twelve hours"
+        }
+      ],
+      "relatedClusters": [],
+      "members": [
+        "F-03-001"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "K",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": "B"
+        }
+      }
+    },
+    {
+      "n": 2,
+      "cluster": "C-02-002",
+      "category": "fix/verified",
+      "page": "02-sample-routing.md",
+      "title": "sample routing",
+      "line": 12,
+      "severity": "S1",
+      "kind": "citation",
+      "basis": "source",
+      "action": "correct",
+      "bearing": "central",
+      "removes": "none: the citation carries the claim",
+      "point": "The passage grounds the redirect check in the RFC.",
+      "defect": "The RFC reference names section 4.11, which RFC 9700 does not have; which section covers the redirect check?",
+      "quote": "sections 4.7 and 4.11",
+      "before": "sections 4.7 and 4.11",
+      "after": "sections 4.7 and 4.5",
+      "delta": 0,
+      "band": "neutral",
+      "question": null,
+      "owner": null,
+      "cites": [
+        "RFC 9700 section 4.5"
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-02-002"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "C",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 3,
+      "cluster": "C-04-001",
+      "category": "propose/grows",
+      "page": "04-sample-cookies.md",
+      "title": "sample cookies",
+      "line": 88,
+      "severity": "S2",
+      "kind": "contradiction",
+      "basis": "set",
+      "action": "reconcile",
+      "bearing": "supporting",
+      "removes": "- Which sealing library INS uses, how the seal key is provisioned, and what the rotation runbook says.",
+      "point": "The Open questions list names what the proposal still has to settle.",
+      "defect": "The Open questions bullet asks for the library, provisioning and runbook while the Cookie design section says they are recorded separately from this proposal; which statement stands?",
+      "quote": "Which sealing library INS uses, how the seal key is provisioned, and what the rotation runbook says.",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "04 \"The library choice, key provisioning and the rotation runbook are implementation detail, to be recorded separately from this proposal.\""
+      ],
+      "related": [
+        {
+          "page": "04-sample-cookies.md",
+          "line": 40,
+          "quote": "The library choice, key provisioning and the rotation runbook are implementation detail, to be recorded separately from this proposal."
+        }
+      ],
+      "relatedClusters": [],
+      "members": [
+        "F-04-001"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "K",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": "B"
+        }
+      }
+    },
+    {
+      "n": 4,
+      "cluster": "C-03-003",
+      "category": "propose/tangent",
+      "page": "03-sample-session.md",
+      "title": "sample session",
+      "line": 30,
+      "severity": "S3",
+      "kind": "fact",
+      "basis": "set",
+      "action": "correct",
+      "bearing": "supporting",
+      "removes": ", held server-side in the session record",
+      "point": "The passage states what IDM contributes at sign-in.",
+      "defect": "The clause places the lifetimes in the session record while the record table lists no such field; where do the lifetimes live?",
+      "quote": "held server-side in the session record",
+      "before": "IDM's contribution arrives at sign-in as token lifetimes, held server-side in the session record;",
+      "after": "IDM's contribution arrives at sign-in as token lifetimes;",
+      "delta": -6,
+      "band": "shrinks",
+      "question": null,
+      "owner": null,
+      "cites": [
+        "03 \"The session record holds the subject, the organisation and the expiry\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-03-003"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "C",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": true,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 5,
+      "cluster": "C-02-001",
+      "category": "propose/removal",
+      "page": "02-sample-routing.md",
+      "title": "sample routing",
+      "line": 46,
+      "severity": "S2",
+      "kind": "contradiction",
+      "basis": "set",
+      "action": "reconcile",
+      "bearing": "supporting",
+      "removes": " and validate the return URL",
+      "point": "The sign-out form carries the ID token hint so IDM can identify the session.",
+      "defect": "States return-URL validation as fact while Open questions says it depends on a tenant setting that is unverified.",
+      "quote": "which IDM uses to identify the session and validate the return URL",
+      "before": "which IDM uses to identify the session and validate the return URL",
+      "after": "which IDM uses to identify the session",
+      "delta": -5,
+      "band": "shrinks",
+      "question": null,
+      "owner": null,
+      "cites": [
+        "03-sample-session.md \"That setting is what makes IDM validate the return URL against the registered list\""
+      ],
+      "related": [
+        {
+          "page": "03-sample-session.md",
+          "line": 12,
+          "quote": "That setting is what makes IDM validate the return URL against the registered list"
+        }
+      ],
+      "relatedClusters": [],
+      "members": [
+        "F-02-001"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "C",
+          "K",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": true,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 6,
+      "cluster": "C-02-003",
+      "category": "propose/dispersion",
+      "page": "02-sample-routing.md",
+      "title": "sample routing",
+      "line": 33,
+      "severity": "S3",
+      "kind": "fact",
+      "basis": "set",
+      "action": "correct",
+      "bearing": "supporting",
+      "removes": "and request logging",
+      "point": "The passage states which routing-service controls the direct path bypasses.",
+      "defect": "The list says request logging does not apply on the direct path, while the logging page says every request is logged at the front door; which is true?",
+      "quote": "the routing service's allowlist, header stripping and request logging do not apply",
+      "before": "the routing service's allowlist, header stripping and request logging do not apply",
+      "after": "the routing service's allowlist and header stripping do not apply",
+      "delta": -2,
+      "band": "shrinks",
+      "question": null,
+      "owner": null,
+      "cites": [
+        "05 \"every request is logged at the front door whichever path it takes\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-02-003"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "C",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": true,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 7,
+      "cluster": "C-03-002",
+      "category": "propose/no-rewrite",
+      "page": "03-sample-session.md",
+      "title": "sample session",
+      "line": 9,
+      "severity": "S2",
+      "kind": "contradiction",
+      "basis": "set",
+      "action": "reconcile",
+      "bearing": "supporting",
+      "removes": "the token lives for twelve hours",
+      "point": "The passage states the token lifetime.",
+      "defect": "The paragraph states an eight-hour token at line 9 and a twelve-hour token at line 14; which lifetime does the policy set?",
+      "quote": "the token lives for eight hours",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "03-sample-session.md \"the token lives for twelve hours\""
+      ],
+      "related": [
+        {
+          "page": "03-sample-session.md",
+          "line": 14,
+          "quote": "the token lives for twelve hours"
+        }
+      ],
+      "relatedClusters": [],
+      "members": [
+        "F-03-002"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "K",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "K",
+        "defaultSide": "A",
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "K",
+          "side": "A",
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": "A"
+        }
+      }
+    }
+  ]
+}

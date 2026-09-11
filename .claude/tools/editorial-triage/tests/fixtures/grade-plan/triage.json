@@ -1,0 +1,112 @@
+{
+  "params": {},
+  "clusters": [
+    {
+      "id": "C-02-001", "page": "02-sample-routing.md", "path": null,
+      "anchorLine": 7, "key": "02-sample-routing.md:7", "members": ["F-02-001"],
+      "severity": "S1", "kinds": ["citation"], "actions": ["correct"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 1, "chosen": "F-02-001", "alternatives": [], "conflict": false, "related": [],
+      "bearing": "central", "removes": "none: the citation carries the claim", "questions": [], "held": false,
+      "bucket": "fix", "reason": "verified", "rank": 1, "needs": "verify"
+    },
+    {
+      "id": "C-02-002", "page": "02-sample-routing.md", "path": null,
+      "anchorLine": 17, "key": "02-sample-routing.md:17", "members": ["F-02-002"],
+      "severity": "S4", "kinds": ["residue"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "tangential", "removes": "- Which sealing library INS uses, how the seal key is provisioned, and what the rotation runbook says.",
+      "questions": [], "held": false,
+      "bucket": "propose", "reason": "removal", "rank": 1, "needs": "bearing"
+    },
+    {
+      "id": "C-02-003", "page": "02-sample-routing.md", "path": null,
+      "anchorLine": 13, "key": "02-sample-routing.md:13", "members": ["F-02-003"],
+      "severity": "S4", "kinds": ["repetition"], "actions": ["shorten"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "the front door", "questions": [], "held": false,
+      "bucket": "propose", "reason": "removal", "rank": 2, "needs": "none"
+    },
+    {
+      "id": "C-02-004", "page": "02-sample-routing.md", "path": null,
+      "anchorLine": 3, "key": "02-sample-routing.md:3", "members": ["F-02-004"],
+      "severity": "S3", "kinds": ["fact"], "actions": ["correct"], "reach": {"pages": 2, "reviewers": 1},
+      "dispersion": 1, "chosen": "F-02-004", "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "the twelve-hour session window", "questions": [], "held": false,
+      "bucket": "fix", "reason": "verified", "rank": 2, "needs": "verify"
+    },
+    {
+      "id": "C-02-005", "page": "02-sample-routing.md", "path": null,
+      "anchorLine": 9, "key": "02-sample-routing.md:9", "members": ["F-02-005"],
+      "severity": "S2", "kinds": ["contradiction"], "actions": ["reconcile"], "reach": {"pages": 2, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": ["C-03-003"],
+      "bearing": "supporting", "removes": "and request logging", "questions": [], "held": false,
+      "bucket": "propose", "reason": "no-rewrite", "rank": 1, "needs": "reconcile"
+    },
+    {
+      "id": "C-02-006", "page": "02-sample-routing.md", "path": null,
+      "anchorLine": 11, "key": "02-sample-routing.md:11", "members": ["F-02-006"],
+      "severity": "S3", "kinds": ["fact"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "and validate the return URL", "questions": [], "held": false,
+      "bucket": "propose", "reason": "removal", "rank": 3, "needs": "none"
+    },
+    {
+      "id": "C-03-001", "page": "03-sample-session.md", "path": null,
+      "anchorLine": 5, "key": "03-sample-session.md:5", "members": ["F-03-001"],
+      "severity": "S4", "kinds": ["term"], "actions": ["rename"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 1, "chosen": "F-03-001", "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "none: the verb carries the sentence", "questions": [], "held": false,
+      "bucket": "fix", "reason": "verified", "rank": 3, "needs": "verify"
+    },
+    {
+      "id": "C-03-002", "page": "03-sample-session.md", "path": null,
+      "anchorLine": 13, "key": "03-sample-session.md:13", "members": ["F-03-002"],
+      "severity": "S3", "kinds": ["omission"], "actions": ["ask"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "none: the sentence states what is undecided",
+      "questions": [{"text": "Who owns the seal key rotation schedule?", "owner": "Ben", "from": "F-03-002"}], "held": false,
+      "bucket": "author", "reason": "author", "rank": 1, "needs": "bearing"
+    },
+    {
+      "id": "C-03-003", "page": "03-sample-session.md", "path": null,
+      "anchorLine": 11, "key": "03-sample-session.md:11", "members": ["F-03-003"],
+      "severity": "S4", "kinds": ["ambiguity"], "actions": ["qualify"], "reach": {"pages": 2, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": ["C-02-005"],
+      "bearing": "supporting", "removes": "none: the sentence is the page's statement of the rule", "questions": [], "held": false,
+      "bucket": "propose", "reason": "inference", "rank": 1, "needs": "reconcile"
+    },
+    {
+      "id": "C-03-004", "page": "03-sample-session.md", "path": null,
+      "anchorLine": 3, "key": "03-sample-session.md:3", "members": ["F-03-004"],
+      "severity": "S5", "kinds": ["flow"], "actions": ["move"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "none: the list is the page's subject", "questions": [], "held": false,
+      "bucket": "propose", "reason": "restructure", "rank": 1, "needs": "none"
+    },
+    {
+      "id": "C-03-005", "page": "03-sample-session.md", "path": null,
+      "anchorLine": 9, "key": "03-sample-session.md:9", "members": ["F-03-005"],
+      "severity": "S3", "kinds": ["fact"], "actions": ["correct"], "reach": {"pages": 2, "reviewers": 1},
+      "dispersion": 1, "chosen": "F-03-005", "alternatives": [], "conflict": false, "related": [],
+      "bearing": "central", "removes": "none: the lifetime is the point of the sentence", "questions": [], "held": false,
+      "bucket": "fix", "reason": "verified", "rank": 4, "needs": "verify"
+    },
+    {
+      "id": "C-03-006", "page": "03-sample-session.md", "path": null,
+      "anchorLine": 7, "key": "03-sample-session.md:7", "members": ["F-03-006"],
+      "severity": "S3", "kinds": ["omission"], "actions": ["expand"], "reach": {"pages": 2, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "none: the sentence states the storage rule", "questions": [], "held": false,
+      "bucket": "propose", "reason": "no-rewrite", "rank": 2, "needs": "none"
+    },
+    {
+      "id": "C-xx-001", "page": "set", "path": null,
+      "anchorLine": null, "key": "set:q:legend s1 wrong s2 contradiction s3", "members": ["F-xx-001"],
+      "severity": "S5", "kinds": ["residue"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "tangential", "removes": "the legend line at the top of the review", "questions": [], "held": false,
+      "bucket": "propose", "reason": "unresolved", "rank": 1, "needs": "bearing"
+    }
+  ],
+  "summary": {"records": 13, "clusters": 13, "buckets": {"fix": 4, "propose": 8, "author": 1, "discard": 0, "unclassified": 0}}
+}

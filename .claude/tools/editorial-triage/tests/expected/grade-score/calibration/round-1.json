@@ -1,0 +1,381 @@
+{
+  "round": 1,
+  "seed": 7,
+  "size": 6,
+  "requested": 6,
+  "targets": {
+    "author/author": {
+      "target": 8,
+      "drawnBefore": 0,
+      "remaining": 8,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "fix/verified": {
+      "target": 8,
+      "drawnBefore": 0,
+      "remaining": 8,
+      "candidates": 4,
+      "drawn": 1
+    },
+    "propose/inference": {
+      "target": 2,
+      "drawnBefore": 0,
+      "remaining": 2,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "propose/no-rewrite": {
+      "target": 2,
+      "drawnBefore": 0,
+      "remaining": 2,
+      "candidates": 2,
+      "drawn": 1
+    },
+    "propose/removal": {
+      "target": 6,
+      "drawnBefore": 0,
+      "remaining": 6,
+      "candidates": 3,
+      "drawn": 1
+    },
+    "propose/restructure": {
+      "target": 2,
+      "drawnBefore": 0,
+      "remaining": 2,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "propose/unresolved": {
+      "target": 2,
+      "drawnBefore": 0,
+      "remaining": 2,
+      "candidates": 1,
+      "drawn": 0
+    }
+  },
+  "items": [
+    {
+      "n": 1,
+      "cluster": "C-03-002",
+      "category": "author/author",
+      "page": "03-sample-session.md",
+      "title": "sample session",
+      "line": 13,
+      "severity": "S3",
+      "kind": "omission",
+      "basis": "author",
+      "action": "ask",
+      "bearing": "supporting",
+      "removes": "none: the sentence states what is undecided",
+      "point": "The passage states what the design has not settled about the seal key.",
+      "defect": "The sentence leaves the rotation schedule undecided without saying who decides it; who owns the schedule?",
+      "quote": "Whether the seal key is rotated on a schedule is not yet decided.",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": "Who owns the seal key rotation schedule?",
+      "owner": "Ben",
+      "cites": [],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-03-002"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "O",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "O",
+          "side": null,
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 2,
+      "cluster": "C-02-001",
+      "category": "fix/verified",
+      "page": "02-sample-routing.md",
+      "title": "sample routing",
+      "line": 7,
+      "severity": "S1",
+      "kind": "citation",
+      "basis": "source",
+      "action": "correct",
+      "bearing": "central",
+      "removes": "none: the citation carries the claim",
+      "point": "The passage grounds the redirect check in the RFC.",
+      "defect": "The reference names section 4.11, which RFC 9700 does not have; which section covers the redirect check?",
+      "quote": "sections 4.7 and 4.11",
+      "before": "sections 4.7 and 4.11",
+      "after": "sections 4.7 and 4.5",
+      "delta": 0,
+      "band": "neutral",
+      "question": null,
+      "owner": null,
+      "cites": [
+        "RFC 9700 section 4.5"
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-02-001"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "C",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 3,
+      "cluster": "C-02-006",
+      "category": "propose/removal",
+      "page": "02-sample-routing.md",
+      "title": "sample routing",
+      "line": 11,
+      "severity": "S3",
+      "kind": "fact",
+      "basis": "set",
+      "action": "delete",
+      "bearing": "supporting",
+      "removes": "and validate the return URL",
+      "point": "The passage states what the sign-out form carries.",
+      "defect": "The clause states return-URL validation as settled while the page's own open item leaves the tenant setting unverified; what makes the validation happen?",
+      "quote": "which IDM uses to identify the session and validate the return URL",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "02 \"Whether the tenant setting that validates the return URL is on\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-02-006"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "round-1.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 4,
+      "cluster": "C-03-003",
+      "category": "propose/inference",
+      "page": "03-sample-session.md",
+      "title": "sample session",
+      "line": 11,
+      "severity": "S4",
+      "kind": "ambiguity",
+      "basis": "inference",
+      "action": "qualify",
+      "bearing": "supporting",
+      "removes": "none: the sentence is the page's statement of the rule",
+      "point": "The passage states the logging rule.",
+      "defect": "The sentence states the logging rule without the exception the routing page names; which page is the home of the rule?",
+      "quote": "Every request is logged at the front door whichever path it takes.",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "02 \"the routing service's allowlist, header stripping and request logging do not apply\""
+      ],
+      "related": [
+        {
+          "page": "02-sample-routing.md",
+          "line": 9,
+          "quote": "the routing service's allowlist, header stripping and request logging do not apply"
+        }
+      ],
+      "relatedClusters": [
+        "C-02-005"
+      ],
+      "members": [
+        "F-03-003"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "O",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "O",
+          "side": null,
+          "file": "all.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 5,
+      "cluster": "C-02-005",
+      "category": "propose/no-rewrite",
+      "page": "02-sample-routing.md",
+      "title": "sample routing",
+      "line": 9,
+      "severity": "S2",
+      "kind": "contradiction",
+      "basis": "set",
+      "action": "reconcile",
+      "bearing": "supporting",
+      "removes": "and request logging",
+      "point": "The passage states which routing-service controls the direct path bypasses.",
+      "defect": "The list says request logging does not apply on the direct path while the session page says every request is logged; which statement stands?",
+      "quote": "the routing service's allowlist, header stripping and request logging do not apply",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "03 \"Every request is logged at the front door whichever path it takes\""
+      ],
+      "related": [
+        {
+          "page": "03-sample-session.md",
+          "line": 11,
+          "quote": "Every request is logged at the front door whichever path it takes"
+        }
+      ],
+      "relatedClusters": [
+        "C-03-003"
+      ],
+      "members": [
+        "F-02-005"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "K",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "all.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 6,
+      "cluster": "C-03-004",
+      "category": "propose/restructure",
+      "page": "03-sample-session.md",
+      "title": "sample session",
+      "line": 3,
+      "severity": "S5",
+      "kind": "flow",
+      "basis": "rule",
+      "action": "move",
+      "bearing": "supporting",
+      "removes": "none: the list is the page's subject",
+      "point": "The passage opens the record page.",
+      "defect": "The opening sentence lists the fields before the reader knows what the record is for; what does the list establish here?",
+      "quote": "The session record holds the subject, the organisation and the expiry.",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "document-types.md \"Reference\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-03-004"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "I",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "I",
+          "side": null,
+          "file": "round-2.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    }
+  ]
+}
