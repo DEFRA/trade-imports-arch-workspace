@@ -1,6 +1,6 @@
 # Review brief
 
-This is the single instruction set for the reviewers used by the `editorial-review` workflow. The spawn prompt supplies the reader frame, document mode, run notes and the scratch file for the gate. Apply that frame to every finding.
+This document is the single instruction set for the reviewers used by the `editorial-review` workflow. The spawn prompt supplies the reader frame, document mode, run notes and the scratch file for the gate. Apply that frame to every finding.
 
 ## Before reviewing
 

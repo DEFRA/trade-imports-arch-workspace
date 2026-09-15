@@ -57,7 +57,7 @@ For substantial documents, complete the brief and outline before drafting. Fixed
 
 ### 2. Build the outline
 
-- Open with the information the reader needs first. This is usually the document's scope or the fixed format's required opening.
+- Open with the information the reader needs first. That information is usually the document's scope or the fixed format's required opening.
 - Use concrete headings that answer the reader's questions.
 - Put each fact in one place. Link or point to that place instead of restating the fact.
 - Choose prose, steps, bullets and tables using the structure rules in [document-types.md](references/document-types.md).

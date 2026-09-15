@@ -42,7 +42,7 @@ Passive voice is useful when the actor is unknown, irrelevant, or less important
 
 Repeat the precise noun when `it`, `this`, `that`, `they`, "the former", "the latter" or "the same" could refer to more than one thing. Repetition is cheaper than ambiguity.
 
-This also applies when a pronoun refers to an idea rather than a nearby noun. In `Session management sits behind it`, the reader must work out what `it` means. Write "Session management sits behind the front door".
+The same rule applies when a pronoun refers to an idea rather than a nearby noun. In `Session management sits behind it`, the reader must work out what `it` means. Write "Session management sits behind the front door".
 
 ### Verbs and noun stacks
 
@@ -65,6 +65,7 @@ Common forms:
 - **Inverted relation** buries the important verb inside a trailing relative clause: `the tenant INS is calling into`, `the model the decision rests on`. Promote the relation: "For INS to call a target in a tenant...".
 - **Trailing vagueness** ends a sentence on an abstract noun or an absolute claim with no named referent: `The shape is settled`, `it depends on one hostname and on nothing else`. End on the concrete claim instead: name what is settled; name the thing that depends.
 - **Trailing pronoun** ends a sentence or a line on `it`: `the routing service provides it`, `only the single hostname keeps the cookie off it`. Name the noun the pronoun stands for. The subject the pronoun hides usually belongs at the front of the sentence, so `the routing service provides it` becomes "the routing service provides a single hostname in front of the journeys". The gate fails this pattern; `IT` as the abbreviation and words merely ending in those letters, such as `audit`, pass unchanged.
+- **Leading demonstrative** opens a sentence on a bare `This`, `That`, `These` or `Those`, leaving the reader to reconstruct the referent from the sentence before: `This adds a deployable to every request path`. Name the thing: "Running a programme-owned proxy adds a deployable to every request path". A demonstrative in front of a noun is a determiner and stays (`This page explains`, `These rules apply`); the defect is the bare pronoun in front of a verb. The gate does not check this pattern.
 - **Dangling-preposition relative** buries the actor's verb in a relative clause that trails off on a preposition: `the session API that the journeys resolve sessions against`. Give the actor its own clause: "the journeys resolve sessions by calling the session API".
 - **Figurative mechanism** makes the reader decode a metaphor before they can understand the system. State the literal behaviour instead.
 
