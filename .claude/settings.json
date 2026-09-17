@@ -25,7 +25,13 @@
       "Bash(head:*)",
       "Bash(tail:*)",
       "Bash(wc:*)",
-      "Bash(~/trade-imports-arch-workspace/.claude/tools/:*)"
+      "Bash(~/trade-imports-arch-workspace/.claude/tools/:*)",
+      "Skill(editorial)",
+      "Skill(editorial-review)",
+      "Skill(editorial-triage)",
+      "Skill(skill-creator)",
+      "WebFetch(domain:agents.md)",
+      "Workflow(editorial-review)"
     ]
   },
   "hooks": {

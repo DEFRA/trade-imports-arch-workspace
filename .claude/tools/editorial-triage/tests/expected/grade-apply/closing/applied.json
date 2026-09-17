@@ -90,6 +90,7 @@
     "applied": 0,
     "skipped": 6,
     "fragments": 1,
+    "alreadyApplied": 0,
     "gateFail": 0
   }
 }

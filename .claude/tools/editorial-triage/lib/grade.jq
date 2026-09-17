@@ -737,6 +737,18 @@ def tidy_removed:
 def phrase_of: if .move == "R" then (.span // "") else (.before // "") end;
 def replacement_of: if .move == "R" then "" else (.after // "") end;
 
+# A rewrite whose replacement contains the phrase it replaces is not idempotent:
+# the phrase survives the edit, so a second apply run finds it again and adds the
+# replacement's extra words a second time. Such an entry is applied only while the
+# page does not already hold the replacement.
+def grows_around_phrase:
+  . as $e
+  | $e.move != "R" and (($e.before // "") | length) > 0
+    and (($e.after // "") | contains($e.before // ""));
+def already_applied($lines; $e):
+  ($e | grows_around_phrase)
+  and (($e.after // "") as $a | any($lines[]; index($a) != null));
+
 def skip($e; $status; $reason):
   .results += [{cluster: $e.cluster, move: $e.move, line: $e.line, at: null,
                 status: $status, reason: $reason, dropped: false}];
@@ -747,6 +759,7 @@ def apply_page($lines0; $entries):
     .lines as $ls
     | ($e | phrase_of) as $ph
     | if ($ph | length) == 0 then skip($e; "skipped-absent"; "the entry carries no text to find")
+      elif already_applied($ls; $e) then skip($e; "skipped-applied"; "the replacement is already in the page, and it contains the phrase it replaces, so applying again would repeat the addition")
       else ([range(0; $ls | length) as $i | {i: $i, n: ($ls[$i] | indices($ph) | length)} | select(.n > 0)]) as $hits
         | ($hits | map(.n) | add // 0) as $total
         | if $total == 0 then skip($e; "skipped-absent"; "the phrase is not in the page")
@@ -805,8 +818,9 @@ def applied_doc($dryRun):
       entries: [$all[] | {cluster, page, move, line, at, status, reason, dropped}],
       summary: {selected: $a.selected,
                 applied: (n_status("applied") + n_status("gate-fail")),
-                skipped: (n_status("skipped-absent") + n_status("skipped-multiple") + n_status("skipped-fragment")),
+                skipped: (n_status("skipped-absent") + n_status("skipped-multiple") + n_status("skipped-fragment") + n_status("skipped-applied")),
                 fragments: n_status("skipped-fragment"),
+                alreadyApplied: n_status("skipped-applied"),
                 gateFail: n_status("gate-fail")} };
 
 def apply_report($dryRun; $diff):
