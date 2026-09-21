@@ -29,7 +29,7 @@ Read these sources, then read every document under review in full before examini
 - Treat tokens in the ubiquitous-language register as proper nouns. Do not expand them unless the run notes ask for the recorded expansion. Never guess an expansion.
 - Honour the run notes. Recently agreed text still needs a genuine defect before it becomes a finding.
 - Report one defect once, under the most specific kind.
-- Treat revision narrative, resolution logs and dated annotations as `residue`. System or domain history may stay when it explains the current design.
+- Treat revision narrative, resolution logs, version histories and dated annotations as `residue`. System or domain history may stay when it explains the current design.
 - Do not flag banned wording or punctuation when it appears only as an exemplar inside inline code, fenced code, blockquotes or URLs. Review those examples for accuracy and usefulness when they are in scope. Ordinary quotation marks do not suppress the gate. YAML frontmatter is configuration rather than body prose.
 
 ## The finding
