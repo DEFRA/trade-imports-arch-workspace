@@ -47,11 +47,15 @@ Canonical run directory: `~/trade-imports-arch-workspace/.claude/workareas/edito
 | `related` | array of `{page, line, quote}` | anchors of the other statements in a cross-page defect | when the defect spans pages |
 | `moveTo` | string | target section or page | for `move` and `restructure` |
 
-Severity range per kind: `fact` S1 to S3; `citation` S1; `reference` S1, S3, S4; `contradiction` S2 only; `absolute` S3; `omission` S3 or S4; `ambiguity` S2 to S4; `term` S4 or S5; `repetition` S4 or S5; `compression` S4; `flow` S4 or S5; `residue` S4 or S5.
+Severity range per kind: `fact` S1 to S3; `citation` S1; `reference` S1, S3, S4; `contradiction` S2 only; `absolute` S3; `omission` S3 or S4; `ambiguity` S2 to S4; `term` S4 or S5; `repetition` S4 or S5; `compression` S3 or S4; `flow` S4 or S5; `residue` S4 or S5.
+
+A `compression` finding is S3 when the reader cannot recover who acts and what the relation is without reading the sentence twice. It is S4 when the sentence reads once and the repair only improves cadence or economy. The distinction matters because partition rule 6 admits a growing rewrite up to `growSeverityMax` (default 3), and naming a hidden actor and a hidden relation usually costs words. Without the S3 grade, every repair for this defect grows the text, falls outside the cap and reaches the user as a proposal, while every shortening repair applies itself.
 
 Basis as confidence: `rule`, `source` and `set` are high; `inference` is medium; `author` is low and never applied. A `contradiction` may carry basis `set` only when one side is the structural home, carries a mechanism against a bare assertion, or is the majority of three or more statements; otherwise basis is `author`.
 
 `removes` is the concentrate-and-distil field. Every finding names the smallest whole unit whose deletion would resolve it, or states why that unit has to stay. A `none:` reason is required before any `after` longer than `before`. `loss` may not be one of: completeness, context, clarity, helpful, useful (the denylist).
+
+State `loss` as what the reader has to do without the addition, for example rearrange the sentence to find the actor and the relation. The denylist matches the whole string, so a specific loss passes and only the bare word is rejected.
 
 ### Legacy fields (pre-v2 findings)
 
@@ -191,4 +195,3 @@ Written by `grade-triage.sh plan` and `grade-triage.sh apply` once the moves are
 One plan entry per cluster: `{cluster, page, path, line, move, side, before, after, span, sides, cites, defect, note, source, confidence}`. The move comes from `labels.json`, else from the later `grades/*.json` by name; a label wins over a grade and carries no confidence. `R` fills `span` with the removal span (the record's `removes` when that is a real span, else a rewrite whose `after` is empty, else the anchor quote) and leaves `after` empty. `C` and `W` fill `before` and `after` from the cluster's rewrite: the lead record's when that record holds a replacement, else the first member that does, because a lead record proposing a deletion carries an empty `after` and would otherwise hide a usable reword on a sibling record. `K` fills `side` with the surviving side, `sides` with both statements and `span` with the one that goes. `O` fills `note` with the open point and its owner. `T` fills `note` with the user's instruction. `I` fills nothing further. A cluster with no move (`ungraded`), a `C` or `W` whose record carries no rewrite (`no rewrite`), an `R` with no text to remove (`no span`) and a page-editing move on a cluster with no page file (`no page file`, the reason a set-wide cluster takes) go to `problems` with that reason.
 
 `apply` takes the plan's `R`, `C` and `W` entries and edits them into the page files `manifest.json` names, page by page in descending line order. Each phrase is re-resolved in the page and applied only when it occurs exactly once, so a page that has moved on skips rather than guesses. Per entry, `status` is `applied`, `skipped-absent`, `skipped-multiple` or `gate-fail`; `gate-fail` means the edit was made and the page then failed the prose gate. `summary.applied` counts every edit made, `gate-fail` entries included.
-

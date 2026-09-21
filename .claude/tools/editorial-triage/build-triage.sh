@@ -265,7 +265,7 @@ jq --slurpfile comp "$TMP/computed.json" '
      | if $k == null or $s == null then true
        else ({fact: ["S1","S2","S3"], citation: ["S1"], reference: ["S1","S3","S4"], contradiction: ["S2"],
               absolute: ["S3"], omission: ["S3","S4"], ambiguity: ["S2","S3","S4"], term: ["S4","S5"],
-              repetition: ["S4","S5"], compression: ["S4"], flow: ["S4","S5"], residue: ["S4","S5"]}[$k] // [])
+              repetition: ["S4","S5"], compression: ["S3","S4"], flow: ["S4","S5"], residue: ["S4","S5"]}[$k] // [])
              | index($s) != null end);
   def denylist: ["completeness","context","clarity","helpful","useful"];
   ($comp[0] | map({(.id): .}) | add // {}) as $c

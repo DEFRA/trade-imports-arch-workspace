@@ -121,11 +121,9 @@ A reader should be able to read each sentence aloud once and restate it accurate
 
 ### 5. Remove waste and fix the structure
 
-Ask what the reader loses if each sentence, paragraph or section disappears. Remove units whose loss changes nothing.
+Apply [language.md](../../best-practices/writing/language.md), "Concentrate and distil". That section is the only home for the removal rules.
 
-Try removal first for every defect ([language.md](../../best-practices/writing/language.md), "Concentrate and distil"). A question that is easy to raise but whose answer would not strengthen the passage's point is a tangent: remove the text that invites the question rather than answer the question. Judgements standing in for facts, undecided mechanisms, pointers and the document's own tallies go by default.
-
-Give repeated facts one home. Merge sections when their overlap causes repetition. Keep connective prose that carries the reader between points; shorter but harder to follow is not an improvement.
+Give repeated facts one home. Merge sections when their overlap causes repetition.
 
 Apply the structural rules in [document-types.md](references/document-types.md). Do not turn prose into bullets merely to shorten the passage.
 
@@ -143,7 +141,9 @@ bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <file
 
 For prose held only in text, use `--stdin --label <name>` and supply the text through standard input. Empty input proves nothing.
 
-Fix every FAIL. Judge every WARN against [language.md](../../best-practices/writing/language.md): literal technical uses may stay; vague or figurative uses must become the specific behaviour, condition or mechanism. The work is not finished until the gate passes.
+Fix every FAIL. Judge every WARN against [language.md](../../best-practices/writing/language.md): literal technical uses may stay; vague or figurative uses must become the specific behaviour, condition or mechanism.
+
+The gate is the floor, not the finish. After the gate passes, read each paragraph once and say that paragraph back without looking at the text. Where your restatement differs from the paragraph, the paragraph is wrong and the paragraph changes. The work is finished when the restatements match.
 
 ## Applying edits
 

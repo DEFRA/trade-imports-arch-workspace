@@ -16,7 +16,7 @@ Write as a knowledgeable colleague speaking directly and precisely to another co
 
 ## Sentences and paragraphs
 
-Keep most sentences under 25 words. Treat that length as a prompt to check clarity, not a limit that overrides meaning. Keep related clauses together when splitting them would hide their relationship.
+A sentence over 25 words is a prompt to check whether the reader can follow the sentence. Length is never the defect on its own, and a 30-word sentence a colleague can restate after one reading stays as written. Keep related clauses together when splitting them would hide their relationship.
 
 - Give each sentence one clear job, but vary sentence length and opening structure so the prose does not become mechanical.
 - Front-load important information.
@@ -29,14 +29,14 @@ Keep most sentences under 25 words. Treat that length as a prompt to check clari
 
 ### Actors and voice
 
-Prefer active voice when the actor matters:
+Name the actor when the document has one and the reader needs to know which actor:
 
 | Passive | Active |
 | --- | --- |
 | The form was submitted by the user | The user submitted the form |
 | Errors were found | The validator found errors |
 
-Passive voice is useful when the actor is unknown, irrelevant, or less important than the outcome. Do not invent an actor merely to make a sentence active.
+When the actor is unknown, irrelevant, or is whichever component happens to handle the request, use the passive and put the thing the reader is tracking in the subject. Never invent an actor to make a sentence active.
 
 ### References and pronouns
 
@@ -56,18 +56,16 @@ Unpack dense noun stacks into clauses that name the relationship: "configuration
 
 Reader-pays compression saves the writer words but makes the reader reconstruct the meaning. The test is whether a colleague can read the sentence aloud once and restate it accurately. If they need private context or have to reverse the grammar, unpack the sentence.
 
-Common forms:
+### Write it forward
 
-- **Ledger voice** turns document bookkeeping into system prose: `held open under X`, `argued under X`, `its case is made once`, `stated below the table`, `collected under`, `points back to`. State each fact, status or pointer directly. Separate them when one sentence would blur their relationship.
-- **Aside stacking** places 2 or more asides inside one sentence and separates the subject from its verb. Keep at most one aside; move the rest into sentences of their own.
-- **Contact-clause squeeze** removes the relative pronoun and gives agency to an inanimate thing: `a store only the front door reaches`. Restore the relation: "a store that only the front door can access".
-- **Abstraction swap** uses a noun such as `the expected axis`, `the posture` or `their standing` instead of the concrete fact. Ask "meaning what, exactly?" and put the answer in the sentence.
-- **Inverted relation** buries the important verb inside a trailing relative clause: `the tenant INS is calling into`, `the model the decision rests on`. Promote the relation: "For INS to call a target in a tenant...".
-- **Trailing vagueness** ends a sentence on an abstract noun or an absolute claim with no named referent: `The shape is settled`, `it depends on one hostname and on nothing else`. End on the concrete claim instead: name what is settled; name the thing that depends.
-- **Trailing pronoun** ends a sentence or a line on `it`: `the routing service provides it`, `only the single hostname keeps the cookie off it`. Name the noun the pronoun stands for. The subject the pronoun hides usually belongs at the front of the sentence, so `the routing service provides it` becomes "the routing service provides a single hostname in front of the journeys". The gate fails this pattern; `IT` as the abbreviation and words merely ending in those letters, such as `audit`, pass unchanged.
-- **Leading demonstrative** opens a sentence on a bare `This`, `That`, `These` or `Those`, leaving the reader to reconstruct the referent from the sentence before: `This adds a deployable to every request path`. Name the thing: "Running a programme-owned proxy adds a deployable to every request path". A demonstrative in front of a noun is a determiner and stays (`This page explains`, `These rules apply`); the defect is the bare pronoun in front of a verb. The gate does not check this pattern.
-- **Dangling-preposition relative** buries the actor's verb in a relative clause that trails off on a preposition: `the session API that the journeys resolve sessions against`. Give the actor its own clause: "the journeys resolve sessions by calling the session API".
-- **Figurative mechanism** makes the reader decode a metaphor before they can understand the system. State the literal behaviour instead.
+These 4 rules are for drafting. Write each sentence as you would say it if the reader asked "what do you mean?".
+
+- Put the actor first when the document has one and the reader needs to know which actor. Where the actor is whichever component happens to handle the request, use the passive and start on the thing the reader is tracking.
+- Carry the relation in the verb. Where the fact is "A comes from B", "A replaces B" or "A causes B", write that verb. Do not assemble the relation out of stacked prepositions and participles.
+- Use one relative clause per sentence, and never one inside another.
+- Use the reader's own term where the reader brief says they know the term. Walking through an example is the long path when the term is the short one.
+
+The named compression patterns live in [review-brief.md](../../skills/editorial/references/review-brief.md), "Compression patterns". They are recognition tests for finished prose. A writer who holds them while drafting produces defensive sentences.
 
 The gate reports the following metaphor candidates as WARNs: `prices`, `priced`, `rides`, `rides in`, `bites`, `spends`, `spent`, `buys`, `kills`, `hangs on`, `collapses`, `leaks`, `lands`, `forecloses`, `softens`, `bootstraps`, `axis` and `posture`. A literal technical use may stay. A figurative use must be rewritten around the mechanism, not swapped for another metaphor.
 
@@ -75,7 +73,9 @@ The gate reports the following metaphor candidates as WARNs: `prices`, `priced`,
 
 Before adding to a passage, ask what the passage is trying to establish and whether the addition would materially strengthen that point. A question that is easy to raise ("who decides this?", "what is the process?") but whose answer would not strengthen the point is a tangent: answering the question adds text and dilutes the central material. Resolve a tangent by removing the text that invites the question, not by answering the question.
 
-Try removal first for every defect, and remove whole units. Delete the sentence, bullet or paragraph that carries the defect; or, when that unit has to stay, rewrite the sentence so the defective part is gone. Do not cut a fragment out of a sentence and leave the rest standing, which strands a subject or breaks the line. Qualify or expand only when neither deletion nor rewording works, and then name what the reader would otherwise infer wrongly or be unable to verify. Shorter but harder to follow is not an improvement, so keep the connective prose that carries the reader between points.
+Removing a whole unit and compressing a unit that stays are different moves. Removal is always available. Compression is not a repair, and a sentence squeezed to save 2 words has been broken rather than shortened.
+
+Remove the sentence, bullet or paragraph that carries the defect. When the unit has to stay, rewrite the sentence so the defective part is gone, and let the rewrite run longer where naming the actor and the relation costs words. Do not cut a fragment out of a sentence and leave the rest standing, which strands a subject or breaks the line. Qualify or expand only when neither deletion nor rewording works, and then name what the reader would otherwise infer wrongly or be unable to verify. Keep the connective prose that carries the reader between points.
 
 The following go by default, and the removal is the whole fix:
 
@@ -101,21 +101,14 @@ Common abbreviations that need no explanation for a general UK audience include 
 
 The Gate column records how `~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh` treats each term. FAIL blocks the artefact. WARN asks the author to judge the actual meaning. "Guidance" is not checked mechanically.
 
+The gate fails 9 marketing words outright and names the repair for each, so do not hold them while writing: `leverage`, `empower`, `facilitate`, `utilise`, `seamless`, `user-friendly`, `streamline`, `load-bearing` and generic lowercase `portal`. The table below holds the terms that need a judgement the script cannot make.
+
 | Term                       | Repair                                                       | Gate     |
 |----------------------------|--------------------------------------------------------------|----------|
 | `deliver`                  | keep for literal transport or message delivery; otherwise state the actual outcome | WARN |
-| `leverage`                 | use                                                          | FAIL     |
-| `empower`                  | allow, let                                                   | FAIL     |
-| `facilitate`               | help, allow, or name the mechanism                           | FAIL     |
-| `utilise`                  | use                                                          | FAIL     |
-| `seamless`                 | state what the reader does not have to do                    | FAIL     |
-| `user-friendly`            | state the behaviour that helps the user                      | FAIL     |
-| `streamline`               | state what was removed or shortened                          | FAIL     |
-| generic lowercase `portal` | website or service                                           | FAIL     |
+| `stands-upon`              | state the assumption directly                                | Guidance |
 | `bounds`                   | keep for mathematical limits or explicit boundary operations; otherwise use determines or constrains | WARN |
-| `load-bearing`             | state what depends on it and what breaks if it changes       | FAIL     |
 | `shape`                    | keep for literal geometry or data structure; otherwise name the design, proposal, pattern or layout | WARN |
-| `stands-upon`              | state the assumption directly                                | FAIL     |
 | `robust`                   | state what withstands retries, redelivery or malformed input | WARN     |
 | `appropriate`              | state the criterion                                          | WARN     |
 | `overarching`              | name what the thing spans                                    | WARN     |
