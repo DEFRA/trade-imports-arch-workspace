@@ -1,0 +1,176 @@
+
+=== variant 1-full-plan ===
+plan: wrote WORK/1-full-plan/out/closing/plan.md
+plan: 16 clusters: R 5, C 0, W 3, K 0, O 2, I 1, T 5; closed without the user 8, left to the user 7, problems 0; held from Apply 5
+plan: spot check (seed 42) of 8 of 8 apply entries in WORK/1-full-plan/out/closing/spot-check.json: C-12-004, C-12-014, C-12-012, C-12-010, C-12-003, C-12-008, C-12-013, C-12-011
+exit-code: 0
+--- presentation cluster carries no page edit ---
+C-12-006 O source=presentation
+--- --no-spot-check is refused while the Q10 entry applies ---
+grade-triage: this run would make a verified material deletion on C-12-004; the verifier's note says what the deletion loses, and the user reads it in the spot check. Draw one and review it: bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/grade-triage.sh plan --dir WORK/1-full-plan/out --sample 10, then apply without --no-spot-check.
+exit-code: 1
+applied.json: absent
+--- a dry run writes nothing ---
+apply: dry run, no page written
+apply: 8 entries selected (moves RCW): would apply 8, skipped 0, gate FAIL 0
+apply: 12-claims.md: would apply 8 of 8 entries, gate pass
+exit-code: 0
+applied.json: absent
+--- the real run ---
+apply: 8 entries selected (moves RCW): applied 8, skipped 0, gate FAIL 0
+apply: 12-claims.md: applied 8 of 8 entries, gate pass
+apply: wrote WORK/1-full-plan/out/closing/applied.json
+exit-code: 0
+page lacks: is live. The routing service
+page has: The session service answers whether a session is live.
+page has: The routing service forwards the answer to the journey, which records the outcome.
+page lacks: A consumer must reject a stale timestamp.
+page lacks: The front door signs the cookie and the journey reads the cookie, as the first section states.
+page lacks: Done.
+page lacks: 404.
+page has: Sessions end because the clocks lapse.
+page has: The browser calls the server when the user signs in and the service validates the request.
+page lacks: The cache holds the verdict for one minute
+page has: When the front door receives the callback, the front door checks the state value
+page changed: yes
+trusted 12-claims.md: sourceHash 405ed3ab5418 hashAfter 7df2e654370a
+trusted hash equals the file: yes
+--- a second run applies nothing ---
+apply: 8 entries selected (moves RCW): applied 0, skipped 8, gate FAIL 0 (skipped-absent 8)
+apply: 12-claims.md: applied 0 of 8 entries
+apply:   C-12-014 R skipped-absent: the phrase is not in the page
+apply:   C-12-013 W skipped-absent: the phrase is not in the page
+apply:   C-12-012 W skipped-absent: the phrase is not in the page
+apply:   C-12-011 R skipped-absent: the phrase is not in the page
+apply:   C-12-010 R skipped-absent: the phrase is not in the page
+apply:   C-12-008 R skipped-absent: the phrase is not in the page
+apply:   C-12-004 R skipped-absent: the phrase is not in the page
+apply:   C-12-003 W skipped-absent: the phrase is not in the page
+apply: wrote WORK/1-full-plan/out/closing/applied.json
+exit-code: 0
+page byte-identical: yes
+trusted hash unchanged: yes
+
+=== variant 2-removal-unverified ===
+F-12-014 claimShift=none removalShift=missing
+plan: wrote WORK/2-removal-unverified/out/closing/plan.md
+plan: 16 clusters: R 0, C 0, W 0, K 0, O 2, I 0, T 1; closed without the user 0, left to the user 3, problems 13; held from Apply 1
+exit-code: 0
+C-12-014 T source=held: held: R from label is not applied: removal verdict missing: no verdict on this edit. Verify, then re-plan
+page has: The cache holds the verdict for one minute
+
+=== variant 3-verdict-withdrawn ===
+plan: wrote WORK/3-verdict-withdrawn/out/closing/plan.md
+plan: 16 clusters: R 1, C 0, W 1, K 0, O 2, I 0, T 0; closed without the user 2, left to the user 2, problems 12
+plan: spot check (seed 42) of 2 of 2 apply entries in WORK/3-verdict-withdrawn/out/closing/spot-check.json: C-12-004, C-12-012
+exit-code: 0
+apply: 2 entries selected (moves RCW): applied 0, skipped 2, gate FAIL 0 (skipped-unverified 2)
+apply: 12-claims.md: applied 0 of 2 entries
+apply:   C-12-012 W skipped-unverified: claimShift missing: no verdict on this edit
+apply:   C-12-004 R skipped-unverified: removal verdict missing: no verdict on this edit
+apply: wrote WORK/3-verdict-withdrawn/out/closing/applied.json
+exit-code: 0
+page unchanged: yes
+{}
+
+=== variant 4-candidate-changed ===
+plan: wrote WORK/4-candidate-changed/out/closing/plan.md
+plan: 16 clusters: R 0, C 0, W 1, K 0, O 2, I 0, T 0; closed without the user 1, left to the user 2, problems 13
+plan: spot check (seed 42) of 1 of 1 apply entries in WORK/4-candidate-changed/out/closing/spot-check.json: C-12-012
+exit-code: 0
+apply: 1 entry selected (moves RCW): applied 0, skipped 1, gate FAIL 0 (skipped-changed 1)
+apply: 12-claims.md: applied 0 of 1 entry
+apply:   C-12-012 W skipped-changed: the record's after differs from the plan's
+apply: wrote WORK/4-candidate-changed/out/closing/applied.json
+exit-code: 0
+page has: Sessions end since the clocks lapse.
+
+=== variant 5-page-changed ===
+plan: wrote WORK/5-page-changed/out/closing/plan.md
+plan: 16 clusters: R 0, C 0, W 1, K 0, O 2, I 0, T 0; closed without the user 1, left to the user 2, problems 13
+plan: spot check (seed 42) of 1 of 1 apply entries in WORK/5-page-changed/out/closing/spot-check.json: C-12-012
+exit-code: 0
+apply: 1 entry selected (moves RCW): applied 0, skipped 1, gate FAIL 0 (skipped-stale 1)
+apply: 12-claims.md: applied 0 of 1 entry
+apply:   C-12-012 W skipped-stale: the page has changed since the review read it (hash differs from sourceHashes) and is not the page apply last wrote
+apply: wrote WORK/5-page-changed/out/closing/applied.json
+exit-code: 0
+apply: 1 entry selected (moves RCW): applied 0, skipped 1, gate FAIL 0 (skipped-stale 1)
+apply: 12-claims.md: applied 0 of 1 entry
+apply:   C-12-012 W skipped-stale: the page has changed since the review read it (hash differs from sourceHashes) and is not the page apply last wrote
+apply: wrote WORK/5-page-changed/out/closing/applied.json
+exit-code: 0
+page unchanged: yes
+page has: Sessions end since the clocks lapse.
+{}
+
+=== variant 6-presentation-added-later ===
+plan: wrote WORK/6-presentation-added-later/out/closing/plan.md
+plan: 16 clusters: R 1, C 0, W 0, K 0, O 1, I 0, T 0; closed without the user 1, left to the user 1, problems 14
+plan: spot check (seed 42) of 1 of 1 apply entries in WORK/6-presentation-added-later/out/closing/spot-check.json: C-12-006
+exit-code: 0
+C-12-006 R record=F-12-006 source=label
+C-12-006 members=F-12-006,F-12-015 kinds=presentation,residue
+apply: 1 entry selected (moves RCW): applied 0, skipped 1, gate FAIL 0 (skipped-held 1)
+apply: 12-claims.md: applied 0 of 1 entry
+apply:   C-12-006 R skipped-held: presentation: the cluster now holds a presentation finding, which goes to its owner
+apply: wrote WORK/6-presentation-added-later/out/closing/applied.json
+exit-code: 0
+page has: When the front door receives the callback, the front door checks the state value, then loads the stored return path, then issues the cookie, and then redirects the browser to the return path.
+
+=== variant 7-verdict-moved-after-plan ===
+plan: wrote WORK/7-verdict-moved-after-plan/out/closing/plan.md
+plan: 16 clusters: R 2, C 0, W 0, K 0, O 2, I 0, T 0; closed without the user 2, left to the user 2, problems 12
+plan: spot check (seed 42) of 2 of 2 apply entries in WORK/7-verdict-moved-after-plan/out/closing/spot-check.json: C-12-014, C-12-008
+exit-code: 0
+--- planned: both removals none ---
+C-12-008 removalShift=none
+C-12-014 removalShift=none
+--- now material: --no-spot-check is not refused, because nothing applies; both skip as changed ---
+apply: 2 entries selected (moves RCW): applied 0, skipped 2, gate FAIL 0 (skipped-changed 2)
+apply: 12-claims.md: applied 0 of 2 entries
+apply:   C-12-014 R skipped-changed: the removal verdict differs from the plan's (none planned, material now); re-plan to show the current verdict
+apply:   C-12-008 R skipped-changed: the removal verdict differs from the plan's (none planned, material now); re-plan to show the current verdict
+apply: wrote WORK/7-verdict-moved-after-plan/out/closing/applied.json
+exit-code: 0
+page has: The cache holds the verdict for one minute
+page has: as the first section states.
+--- re-planned on material, then re-verified none: the same in the other direction ---
+plan: wrote WORK/7-verdict-moved-after-plan/out/closing/plan.md
+plan: 16 clusters: R 2, C 0, W 0, K 0, O 2, I 0, T 0; closed without the user 2, left to the user 2, problems 12
+plan: spot check (seed 42) of 2 of 2 apply entries in WORK/7-verdict-moved-after-plan/out/closing/spot-check.json: C-12-014, C-12-008
+exit-code: 0
+apply: 2 entries selected (moves RCW): applied 0, skipped 2, gate FAIL 0 (skipped-changed 2)
+apply: 12-claims.md: applied 0 of 2 entries
+apply:   C-12-014 R skipped-changed: the removal verdict differs from the plan's (material planned, none now); re-plan to show the current verdict
+apply:   C-12-008 R skipped-changed: the removal verdict differs from the plan's (material planned, none now); re-plan to show the current verdict
+apply: wrote WORK/7-verdict-moved-after-plan/out/closing/applied.json
+exit-code: 0
+page has: The cache holds the verdict for one minute
+--- re-planned on none: applies without a refusal ---
+plan: wrote WORK/7-verdict-moved-after-plan/out/closing/plan.md
+plan: 16 clusters: R 2, C 0, W 0, K 0, O 2, I 0, T 0; closed without the user 2, left to the user 2, problems 12
+plan: spot check (seed 42) of 2 of 2 apply entries in WORK/7-verdict-moved-after-plan/out/closing/spot-check.json: C-12-014, C-12-008
+exit-code: 0
+apply: 2 entries selected (moves RCW): applied 2, skipped 0, gate FAIL 0
+apply: 12-claims.md: applied 2 of 2 entries, gate pass
+apply: wrote WORK/7-verdict-moved-after-plan/out/closing/applied.json
+exit-code: 0
+page lacks: The cache holds the verdict for one minute
+
+=== variant 8-removal-state-absent ===
+plan: wrote WORK/8-removal-state-absent/out/closing/plan.md
+plan: 16 clusters: R 1, C 0, W 0, K 0, O 2, I 0, T 0; closed without the user 1, left to the user 2, problems 13
+plan: spot check (seed 42) of 1 of 1 apply entries in WORK/8-removal-state-absent/out/closing/spot-check.json: C-12-014
+exit-code: 0
+F-12-014 claimShift=none removalShift=null
+apply: 1 entry selected (moves RCW): applied 0, skipped 1, gate FAIL 0 (skipped-unverified 1)
+apply: 12-claims.md: applied 0 of 1 entry
+apply:   C-12-014 R skipped-unverified: removal verdict missing: no verdict on this edit
+apply: wrote WORK/8-removal-state-absent/out/closing/applied.json
+exit-code: 0
+page has: The cache holds the verdict for one minute
+plan: wrote WORK/8-removal-state-absent/out/closing/plan.md
+plan: 16 clusters: R 0, C 0, W 0, K 0, O 2, I 0, T 1; closed without the user 0, left to the user 3, problems 13; held from Apply 1
+exit-code: 0
+C-12-014 T source=held: held: R from label is not applied: removal verdict missing: no verdict on this edit. Verify, then re-plan

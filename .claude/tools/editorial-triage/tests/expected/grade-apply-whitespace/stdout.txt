@@ -1,0 +1,30 @@
+plan exit-code: 0
+plan entries: 7
+apply: 7 entries selected (moves RCW): applied 7, skipped 0, gate FAIL 0
+apply: 20-whitespace.md: applied 7 of 7 entries, gate pass
+apply: wrote WORK/closing/applied.json
+apply exit-code: 0
+--- applied.json summary ---
+selected 7 applied 7 skipped 0 gateFail 0
+C-20-007 applied
+C-20-006 applied
+C-20-005 applied
+C-20-004 applied
+C-20-003 applied
+C-20-002 applied
+C-20-001 applied
+--- a second apply run applies nothing (idempotent) ---
+apply: 7 entries selected (moves RCW): applied 0, skipped 7, gate FAIL 0 (skipped-absent 7)
+apply: 20-whitespace.md: applied 0 of 7 entries
+apply:   C-20-007 R skipped-absent: the phrase is not in the page
+apply:   C-20-006 R skipped-absent: the phrase is not in the page
+apply:   C-20-005 R skipped-absent: the phrase is not in the page
+apply:   C-20-004 R skipped-absent: the phrase is not in the page
+apply:   C-20-003 R skipped-absent: the phrase is not in the page
+apply:   C-20-002 R skipped-absent: the phrase is not in the page
+apply:   C-20-001 R skipped-absent: the phrase is not in the page
+apply: wrote WORK/closing/applied.json
+apply exit-code: 0
+page byte-identical: yes
+--- the prose gate on the page as apply left it ---
+check-prose exit-code: 0

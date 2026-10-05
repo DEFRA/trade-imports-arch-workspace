@@ -1,0 +1,82 @@
+build-triage: records 9 (drill 9)
+build-triage: clusters 9; duplicates collapsed 0
+build-triage: anchors reviewer 9
+build-triage: stale: span absent 0, span ambiguous 0, anchor unresolved 0
+build-triage: claims: nominated 6; claimShift missing 5, none 1, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 5
+build-triage: net delta: fix 0, propose -1; held 0; questions 1
+build-triage: page(s) changed since the review read them (hash differs from sourceHashes); their records are held as stale until the review is re-run: 13-stale.md
+build-triage: verification: files read 0, ignored 0; verdicts applied 0 (removals 0), items rejected 0
+build-triage: 5 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+build-triage: wrote WORK/out/{review,findings,retains,triage,index,manifest}.json
+--- run fields ---
+mode revise, intent clarify, builder build-triage v3
+sourceHashes 12-claims.md, 13-stale.md
+manifest keys builder, commit, intent, mode, pages, params, run, source, sourceHashes, summary
+--- retains ---
+12-claims.md L7 drill:12-claims.md: A consumer must reject a stale timestamp.
+--- records ---
+F-12-001 flow/split applicable=unique gate=pass layoutOnly=true claimShift=none introducedCheck=none checks=
+F-12-002 flow/rewrite applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=none checks=
+F-12-003 repetition/delete applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=none checks=
+F-12-004 compression/rewrite applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=held checks=
+F-12-005 term/rewrite applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=none checks=introduced-missing
+F-12-006 presentation/ask applicable=none gate=none layoutOnly=false claimShift=none introducedCheck=none checks=
+F-12-007 term/rename applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=held checks=
+F-13-001 term/rename applicable=unique gate=pass layoutOnly=false claimShift=stale introducedCheck=supported checks=
+F-13-002 presentation/ask applicable=none gate=none layoutOnly=false claimShift=stale introducedCheck=none checks=inventory-unquoted
+--- nominations ---
+F-12-001 nominated=false added= removed= missing=0
+F-12-002 nominated=true added=modal:should removed=modal:must missing=0
+F-12-003 nominated=true added= removed=modal:must content:consumer content:reject content:stale content:timestamp missing=1
+F-12-004 nominated=true added=connective:because negation:never content:reads content:cookie's content:content removed=quantifier:all missing=0
+F-12-005 nominated=true added=quantifier:each removed= missing=0
+F-12-007 nominated=true added=content:signing removed= missing=0
+F-13-001 nominated=true added=content:event removed=content:record missing=0
+--- hashes ---
+F-12-001 sourceHash=cca3f53d candidateHash=26890b36
+F-12-002 sourceHash=cca3f53d candidateHash=32d92bb0
+F-12-003 sourceHash=cca3f53d candidateHash=06096e09
+F-12-004 sourceHash=cca3f53d candidateHash=1873d007
+F-12-005 sourceHash=cca3f53d candidateHash=20f4bb57
+F-12-006 sourceHash=cca3f53d candidateHash=null
+F-12-007 sourceHash=cca3f53d candidateHash=58bb0926
+F-13-001 sourceHash=00000000 candidateHash=385f70b0
+F-13-002 sourceHash=00000000 candidateHash=null
+--- clusters ---
+C-12-001 propose/unverified intent=clarify claimShift=missing layoutOnly=false introducedCheck=none needs=verify-claims members=F-12-002
+C-12-002 discard/introduced-missing intent=clarify claimShift=missing layoutOnly=false introducedCheck=none needs=verify-claims members=F-12-005
+C-12-003 fix/layout intent=clarify claimShift=none layoutOnly=true introducedCheck=none needs=verify members=F-12-001
+C-12-004 propose/unverified intent=clarify claimShift=missing layoutOnly=false introducedCheck=none needs=verify-claims members=F-12-003
+C-12-005 propose/unverified intent=clarify claimShift=missing layoutOnly=false introducedCheck=held needs=verify-claims members=F-12-004
+C-12-006 author/presentation intent=clarify claimShift=none layoutOnly=false introducedCheck=none needs=bearing members=F-12-006
+C-12-007 propose/unverified intent=clarify claimShift=missing layoutOnly=false introducedCheck=held needs=verify-claims members=F-12-007
+C-13-001 propose/stale intent=clarify claimShift=stale layoutOnly=false introducedCheck=supported needs=verify-claims members=F-13-001
+C-13-002 discard/inventory-unquoted intent=clarify claimShift=stale layoutOnly=false introducedCheck=none needs=none members=F-13-002
+--- summary ---
+{"byBucket":{"author":1,"discard":2,"fix":1,"propose":5},"byReason":{"introduced-missing":1,"inventory-unquoted":1,"layout":1,"presentation":1,"stale":1,"unverified":4},"claims":{"nominated":6,"byShift":{"missing":5,"none":1,"stale":1},"introducedHeld":2,"layoutOnly":1},"stale":{"spanAbsent":0,"spanAmbiguous":0,"anchorUnresolved":0}}
+--- a result without sourceHashes does not build ---
+build-triage: review result has no sourceHashes (page filename to the SHA-256 of the page the review read)
+exit 1
+--- a finding without its kind does not build ---
+build-triage: review result is malformed: every finding carries kind, severity, action and basis (contract, reviewer-set fields). Fix the review result or re-run the review:
+  drill:12-claims.md record 2 (12-claims.md) missing kind: must refuse a cookie whose signature fails
+exit 2
+--- the same review as a findings directory ---
+build-triage: records 9 (drill 9)
+build-triage: claims: nominated 6; claimShift missing 5, none 1, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 5
+build-triage: page(s) changed since the review read them (hash differs from sourceHashes); their records are held as stale until the review is re-run: 13-stale.md
+build-triage: 5 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+build-triage: wrote WORK/out4/{review,findings,retains,triage,index,manifest}.json
+mode revise, intent clarify, source review-dir
+retains 1
+--- the same directory under a path with a space ---
+exit 0
+0
+build-triage: records 9 (drill 9)
+build-triage: page(s) changed since the review read them (hash differs from sourceHashes); their records are held as stale until the review is re-run: 13-stale.md
+build-triage: 5 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+build-triage: wrote WORK/out 5/{review,findings,retains,triage,index,manifest}.json
+--- layout-only rejects a nesting change and a lost word boundary ---
+{"paragraphBreak":true,"listConversion":true,"nestedMadeFlat":false,"flatMadeNested":false,"wordsJoined":false,"stopDropped":false}

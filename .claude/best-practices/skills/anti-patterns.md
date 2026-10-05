@@ -91,3 +91,27 @@ Each entry: the anti-pattern, the symptom that catches it, and the correction.
 **Why it's wrong:** the whole point of emitting resolved commands is a prompt-free verbatim run; a partially-covered emission set trains the agent to expect no prompt and the user to rubber-stamp the ones that appear.
 
 **Correction:** route every emitted command through an allowlisted prefix (a tools-dir pass-through mode), or document in the skill that the uncovered command prompts by design. Documented instance: confluence-publish's `BUILD_CMD` prompts by design - a deliberate speed bump before the slow, estate-wide diagram rebuild.
+
+## A12. Approval gate that exists only in skill prose, in front of a file-mutating script
+
+**Symptom:** the skill's steps say to show the user a sample and halt on a veto, but the script that edits files outside the workarea never checks that the sample was drawn or approved.
+
+**Why it's wrong:** skill prose is advisory context the model may skip or compress; the script is the deterministic layer. A gate on the advisory side of that line guards nothing on the run where it matters most, which is the run where the agent is in a hurry.
+
+**Correction:** give the approving step an artifact keyed to the thing being approved, and have the mutating step refuse unless that artifact is present and current. Document the override flag. Documented instance: editorial-triage's `apply` refuses until `plan --sample` has written a spot check no older than the plan.
+
+## A13. Worker output citing a vocabulary nothing validates
+
+**Symptom:** a worker persona requires each item to cite an id from a rubric, schema or catalogue, and the ingesting helper validates the item's enum fields but not the citation. Ids that do not exist accumulate silently.
+
+**Why it's wrong:** the citation is the evidence that the worker followed the shared definition rather than its own judgment. Unvalidated, the citation decays into decoration, and drift between the asset and the workers goes unnoticed until someone greps for the id.
+
+**Correction:** validate the citation where the helper already validates the enums, and report an unknown id the way an out-of-range value is reported. Documented instance: editorial-triage warns when a grade cites a heuristic the rubric does not define or has retired.
+
+## A14. Superseded path kept alive by its own test coverage
+
+**Symptom:** a replaced path stays in the tree because the golden suite covers it and old runs might use it, while the skill gives no procedure for running it and no live run ever has.
+
+**Why it's wrong:** the golden coverage is a cost the path imposes, not evidence of value, and a path with no documented procedure is unusable by the next reader anyway. Shared modules must then stay consistent across the live and dead paths, so every future rules change pays a tax for code nobody runs.
+
+**Correction:** check for live state before deciding, by asking whether any workarea has ever exercised the path. If none has, delete the path, its personas, its golden cases and its contract sections, and split any shared module into the part the live path needs and the part that goes.

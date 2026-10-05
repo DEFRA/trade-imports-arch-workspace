@@ -1,0 +1,15 @@
+{
+  "gradedBy": "GRADER v1",
+  "mode": "blind",
+  "round": 1,
+  "items": [
+    {"cluster": "C-02-001", "move": "R", "side": null, "confidence": "medium", "heuristic": "H-14", "why": "The section numbers are a claim about a document outside the set, so they go rather than being corrected."},
+    {"cluster": "C-02-003", "move": "R", "side": null, "confidence": "high", "heuristic": "H-03", "why": "The second naming of the front door repeats what the first clause has said."},
+    {"cluster": "C-02-004", "move": "C", "side": null, "confidence": "high", "heuristic": "H-10", "why": "The session page holds the lifetime, so the window the paragraph names is corrected against it."},
+    {"cluster": "C-02-006", "move": "R", "side": null, "confidence": "high", "heuristic": "H-06", "why": "The page's own open item says the tenant setting is unverified, so the clause is cut rather than qualified."},
+    {"cluster": "C-03-001", "move": "W", "side": null, "confidence": "high", "heuristic": "H-11", "why": "The style guide covers the verb and the rewrite does not grow the sentence."},
+    {"cluster": "C-03-002", "move": "O", "side": null, "confidence": "medium", "heuristic": "H-08", "why": "The set does not say who owns the schedule, and the sentence depends on the answer."},
+    {"cluster": "C-03-004", "move": "W", "side": null, "confidence": "low", "heuristic": "H-11", "why": "The opening reads better after the lifetime paragraph."},
+    {"cluster": "C-xx-001", "move": "R", "side": null, "confidence": "high", "heuristic": "H-16", "why": "The legend is the review's own meta-line, so the finding is dropped rather than ignored."}
+  ]
+}

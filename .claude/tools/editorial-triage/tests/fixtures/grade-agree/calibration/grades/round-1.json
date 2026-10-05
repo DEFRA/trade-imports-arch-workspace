@@ -1,0 +1,12 @@
+{
+  "gradedBy": "GRADER v1",
+  "mode": "blind",
+  "round": 1,
+  "items": [
+    {"cluster": "C-03-001", "move": "K", "side": "A", "confidence": "medium", "heuristic": "H-12", "why": "Neither page carries a mechanism, so nothing settles the lifetime and the routing page's statement is the one readers meet first."},
+    {"cluster": "C-02-001", "move": "C", "side": null, "confidence": "high", "heuristic": "H-10", "why": "RFC 9700 has no section 4.11 and section 4.5 is the redirect check."},
+    {"cluster": "C-02-004", "move": "C", "side": null, "confidence": "medium", "heuristic": "H-10", "why": "The interval is sourced from the session record, so the sentence can be corrected in place."},
+    {"cluster": "C-02-008", "move": "W", "side": null, "confidence": "high", "heuristic": "H-11", "why": "A two-word cut under the compression rule with no meaning lost."},
+    {"cluster": "C-03-004", "move": "I", "side": null, "confidence": "medium", "heuristic": "H-13", "why": "The algorithm claim has no citation, so the correction is a guess."}
+  ]
+}

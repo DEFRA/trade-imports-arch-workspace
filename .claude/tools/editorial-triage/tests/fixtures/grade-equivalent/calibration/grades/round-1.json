@@ -1,0 +1,14 @@
+{
+  "gradedBy": "GRADER v1",
+  "mode": "blind",
+  "round": 1,
+  "items": [
+    {"cluster": "C-03-001", "move": "R", "side": null, "confidence": "medium", "heuristic": "H-06", "why": "The routing page is the home of the lifetime, so the eight-hour claim on the record is cut."},
+    {"cluster": "C-02-002", "move": "R", "side": null, "confidence": "medium", "heuristic": "H-14", "why": "The section numbers are a claim about an external document, so they go rather than being corrected."},
+    {"cluster": "C-02-001", "move": "R", "side": null, "confidence": "high", "heuristic": "H-06", "why": "The page's own Open questions say the validation is unverified, so the clause is cut."},
+    {"cluster": "C-03-002", "move": "K", "side": "A", "confidence": "medium", "heuristic": "H-12", "why": "Line 9 is the structural home of the token lifetime, so the eight-hour statement survives."},
+    {"cluster": "C-04-001", "move": "R", "side": null, "confidence": "high", "heuristic": "H-12", "why": "The Cookie design sentence is the home of the scoping decision, so the Open questions bullet is cut."},
+    {"cluster": "C-03-003", "move": "R", "side": null, "confidence": "high", "heuristic": "H-06", "why": "The record table lists no lifetime field, so the clause that places the lifetimes there is cut."},
+    {"cluster": "C-02-003", "move": "R", "side": null, "confidence": "high", "heuristic": "H-06", "why": "The logging page says every request is logged, so the list item that contradicts that page is cut."}
+  ]
+}

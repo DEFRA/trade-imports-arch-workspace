@@ -1,0 +1,122 @@
+{
+  "run": "plan-run",
+  "dryRun": false,
+  "moves": "RCW",
+  "selected": 6,
+  "pages": [
+    {
+      "page": "02-sample-routing.md",
+      "path": "WORK/pages/02-sample-routing.md",
+      "entries": 5,
+      "applied": 0,
+      "changed": false,
+      "gate": "none",
+      "failLines": []
+    },
+    {
+      "page": "03-sample-session.md",
+      "path": "WORK/pages/03-sample-session.md",
+      "entries": 1,
+      "applied": 0,
+      "changed": false,
+      "gate": "none",
+      "failLines": []
+    }
+  ],
+  "entries": [
+    {
+      "cluster": "C-02-002",
+      "record": "F-02-002",
+      "page": "02-sample-routing.md",
+      "move": "R",
+      "line": 17,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-02-003",
+      "record": "F-02-003",
+      "page": "02-sample-routing.md",
+      "move": "R",
+      "line": 13,
+      "at": null,
+      "status": "skipped-multiple",
+      "reason": "the phrase occurs 2 times in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-02-006",
+      "record": "F-02-006",
+      "page": "02-sample-routing.md",
+      "move": "R",
+      "line": 11,
+      "at": null,
+      "status": "skipped-fragment",
+      "reason": "the span is not a whole sentence, bullet or paragraph; a removal deletes a whole unit, so this finding needs a reword instead",
+      "dropped": false
+    },
+    {
+      "cluster": "C-02-001",
+      "record": "F-02-001",
+      "page": "02-sample-routing.md",
+      "move": "C",
+      "line": 7,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-02-004",
+      "record": "F-02-004",
+      "page": "02-sample-routing.md",
+      "move": "C",
+      "line": 3,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-03-001",
+      "record": "F-03-001",
+      "page": "03-sample-session.md",
+      "move": "W",
+      "line": 5,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    }
+  ],
+  "trusted": {
+    "02-sample-routing.md": {
+      "sourceHash": "39c0d8f215abcc30806d844265966c114f84c07549652ab5c5b5769c278c3fdd",
+      "hashAfter": "7b5917834fa5fb031707018084416c665d51bec90629292865de38c91cee4858"
+    },
+    "03-sample-session.md": {
+      "sourceHash": "7adfb03e4abe94b055435559383cd0d3571c869e9b63c5d53a3e5572456ccf84",
+      "hashAfter": "616255a3fe1c1929c6f76562f524e08df2a924b9a5a02971e86c49d9267dd2ea"
+    }
+  },
+  "summary": {
+    "selected": 6,
+    "applied": 0,
+    "skipped": 6,
+    "gateFail": 0,
+    "byStatus": {
+      "applied": 0,
+      "gate-fail": 0,
+      "skipped-absent": 4,
+      "skipped-multiple": 1,
+      "skipped-fragment": 1,
+      "skipped-applied": 0,
+      "skipped-changed": 0,
+      "skipped-unverified": 0,
+      "skipped-held": 0,
+      "skipped-stale": 0
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "records": [
+    {
+      "id": "F-03-001", "source": "drill", "reviewer": "drill:03-sample-session.md",
+      "page": "03-sample-session.md", "line": 5, "quote": "the session lasts eight hours",
+      "kind": "contradiction", "severity": "S2",
+      "defect": "The record states an eight-hour session while the routing page states twelve; which value does the IDM policy set?",
+      "action": "reconcile", "basis": "author",
+      "point": "The passage states the session lifetime.", "bearing": "central", "removes": "none: the lifetime is the point of the paragraph",
+      "question": "Which session lifetime is current, eight hours or twelve?", "owner": "Ben",
+      "related": [{"page": "02-sample-routing.md", "line": 20, "quote": "the session lasts twelve hours"}],
+      "anchorLine": 5, "anchorResolved": "reviewer", "applicable": "none", "gate": "none", "delta": 0, "band": "none", "guess": false,
+      "cluster": "C-03-001", "checks": []
+    },
+    {
+      "id": "F-02-002", "source": "drill", "reviewer": "drill:02-sample-routing.md",
+      "page": "02-sample-routing.md", "line": 12, "quote": "sections 4.7 and 4.11",
+      "kind": "citation", "severity": "S1",
+      "defect": "The RFC reference names section 4.11, which RFC 9700 does not have; which section covers the redirect check?",
+      "action": "correct", "basis": "source", "cites": ["RFC 9700 section 4.5"],
+      "point": "The passage grounds the redirect check in the RFC.", "bearing": "central", "removes": "none: the citation carries the claim",
+      "before": "sections 4.7 and 4.11", "after": "sections 4.7 and 4.5",
+      "anchorLine": 12, "anchorResolved": "reviewer", "applicable": "unique", "gate": "pass", "delta": 0, "band": "neutral", "guess": false,
+      "cluster": "C-02-002", "checks": []
+    },
+    {
+      "id": "F-02-001", "source": "drill", "reviewer": "drill:02-sample-routing.md",
+      "page": "02-sample-routing.md", "line": 46, "quote": "which IDM uses to identify the session and validate the return URL",
+      "kind": "contradiction", "severity": "S2",
+      "defect": "States return-URL validation as fact while Open questions says it depends on a tenant setting that is unverified.",
+      "action": "reconcile", "basis": "set", "cites": ["03-sample-session.md \"That setting is what makes IDM validate the return URL against the registered list\""],
+      "point": "The sign-out form carries the ID token hint so IDM can identify the session.", "bearing": "supporting", "removes": " and validate the return URL",
+      "before": "which IDM uses to identify the session and validate the return URL", "after": "which IDM uses to identify the session",
+      "related": [{"page": "03-sample-session.md", "line": 12, "quote": "That setting is what makes IDM validate the return URL against the registered list"}],
+      "anchorLine": 46, "anchorResolved": "exact", "applicable": "unique", "gate": "pass", "delta": -5, "band": "shrinks", "guess": false,
+      "cluster": "C-02-001", "checks": []
+    },
+    {
+      "id": "F-04-001", "source": "structural", "reviewer": "structural:crossReferences",
+      "page": "04-sample-cookies.md", "line": 88, "quote": "Which sealing library INS uses, how the seal key is provisioned, and what the rotation runbook says.",
+      "kind": "contradiction", "severity": "S2",
+      "defect": "The Open questions bullet asks for the library, provisioning and runbook while the Cookie design section says they are recorded separately from this proposal; which statement stands?",
+      "action": "reconcile", "basis": "set", "cites": ["04 \"The library choice, key provisioning and the rotation runbook are implementation detail, to be recorded separately from this proposal.\""],
+      "point": "The Open questions list names what the proposal still has to settle.", "bearing": "supporting",
+      "removes": "- Which sealing library INS uses, how the seal key is provisioned, and what the rotation runbook says.",
+      "related": [{"page": "04-sample-cookies.md", "line": 40, "quote": "The library choice, key provisioning and the rotation runbook are implementation detail, to be recorded separately from this proposal."}],
+      "anchorLine": 88, "anchorResolved": "exact", "applicable": "none", "gate": "none", "delta": 0, "band": "none", "guess": false,
+      "cluster": "C-04-001", "checks": []
+    },
+    {
+      "id": "F-03-003", "source": "drill", "reviewer": "drill:03-sample-session.md",
+      "page": "03-sample-session.md", "line": 30, "quote": "held server-side in the session record",
+      "kind": "fact", "severity": "S3",
+      "defect": "The clause places the lifetimes in the session record while the record table lists no such field; where do the lifetimes live?",
+      "action": "correct", "basis": "set", "cites": ["03 \"The session record holds the subject, the organisation and the expiry\""],
+      "point": "The passage states what IDM contributes at sign-in.", "bearing": "supporting", "removes": ", held server-side in the session record",
+      "before": "IDM's contribution arrives at sign-in as token lifetimes, held server-side in the session record;", "after": "IDM's contribution arrives at sign-in as token lifetimes;",
+      "anchorLine": 30, "anchorResolved": "exact", "applicable": "unique", "gate": "pass", "delta": -6, "band": "shrinks", "guess": false,
+      "cluster": "C-03-003", "checks": []
+    },
+    {
+      "id": "F-02-003", "source": "drill", "reviewer": "drill:02-sample-routing.md",
+      "page": "02-sample-routing.md", "line": 33, "quote": "the routing service's allowlist, header stripping and request logging do not apply",
+      "kind": "fact", "severity": "S3",
+      "defect": "The list says request logging does not apply on the direct path, while the logging page says every request is logged at the front door; which is true?",
+      "action": "correct", "basis": "set", "cites": ["05 \"every request is logged at the front door whichever path it takes\""],
+      "point": "The passage states which routing-service controls the direct path bypasses.", "bearing": "supporting", "removes": "and request logging",
+      "before": "the routing service's allowlist, header stripping and request logging do not apply", "after": "the routing service's allowlist and header stripping do not apply",
+      "anchorLine": 33, "anchorResolved": "exact", "applicable": "unique", "gate": "pass", "delta": -2, "band": "shrinks", "guess": false,
+      "cluster": "C-02-003", "checks": []
+    },
+    {
+      "id": "F-03-002", "source": "drill", "reviewer": "drill:03-sample-session.md",
+      "page": "03-sample-session.md", "line": 9, "quote": "the token lives for eight hours",
+      "kind": "contradiction", "severity": "S2",
+      "defect": "The paragraph states an eight-hour token at line 9 and a twelve-hour token at line 14; which lifetime does the policy set?",
+      "action": "reconcile", "basis": "set", "cites": ["03-sample-session.md \"the token lives for twelve hours\""],
+      "point": "The passage states the token lifetime.", "bearing": "supporting", "removes": "the token lives for twelve hours",
+      "related": [{"page": "03-sample-session.md", "line": 14, "quote": "the token lives for twelve hours"}],
+      "anchorLine": 9, "anchorResolved": "exact", "applicable": "none", "gate": "none", "delta": 0, "band": "none", "guess": false,
+      "cluster": "C-03-002", "checks": []
+    }
+  ]
+}

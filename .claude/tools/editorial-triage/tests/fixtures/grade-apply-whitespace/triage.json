@@ -1,0 +1,62 @@
+{
+  "params": {},
+  "clusters": [
+    {
+      "id": "C-20-001", "page": "20-whitespace.md", "path": null,
+      "anchorLine": 3, "key": "20-whitespace.md:3", "members": ["F-20-001"],
+      "severity": "S4", "kinds": ["residue"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "First sentence stands at the head of the paragraph.", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "removal", "rank": 1, "needs": "none"
+    },
+    {
+      "id": "C-20-002", "page": "20-whitespace.md", "path": null,
+      "anchorLine": 5, "key": "20-whitespace.md:5", "members": ["F-20-002"],
+      "severity": "S4", "kinds": ["residue"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "First sentence opens the indented continuation.", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "removal", "rank": 1, "needs": "none"
+    },
+    {
+      "id": "C-20-003", "page": "20-whitespace.md", "path": null,
+      "anchorLine": 7, "key": "20-whitespace.md:7", "members": ["F-20-003"],
+      "severity": "S4", "kinds": ["residue"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "First sentence opens the tab continuation.", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "removal", "rank": 1, "needs": "none"
+    },
+    {
+      "id": "C-20-004", "page": "20-whitespace.md", "path": null,
+      "anchorLine": 9, "key": "20-whitespace.md:9", "members": ["F-20-004"],
+      "severity": "S4", "kinds": ["residue"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "First sentence opens the indented list item.", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "removal", "rank": 1, "needs": "none"
+    },
+    {
+      "id": "C-20-005", "page": "20-whitespace.md", "path": null,
+      "anchorLine": 11, "key": "20-whitespace.md:11", "members": ["F-20-005"],
+      "severity": "S4", "kinds": ["residue"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "Remove this middle clause from the passage.", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "removal", "rank": 1, "needs": "none"
+    },
+    {
+      "id": "C-20-006", "page": "20-whitespace.md", "path": null,
+      "anchorLine": 13, "key": "20-whitespace.md:13", "members": ["F-20-006"],
+      "severity": "S4", "kinds": ["residue"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "Only sentence stands alone on its own line in the passage.", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "removal", "rank": 1, "needs": "none"
+    },
+    {
+      "id": "C-20-007", "page": "20-whitespace.md", "path": null,
+      "anchorLine": 15, "key": "20-whitespace.md:15", "members": ["F-20-007"],
+      "severity": "S4", "kinds": ["residue"], "actions": ["delete"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "Only sentence stands alone inside the indented block of the passage.", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "removal", "rank": 1, "needs": "none"
+    }
+  ],
+  "summary": {"records": 7, "clusters": 7, "buckets": {"fix": 0, "propose": 7, "author": 0, "discard": 0}}
+}

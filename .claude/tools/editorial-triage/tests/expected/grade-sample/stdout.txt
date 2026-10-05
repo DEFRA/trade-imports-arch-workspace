@@ -1,0 +1,12 @@
+sample: wrote WORK/calibration/round-1.md
+sample: round 1 mix (8 items): author/author 1, fix/verified 2, propose/inference 1, propose/no-rewrite 1, propose/removal 1, propose/restructure 1, propose/unresolved 1
+exit-code: 0
+sample: wrote WORK/calibration/round-2.md
+sample: round 2 mix (5 items of 6 requested, targets exhausted): fix/verified 2, propose/no-rewrite 1, propose/removal 2
+exit-code: 0
+grade-triage: round 1 already exists at WORK/calibration/round-1.json. Use --round 2 for the next round, bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/grade-triage.sh render --dir WORK --round 1 to redraw its cards, or --force to re-sample round 1 (labels of clusters that drop out of the round stay in labels.json but are no longer compared).
+exit-code: 1
+grade-triage: no unsampled cluster with a remaining target is left for round 3; every category is exhausted. Raise the targets with --targets, or stop sampling.
+exit-code: 1
+grade-triage: no grades under WORK/calibration/grades/. Have the grader write calibration/grades/<name>.json ({gradedBy, mode, round, items: [{cluster, move, side, confidence, heuristic, why}]}) and re-run score.
+exit-code: 2

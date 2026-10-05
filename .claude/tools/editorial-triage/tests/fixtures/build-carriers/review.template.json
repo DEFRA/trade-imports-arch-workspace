@@ -1,0 +1,264 @@
+{
+  "version": 3,
+  "mode": "review",
+  "intent": "clarify",
+  "sourceHashes": {
+    "12-claims.md": "@@HASH_CLAIMS@@",
+    "13-stale.md": "@@HASH_STALE@@"
+  },
+  "units": [
+    {
+      "unit": "claims",
+      "path": "@@WORK@@/pages/12-claims.md",
+      "retains": [
+        {
+          "line": 3,
+          "quote": "must refuse a cookie whose signature fails",
+          "reason": "The refusal rule is stated once, in the place a reader looks for it."
+        }
+      ],
+      "findings": [
+        {
+          "page": "12-claims.md",
+          "line": 13,
+          "quote": "Every consumer holds the current key version",
+          "kind": "term",
+          "severity": "S4",
+          "defect": "The sentence says key where the page says signing key elsewhere, so the reader cannot tell which key is meant.",
+          "point": "The paragraph establishes what every consumer holds.",
+          "bearing": "supporting",
+          "removes": "none: the sentence carries the only statement of what a consumer holds",
+          "action": "rename",
+          "basis": "set",
+          "cites": [
+            "12-claims.md \"The front door signs the cookie\""
+          ],
+          "before": "Every consumer holds the current key version.",
+          "after": "Every consumer holds the current signing key version.",
+          "introduced": [
+            {
+              "text": "signing key",
+              "status": "supported",
+              "source": "12-claims.md \"The front door signs the cookie\""
+            }
+          ],
+          "guess": false
+        },
+        {
+          "page": "12-claims.md",
+          "line": 7,
+          "quote": "A consumer must reject a stale timestamp",
+          "kind": "flow",
+          "severity": "S4",
+          "defect": "A restatement of the page drops the sentence, so the reader carries nothing away from it.",
+          "point": "The page establishes who signs, who reads and what a consumer holds.",
+          "bearing": "tangential",
+          "removes": "A consumer must reject a stale timestamp.",
+          "action": "delete",
+          "basis": "rule",
+          "cites": [
+            "language.md, What a paragraph carries"
+          ],
+          "before": "A consumer must reject a stale timestamp.",
+          "after": "",
+          "guess": false
+        }
+      ]
+    }
+  ],
+  "structural": {
+    "findings": [
+      {
+        "page": "12-claims.md",
+        "line": 11,
+        "quote": "When the front door receives the callback",
+        "kind": "presentation",
+        "severity": "S4",
+        "defect": "Four conditioned steps between the front door and the browser are stated as one sentence, which a reader would follow more easily as a sequence diagram.",
+        "point": "The paragraph establishes what the front door does at the callback.",
+        "bearing": "supporting",
+        "removes": "none: presentation",
+        "action": "ask",
+        "basis": "author",
+        "question": "Should the callback steps be drawn as a sequence diagram (front door, browser)?",
+        "owner": "author",
+        "inventory": {
+          "actors": [
+            "front door",
+            "browser"
+          ],
+          "steps": [
+            {
+              "actor": "front door",
+              "action": "checks the state value",
+              "condition": "when the front door receives the callback",
+              "quote": "the front door checks the state value"
+            },
+            {
+              "actor": "front door",
+              "action": "redirects the browser to the return path",
+              "condition": null,
+              "quote": "then redirects the browser to the return path"
+            }
+          ],
+          "existingDiagram": null
+        },
+        "guess": false
+      }
+    ],
+    "redundancies": [
+      {
+        "fact": "The routing service forwards the session answer and holds no key.",
+        "home": {
+          "page": "12-claims.md",
+          "line": 9,
+          "quote": "The routing service holds no key at all"
+        },
+        "occurrences": [
+          {
+            "page": "12-claims.md",
+            "line": 5,
+            "quote": "The routing service forwards the answer to the journey",
+            "kind": "repetition",
+            "severity": "S4",
+            "defect": "The sentence repeats the routing service's role, whose home is the paragraph on what the routing service holds.",
+            "point": "The paragraph establishes what the routing service does with the answer.",
+            "bearing": "supporting",
+            "removes": "The routing service forwards the answer to the journey, which records the outcome.",
+            "action": "delete",
+            "basis": "set",
+            "cites": [
+              "12-claims.md \"The routing service holds no key at all\""
+            ],
+            "related": [
+              {
+                "page": "12-claims.md",
+                "line": 9,
+                "quote": "The routing service holds no key at all"
+              }
+            ],
+            "before": "The routing service forwards the answer to the journey, which records the outcome.",
+            "after": "",
+            "guess": false
+          }
+        ]
+      }
+    ]
+  },
+  "editorPass": {
+    "pages": [
+      {
+        "page": "12-claims.md",
+        "verdict": "finishes",
+        "opening": "The opening names who signs and who reads the cookie.",
+        "carriedAway": "The front door signs the cookie and every consumer checks it.",
+        "retains": [
+          {
+            "line": null,
+            "quote": "The front door signs the cookie.",
+            "reason": "The opening sentence states the page's scope in six words and needs no more."
+          }
+        ],
+        "findings": [
+          {
+            "page": "12-claims.md",
+            "line": 5,
+            "quote": "which records the outcome",
+            "kind": "compression",
+            "severity": "S3",
+            "defect": "The relative clause hides who records the outcome, so the reader has to reverse the grammar to find the actor.",
+            "point": "The paragraph establishes what the routing service does with the answer.",
+            "bearing": "supporting",
+            "removes": "none: the sentence carries the only statement of who records the outcome",
+            "action": "rewrite",
+            "basis": "rule",
+            "cites": [
+              "language.md, Write it forward"
+            ],
+            "before": "The routing service forwards the answer to the journey, which records the outcome.",
+            "after": "The routing service forwards the answer to the journey, and the journey records the outcome in the outcome record.",
+            "loss": "Without the actor the reader has to rearrange the sentence to find who records.",
+            "introduced": [
+              {
+                "text": "the outcome record",
+                "status": "unsupported",
+                "source": null
+              }
+            ],
+            "guess": true
+          }
+        ]
+      }
+    ],
+    "order": [
+      {
+        "page": "12-claims.md",
+        "line": 13,
+        "quote": "current key version",
+        "kind": "term",
+        "severity": "S4",
+        "defect": "The reader meets key version before the page says what a key version is.",
+        "point": "The paragraph establishes what every consumer holds.",
+        "bearing": "supporting",
+        "removes": "none: the sentence carries the only statement of what a consumer holds",
+        "action": "point",
+        "basis": "set",
+        "cites": [
+          "12-claims.md \"The front door signs the cookie\""
+        ],
+        "related": [
+          {
+            "page": "12-claims.md",
+            "line": 3,
+            "quote": "The front door signs the cookie"
+          }
+        ],
+        "guess": false
+      }
+    ],
+    "patterns": [
+      {
+        "pattern": "Paragraphs hold two topics that a break would separate.",
+        "instances": [
+          {
+            "page": "12-claims.md",
+            "line": 5,
+            "quote": "The session service answers whether a session is live"
+          },
+          {
+            "page": "12-claims.md",
+            "line": 3,
+            "quote": "The front door signs the cookie"
+          }
+        ],
+        "finding": {
+          "page": "12-claims.md",
+          "line": 5,
+          "quote": "The session service answers whether a session is live",
+          "kind": "flow",
+          "severity": "S4",
+          "defect": "The paragraph holds two topics, the session service and the routing service, so the reader meets the second before the first is closed.",
+          "point": "The paragraph establishes what the session service answers and what the routing service does with the answer.",
+          "bearing": "supporting",
+          "removes": "none: layout",
+          "action": "split",
+          "basis": "rule",
+          "cites": [
+            "language.md, Sentences and paragraphs"
+          ],
+          "before": "The session service answers whether a session is live. The routing service forwards the answer to the journey, which records the outcome.",
+          "after": "The session service answers whether a session is live.\n\nThe routing service forwards the answer to the journey, which records the outcome.",
+          "introduced": [],
+          "changes": [
+            {
+              "kind": "split",
+              "original": "The session service answers whether a session is live. The routing service forwards the answer to the journey, which records the outcome.",
+              "revised": "The session service answers whether a session is live.\n\nThe routing service forwards the answer to the journey, which records the outcome."
+            }
+          ],
+          "guess": false
+        }
+      }
+    ]
+  }
+}

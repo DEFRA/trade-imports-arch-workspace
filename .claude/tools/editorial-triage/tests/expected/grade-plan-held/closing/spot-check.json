@@ -1,0 +1,30 @@
+{
+  "seed": 42,
+  "requested": 3,
+  "size": 2,
+  "of": 2,
+  "items": [
+    {
+      "n": 1,
+      "cluster": "C-02-003",
+      "record": "F-02-003",
+      "page": "02-sample-routing.md",
+      "line": 13,
+      "move": "R",
+      "before": "the front door",
+      "after": "",
+      "note": null
+    },
+    {
+      "n": 2,
+      "cluster": "C-02-002",
+      "record": "F-02-002",
+      "page": "02-sample-routing.md",
+      "line": 17,
+      "move": "R",
+      "before": "- Which sealing library INS uses, how the seal key is provisioned, and what the rotation runbook says.",
+      "after": "",
+      "note": null
+    }
+  ]
+}

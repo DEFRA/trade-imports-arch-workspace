@@ -1,0 +1,63 @@
+{
+  "params": {},
+  "clusters": [
+    {
+      "id": "C-03-001", "page": "03-sample-session.md", "path": "trade-imports-documentation/docs/sample/03-sample-session.md",
+      "anchorLine": 5, "key": "03-sample-session.md:5", "members": ["F-03-001"],
+      "severity": "S2", "kinds": ["contradiction"], "actions": ["reconcile"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "central", "removes": "none: the lifetime is the point of the paragraph",
+      "questions": [{"text": "Which session lifetime is current, eight hours or twelve?", "owner": "Ben", "from": "F-03-001"}], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "author", "reason": "author", "rank": 1, "needs": "reconcile+bearing"
+    },
+    {
+      "id": "C-02-002", "page": "02-sample-routing.md", "path": "trade-imports-documentation/docs/sample/02-sample-routing.md",
+      "anchorLine": 12, "key": "02-sample-routing.md:12", "members": ["F-02-002"],
+      "severity": "S1", "kinds": ["citation"], "actions": ["correct"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 1, "chosen": "F-02-002", "alternatives": [], "conflict": false, "related": [],
+      "bearing": "central", "removes": "none: the citation carries the claim", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "fix", "reason": "verified", "rank": 1, "needs": "verify"
+    },
+    {
+      "id": "C-02-001", "page": "02-sample-routing.md", "path": "trade-imports-documentation/docs/sample/02-sample-routing.md",
+      "anchorLine": 46, "key": "02-sample-routing.md:46", "members": ["F-02-001"],
+      "severity": "S2", "kinds": ["contradiction"], "actions": ["reconcile"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 1, "chosen": "F-02-001", "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": " and validate the return URL", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "removal", "rank": 1, "needs": "reconcile"
+    },
+    {
+      "id": "C-04-001", "page": "04-sample-cookies.md", "path": "trade-imports-documentation/docs/sample/04-sample-cookies.md",
+      "anchorLine": 88, "key": "04-sample-cookies.md:88", "members": ["F-04-001"],
+      "severity": "S2", "kinds": ["contradiction"], "actions": ["reconcile"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "- Which sealing library INS uses, how the seal key is provisioned, and what the rotation runbook says.", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "grows", "rank": 1, "needs": "reconcile"
+    },
+    {
+      "id": "C-03-003", "page": "03-sample-session.md", "path": "trade-imports-documentation/docs/sample/03-sample-session.md",
+      "anchorLine": 30, "key": "03-sample-session.md:30", "members": ["F-03-003"],
+      "severity": "S3", "kinds": ["fact"], "actions": ["correct"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 1, "chosen": "F-03-003", "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": ", held server-side in the session record", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "tangent", "rank": 1, "needs": "bearing"
+    },
+    {
+      "id": "C-02-003", "page": "02-sample-routing.md", "path": "trade-imports-documentation/docs/sample/02-sample-routing.md",
+      "anchorLine": 33, "key": "02-sample-routing.md:33", "members": ["F-02-003"],
+      "severity": "S3", "kinds": ["fact"], "actions": ["correct"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 1, "chosen": "F-02-003", "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "and request logging", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "dispersion", "rank": 1, "needs": "none"
+    },
+    {
+      "id": "C-03-002", "page": "03-sample-session.md", "path": "trade-imports-documentation/docs/sample/03-sample-session.md",
+      "anchorLine": 9, "key": "03-sample-session.md:9", "members": ["F-03-002"],
+      "severity": "S2", "kinds": ["contradiction"], "actions": ["reconcile"], "reach": {"pages": 1, "reviewers": 1},
+      "dispersion": 0, "chosen": null, "alternatives": [], "conflict": false, "related": [],
+      "bearing": "supporting", "removes": "the token lives for twelve hours", "questions": [], "held": false,
+      "claimShift": "none", "introducedCheck": "none", "bucket": "propose", "reason": "no-rewrite", "rank": 2, "needs": "reconcile"
+    }
+  ],
+  "summary": {"records": 7, "clusters": 7, "buckets": {"fix": 1, "propose": 5, "author": 1, "discard": 0}}
+}

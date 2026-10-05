@@ -1,0 +1,20 @@
+{
+  "gradedBy": "GRADER v1",
+  "mode": "seen",
+  "round": null,
+  "items": [
+    {"cluster": "C-02-001", "move": "C", "side": null, "confidence": "high", "heuristic": "H-10", "why": "RFC 9700 has no section 4.11 and section 4.5 is the redirect check."},
+    {"cluster": "C-02-002", "move": "W", "side": null, "confidence": "high", "heuristic": "H-11", "why": "The plain verb reads faster under the words rule and nothing grows."},
+    {"cluster": "C-02-003", "move": "O", "side": null, "confidence": "medium", "heuristic": "H-08", "why": "Whether the cookie is re-issued is a fact the set does not hold and the passage depends on the answer."},
+    {"cluster": "C-02-004", "move": "R", "side": null, "confidence": "high", "heuristic": "H-03", "why": "The sentence is a reassurance off the passage's point, so the claim goes rather than being fixed."},
+    {"cluster": "C-02-005", "move": "R", "side": null, "confidence": "high", "heuristic": "H-11", "why": "A drafting note in published text is cut."},
+    {"cluster": "C-02-007", "move": "K", "side": "B", "confidence": "medium", "heuristic": "H-12", "why": "The session record is the home of the lifetime, so its eight hours survive."},
+    {"cluster": "C-02-008", "move": "W", "side": null, "confidence": "high", "heuristic": "H-11", "why": "A two-word cut under the compression rule with no meaning lost."},
+    {"cluster": "C-03-001", "move": "K", "side": "A", "confidence": "medium", "heuristic": "H-12", "why": "The record's own statement is the one the page is about."},
+    {"cluster": "C-03-002", "move": "I", "side": null, "confidence": "medium", "heuristic": "H-13", "why": "The pointer's target is inferred and the page reads either way."},
+    {"cluster": "C-03-003", "move": "O", "side": null, "confidence": "medium", "heuristic": "H-08", "why": "The record-or-claim distinction is a fact the set does not hold and the definition depends on the answer."},
+    {"cluster": "C-03-004", "move": "I", "side": null, "confidence": "medium", "heuristic": "H-13", "why": "The algorithm claim has no citation, so the correction is a guess."},
+    {"cluster": "C-03-005", "move": "I", "side": null, "confidence": "low", "heuristic": "H-11", "why": "The rewrite grows by three words and asserts a configured lifetime the set does not establish."},
+    {"cluster": "C-xx-001", "move": "I", "side": null, "confidence": "low", "heuristic": "H-05", "why": "The duplicate background is a structural choice with its home on the routing page."}
+  ]
+}

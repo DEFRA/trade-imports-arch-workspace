@@ -1,0 +1,177 @@
+{
+  "round": 1,
+  "items": 6,
+  "compared": 3,
+  "missingLabel": [],
+  "missingGrade": [
+    "C-02-006",
+    "C-03-003",
+    "C-02-005"
+  ],
+  "move": {
+    "agree": 1,
+    "total": 3,
+    "rate": 0.3333333333333333
+  },
+  "side": {
+    "agree": 0,
+    "total": 0,
+    "rate": null
+  },
+  "equivalent": {
+    "count": 0,
+    "items": []
+  },
+  "byCategory": [
+    {
+      "category": "author/author",
+      "n": 1,
+      "move": {
+        "agree": 0,
+        "total": 1,
+        "rate": 0
+      }
+    },
+    {
+      "category": "fix/verified",
+      "n": 1,
+      "move": {
+        "agree": 1,
+        "total": 1,
+        "rate": 1
+      }
+    },
+    {
+      "category": "propose/restructure",
+      "n": 1,
+      "move": {
+        "agree": 0,
+        "total": 1,
+        "rate": 0
+      }
+    }
+  ],
+  "confusion": {
+    "rows": [
+      "R",
+      "C",
+      "W",
+      "K",
+      "O",
+      "I",
+      "T"
+    ],
+    "cols": [
+      "R",
+      "C",
+      "W",
+      "K",
+      "O",
+      "I",
+      "T"
+    ],
+    "counts": {
+      "R": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "C": {
+        "R": 0,
+        "C": 1,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "W": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "K": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 1,
+        "I": 0,
+        "T": 0
+      },
+      "O": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "I": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "T": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 1,
+        "T": 0
+      }
+    }
+  },
+  "disagreements": [
+    {
+      "n": 1,
+      "cluster": "C-03-002",
+      "category": "author/author",
+      "label": {
+        "move": "K",
+        "side": "B",
+        "note": "the record is the home of the lifetime"
+      },
+      "grade": {
+        "move": "O",
+        "side": null,
+        "confidence": "low",
+        "heuristic": "H-08",
+        "why": "The pointer's target is inferred, so the cookie rule's home is an open point with an owner.",
+        "file": "round-1b.json"
+      }
+    },
+    {
+      "n": 6,
+      "cluster": "C-03-004",
+      "category": "propose/restructure",
+      "label": {
+        "move": "T",
+        "side": null,
+        "note": "say which page holds the cookie rule"
+      },
+      "grade": {
+        "move": "I",
+        "side": null,
+        "confidence": "high",
+        "heuristic": "H-11",
+        "why": "The record carries no rewrite, so the move it supports is to leave the opening as it stands.",
+        "file": "round-2.json"
+      }
+    }
+  ]
+}

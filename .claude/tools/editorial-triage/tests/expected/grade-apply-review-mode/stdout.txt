@@ -1,0 +1,21 @@
+--- page hashes before ---
+02-sample-routing.md 39c0d8f215abcc30806d844265966c114f84c07549652ab5c5b5769c278c3fdd
+03-sample-session.md 7adfb03e4abe94b055435559383cd0d3571c869e9b63c5d53a3e5572456ccf84
+plan: wrote WORK/closing/plan.md
+plan: 13 clusters: R 3, C 2, W 1, K 1, O 1, I 1, T 1; closed without the user 6, left to the user 1, problems 3
+plan: spot check (seed 42) of 3 of 6 apply entries in WORK/closing/spot-check.json: C-02-003, C-02-001, C-02-006
+exit-code: 0
+spot check present: yes
+--- apply --dry-run ---
+grade-triage: this run's mode is review: findings, retains and questions only, and no page is edited; re-run the review with mode revise to apply.
+exit-code: 1
+--- apply --force --no-spot-check ---
+grade-triage: this run's mode is review: findings, retains and questions only, and no page is edited; re-run the review with mode revise to apply.
+exit-code: 1
+--- apply ---
+grade-triage: this run's mode is review: findings, retains and questions only, and no page is edited; re-run the review with mode revise to apply.
+exit-code: 1
+applied.json absent: yes
+--- page hashes after ---
+02-sample-routing.md 39c0d8f215abcc30806d844265966c114f84c07549652ab5c5b5769c278c3fdd
+03-sample-session.md 7adfb03e4abe94b055435559383cd0d3571c869e9b63c5d53a3e5572456ccf84

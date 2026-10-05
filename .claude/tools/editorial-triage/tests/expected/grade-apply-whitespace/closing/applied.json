@@ -1,0 +1,120 @@
+{
+  "run": "whitespace-run",
+  "dryRun": false,
+  "moves": "RCW",
+  "selected": 7,
+  "pages": [
+    {
+      "page": "20-whitespace.md",
+      "path": "WORK/pages/20-whitespace.md",
+      "entries": 7,
+      "applied": 0,
+      "changed": false,
+      "gate": "none",
+      "failLines": []
+    }
+  ],
+  "entries": [
+    {
+      "cluster": "C-20-007",
+      "record": "F-20-007",
+      "page": "20-whitespace.md",
+      "move": "R",
+      "line": 15,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-20-006",
+      "record": "F-20-006",
+      "page": "20-whitespace.md",
+      "move": "R",
+      "line": 13,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-20-005",
+      "record": "F-20-005",
+      "page": "20-whitespace.md",
+      "move": "R",
+      "line": 11,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-20-004",
+      "record": "F-20-004",
+      "page": "20-whitespace.md",
+      "move": "R",
+      "line": 9,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-20-003",
+      "record": "F-20-003",
+      "page": "20-whitespace.md",
+      "move": "R",
+      "line": 7,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-20-002",
+      "record": "F-20-002",
+      "page": "20-whitespace.md",
+      "move": "R",
+      "line": 5,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    },
+    {
+      "cluster": "C-20-001",
+      "record": "F-20-001",
+      "page": "20-whitespace.md",
+      "move": "R",
+      "line": 3,
+      "at": null,
+      "status": "skipped-absent",
+      "reason": "the phrase is not in the page",
+      "dropped": false
+    }
+  ],
+  "trusted": {
+    "20-whitespace.md": {
+      "sourceHash": "fccfc0717076afdfa8647faeaed0ed1381b83daf516b2b20d8e19130a5aa1e86",
+      "hashAfter": "c20664294d575ad098d9a78e1947aa19ccb0f5e56564b8a3c62e1237577f3538"
+    }
+  },
+  "summary": {
+    "selected": 7,
+    "applied": 0,
+    "skipped": 7,
+    "gateFail": 0,
+    "byStatus": {
+      "applied": 0,
+      "gate-fail": 0,
+      "skipped-absent": 7,
+      "skipped-multiple": 0,
+      "skipped-fragment": 0,
+      "skipped-applied": 0,
+      "skipped-changed": 0,
+      "skipped-unverified": 0,
+      "skipped-held": 0,
+      "skipped-stale": 0
+    }
+  }
+}

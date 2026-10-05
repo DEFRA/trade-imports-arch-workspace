@@ -1,0 +1,32 @@
+--- two pages, one through a path with a space ---
+{
+  "12-claims.md": "cca3f53d13df65ca496f3dee4e80805a1bad24a42b45f37bdecf0e99e3458966",
+  "13-stale.md": "74ac33078d817474b03f803da8a1a52f2596c0b70c862cca67cd10e8a38e2bd8"
+}
+exit 0
+expected 12-claims.md cca3f53d13df65ca496f3dee4e80805a1bad24a42b45f37bdecf0e99e3458966
+expected 13-stale.md 74ac33078d817474b03f803da8a1a52f2596c0b70c862cca67cd10e8a38e2bd8
+--- the tracked fixture page through its tilde path ---
+{
+  "12-claims.md": "cca3f53d13df65ca496f3dee4e80805a1bad24a42b45f37bdecf0e99e3458966"
+}
+exit 0
+expected 12-claims.md cca3f53d13df65ca496f3dee4e80805a1bad24a42b45f37bdecf0e99e3458966
+--- no path ---
+build-triage: --hash-pages needs at least one page path (see --help)
+exit 1
+--- a missing path ---
+build-triage: not a readable page file: WORK/pages/nope.md
+exit 1
+--- a directory ---
+build-triage: not a readable page file: WORK/pages
+exit 1
+--- an unreadable file ---
+build-triage: not a readable page file: WORK/unreadable.md
+exit 1
+--- two paths sharing a filename ---
+build-triage: two of the given paths share the filename 13-stale.md; a page is keyed by its filename, so give one path per page
+exit 1
+--- work directory ---
+out present: no
+entries unchanged

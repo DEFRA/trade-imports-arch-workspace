@@ -1,0 +1,18 @@
+sample: wrote WORK/calibration/round-1.md
+sample: round 1 mix (6 items): author/author 1, fix/verified 1, propose/inference 1, propose/no-rewrite 1, propose/removal 1, propose/restructure 1
+exit-code: 0
+label: recorded 6 labels for round 1
+label: overwrote C-02-001
+label: overwrote C-03-003
+label: overwrote C-02-005
+exit-code: 0
+score: run revise, intent clarify; 12 of 13 clusters graded (coverage 0.92)
+  scope                 graded  R  C  W  K  O  I  T  closed  ignored  load
+  overall                12/13  5  1  2  0  2  2  0    0.67     0.17     2
+  02-sample-routing.md     6/6  4  1  1  0  0  0  0    1.00     0.00     0
+  03-sample-session.md     5/6  0  0  1  0  2  2  0    0.20     0.40     2
+  set                      1/1  1  0  0  0  0  0  0    1.00     0.00     0
+score: closed is the share of grades predicting R, C or W among graded clusters; it consults neither the plan's eligibility nor applied edits
+score: 2 grade(s) name clusters not in triage.json: C-02-007, C-02-008
+score: agreement on 7 labelled clusters: move 1 of 7 (0.14); side where both chose K none; equivalent moves 0
+exit-code: 0

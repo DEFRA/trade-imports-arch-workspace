@@ -1,0 +1,48 @@
+=== build 1-no-verdicts ===
+build-triage: records 7 (drill 7)
+build-triage: claims: nominated 7; claimShift missing 7; introductions held 2; layout-only 0
+build-triage: buckets discard 3, propose 4
+build-triage: verification: files read 0, ignored 0; verdicts applied 0 (removals 0), items rejected 0
+build-triage: 7 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 09-alpha.md 09-beta.md 10 spaced.md
+--- records: anchor form, checks, introducedCheck, claimShift, bucket ---
+F-09a-001 repetition/delete cite=09-beta.md checks= introducedCheck=none claimShift=missing cluster C-09a-001: propose/unverified introducedCheck=none
+F-09a-002 compression/rewrite cite=language.md, Concentrate and distil checks= introducedCheck=held claimShift=missing cluster C-09a-002: propose/unverified introducedCheck=held
+F-09b-001 repetition/delete cite=09-beta.md checks=cites-not-found introducedCheck=none claimShift=missing cluster C-09b-001: discard/cites-not-found introducedCheck=none
+F-09b-002 term/rename cite=09-alpha.md checks= introducedCheck=supported claimShift=missing cluster C-09b-002: propose/unverified introducedCheck=supported
+F-10-001 term/rename cite=10 spaced.md checks= introducedCheck=supported claimShift=missing cluster C-10-001: propose/unverified introducedCheck=supported
+F-10-002 repetition/delete cite=09-beta.md no quoted anchor checks=cites-not-found introducedCheck=none claimShift=missing cluster C-10-002: discard/cites-not-found introducedCheck=none
+F-10-003 term/rename cite=10 spaced.md checks=cites-not-found introducedCheck=held claimShift=missing cluster C-10-003: discard/cites-not-found introducedCheck=held
+--- page keys ---
+09-alpha.md  no=09  key=09a
+09-beta.md  no=09  key=09b
+10 spaced.md  no=10  key=10
+--- record ids ---
+total 7, distinct 7
+prefixes 09a, 09b, 10
+--- cluster ids ---
+total 7, distinct 7
+prefixes 09a, 09b, 10
+--- each record sits in a cluster on its own page ---
+records clustered onto another page: 0
+--- a cite resolves on the named page alone ---
+cites-not-found checks: F-09b-001,F-10-002,F-10-003
+clusters discarded as cites-not-found: 3
+=== build 2-verified-rewrites ===
+build-triage: records 7 (drill 7)
+build-triage: claims: nominated 7; claimShift missing 5, none 2; introductions held 2; layout-only 0
+build-triage: buckets discard 3, propose 4
+build-triage: verification: files read 2, ignored 0; verdicts applied 2 (removals 0), items rejected 0
+build-triage: 5 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 09-alpha.md 09-beta.md 10 spaced.md
+--- records: anchor form, checks, introducedCheck, claimShift, bucket ---
+F-09a-001 repetition/delete cite=09-beta.md checks= introducedCheck=none claimShift=missing cluster C-09a-001: propose/unverified introducedCheck=none
+F-09a-002 compression/rewrite cite=language.md, Concentrate and distil checks= introducedCheck=held claimShift=none cluster C-09a-002: propose/introduced introducedCheck=held
+F-09b-001 repetition/delete cite=09-beta.md checks=cites-not-found introducedCheck=none claimShift=missing cluster C-09b-001: discard/cites-not-found introducedCheck=none
+F-09b-002 term/rename cite=09-alpha.md checks= introducedCheck=supported claimShift=none cluster C-09b-002: propose/grows introducedCheck=supported
+F-10-001 term/rename cite=10 spaced.md checks= introducedCheck=supported claimShift=missing cluster C-10-001: propose/unverified introducedCheck=supported
+F-10-002 repetition/delete cite=09-beta.md no quoted anchor checks=cites-not-found introducedCheck=none claimShift=missing cluster C-10-002: discard/cites-not-found introducedCheck=none
+F-10-003 term/rename cite=10 spaced.md checks=cites-not-found introducedCheck=held claimShift=missing cluster C-10-003: discard/cites-not-found introducedCheck=held
+--- the held introduction reaches its own reason; the supported one is neither held nor unverified ---
+F-09a-002 cluster: propose/introduced
+F-09b-002 cluster: propose/grows (not introduced: true; not unverified: true)
+--- run fields ---
+mode review, intent distil, sourceHashes 09-alpha.md, 09-beta.md, 10 spaced.md

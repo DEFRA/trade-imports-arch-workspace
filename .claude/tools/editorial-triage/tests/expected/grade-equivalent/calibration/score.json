@@ -1,0 +1,95 @@
+{
+  "run": {
+    "mode": "revise",
+    "intent": "distil"
+  },
+  "clusters": 7,
+  "graded": 7,
+  "coverage": 1,
+  "overall": {
+    "graded": 7,
+    "byMove": {
+      "R": 6,
+      "C": 0,
+      "W": 0,
+      "K": 1,
+      "O": 0,
+      "I": 0,
+      "T": 0
+    },
+    "closedWithoutUser": 0.8571428571428571,
+    "ignored": 0,
+    "load": 1
+  },
+  "pages": [
+    {
+      "page": "02-sample-routing.md",
+      "clusters": 3,
+      "coverage": 1,
+      "graded": 3,
+      "byMove": {
+        "R": 3,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "closedWithoutUser": 1,
+      "ignored": 0,
+      "load": 0
+    },
+    {
+      "page": "03-sample-session.md",
+      "clusters": 3,
+      "coverage": 1,
+      "graded": 3,
+      "byMove": {
+        "R": 2,
+        "C": 0,
+        "W": 0,
+        "K": 1,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "closedWithoutUser": 0.6666666666666666,
+      "ignored": 0,
+      "load": 1
+    },
+    {
+      "page": "04-sample-cookies.md",
+      "clusters": 1,
+      "coverage": 1,
+      "graded": 1,
+      "byMove": {
+        "R": 1,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "closedWithoutUser": 1,
+      "ignored": 0,
+      "load": 0
+    }
+  ],
+  "unknownGrades": [],
+  "agreement": {
+    "labelled": 7,
+    "move": {
+      "agree": 6,
+      "total": 7,
+      "rate": 0.8571428571428571
+    },
+    "side": {
+      "agree": 3,
+      "total": 3,
+      "rate": 1
+    },
+    "equivalent": 6
+  }
+}
