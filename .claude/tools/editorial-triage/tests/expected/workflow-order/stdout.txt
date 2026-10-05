@@ -1,0 +1,64 @@
+scenario two-docs: calls snapshot,drill:one.md,drill:two.md,structural:one.md,structural:two.md,editor-pass
+  version 3; mode review; intent clarify
+  units retains [[],[]]
+  completion logged: true
+  sourceHashes match: true
+scenario one-doc: calls snapshot,scope,drill:a,drill:b,structural:one.md,editor-pass
+  version 3; mode review; intent clarify
+  units retains [[],[]]
+  completion logged: true
+  snapshot before scope: true
+scenario two-sections: calls snapshot,drill:x,drill:y,structural:one.md,structural:two.md,editor-pass
+  version 3; mode review; intent clarify
+  units retains [[],[]]
+  completion logged: true
+  sourceHashes match: true
+  no scope: true
+scenario odd-path: calls snapshot,scope,drill:a,drill:b,structural:it's "a" $x `y`.md,editor-pass
+  version 3; mode review; intent clarify
+  units retains [[],[]]
+  completion logged: true
+  shell printed the path unchanged: true
+scenario missing-mode: calls (none)
+  threw with no agent call: true; args.mode is required: review (findings, retains and questions; no page changes) or revise (the closing plan applies the batch)
+scenario unknown-mode: calls (none)
+  threw with no agent call: true; args.mode must be review or revise, got "edit"
+scenario missing-intent: calls (none)
+  threw with no agent call: true; args.intent is required: distil (remove whole units, never grow) or clarify (split, list, reorder and reword; change no claim)
+scenario unknown-intent: calls (none)
+  threw with no agent call: true; args.intent must be distil or clarify, got "default"
+scenario docs-and-sections: calls (none)
+  threw with no agent call: true; args.docs and args.sections are alternatives: give one page set, not both
+scenario snapshot-short: calls snapshot
+  threw after the snapshot only: true; the snapshot returned no hash for two.md; every page under review is hashed before it is read
+scenario snapshot-malformed: calls snapshot
+  threw after the snapshot only: true; the snapshot returned a hash that is not a SHA-256 for one.md: "xyz"
+scenario snapshot-conflict: calls snapshot
+  threw after the snapshot only: true; the snapshot returned two different hashes for one.md
+scenario snapshot-short-one-doc: calls snapshot
+  threw after the snapshot only: true; the snapshot returned no hash for one.md; every page under review is hashed before it is read
+scenario missing-drill: calls snapshot,drill:one.md,drill:two.md,structural:one.md,structural:two.md,editor-pass
+  wave ran in full: true
+  names every missing label: true
+  completion logged: false
+  the review is incomplete: no result from drill:one.md; nothing is returned, because a review with a missing reviewer is not a review
+scenario missing-structural: calls snapshot,drill:one.md,drill:two.md,structural:one.md,structural:two.md,editor-pass
+  wave ran in full: true
+  names every missing label: true
+  completion logged: false
+  the review is incomplete: no result from structural:two.md; nothing is returned, because a review with a missing reviewer is not a review
+scenario missing-editor: calls snapshot,drill:one.md,drill:two.md,structural:one.md,structural:two.md,editor-pass
+  wave ran in full: true
+  names every missing label: true
+  completion logged: false
+  the review is incomplete: no result from editor-pass; nothing is returned, because a review with a missing reviewer is not a review
+scenario missing-undefined: calls snapshot,drill:one.md,drill:two.md,structural:one.md,structural:two.md,editor-pass
+  wave ran in full: true
+  names every missing label: true
+  completion logged: false
+  the review is incomplete: no result from drill:two.md; nothing is returned, because a review with a missing reviewer is not a review
+scenario missing-several: calls snapshot,drill:one.md,drill:two.md,structural:one.md,structural:two.md,editor-pass
+  wave ran in full: true
+  names every missing label: true
+  completion logged: false
+  the review is incomplete: no result from drill:one.md, structural:one.md, editor-pass; nothing is returned, because a review with a missing reviewer is not a review

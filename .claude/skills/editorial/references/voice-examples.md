@@ -2,6 +2,8 @@
 
 These examples show repairs that make technical prose easier to read without changing its meaning. Read them before drafting human-facing technical prose. Each example names the reader and ends with the transferable move.
 
+Most of these repairs make the text longer. A sentence that hides an actor, a relation or a reason costs words to repair, and that cost does not conflict with removing whole units. Removing a unit shortens the document. Rewriting a unit that stays often lengthens the passage.
+
 ## Separate compressed requirements
 
 Reader: a reviewer of the authentication design who knows Entra tenancy.

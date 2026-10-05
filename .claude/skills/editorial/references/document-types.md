@@ -26,6 +26,8 @@ A numbered mechanism can belong in an explanation when sequence carries the mean
 - Use prose for a connected argument, causal explanation or qualification.
 - Keep a rule beside its necessary qualification. Do not scatter exceptions across later sections.
 
+A sequence or causal chain of interactions between named components, with their conditions, that a reader would follow more easily as a diagram is a diagram candidate: a sequence diagram for ordered exchanges, a flow diagram for decisions, a state diagram for one entity's lifecycle. Where a diagram exists, the prose beside it states consequences, limits and open questions and does not restate the arrows. A diagram is drawn only from stated actors, steps and conditions, never from an arrow the text does not state.
+
 During review, look for conceptual asides that interrupt a procedure, advice embedded in a reference table, unexplained step sequences in an explanation, and background paragraphs that a task-focused reader must scroll past.
 
 ## Fixed-format artefacts
