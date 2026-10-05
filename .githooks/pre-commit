@@ -33,7 +33,7 @@ if echo "$STAGED" | grep -Eq '^(\.claude/|Makefile$)'; then
     # blessed stdout embeds lint-skills.sh output, so a workspace-side
     # lint change can break scaffold goldens too. Doc-only commits
     # stay fast.
-    if echo "$STAGED" | grep -Eq '^\.claude/tools/(skill-creator|workspace|editorial|pr)/'; then
+    if echo "$STAGED" | grep -Eq '^\.claude/tools/(skill-creator|workspace|editorial|editorial-triage|pr)/'; then
         HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/run-golden.sh" || {
             echo "pre-commit: scaffold goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
             exit 1
@@ -44,6 +44,10 @@ if echo "$STAGED" | grep -Eq '^(\.claude/|Makefile$)'; then
         }
         HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/editorial/tests/run-golden.sh" || {
             echo "pre-commit: prose-gate goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
+            exit 1
+        }
+        HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/editorial-triage/tests/run-golden.sh" || {
+            echo "pre-commit: triage goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
             exit 1
         }
     fi
