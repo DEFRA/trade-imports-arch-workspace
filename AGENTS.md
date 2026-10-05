@@ -111,10 +111,12 @@ read the SKILL.md and follow it as a procedure - the scripts it calls
 run anywhere. Conventions shared by all skills:
 `.claude/best-practices/skills/agent-skills.md`.
 
-When creating or revising human-facing technical prose, follow
-`.claude/skills/editorial/SKILL.md`, including its review and close-out
-steps. This also applies when substantial documentation is part of a
-coding, modelling or analysis task.
+Invoke the editorial skill, `.claude/skills/editorial/SKILL.md`, only
+when the user asks for an editorial pass, by name or with `/editorial`.
+Drafting and revising prose before that point happens without the skill,
+its cold reader and its hooks, so no review tokens are used until the
+user is ready to put a document before review. Once asked, follow the
+skill in full, including its review and close-out steps.
 
 ## Git, GitHub and pull requests
 
