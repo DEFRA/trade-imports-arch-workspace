@@ -74,7 +74,10 @@ The publisher's summary counts (`Successful / Failed / Skipped`) are not suffici
   - the page was NOT published, even though the summary still counts it as successful. Report: not published, because the existing Confluence page lacks the `generated` label; the remedy is adding that label to the page in Confluence (a deliberate safety mechanism - never bypass it silently).
 - `✅ Updated successfully (ID: <n>)` or `✅ Created successfully (ID: <n>)` - the real success signal. Capture the page ID.
 - `⚠️  No Mermaid diagram image found` / `⚠️  Image not found` - the page published but with a missing image; report it as published-degraded and name the asset.
-- Non-zero exit or `Failed: ≥1` - report the `❌` line verbatim.
+- `❌ Failed to publish <file>: <N> image upload(s) failed: <names>` after an `Updated successfully` or `Created successfully` line - the page text is live, but the named images show as broken until they upload, and the summary counts the page as failed with a non-zero exit. Report: published with failed images, the page link, and the image names verbatim. The remedy is running the same PUBLISH_CMD again: the cause is usually a network failure (`ETIMEDOUT`, `ENOTFOUND`) or an HTTP error, which the preceding `❌ Failed to upload image` line names.
+- `⚠️  Link not resolved to a Confluence page: <url> (<reason>); linking to GitHub` (or `; left unchanged`) - the page published, but that link points to the GitHub source, or stays as written, instead of a Confluence page. Report it as published-degraded with the URL and reason. A target with no page yet resolves on a later publish once its page exists; `not in publishPaths` needs a config entry.
+- `⚠️  Link not rewritten (unsupported markdown link form): <url>` - the link stays relative and is broken in Confluence; report it as published-degraded. The usual cause is a reference-style link, which the source page can change to an inline link.
+- Any other non-zero exit or `Failed: ≥1` - report the `❌` line verbatim.
 
 On success, construct the link from Step 0 facts and the captured ID: `<CONFLUENCE_BASE>/spaces/<SPACE>/pages/<ID>`.
 
@@ -83,9 +86,9 @@ On success, construct the link from Step 0 facts and the captured ID: `<CONFLUEN
 ```
 confluence-publish complete for <PAGE>.
 
-Outcome: created | updated | NOT published (<reason>)
+Outcome: created | updated | published with failed images (rerun) | NOT published (<reason>)
 Page: <CONFLUENCE_BASE>/spaces/<SPACE>/pages/<ID>
-Degraded: <missing images, if any - otherwise omit this line>
+Degraded: <missing or failed images and unresolved links, if any - otherwise omit this line>
 
 Next: check the page renders as expected in Confluence.
 ```
