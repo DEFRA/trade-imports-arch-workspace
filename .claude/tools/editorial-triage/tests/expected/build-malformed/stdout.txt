@@ -1,0 +1,6 @@
+good build exit 0
+build-triage: could not normalise the review result; a finding may not be an object (see the jq error above)
+malformed build exit 2
+earlier files unchanged: yes
+records in findings.json: 9
+temp files left: 0

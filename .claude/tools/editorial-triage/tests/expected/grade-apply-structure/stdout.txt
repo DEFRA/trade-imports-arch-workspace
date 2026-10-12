@@ -1,0 +1,30 @@
+C-01 W applied at 3 dropped false
+C-02 R applied at 5 dropped false
+C-03 R applied at 7 dropped false
+C-04 R applied at 9 dropped false
+C-05 R applied at 12 dropped false
+C-06 R applied at 15 dropped true
+C-07 R applied at 20 dropped true
+--- page ---
+[# Structure]
+[]
+[Café – first claim. Second one is right.]
+[]
+[Use a .env file for this.]
+[]
+[Run `x  y` first.]
+[]
+[Keep this line.  ]
+[The hard break above stays.]
+[]
+[Égalité comes first.]
+[]
+[- Keep the first bullet.]
+[- Keep the last bullet.]
+[]
+[| Key | Value |]
+[| --- | --- |]
+[| a | Keep this row. |]
+[| c | Keep this row too. |]
+[]
+jq exit-code: 0

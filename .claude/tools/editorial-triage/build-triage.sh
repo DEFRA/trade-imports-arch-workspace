@@ -85,9 +85,14 @@ fi
 DIR="${DIR/#\~/$HOME}"
 [[ -f "$GATE" ]] || die "prose gate not found at $GATE; the editorial tools must be present"
 
+# Every file the build writes is JSON. A jq step that failed upstream leaves
+# empty or broken input here, so the write refuses it rather than replacing a
+# good file from an earlier run; the caller dies on the failure.
 atomic_write() {  # $1 target path; stdin content
   local tmp="$1.tmp.$$"
-  cat > "$tmp" || return 1
+  if ! cat > "$tmp" || ! [[ -s "$tmp" ]] || ! jq -e . "$tmp" >/dev/null 2>&1; then
+    rm -f "$tmp"; return 1
+  fi
   mv "$tmp" "$1"
 }
 
@@ -107,9 +112,9 @@ if [[ -n "$FROM_RUN" ]]; then
   fi
   jq -e . "$RUN_FILE" >/dev/null 2>&1 || die "run record is not valid JSON: $RUN_FILE"
   if jq -e '.result | type == "object"' "$RUN_FILE" >/dev/null 2>&1; then
-    jq '.result' "$RUN_FILE" | atomic_write "$DIR/review.json"
+    jq '.result' "$RUN_FILE" | atomic_write "$DIR/review.json" || die "could not write $DIR/review.json from $RUN_FILE" 2
   else
-    jq '.' "$RUN_FILE" | atomic_write "$DIR/review.json"
+    jq '.' "$RUN_FILE" | atomic_write "$DIR/review.json" || die "could not write $DIR/review.json from $RUN_FILE" 2
   fi
   SOURCE_KIND="run-record"; SOURCE_PATH="$RUN_FILE"
   jq -e '.units | type == "array"' "$DIR/review.json" >/dev/null 2>&1 \
@@ -129,7 +134,7 @@ else
        editorPass: null,
        extra: [ .[] | select((.reviewer // "") | startswith("drill") | not) ]}' "${FINDING_FILES[@]}" > "$TMP/assembled.json" \
     || die "could not assemble the findings files under $REVIEW_DIR/review (see the jq error above)"
-  atomic_write "$DIR/review.json" < "$TMP/assembled.json"
+  atomic_write "$DIR/review.json" < "$TMP/assembled.json" || die "could not write $DIR/review.json from the findings files" 2
   SOURCE_KIND="review-dir"; SOURCE_PATH="$REVIEW_DIR"
 fi
 
@@ -157,7 +162,8 @@ jq -c --arg home "$HOME" '[ .units[] | (.path | sub("^~/"; $home + "/")) as $p
        | map(if length == 1 then map(. + {key: .no})
              else to_entries | map(.value + {key: (.value.no + ([97 + .key] | implode))}) end)
        | add
-       | sort_by(.page)' "$DIR/review.json" > "$TMP/pages0.json"
+       | sort_by(.page)' "$DIR/review.json" > "$TMP/pages0.json" \
+  || die "could not list the review's pages (see the jq error above)" 2
 MISSING=$(jq -r '.[].path' "$TMP/pages0.json" | while IFS= read -r p; do [[ -f "$p" ]] || printf '%s\n' "$p"; done)
 [[ -z "$MISSING" ]] || die "page file(s) not found; check the docs repo is present and on the reviewed commit:
 $MISSING"
@@ -168,14 +174,16 @@ while IFS=$'\t' read -r pg path; do
 done < <(jq -r '.[] | [.page, .path] | @tsv' "$TMP/pages0.json")
 jq --slurpfile hashes "$TMP/hashes.jsonl" --slurpfile review "$DIR/review.json" '
   ($hashes | map({(.page): .hash}) | add // {}) as $h
-  | map(. + {hash: $h[.page], sourceHash: ($review[0].sourceHashes[.page] // null)})' "$TMP/pages0.json" > "$TMP/pages.json"
+  | map(. + {hash: $h[.page], sourceHash: ($review[0].sourceHashes[.page] // null)})' "$TMP/pages0.json" > "$TMP/pages.json" \
+  || die "could not hash the review's pages (see the jq error above)" 2
 UNHASHED=$(jq -r '.[] | select(.sourceHash == null) | .page' "$TMP/pages.json")
 [[ -z "$UNHASHED" ]] || die "sourceHashes has no entry for page(s) the review reported on; the review must hash every page it read:
 $UNHASHED"
 
 # ---------------------------------------------------------------- normalise
-jq --argjson pages "$(cat "$TMP/pages.json")" -f "$LIB/normalize-v2.jq" "$DIR/review.json" > "$TMP/records1.json"
-jq '{retains: .retains}' "$TMP/records1.json" | atomic_write "$DIR/retains.json"
+jq --argjson pages "$(cat "$TMP/pages.json")" -f "$LIB/normalize-v2.jq" "$DIR/review.json" > "$TMP/records1.json" \
+  || die "could not normalise the review result; a finding may not be an object (see the jq error above)" 2
+jq '{retains: .retains}' "$TMP/records1.json" | atomic_write "$DIR/retains.json" || die "could not write $DIR/retains.json" 2
 
 # a finding the partition cannot place is malformed input, not a bucket
 MALFORMED=$(jq -r '.records | to_entries[] | . as $e
@@ -216,7 +224,8 @@ jq -L "$LIB" --argjson pages "$(cat "$TMP/pages.json")" '
       claimDiff: (if .before == null then null else claim_diff(.before; .after) end),
       layoutOnly: layout_only(.before; .after)
     })
-  | {records: .}' "$TMP/records1.json" > "$TMP/records2.json"
+  | {records: .}' "$TMP/records1.json" > "$TMP/records2.json" \
+  || die "could not number and anchor the records (see the jq error above)" 2
 
 # ---------------------------------------------------------------- anchors, gate, delta
 # stripped page copies (quotes and backticks removed, line numbers preserved)
@@ -372,7 +381,8 @@ while IFS="$US" read -r -d "$RS" id page line quote before after stripped span p
     >> "$TMP/computed.jsonl"
 done < "$TMP/records.rs"
 
-jq -s '.' "$TMP/computed.jsonl" > "$TMP/computed.json"
+jq -s '.' "$TMP/computed.jsonl" > "$TMP/computed.json" \
+  || die "could not collect the computed anchors (see the jq error above)" 2
 
 # merge computed fields, run validation checks, set claimShift and introducedCheck
 jq --slurpfile comp "$TMP/computed.json" --argjson pages "$(cat "$TMP/pages.json")" '
@@ -423,7 +433,8 @@ jq --slurpfile comp "$TMP/computed.json" --argjson pages "$(cat "$TMP/pages.json
                          elif (.after // null) == "" and .before == .removes then null
                          elif .claimShift == "stale" then "stale" else "missing" end)
       | .removalNote = null
-      | del(._stripped, ._span, ._prefix, ._setCites, ._invQuotes, ._introAnchors) )' "$TMP/records2.json" > "$TMP/records3.json"
+      | del(._stripped, ._span, ._prefix, ._setCites, ._invQuotes, ._introAnchors) )' "$TMP/records2.json" > "$TMP/records3.json" \
+  || die "could not merge the computed fields (see the jq error above)" 2
 
 # ---------------------------------------------------------------- verdicts
 # verification/claims-<page>.json, one per page, read on every build. File
@@ -458,7 +469,8 @@ while IFS=$'\t' read -r pg hash shash; do
   jq -c --arg pg "$pg" '{page: $pg, items: .items}' "$f" >> "$TMP/verdicts.jsonl"
   VER_READ=$((VER_READ + 1))
 done < <(jq -r '.[] | [.page, .hash, .sourceHash] | @tsv' "$TMP/pages.json")
-jq -s '.' "$TMP/verdicts.jsonl" > "$TMP/verdicts.json"
+jq -s '.' "$TMP/verdicts.jsonl" > "$TMP/verdicts.json" \
+  || die "could not collect the verification files (see the jq error above)" 2
 
 jq -L "$LIB" --slurpfile v "$TMP/verdicts.json" --argjson stalePages "$STALE_PAGES" '
   include "claim-elements";
@@ -534,7 +546,8 @@ jq -r '.reports[]' "$TMP/records4.json" | sed 's/^/build-triage: /'
 VER_APPLIED=$(jq -r '[.records[] | select(.claimDiff.nominated == true and (.claimShift | IN("none", "material", "unresolved")))] | length' "$TMP/records4.json")
 VER_REMOVALS=$(jq -r '[.records[] | select(.removalShift != null and (.removalShift | IN("none", "material", "unresolved")))] | length' "$TMP/records4.json")
 VER_ITEMS_IGNORED=$(jq -r '[.reports[] | capture("(?<id>F-[A-Za-z0-9]+-[0-9]+)") | .id] | unique | length' "$TMP/records4.json")
-jq '{records: .records}' "$TMP/records4.json" > "$TMP/records3.json"
+jq '{records: .records}' "$TMP/records4.json" > "$TMP/records3.json" \
+  || die "could not carry the verified records forward (see the jq error above)" 2
 
 # ---------------------------------------------------------------- cluster, partition, rank
 HELD='null'
@@ -542,11 +555,14 @@ HELD='null'
 jq -L "$ROOT/.claude/tools/editorial-triage" --argjson params "$PARAMS" --argjson held "$HELD" --arg intent "$INTENT" -f "$LIB/triage.jq" "$TMP/records3.json" > "$TMP/triaged.json" \
   || die "clustering failed (see jq error above)" 2
 
-jq '{records: (.records | map(del(._key)))}' "$TMP/triaged.json" | atomic_write "$DIR/findings.json"
-jq '{params: .params, clusters: .clusters, summary: .summary}' "$TMP/triaged.json" | atomic_write "$DIR/triage.json"
+jq '{records: (.records | map(del(._key)))}' "$TMP/triaged.json" | atomic_write "$DIR/findings.json" \
+  || die "could not write $DIR/findings.json" 2
+jq '{params: .params, clusters: .clusters, summary: .summary}' "$TMP/triaged.json" | atomic_write "$DIR/triage.json" \
+  || die "could not write $DIR/triage.json" 2
 jq '[ .clusters | group_by(.page)[] | {page: .[0].page, path: .[0].path,
       clusters: [ .[] | {id, line: .anchorLine, needs, bucket, severity} ] } ]
-  | {pages: .}' "$TMP/triaged.json" | atomic_write "$DIR/index.json"
+  | {pages: .}' "$TMP/triaged.json" | atomic_write "$DIR/index.json" \
+  || die "could not write $DIR/index.json" 2
 
 if [[ -z "$COMMIT" ]]; then
   FIRST_PATH=$(jq -r '.[0].path' "$TMP/pages.json")
@@ -557,7 +573,8 @@ jq -n --arg run "$(basename "$DIR")" --arg kind "$SOURCE_KIND" --arg src "$SOURC
       --argjson pages "$(jq 'map(del(.sourceHash))' "$TMP/pages.json")" --arg builder "$BUILDER" \
       --argjson summary "$(jq '.summary' "$TMP/triaged.json")" --argjson params "$(jq '.params' "$TMP/triaged.json")" \
       '{run: $run, source: {kind: $kind, path: $src}, commit: $commit, mode: $mode, intent: $intent, sourceHashes: $sourceHashes,
-        pages: $pages, params: $params, builder: $builder, summary: $summary}' | atomic_write "$DIR/manifest.json"
+        pages: $pages, params: $params, builder: $builder, summary: $summary}' | atomic_write "$DIR/manifest.json" \
+  || die "could not write $DIR/manifest.json" 2
 
 jq -r '.summary as $s
   | "records \($s.records) (\($s.bySource | to_entries | map("\(.key) \(.value)") | join(", ")))",

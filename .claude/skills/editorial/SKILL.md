@@ -1,6 +1,6 @@
 ---
 name: editorial
-description: Writing, revising and reviewing human-facing technical documentation in the workspace editorial voice. Use for architecture documents, solution overviews, design docs, explanations, how-to guides, reference pages, READMEs, ADRs, Confluence pages, PR descriptions, commit bodies and Jira tickets. Also use when a coding, modelling or analysis task produces substantial documentation or explanatory prose. Establishes the reader brief and structure, drills from surface text to meaning, and applies a cold-reader review and mechanical style gate. Not for code comments or ordinary conversational replies.
+description: Editorial pass on human-facing technical documentation in the workspace editorial voice - architecture documents, solution overviews, design docs, explanations, how-to guides, reference pages, READMEs, ADRs, Confluence pages, PR descriptions, commit bodies and Jira tickets. Invoke only when the user asks for an editorial pass, by name or with /editorial; drafting and revising before that point follow language.md without this skill, its cold reader or its hooks. Establishes the reader brief and structure, drills from surface text to meaning, and applies a cold-reader review and mechanical style gate. Not for code comments or ordinary conversational replies.
 hooks:
   PostToolUse:
     - matcher: Write|Edit|MultiEdit

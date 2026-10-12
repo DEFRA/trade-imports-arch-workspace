@@ -848,22 +848,26 @@ def whole_unit($line; $ph; $at):
     else (($body | startswith($s)) or (($body | index(". " + $s)) != null))
          and ($s | test("[.?!]$")) end;
 
-# The line a removal leaves: leading indent kept, doubled spaces collapsed,
-# a doubled comma joined and a space before a comma or full stop closed up.
-# The indent comes from the line as it stood before the removal. Taking it from
-# the line afterwards reads a separator the removal left at the head as though
-# it were indentation, so deleting a paragraph's first sentence used to leave a
-# space in front of the second.
-def tidy_removed($orig):
-  . as $l
-  | ($orig | sub("[^[:space:]].*$"; "")) as $ind
-  | ($l | sub("^[[:space:]]+"; "") | sub("[[:space:]]+$"; "")) as $body
-  | if $body == "" then ""
-    else $ind + ($body
-      | gsub("[[:space:]]{2,}"; " ")
-      | gsub(",[[:space:]]*,"; ",")
-      | gsub("[[:space:]]+(?<p>[,.])"; "\(.p)"))
-    end;
+# The line a removal leaves, from the text before the span and the text after
+# it. Only the join is tidied: the space on either side of the cut becomes one
+# space, or none before closing punctuation, and a comma on both sides becomes
+# one. Everything else on the line stays as written, so spacing inside code, a
+# table's padding and a trailing hard break survive. When nothing but
+# indentation precedes the cut, that indentation is kept and the separator the
+# removal left at the head is dropped, so deleting a paragraph's first sentence
+# leaves no space in front of the second.
+def join_removed($pre; $post):
+  ($pre | sub("[[:space:]]+$"; "")) as $p
+  | ($post | sub("^[[:space:]]+"; "")) as $q
+  | if $p == "" then (if $q == "" then "" else $pre + $q end)
+    elif $q == "" then $p + $post
+    elif ($p | endswith(",")) and ($q | startswith(",")) then $p + $q[1:]
+    elif ($q | test("^[,.;:!?)]")) then $p + $q
+    else $p + " " + $q end;
+
+# A line a removal has emptied: blank, or a list marker with no text.
+def is_emptied: test("^[[:space:]]*(([-*+]|[0-9]+[.)])[[:space:]]*)?$");
+def is_table_row: test("^[[:space:]]*\\|");
 
 def phrase_of: if .move == "R" then (.span // "") else (.before // "") end;
 def replacement_of: if .move == "R" then "" else (.after // "") end;
@@ -930,14 +934,19 @@ def apply_page($lines0; $entries):
         | ($hits | map(.n) | add // 0) as $total
         | if $total == 0 then skip($e; "skipped-absent"; "the phrase is not in the page")
           elif $total > 1 then skip($e; "skipped-multiple"; "the phrase occurs \($total) times in the page")
-          else ($hits[0].i) as $i | ($ls[$i]) as $line | ($line | index($ph)) as $at
+          # the offset in characters: jq's index() counts bytes, and slicing counts
+          # characters, so any multi-byte character before the phrase moved the cut
+          else ($hits[0].i) as $i | ($ls[$i]) as $line | ($line | split($ph) | .[0] | length) as $at
             | if $e.move == "R" and ((whole_unit($line; $ph; $at)) | not)
               then skip($e; "skipped-fragment"; "the span is not a whole sentence, bullet or paragraph; a removal deletes a whole unit, so this finding needs a reword instead")
               else
-            ($line[0:$at] + ($e | replacement_of) + $line[($at + ($ph | length)):]) as $new0
-            | (if $e.move == "R" then ($new0 | tidy_removed($line)) else $new0 end) as $new
-            | (($e.move == "R") and ($new | test("^[[:space:]]*$"))
-               and ((($i > 0) and ($ls[$i - 1] | is_list_line))
+            ($line[0:$at]) as $pre | ($line[($at + ($ph | length)):]) as $post
+            | (if $e.move == "R" then join_removed($pre; $post) else $pre + ($e | replacement_of) + $post end) as $new
+            # an emptied bullet or table row goes with its line: a lone marker or a
+            # blank line inside a table would break the structure around the line
+            | (($e.move == "R") and ($new | is_emptied)
+               and (($line | is_list_line) or ($line | is_table_row)
+                    or (($i > 0) and ($ls[$i - 1] | is_list_line))
                     or ((($i + 1) < ($ls | length)) and ($ls[$i + 1] | is_list_line)))) as $drop
             | .lines = (if $drop then ($ls | del(.[$i])) else ($ls | .[$i] = $new) end)
             | .results += [result($e; "applied"; null) + {at: ($i + 1), dropped: $drop, was: $line, now: (if $drop then null else $new end)}]

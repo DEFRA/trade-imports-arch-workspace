@@ -1,6 +1,6 @@
 # grade-apply-whitespace: the real Apply path (label, plan, apply) exercising
 # seven removal cases on one page, each verified none so
-# none needs a spot check. Exercises tidy_removed's indent-from-the-original-line
+# none needs a spot check. Exercises join_removed's indent-from-the-original-line
 # repair end to end, not just apply_page in isolation: paragraph head (no
 # indent), a four-space indented continuation, a tab-indented continuation, a
 # two-space indented list item, a middle-sentence removal (indent empty on both
