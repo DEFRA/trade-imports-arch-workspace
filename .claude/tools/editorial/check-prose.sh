@@ -20,9 +20,11 @@
 # literal uses stay, figurative uses are replaced - and the reader-pays
 # compression family (language.md, "Reader-pays compression"):
 # ledger phrases ("held open under", "argued under", ...), the
-# contact-clause pattern ("only the front door reaches") and aside
-# stacking (3 or more " - " separators in one sentence). All WARN
-# judgments stay with the editorial skill.
+# contact-clause pattern ("only the front door reaches"), aside
+# stacking (3 or more " - " separators in one sentence) and "alone"
+# after a noun ("the front door alone holds" - put only before the noun
+# where it restricts the subject). All WARN judgments stay with the
+# editorial skill.
 # The gate polices what the author writes, not the wider world: fenced
 # code blocks, inline backtick spans, blockquoted (verbatim) text and
 # URLs are blanked (line numbers preserved) so exemplar text, quotes and
@@ -58,6 +60,10 @@ CONTEXT_PATTERN='\b(deliver(s|ed|ing)?|shapes?|bounds)\b'
 METAPHOR_PATTERN='\b(prices?|priced|rides?|bites?|spends?|spent|buys?|kills?|collapses?|leaks?|lands?|forecloses?|soften(s|ed|ing)?|bootstrap(s|ped|ping)?|ax[ei]s|postures?)\b|hangs? on'
 LEDGER_PATTERN='held open under|argued under|its case is made|stated below the table|collected under|points? back to'
 CONTACT_PATTERN='\bonly (the |that |its )?([a-zA-Z'\''-]+ ){1,3}(reaches|sees|touches)\b'
+# "alone" after a noun: where it restricts the subject ("the front door
+# alone holds"), the rule is "only" before the noun. The by-itself sense
+# ("expiry alone ends no session") is a judgment call, so WARN not FAIL.
+ALONE_PATTERN='\balone\b'
 
 usage() { sed -n '2,31p' "$0" | sed 's/^# \{0,1\}//'; }
 
@@ -70,8 +76,12 @@ fail() {
 # preserving line count, so matches inside exemplar text, verbatim quotes
 # of external documents, and real-world names in links are treated as
 # data. Same rationale as the quoted-span stripping in hooks/guard-bash.sh.
+# Double-backtick spans (the Markdown form for a span that itself contains
+# a backtick) go first: the single-backtick pass would read the opening
+# pair as an empty span and expose the text up to the inner backtick.
 strip_masked() {
   awk '/^[[:space:]]*(```|~~~)/{f=!f; print ""; next} f{print ""; next} /^[[:space:]]*>/{print ""; next} {print}' "$1" \
+    | sed -E 's/``([^`]|`[^`])*``//g' \
     | sed 's/`[^`]*`//g' \
     | sed -E 's|https?://[^[:space:]<>")]+||g'
 }
@@ -169,6 +179,12 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
   if [ -n "$hits" ]; then
     report_hits "$1" "$2" WARN "$hits"
     printf 'check-prose: WARN hits are the contact-clause pattern - restore the relative pronoun and the capability verb: "a store that only the front door can access" (%s, "Reader-pays compression").\n' "$LANGUAGE_DOC" >&2
+  fi
+
+  hits=$(printf '%s\n' "$masked" | grep -inE "$ALONE_PATTERN" || true)
+  if [ -n "$hits" ]; then
+    report_hits "$1" "$2" WARN "$hits"
+    printf 'check-prose: WARN hits are "alone" after a noun - where it restricts the subject, put only before the noun: "only the front door holds"; keep the by-itself sense or write "by itself" (%s, "Words to avoid or examine").\n' "$LANGUAGE_DOC" >&2
   fi
 
   hits=$(printf '%s\n' "$masked" | awk '{

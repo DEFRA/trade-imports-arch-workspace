@@ -1,0 +1,11 @@
+{
+  "run": "whitespace-run",
+  "commit": "0000000",
+  "mode": "revise",
+  "intent": "clarify",
+  "sourceHashes": {},
+  "pages": [
+    {"page": "20-whitespace.md", "path": "pages/20-whitespace.md", "no": "20", "hash": null}
+  ],
+  "builder": "build-triage v1"
+}

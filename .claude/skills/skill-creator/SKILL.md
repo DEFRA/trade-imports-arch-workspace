@@ -114,7 +114,7 @@ Next: open .claude/skills/<name>/SKILL.md and fill in the TODOs.
 
 ## Step A2: Spawn one AUDITOR per target
 
-Spawn `general-purpose` Task subagents in parallel (up to one per target). Each spawn prompt:
+Spawn `general-purpose` Task subagents in parallel (up to one per target), each with `model: sonnet`. The auditor works through an explicit checklist against one file and writes a structured plan, so the pattern list carries the judgment rather than the model tier.
 
 Emit ALL Task calls in a single assistant response - do NOT spawn one, await the result, then spawn the next. Parallelism only works when calls are batched in one turn.
 

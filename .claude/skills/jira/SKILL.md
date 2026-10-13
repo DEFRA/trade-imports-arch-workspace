@@ -1,6 +1,7 @@
 ---
 name: jira
 description: 'Create, read and update JIRA tickets via the standalone curl+jq scripts in tools/jira/: single-key or JQL batch fetch with a flat JSON projection, ticket creation with type/priority/labels/parent, description replacement in Jira wiki markup, and an auth pre-flight. Triggers: "create jira ticket", "fetch jira ticket", "read jira ticket", "run jql", "update jira description", "rewrite the ticket". NOT for transitioning or commenting on tickets (no tools exist yet - extend tools/jira/ first), and NOT for Confluence pages - reads are the confluence-read skill, publishing is confluence-publish.'
+model: sonnet
 ---
 
 Create, read and update JIRA issues from any session in this workspace. Reading returns a flat JSON array the session can reason over directly; creation posts a new issue and returns its key and browse URL; updating replaces an issue's description. All work is done by the self-contained scripts in `~/trade-imports-arch-workspace/.claude/tools/jira/` - this skill owns no logic, only the procedure.

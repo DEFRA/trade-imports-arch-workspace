@@ -8,7 +8,9 @@
 # Fixture files legitimately contain the banned bytes - they are excluded
 # from the pre-commit staged-markdown gate. The gate is resolved via
 # $HOME/trade-imports-arch-workspace so the pre-commit temp-HOME seam
-# tests the STAGED script. --bless rewrites expected files.
+# tests the STAGED script. fixtures/claim-diff/case.sh exercises the
+# claim-diff.sh wrapper the same way, recorded as the case "claim-diff".
+# --bless rewrites expected files.
 
 set -u
 
@@ -70,6 +72,13 @@ record "stdin-print-fail-lines" "$out" "$rc"
 
 out=$(bash "$GATE" "$TESTS_DIR/fixtures/does-not-exist.md" 2>&1); rc=$?
 record "missing-file" "$out" "$rc"
+
+# The claim-diff wrapper, through its own case: the case owns and removes the
+# work directory it is given; the runner removes it again as a second line.
+WORK=$(mktemp -d)
+out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DIR/fixtures/claim-diff/case.sh" 2>&1); rc=$?
+rm -rf "$WORK"
+record "claim-diff" "$out" "$rc"
 
 if [[ "$COUNT" -eq 0 ]]; then
     say "FAIL - no fixtures found under $TESTS_DIR/fixtures/"

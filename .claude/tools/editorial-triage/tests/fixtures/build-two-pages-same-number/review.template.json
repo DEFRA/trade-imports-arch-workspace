@@ -1,0 +1,202 @@
+{
+  "version": 3,
+  "mode": "review",
+  "intent": "distil",
+  "sourceHashes": {
+    "09-alpha.md": "@@HASH_ALPHA@@",
+    "09-beta.md": "@@HASH_BETA@@",
+    "10 spaced.md": "@@HASH_SPACED@@"
+  },
+  "units": [
+    {
+      "unit": "alpha",
+      "path": "@@WORK@@/pages/09-alpha.md",
+      "findings": [
+        {
+          "page": "09-alpha.md",
+          "line": 3,
+          "quote": "The front door signs the cookie",
+          "kind": "repetition",
+          "severity": "S4",
+          "defect": "The sentence repeats a fact the beta page states as the rule, so the reader meets the fact twice.",
+          "point": "The paragraph establishes which component signs the cookie.",
+          "bearing": "supporting",
+          "removes": "The front door signs the cookie and the journey reads the cookie.",
+          "action": "delete",
+          "basis": "set",
+          "cites": [
+            "09-beta.md \"The session service answers whether a session is live.\""
+          ],
+          "before": "The front door signs the cookie and the journey reads the cookie.",
+          "after": "",
+          "guess": false
+        },
+        {
+          "page": "09-alpha.md",
+          "line": 5,
+          "quote": "A judgement standing in for a fact",
+          "kind": "compression",
+          "severity": "S3",
+          "defect": "The sentence states the rule without the case that shows the rule, so the reader cannot tell what a judgement standing in for a fact looks like.",
+          "point": "The paragraph establishes how a judgement is closed.",
+          "bearing": "supporting",
+          "removes": "none: the sentence carries the only statement of the rule",
+          "action": "rewrite",
+          "basis": "rule",
+          "cites": [
+            "language.md, Concentrate and distil"
+          ],
+          "before": "A judgement standing in for a fact is removed rather than qualified.",
+          "after": "A judgement standing in for a fact is removed rather than qualified, as the signing rule shows.",
+          "loss": "Without the case the reader has to find an example of the rule elsewhere.",
+          "introduced": [
+            {
+              "text": "the signing rule",
+              "status": "supported",
+              "source": "09-alpha.md \"The session service answers whether a session is live.\""
+            }
+          ],
+          "guess": false
+        }
+      ]
+    },
+    {
+      "unit": "beta",
+      "path": "@@WORK@@/pages/09-beta.md",
+      "findings": [
+        {
+          "page": "09-beta.md",
+          "line": 3,
+          "quote": "The session service answers whether a session is live",
+          "kind": "repetition",
+          "severity": "S4",
+          "defect": "The sentence repeats what the alpha page already establishes about the signing component.",
+          "point": "The paragraph establishes what the session service answers.",
+          "bearing": "supporting",
+          "removes": "The session service answers whether a session is live.",
+          "action": "delete",
+          "basis": "set",
+          "cites": [
+            "09-beta.md \"The front door signs the cookie\""
+          ],
+          "before": "The session service answers whether a session is live.",
+          "after": "",
+          "guess": false
+        },
+        {
+          "page": "09-beta.md",
+          "line": 5,
+          "quote": "The routing service holds no key at all",
+          "kind": "term",
+          "severity": "S4",
+          "defect": "The sentence says key where the alpha page says the front door signs the cookie, so the reader cannot tell which key is meant.",
+          "point": "The paragraph establishes what the routing service holds.",
+          "bearing": "supporting",
+          "removes": "none: the sentence carries the only statement of what the routing service holds",
+          "action": "rename",
+          "basis": "set",
+          "cites": [
+            "09-alpha.md \"The front door signs the cookie\""
+          ],
+          "before": "The routing service holds no key at all.",
+          "after": "The routing service holds no signing key at all.",
+          "introduced": [
+            {
+              "text": "signing key",
+              "status": "supported",
+              "source": "09-alpha.md \"The front door signs the cookie\""
+            }
+          ],
+          "guess": false
+        }
+      ]
+    },
+    {
+      "unit": "spaced",
+      "path": "@@WORK@@/pages/10 spaced.md",
+      "findings": [
+        {
+          "page": "10 spaced.md",
+          "line": 3,
+          "quote": "The consumer checks the expiry before the signature",
+          "kind": "term",
+          "severity": "S4",
+          "defect": "The sentence says signature where the page says cookie elsewhere, so the reader cannot tell whose signature is checked.",
+          "point": "The paragraph establishes the order of the consumer's checks.",
+          "bearing": "supporting",
+          "removes": "none: the sentence carries the only statement of the order",
+          "action": "rename",
+          "basis": "set",
+          "cites": [
+            "10 spaced.md \"The front door issues one cookie per session.\""
+          ],
+          "before": "The consumer checks the expiry before the signature.",
+          "after": "The consumer checks the expiry before the cookie signature.",
+          "introduced": [
+            {
+              "text": "cookie signature",
+              "status": "supported",
+              "source": "10 spaced.md \"The front door issues one cookie per session.\""
+            }
+          ],
+          "guess": false
+        },
+        {
+          "page": "10 spaced.md",
+          "line": 5,
+          "quote": "The front door issues one cookie per session",
+          "kind": "repetition",
+          "severity": "S4",
+          "defect": "The sentence repeats what the alpha page states about the front door.",
+          "point": "The paragraph establishes how many cookies a session gets.",
+          "bearing": "supporting",
+          "removes": "The front door issues one cookie per session.",
+          "action": "delete",
+          "basis": "set",
+          "cites": [
+            "09-beta.md no quoted anchor"
+          ],
+          "before": "The front door issues one cookie per session.",
+          "after": "",
+          "guess": false
+        },
+        {
+          "page": "10 spaced.md",
+          "line": 7,
+          "quote": "A consumer that finds no cookie asks the front door for one",
+          "kind": "term",
+          "severity": "S4",
+          "defect": "The sentence says cookie where the page says signed cookie elsewhere, so the reader cannot tell which cookie is asked for.",
+          "point": "The paragraph establishes what a consumer without a cookie does.",
+          "bearing": "supporting",
+          "removes": "none: the sentence carries the only statement of the fallback",
+          "action": "rename",
+          "basis": "set",
+          "cites": [
+            "10 spaced.md \"The front door issues one cookie per session.\"",
+            "09-alpha.md \"A quote absent from every page.\""
+          ],
+          "before": "A consumer that finds no cookie asks the front door for one.",
+          "after": "A consumer that finds no signed cookie asks the front door for one.",
+          "introduced": [
+            {
+              "text": "signed cookie",
+              "status": "supported",
+              "source": "10 spaced.md \"A quote absent from every page.\""
+            }
+          ],
+          "guess": false
+        }
+      ]
+    }
+  ],
+  "structural": {
+    "findings": [],
+    "redundancies": []
+  },
+  "editorPass": {
+    "pages": [],
+    "order": [],
+    "patterns": []
+  }
+}

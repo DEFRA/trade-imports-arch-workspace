@@ -1,0 +1,53 @@
+{
+  "labels": {
+    "C-03-001": {
+      "round": 1,
+      "n": 1,
+      "move": "K",
+      "side": "B",
+      "note": "the routing page is the home of the lifetime"
+    },
+    "C-02-002": {
+      "round": 1,
+      "n": 2,
+      "move": "C",
+      "side": null,
+      "note": null
+    },
+    "C-04-001": {
+      "round": 1,
+      "n": 3,
+      "move": "K",
+      "side": "B",
+      "note": "keep the scoping sentence, drop the Open questions bullet"
+    },
+    "C-03-003": {
+      "round": 1,
+      "n": 4,
+      "move": "C",
+      "side": null,
+      "note": "same result as the removal"
+    },
+    "C-02-001": {
+      "round": 1,
+      "n": 5,
+      "move": "C",
+      "side": null,
+      "note": "the clause goes and the sentence reads the same"
+    },
+    "C-02-003": {
+      "round": 1,
+      "n": 6,
+      "move": "C",
+      "side": null,
+      "note": "the list reads the same without the item"
+    },
+    "C-03-002": {
+      "round": 1,
+      "n": 7,
+      "move": "R",
+      "side": null,
+      "note": "the twelve-hour sentence goes"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "gradedBy": "GRADER v1",
+  "mode": "re-grade",
+  "round": 1,
+  "items": [
+    {"cluster": "C-02-004", "move": "R", "side": null, "confidence": "high", "heuristic": "H-03", "why": "The sentence is a reassurance off the passage's point, so the claim goes rather than being fixed."},
+    {"cluster": "C-03-002", "move": "O", "side": null, "confidence": "low", "heuristic": "H-08", "why": "The pointer's target is inferred, so the cookie rule's home is an open point with an owner."}
+  ]
+}

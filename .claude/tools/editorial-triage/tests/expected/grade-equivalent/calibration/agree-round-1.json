@@ -1,0 +1,234 @@
+{
+  "round": 1,
+  "items": 7,
+  "compared": 7,
+  "missingLabel": [],
+  "missingGrade": [],
+  "move": {
+    "agree": 6,
+    "total": 7,
+    "rate": 0.8571428571428571
+  },
+  "side": {
+    "agree": 3,
+    "total": 3,
+    "rate": 1
+  },
+  "equivalent": {
+    "count": 6,
+    "items": [
+      {
+        "n": 1,
+        "cluster": "C-03-001",
+        "label": "K:B",
+        "grade": "R",
+        "as": "K:B"
+      },
+      {
+        "n": 3,
+        "cluster": "C-04-001",
+        "label": "K:B",
+        "grade": "R",
+        "as": "K:B"
+      },
+      {
+        "n": 4,
+        "cluster": "C-03-003",
+        "label": "C",
+        "grade": "R",
+        "as": "R"
+      },
+      {
+        "n": 5,
+        "cluster": "C-02-001",
+        "label": "C",
+        "grade": "R",
+        "as": "R"
+      },
+      {
+        "n": 6,
+        "cluster": "C-02-003",
+        "label": "C",
+        "grade": "R",
+        "as": "R"
+      },
+      {
+        "n": 7,
+        "cluster": "C-03-002",
+        "label": "R",
+        "grade": "K:A",
+        "as": "K:A"
+      }
+    ]
+  },
+  "byCategory": [
+    {
+      "category": "author/author",
+      "n": 1,
+      "move": {
+        "agree": 1,
+        "total": 1,
+        "rate": 1
+      }
+    },
+    {
+      "category": "fix/verified",
+      "n": 1,
+      "move": {
+        "agree": 0,
+        "total": 1,
+        "rate": 0
+      }
+    },
+    {
+      "category": "propose/dispersion",
+      "n": 1,
+      "move": {
+        "agree": 1,
+        "total": 1,
+        "rate": 1
+      }
+    },
+    {
+      "category": "propose/grows",
+      "n": 1,
+      "move": {
+        "agree": 1,
+        "total": 1,
+        "rate": 1
+      }
+    },
+    {
+      "category": "propose/no-rewrite",
+      "n": 1,
+      "move": {
+        "agree": 1,
+        "total": 1,
+        "rate": 1
+      }
+    },
+    {
+      "category": "propose/removal",
+      "n": 1,
+      "move": {
+        "agree": 1,
+        "total": 1,
+        "rate": 1
+      }
+    },
+    {
+      "category": "propose/tangent",
+      "n": 1,
+      "move": {
+        "agree": 1,
+        "total": 1,
+        "rate": 1
+      }
+    }
+  ],
+  "confusion": {
+    "rows": [
+      "R",
+      "C",
+      "W",
+      "K",
+      "O",
+      "I",
+      "T"
+    ],
+    "cols": [
+      "R",
+      "C",
+      "W",
+      "K",
+      "O",
+      "I",
+      "T"
+    ],
+    "counts": {
+      "R": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 1,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "C": {
+        "R": 4,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "W": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "K": {
+        "R": 2,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "O": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "I": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      },
+      "T": {
+        "R": 0,
+        "C": 0,
+        "W": 0,
+        "K": 0,
+        "O": 0,
+        "I": 0,
+        "T": 0
+      }
+    }
+  },
+  "disagreements": [
+    {
+      "n": 2,
+      "cluster": "C-02-002",
+      "category": "fix/verified",
+      "label": {
+        "move": "C",
+        "side": null,
+        "note": null
+      },
+      "grade": {
+        "move": "R",
+        "side": null,
+        "confidence": "medium",
+        "heuristic": "H-14",
+        "why": "The section numbers are a claim about an external document, so they go rather than being corrected.",
+        "file": "round-1.json"
+      }
+    }
+  ]
+}

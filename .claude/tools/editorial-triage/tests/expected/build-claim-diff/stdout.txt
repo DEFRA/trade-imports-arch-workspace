@@ -1,0 +1,147 @@
+##### hash-pages
+--- two pages, one through a path with a space ---
+{
+  "12-claims.md": "cca3f53d13df65ca496f3dee4e80805a1bad24a42b45f37bdecf0e99e3458966",
+  "13-stale.md": "74ac33078d817474b03f803da8a1a52f2596c0b70c862cca67cd10e8a38e2bd8"
+}
+exit 0
+expected 12-claims.md cca3f53d13df65ca496f3dee4e80805a1bad24a42b45f37bdecf0e99e3458966
+expected 13-stale.md 74ac33078d817474b03f803da8a1a52f2596c0b70c862cca67cd10e8a38e2bd8
+--- the tracked fixture page through its tilde path ---
+{
+  "12-claims.md": "cca3f53d13df65ca496f3dee4e80805a1bad24a42b45f37bdecf0e99e3458966"
+}
+exit 0
+expected 12-claims.md cca3f53d13df65ca496f3dee4e80805a1bad24a42b45f37bdecf0e99e3458966
+--- no path ---
+build-triage: --hash-pages needs at least one page path (see --help)
+exit 1
+--- a missing path ---
+build-triage: not a readable page file: WORK/pages/nope.md
+exit 1
+--- a directory ---
+build-triage: not a readable page file: WORK/pages
+exit 1
+--- an unreadable file ---
+build-triage: not a readable page file: WORK/unreadable.md
+exit 1
+--- two paths sharing a filename ---
+build-triage: two of the given paths share the filename 13-stale.md; a page is keyed by its filename, so give one path per page
+exit 1
+--- work directory ---
+out present: no
+entries unchanged
+##### claim-diff
+build-triage: records 9 (drill 9)
+build-triage: clusters 9; duplicates collapsed 0
+build-triage: anchors reviewer 9
+build-triage: stale: span absent 0, span ambiguous 0, anchor unresolved 0
+build-triage: claims: nominated 6; claimShift missing 5, none 1, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 5
+build-triage: net delta: fix 0, propose -1; held 0; questions 1
+build-triage: page(s) changed since the review read them (hash differs from sourceHashes); their records are held as stale until the review is re-run: 13-stale.md
+build-triage: verification: files read 0, ignored 0; verdicts applied 0 (removals 0), items rejected 0
+build-triage: 5 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+build-triage: wrote WORK/out/{review,findings,retains,triage,index,manifest}.json
+--- run fields ---
+mode revise, intent clarify, builder build-triage v3
+sourceHashes 12-claims.md, 13-stale.md
+manifest keys builder, commit, intent, mode, pages, params, run, source, sourceHashes, summary
+--- retains ---
+12-claims.md L7 drill:12-claims.md: A consumer must reject a stale timestamp.
+--- records ---
+F-12-001 flow/split applicable=unique gate=pass layoutOnly=true claimShift=none introducedCheck=none checks=
+F-12-002 flow/rewrite applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=none checks=
+F-12-003 repetition/delete applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=none checks=
+F-12-004 compression/rewrite applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=held checks=
+F-12-005 term/rewrite applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=none checks=introduced-missing
+F-12-006 presentation/ask applicable=none gate=none layoutOnly=false claimShift=none introducedCheck=none checks=
+F-12-007 term/rename applicable=unique gate=pass layoutOnly=false claimShift=missing introducedCheck=held checks=
+F-13-001 term/rename applicable=unique gate=pass layoutOnly=false claimShift=stale introducedCheck=supported checks=
+F-13-002 presentation/ask applicable=none gate=none layoutOnly=false claimShift=stale introducedCheck=none checks=inventory-unquoted
+--- nominations ---
+F-12-001 nominated=false added= removed= missing=0
+F-12-002 nominated=true added=modal:should removed=modal:must missing=0
+F-12-003 nominated=true added= removed=modal:must content:consumer content:reject content:stale content:timestamp missing=1
+F-12-004 nominated=true added=connective:because negation:never content:reads content:cookie's content:content removed=quantifier:all missing=0
+F-12-005 nominated=true added=quantifier:each removed= missing=0
+F-12-007 nominated=true added=content:signing removed= missing=0
+F-13-001 nominated=true added=content:event removed=content:record missing=0
+--- hashes ---
+F-12-001 sourceHash=cca3f53d candidateHash=26890b36
+F-12-002 sourceHash=cca3f53d candidateHash=32d92bb0
+F-12-003 sourceHash=cca3f53d candidateHash=06096e09
+F-12-004 sourceHash=cca3f53d candidateHash=1873d007
+F-12-005 sourceHash=cca3f53d candidateHash=20f4bb57
+F-12-006 sourceHash=cca3f53d candidateHash=null
+F-12-007 sourceHash=cca3f53d candidateHash=58bb0926
+F-13-001 sourceHash=00000000 candidateHash=385f70b0
+F-13-002 sourceHash=00000000 candidateHash=null
+--- clusters ---
+C-12-001 propose/unverified intent=clarify claimShift=missing layoutOnly=false introducedCheck=none needs=verify-claims members=F-12-002
+C-12-002 discard/introduced-missing intent=clarify claimShift=missing layoutOnly=false introducedCheck=none needs=verify-claims members=F-12-005
+C-12-003 fix/layout intent=clarify claimShift=none layoutOnly=true introducedCheck=none needs=verify members=F-12-001
+C-12-004 propose/unverified intent=clarify claimShift=missing layoutOnly=false introducedCheck=none needs=verify-claims members=F-12-003
+C-12-005 propose/unverified intent=clarify claimShift=missing layoutOnly=false introducedCheck=held needs=verify-claims members=F-12-004
+C-12-006 author/presentation intent=clarify claimShift=none layoutOnly=false introducedCheck=none needs=bearing members=F-12-006
+C-12-007 propose/unverified intent=clarify claimShift=missing layoutOnly=false introducedCheck=held needs=verify-claims members=F-12-007
+C-13-001 propose/stale intent=clarify claimShift=stale layoutOnly=false introducedCheck=supported needs=verify-claims members=F-13-001
+C-13-002 discard/inventory-unquoted intent=clarify claimShift=stale layoutOnly=false introducedCheck=none needs=none members=F-13-002
+--- summary ---
+{"byBucket":{"author":1,"discard":2,"fix":1,"propose":5},"byReason":{"introduced-missing":1,"inventory-unquoted":1,"layout":1,"presentation":1,"stale":1,"unverified":4},"claims":{"nominated":6,"byShift":{"missing":5,"none":1,"stale":1},"introducedHeld":2,"layoutOnly":1},"stale":{"spanAbsent":0,"spanAmbiguous":0,"anchorUnresolved":0}}
+--- a result without sourceHashes does not build ---
+build-triage: review result has no sourceHashes (page filename to the SHA-256 of the page the review read)
+exit 1
+--- a finding without its kind does not build ---
+build-triage: review result is malformed: every finding carries kind, severity, action and basis (contract, reviewer-set fields). Fix the review result or re-run the review:
+  drill:12-claims.md record 2 (12-claims.md) missing kind: must refuse a cookie whose signature fails
+exit 2
+--- the same review as a findings directory ---
+build-triage: records 9 (drill 9)
+build-triage: claims: nominated 6; claimShift missing 5, none 1, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 5
+build-triage: page(s) changed since the review read them (hash differs from sourceHashes); their records are held as stale until the review is re-run: 13-stale.md
+build-triage: 5 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+build-triage: wrote WORK/out4/{review,findings,retains,triage,index,manifest}.json
+mode revise, intent clarify, source review-dir
+retains 1
+--- the same directory under a path with a space ---
+exit 0
+0
+build-triage: records 9 (drill 9)
+build-triage: page(s) changed since the review read them (hash differs from sourceHashes); their records are held as stale until the review is re-run: 13-stale.md
+build-triage: 5 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+build-triage: wrote WORK/out 5/{review,findings,retains,triage,index,manifest}.json
+--- layout-only rejects a nesting change and a lost word boundary ---
+{"paragraphBreak":true,"listConversion":true,"nestedMadeFlat":false,"flatMadeNested":false,"wordsJoined":false,"stopDropped":false}
+##### malformed
+good build exit 0
+build-triage: could not normalise the review result; a finding may not be an object (see the jq error above)
+malformed build exit 2
+earlier files unchanged: yes
+records in findings.json: 9
+temp files left: 0
+##### carriers
+build-triage: records 7 (drill 2, editor 3, structural 2)
+build-triage: 3 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+build-triage: wrote WORK/carriers/out/{review,findings,retains,triage,index,manifest}.json
+--- records ---
+{"id":"F-12-001","reviewer":"drill:12-claims.md","page":"12-claims.md","line":13,"quote":"Every consumer holds the current key version","kind":"term","before":"Every consumer holds the current key version.","after":"Every consumer holds the current signing key version.","related":[],"inventory":null,"introduced":[{"text":"signing key","status":"supported","source":"12-claims.md \"The front door signs the cookie\""}],"changes":null,"fact":null,"pattern":null}
+{"id":"F-12-002","reviewer":"drill:12-claims.md","page":"12-claims.md","line":7,"quote":"A consumer must reject a stale timestamp","kind":"flow","before":"A consumer must reject a stale timestamp.","after":"","related":[],"inventory":null,"introduced":null,"changes":null,"fact":null,"pattern":null}
+{"id":"F-12-003","reviewer":"editor:pages","page":"12-claims.md","line":5,"quote":"which records the outcome","kind":"compression","before":"The routing service forwards the answer to the journey, which records the outcome.","after":"The routing service forwards the answer to the journey, and the journey records the outcome in the outcome record.","related":[],"inventory":null,"introduced":[{"text":"the outcome record","status":"unsupported","source":null}],"changes":null,"fact":null,"pattern":null}
+{"id":"F-12-004","reviewer":"editor:order","page":"12-claims.md","line":13,"quote":"current key version","kind":"term","before":null,"after":null,"related":[{"page":"12-claims.md","line":3,"quote":"The front door signs the cookie"}],"inventory":null,"introduced":null,"changes":null,"fact":null,"pattern":null}
+{"id":"F-12-005","reviewer":"editor:patterns","page":"12-claims.md","line":5,"quote":"The session service answers whether a session is live","kind":"flow","before":"The session service answers whether a session is live. The routing service forwards the answer to the journey, which records the outcome.","after":"The session service answers whether a session is live.\n\nThe routing service forwards the answer to the journey, which records the outcome.","related":[{"page":"12-claims.md","line":3,"quote":"The front door signs the cookie"},{"page":"12-claims.md","line":5,"quote":"The session service answers whether a session is live"}],"inventory":null,"introduced":[],"changes":[{"kind":"split","original":"The session service answers whether a session is live. The routing service forwards the answer to the journey, which records the outcome.","revised":"The session service answers whether a session is live.\n\nThe routing service forwards the answer to the journey, which records the outcome."}],"fact":null,"pattern":"Paragraphs hold two topics that a break would separate."}
+{"id":"F-12-006","reviewer":"structural:findings","page":"12-claims.md","line":11,"quote":"When the front door receives the callback","kind":"presentation","before":null,"after":null,"related":[],"inventory":{"actors":["front door","browser"],"steps":[{"actor":"front door","action":"checks the state value","condition":"when the front door receives the callback","quote":"the front door checks the state value"},{"actor":"front door","action":"redirects the browser to the return path","condition":null,"quote":"then redirects the browser to the return path"}],"existingDiagram":null},"introduced":null,"changes":null,"fact":null,"pattern":null}
+{"id":"F-12-007","reviewer":"structural:redundancies","page":"12-claims.md","line":5,"quote":"The routing service forwards the answer to the journey","kind":"repetition","before":"The routing service forwards the answer to the journey, which records the outcome.","after":"","related":[{"page":"12-claims.md","line":9,"quote":"The routing service holds no key at all"}],"inventory":null,"introduced":null,"changes":null,"fact":"The routing service forwards the session answer and holds no key.","pattern":null}
+--- retains ---
+{"page":"12-claims.md","line":3,"quote":"must refuse a cookie whose signature fails","reason":"The refusal rule is stated once, in the place a reader looks for it.","reviewer":"drill:12-claims.md"}
+{"page":"12-claims.md","line":null,"quote":"The front door signs the cookie.","reason":"The opening sentence states the page's scope in six words and needs no more.","reviewer":"editor:pages"}
+--- preservation ---
+records expected 7, built 7
+preserved: true
+retains expected 2, built 2
+retains preserved: true
+--- the comparison detects a changed replacement ---
+preserved: false [{"quote":"Every consumer holds the current key version","fields":["after"]}]
+--- the comparison detects a changed inventory action ---
+preserved: false [{"quote":"When the front door receives the callback","fields":["inventory"]}]

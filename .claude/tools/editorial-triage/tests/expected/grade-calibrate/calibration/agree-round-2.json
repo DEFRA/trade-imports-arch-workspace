@@ -1,0 +1,347 @@
+{
+  "round": 2,
+  "seed": 7,
+  "size": 6,
+  "requested": 6,
+  "targets": {
+    "author/author": {
+      "target": 8,
+      "drawnBefore": 1,
+      "remaining": 7,
+      "candidates": 0,
+      "drawn": 0
+    },
+    "fix/verified": {
+      "target": 8,
+      "drawnBefore": 1,
+      "remaining": 7,
+      "candidates": 3,
+      "drawn": 2
+    },
+    "propose/inference": {
+      "target": 2,
+      "drawnBefore": 1,
+      "remaining": 1,
+      "candidates": 0,
+      "drawn": 0
+    },
+    "propose/no-rewrite": {
+      "target": 2,
+      "drawnBefore": 1,
+      "remaining": 1,
+      "candidates": 1,
+      "drawn": 1
+    },
+    "propose/removal": {
+      "target": 6,
+      "drawnBefore": 1,
+      "remaining": 5,
+      "candidates": 2,
+      "drawn": 2
+    },
+    "propose/restructure": {
+      "target": 2,
+      "drawnBefore": 1,
+      "remaining": 1,
+      "candidates": 0,
+      "drawn": 0
+    },
+    "propose/unresolved": {
+      "target": 2,
+      "drawnBefore": 0,
+      "remaining": 2,
+      "candidates": 1,
+      "drawn": 1
+    }
+  },
+  "items": [
+    {
+      "n": 1,
+      "cluster": "C-02-004",
+      "category": "fix/verified",
+      "page": "02-sample-routing.md",
+      "title": "sample routing",
+      "line": 3,
+      "severity": "S3",
+      "kind": "fact",
+      "basis": "set",
+      "action": "correct",
+      "bearing": "supporting",
+      "removes": "the twelve-hour session window",
+      "point": "The passage states what the routing service takes.",
+      "defect": "The paragraph names a twelve-hour window the session page does not state; where does the number come from?",
+      "quote": "every browser request for the service",
+      "before": "the twelve-hour session window",
+      "after": "the session window",
+      "delta": -1,
+      "band": "shrinks",
+      "question": null,
+      "owner": null,
+      "cites": [
+        "03 \"The record states that the session lasts eight hours\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-02-004"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "C",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "grade",
+        "grade": {
+          "move": "R",
+          "side": null,
+          "file": "round-1b.json"
+        },
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 2,
+      "cluster": "C-02-002",
+      "category": "propose/removal",
+      "page": "02-sample-routing.md",
+      "title": "sample routing",
+      "line": 17,
+      "severity": "S4",
+      "kind": "residue",
+      "basis": "set",
+      "action": "delete",
+      "bearing": "tangential",
+      "removes": "- Which sealing library INS uses, how the seal key is provisioned, and what the rotation runbook says.",
+      "point": "The Open questions list names what the proposal still has to settle.",
+      "defect": "The bullet keeps an open question inside the page while the register outside the pages holds the questions; where does this item belong?",
+      "quote": "Which sealing library INS uses, how the seal key is provisioned, and what the rotation runbook says.",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "01 \"Open questions are kept in the register outside these pages\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-02-002"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "rule",
+        "grade": null,
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 3,
+      "cluster": "C-xx-001",
+      "category": "propose/unresolved",
+      "page": "set",
+      "title": "set",
+      "line": null,
+      "severity": "S5",
+      "kind": "residue",
+      "basis": "rule",
+      "action": "delete",
+      "bearing": "tangential",
+      "removes": "the legend line at the top of the review",
+      "point": "The line explains the review's severity codes.",
+      "defect": "The legend is the review's own note about its report rather than a finding about the pages; what does it tell the reader of the set?",
+      "quote": "Legend: S1 wrong, S2 contradiction, S3 overreach",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "document-types.md \"Review output\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-xx-001"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "rule",
+        "grade": null,
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 4,
+      "cluster": "C-03-006",
+      "category": "propose/no-rewrite",
+      "page": "03-sample-session.md",
+      "title": "sample session",
+      "line": 7,
+      "severity": "S3",
+      "kind": "omission",
+      "basis": "set",
+      "action": "expand",
+      "bearing": "supporting",
+      "removes": "none: the sentence states the storage rule",
+      "point": "The passage states where sessions are stored.",
+      "defect": "The sentence covers every environment while the page names no store for test; which store does test use?",
+      "quote": "Sessions utilise the same store in every environment.",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "08 \"test runs against its own store\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-03-006"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "I",
+        "defaultSide": null,
+        "defaultFrom": "rule",
+        "grade": null,
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 5,
+      "cluster": "C-03-005",
+      "category": "fix/verified",
+      "page": "03-sample-session.md",
+      "title": "sample session",
+      "line": 9,
+      "severity": "S3",
+      "kind": "fact",
+      "basis": "set",
+      "action": "correct",
+      "bearing": "central",
+      "removes": "none: the lifetime is the point of the sentence",
+      "point": "The passage states the session lifetime.",
+      "defect": "The record states eight hours where the routing page states twelve; which lifetime is current?",
+      "quote": "the session lasts eight hours",
+      "before": "the session lasts eight hours",
+      "after": "the session lasts twelve hours",
+      "delta": 0,
+      "band": "neutral",
+      "question": null,
+      "owner": null,
+      "cites": [
+        "02 \"the twelve-hour session window\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-03-005"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "C",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "C",
+        "defaultSide": null,
+        "defaultFrom": "rule",
+        "grade": null,
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    },
+    {
+      "n": 6,
+      "cluster": "C-02-003",
+      "category": "propose/removal",
+      "page": "02-sample-routing.md",
+      "title": "sample routing",
+      "line": 13,
+      "severity": "S4",
+      "kind": "repetition",
+      "basis": "rule",
+      "action": "shorten",
+      "bearing": "supporting",
+      "removes": "the front door",
+      "point": "The passage states where a session starts.",
+      "defect": "The sentence names the front door twice where the second clause could carry the pronoun; what does the repeat add?",
+      "quote": "Every session starts at the front door, and the direct path bypasses the front door.",
+      "before": null,
+      "after": null,
+      "delta": null,
+      "band": null,
+      "question": null,
+      "owner": null,
+      "cites": [
+        "language.md \"Reader-pays compression\""
+      ],
+      "related": [],
+      "relatedClusters": [],
+      "members": [
+        "F-02-003"
+      ],
+      "moves": {
+        "offered": [
+          "R",
+          "O",
+          "I",
+          "T"
+        ],
+        "default": "R",
+        "defaultSide": null,
+        "defaultFrom": "rule",
+        "grade": null,
+        "equivalence": {
+          "rewriteIsRemoval": false,
+          "rAsSide": null
+        }
+      }
+    }
+  ]
+}

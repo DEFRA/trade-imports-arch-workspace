@@ -5,6 +5,9 @@ trade-imports-documentation
 # JetBrains IDE project configuration
 .idea
 
+# JetBrains AI Assistant session-folder MCP state (machine-local, one file per IDE session)
+.awb/
+
 # macOS Finder metadata
 .DS_Store
 
@@ -22,8 +25,13 @@ analysis/
 
 # Task-local skill run state (individual work, derived from the ignored analysis corpus).
 # Estate-state workareas (skills-audit, skill-creator) stay tracked - they are the payload.
+# Task-local run state of the editorial-triage skill (findings, clusters, reports)
+.claude/workareas/editorial-triage/
 .claude/workareas/editorial/
 .claude/workareas/confluence-sync/
+
+# Editorial research run state (run records, cold-reader findings, story cards)
+editorial-research/
 
 # Child repo: shared docs-generation tooling library (its own git repository)
 delivery-info-arch-tooling/
@@ -45,3 +53,4 @@ package-lock.json
 
 # Don't push Claude local settings
 settings.local.json
+/analysis/

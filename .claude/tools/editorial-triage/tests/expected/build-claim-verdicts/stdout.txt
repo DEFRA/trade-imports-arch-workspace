@@ -1,0 +1,281 @@
+=== build 1-no-files ===
+build-triage: claims: nominated 12; claimShift missing 11, none 1, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 11
+build-triage: verification: files read 0, ignored 0; verdicts applied 0 (removals 0), items rejected 0
+build-triage: 11 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-003 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-004 compression/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=missing removal=- propose/unverified note=-
+F-12-008 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-009 ambiguity/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-010 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-011 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-012 term/rewrite claimShift=missing removal=missing propose/unverified note=-
+F-12-013 term/rewrite claimShift=missing removal=- propose/unverified note=-
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 2-valid-file ===
+build-triage: verification: F-12-007 rewrite verdict was made against another candidate (hash differs); record is stale
+build-triage: claims: nominated 12; claimShift material 3, missing 1, none 6, stale 2, unresolved 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 3, propose 9
+build-triage: verification: files read 1, ignored 0; verdicts applied 9 (removals 1), items rejected 1
+build-triage: 1 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=material removal=- propose/claim-shift note=The rule weakens: must refuse in the source, should refuse in the candidate (removed:modal:must, added:modal:should).
+F-12-003 repetition/delete claimShift=material removal=- propose/claim-shift note=The timestamp rule is stated only in the deleted sentence (line 7), so the claim is lost; the record names the loss as a repetition it is not (sentence:0).
+F-12-004 compression/rewrite claimShift=material removal=- propose/claim-shift note=The candidate states a cause the page does not, that the routing service never reads the cookie content (added:negation:never, added:connective:because, added content).
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=stale removal=- propose/stale note=-
+F-12-008 repetition/delete claimShift=none removal=- propose/tangent note=Both claims survive at line 3: The front door signs the cookie. The journey reads the cookie and must refuse a cookie whose signature fails.
+F-12-009 ambiguity/rewrite claimShift=unresolved removal=- propose/claim-shift note=The source It can be the verdict or the journey; the candidate writes the verdict in (added:content:verdict).
+F-12-010 residue/delete claimShift=none removal=- propose/tangent note=The one-word paragraph carries no claim (sentence:0).
+F-12-011 residue/delete claimShift=none removal=- propose/tangent note=A bare status code carries no claim (sentence:0).
+F-12-012 term/rewrite claimShift=none removal=material fix/verified note=Since to because states the same cause (removed:connective:since, added:connective:because).
+F-12-013 term/rewrite claimShift=none removal=- fix/verified note=Checks to validates names the same act (removed:content:checks, added:content:validates).
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 3-wrong-file-hash ===
+build-triage: verification: ignored claims-12-claims.md.json (sourceHash differs from the manifest); its records are stale
+build-triage: claims: nominated 12; claimShift none 1, stale 12; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 11
+build-triage: verification: files read 0, ignored 1; verdicts applied 0 (removals 0), items rejected 0
+F-12-002 flow/rewrite claimShift=stale removal=- propose/stale note=-
+F-12-003 repetition/delete claimShift=stale removal=- propose/stale note=-
+F-12-004 compression/rewrite claimShift=stale removal=- propose/stale note=-
+F-12-005 term/rewrite claimShift=stale removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=stale removal=- propose/stale note=-
+F-12-008 repetition/delete claimShift=stale removal=- propose/stale note=-
+F-12-009 ambiguity/rewrite claimShift=stale removal=- propose/stale note=-
+F-12-010 residue/delete claimShift=stale removal=- propose/stale note=-
+F-12-011 residue/delete claimShift=stale removal=- propose/stale note=-
+F-12-012 term/rewrite claimShift=stale removal=stale propose/stale note=-
+F-12-013 term/rewrite claimShift=stale removal=- propose/stale note=-
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 4-bad-items ===
+build-triage: verification: claims-12-claims.md.json names "F-99-001", which is not a record on that page; item ignored
+build-triage: verification: claims-12-claims.md.json names F-12-002 3 times; every item for that record ignored
+build-triage: verification: F-12-003 rewrite item ignored: a judgment is not none, material or unresolved
+build-triage: verification: F-12-004 rewrite item ignored: shifts name elements the candidate does not have: sentence:0
+build-triage: verification: F-12-005 rewrite item ignored: note is missing; a verdict that is not none, and any deletion, needs one
+build-triage: verification: F-12-007 rewrite item ignored: claimShift none is not the worst judgment (material)
+build-triage: verification: F-12-009 rewrite item ignored: shifts do not cover added:content:verdict
+build-triage: verification: F-12-010 rewrite item ignored: shifts is empty
+build-triage: verification: F-12-011 rewrite item ignored: shifts do not cover sentence:0
+build-triage: verification: F-12-012 has no removal verdict in its item; removal stays unverified
+build-triage: claims: nominated 12; claimShift missing 9, none 3, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 2, propose 10
+build-triage: verification: files read 1, ignored 0; verdicts applied 2 (removals 0), items rejected 10
+build-triage: 10 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-003 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-004 compression/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=missing removal=- propose/unverified note=-
+F-12-008 repetition/delete claimShift=none removal=- propose/tangent note=Both claims survive at line 3: The front door signs the cookie. The journey reads the cookie.
+F-12-009 ambiguity/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-010 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-011 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-012 term/rewrite claimShift=none removal=missing fix/verified note=rewrite part only; the removal part is absent
+F-12-013 term/rewrite claimShift=missing removal=- propose/unverified note=-
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 5-stale-page ===
+build-triage: verification: 13-stale.md has moved on since the review (hash differs); claims-13-stale.md.json is not read and its records are stale
+build-triage: claims: nominated 12; claimShift missing 11, none 1, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 11
+build-triage: verification: files read 0, ignored 0; verdicts applied 0 (removals 0), items rejected 0
+build-triage: 11 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-003 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-004 compression/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=missing removal=- propose/unverified note=-
+F-12-008 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-009 ambiguity/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-010 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-011 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-012 term/rewrite claimShift=missing removal=missing propose/unverified note=-
+F-12-013 term/rewrite claimShift=missing removal=- propose/unverified note=-
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 6-unparseable-file ===
+build-triage: verification: ignored claims-12-claims.md.json (not a JSON object); its records stay unverified
+build-triage: claims: nominated 12; claimShift missing 11, none 1, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 11
+build-triage: verification: files read 0, ignored 1; verdicts applied 0 (removals 0), items rejected 0
+build-triage: 11 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-003 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-004 compression/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=missing removal=- propose/unverified note=-
+F-12-008 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-009 ambiguity/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-010 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-011 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-012 term/rewrite claimShift=missing removal=missing propose/unverified note=-
+F-12-013 term/rewrite claimShift=missing removal=- propose/unverified note=-
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 7-verifiedBy-not-a-string ===
+build-triage: verification: ignored claims-12-claims.md.json (verifiedBy is not a non-empty string); its records stay unverified
+build-triage: claims: nominated 12; claimShift missing 11, none 1, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 11
+build-triage: verification: files read 0, ignored 1; verdicts applied 0 (removals 0), items rejected 0
+build-triage: 11 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-003 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-004 compression/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=missing removal=- propose/unverified note=-
+F-12-008 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-009 ambiguity/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-010 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-011 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-012 term/rewrite claimShift=missing removal=missing propose/unverified note=-
+F-12-013 term/rewrite claimShift=missing removal=- propose/unverified note=-
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 8-wrong-hash-and-blank-verifiedBy ===
+build-triage: verification: ignored claims-12-claims.md.json (sourceHash differs from the manifest); its records are stale
+build-triage: claims: nominated 12; claimShift none 1, stale 12; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 11
+build-triage: verification: files read 0, ignored 1; verdicts applied 0 (removals 0), items rejected 0
+F-12-002 flow/rewrite claimShift=stale removal=- propose/stale note=-
+F-12-003 repetition/delete claimShift=stale removal=- propose/stale note=-
+F-12-004 compression/rewrite claimShift=stale removal=- propose/stale note=-
+F-12-005 term/rewrite claimShift=stale removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=stale removal=- propose/stale note=-
+F-12-008 repetition/delete claimShift=stale removal=- propose/stale note=-
+F-12-009 ambiguity/rewrite claimShift=stale removal=- propose/stale note=-
+F-12-010 residue/delete claimShift=stale removal=- propose/stale note=-
+F-12-011 residue/delete claimShift=stale removal=- propose/stale note=-
+F-12-012 term/rewrite claimShift=stale removal=stale propose/stale note=-
+F-12-013 term/rewrite claimShift=stale removal=- propose/stale note=-
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 9-items-not-an-array ===
+build-triage: verification: ignored claims-12-claims.md.json (items is not an array); its records stay unverified
+build-triage: claims: nominated 12; claimShift missing 11, none 1, stale 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 1, propose 11
+build-triage: verification: files read 0, ignored 1; verdicts applied 0 (removals 0), items rejected 0
+build-triage: 11 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-003 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-004 compression/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=missing removal=- propose/unverified note=-
+F-12-008 repetition/delete claimShift=missing removal=- propose/unverified note=-
+F-12-009 ambiguity/rewrite claimShift=missing removal=- propose/unverified note=-
+F-12-010 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-011 residue/delete claimShift=missing removal=- propose/unverified note=-
+F-12-012 term/rewrite claimShift=missing removal=missing propose/unverified note=-
+F-12-013 term/rewrite claimShift=missing removal=- propose/unverified note=-
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 10-deletion-span-changed-old-item-kept ===
+build-triage: verification: F-12-007 rewrite verdict was made against another candidate (hash differs); record is stale
+build-triage: verification: F-12-008 rewrite verdict was made against another candidate (hash differs); record is stale
+build-triage: claims: nominated 12; claimShift material 3, missing 1, none 5, stale 3, unresolved 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 3, propose 8
+build-triage: verification: files read 1, ignored 0; verdicts applied 8 (removals 1), items rejected 2
+build-triage: 1 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=material removal=- propose/claim-shift note=The rule weakens: must refuse in the source, should refuse in the candidate (removed:modal:must, added:modal:should).
+F-12-003 repetition/delete claimShift=material removal=- propose/stale note=The timestamp rule is stated only in the deleted sentence (line 7), so the claim is lost; the record names the loss as a repetition it is not (sentence:0).
+F-12-004 compression/rewrite claimShift=material removal=- propose/claim-shift note=The candidate states a cause the page does not, that the routing service never reads the cookie content (added:negation:never, added:connective:because, added content).
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=stale removal=- propose/stale note=-
+F-12-008 repetition/delete claimShift=stale removal=- propose/stale note=-
+F-12-009 ambiguity/rewrite claimShift=unresolved removal=- propose/claim-shift note=The source It can be the verdict or the journey; the candidate writes the verdict in (added:content:verdict).
+F-12-010 residue/delete claimShift=none removal=- propose/tangent note=The one-word paragraph carries no claim (sentence:0).
+F-12-011 residue/delete claimShift=none removal=- propose/tangent note=A bare status code carries no claim (sentence:0).
+F-12-012 term/rewrite claimShift=none removal=material fix/verified note=Since to because states the same cause (removed:connective:since, added:connective:because).
+F-12-013 term/rewrite claimShift=none removal=- fix/verified note=Checks to validates names the same act (removed:content:checks, added:content:validates).
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+page hash unchanged: yes
+F-12-008 before=A consumer must reject a stale timestamp after="" elements=must,consumer,reject,stale,timestamp missing=1
+=== build 11a-rewrite-verified ===
+build-triage: verification: F-12-007 rewrite verdict was made against another candidate (hash differs); record is stale
+build-triage: claims: nominated 12; claimShift material 3, missing 1, none 6, stale 2, unresolved 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 3, propose 9
+build-triage: verification: files read 1, ignored 0; verdicts applied 9 (removals 1), items rejected 1
+build-triage: 1 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=material removal=- propose/claim-shift note=The rule weakens: must refuse in the source, should refuse in the candidate (removed:modal:must, added:modal:should).
+F-12-003 repetition/delete claimShift=material removal=- propose/claim-shift note=The timestamp rule is stated only in the deleted sentence (line 7), so the claim is lost; the record names the loss as a repetition it is not (sentence:0).
+F-12-004 compression/rewrite claimShift=material removal=- propose/claim-shift note=The candidate states a cause the page does not, that the routing service never reads the cookie content (added:negation:never, added:connective:because, added content).
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=stale removal=- propose/stale note=-
+F-12-008 repetition/delete claimShift=none removal=- propose/tangent note=Both claims survive at line 3: The front door signs the cookie. The journey reads the cookie and must refuse a cookie whose signature fails.
+F-12-009 ambiguity/rewrite claimShift=unresolved removal=- propose/claim-shift note=The source It can be the verdict or the journey; the candidate writes the verdict in (added:content:verdict).
+F-12-010 residue/delete claimShift=none removal=- propose/tangent note=The one-word paragraph carries no claim (sentence:0).
+F-12-011 residue/delete claimShift=none removal=- propose/tangent note=A bare status code carries no claim (sentence:0).
+F-12-012 term/rewrite claimShift=none removal=material fix/verified note=Since to because states the same cause (removed:connective:since, added:connective:because).
+F-12-013 term/rewrite claimShift=none removal=- fix/verified note=Checks to validates names the same act (removed:content:checks, added:content:validates).
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+F-12-013 elements=content:validates,content:checks candidateHash=595f831065ee
+=== build 11b-rewrite-source-swapped-old-item-kept ===
+build-triage: verification: F-12-007 rewrite verdict was made against another candidate (hash differs); record is stale
+build-triage: verification: F-12-013 rewrite verdict was made against another candidate (hash differs); record is stale
+build-triage: claims: nominated 12; claimShift material 3, missing 1, none 5, stale 3, unresolved 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 2, propose 10
+build-triage: verification: files read 1, ignored 0; verdicts applied 8 (removals 1), items rejected 2
+build-triage: 1 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=material removal=- propose/claim-shift note=The rule weakens: must refuse in the source, should refuse in the candidate (removed:modal:must, added:modal:should).
+F-12-003 repetition/delete claimShift=material removal=- propose/claim-shift note=The timestamp rule is stated only in the deleted sentence (line 7), so the claim is lost; the record names the loss as a repetition it is not (sentence:0).
+F-12-004 compression/rewrite claimShift=material removal=- propose/claim-shift note=The candidate states a cause the page does not, that the routing service never reads the cookie content (added:negation:never, added:connective:because, added content).
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=stale removal=- propose/stale note=-
+F-12-008 repetition/delete claimShift=none removal=- propose/tangent note=Both claims survive at line 3: The front door signs the cookie. The journey reads the cookie and must refuse a cookie whose signature fails.
+F-12-009 ambiguity/rewrite claimShift=unresolved removal=- propose/claim-shift note=The source It can be the verdict or the journey; the candidate writes the verdict in (added:content:verdict).
+F-12-010 residue/delete claimShift=none removal=- propose/tangent note=The one-word paragraph carries no claim (sentence:0).
+F-12-011 residue/delete claimShift=none removal=- propose/tangent note=A bare status code carries no claim (sentence:0).
+F-12-012 term/rewrite claimShift=none removal=material fix/verified note=Since to because states the same cause (removed:connective:since, added:connective:because).
+F-12-013 term/rewrite claimShift=stale removal=- propose/stale note=-
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+page hash unchanged: yes
+F-12-013 applicable=unique elements=content:validates,content:checks candidateHash=b0c826ca5c30
+=== build 12a-retry-removal-part-missing ===
+build-triage: verification: F-12-007 rewrite verdict was made against another candidate (hash differs); record is stale
+build-triage: verification: F-12-012 has no removal verdict in its item; removal stays unverified
+build-triage: claims: nominated 12; claimShift material 3, missing 1, none 6, stale 2, unresolved 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 3, propose 9
+build-triage: verification: files read 1, ignored 0; verdicts applied 9 (removals 0), items rejected 2
+build-triage: 2 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=material removal=- propose/claim-shift note=The rule weakens: must refuse in the source, should refuse in the candidate (removed:modal:must, added:modal:should).
+F-12-003 repetition/delete claimShift=material removal=- propose/claim-shift note=The timestamp rule is stated only in the deleted sentence (line 7), so the claim is lost; the record names the loss as a repetition it is not (sentence:0).
+F-12-004 compression/rewrite claimShift=material removal=- propose/claim-shift note=The candidate states a cause the page does not, that the routing service never reads the cookie content (added:negation:never, added:connective:because, added content).
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=stale removal=- propose/stale note=-
+F-12-008 repetition/delete claimShift=none removal=- propose/tangent note=Both claims survive at line 3: The front door signs the cookie. The journey reads the cookie and must refuse a cookie whose signature fails.
+F-12-009 ambiguity/rewrite claimShift=unresolved removal=- propose/claim-shift note=The source It can be the verdict or the journey; the candidate writes the verdict in (added:content:verdict).
+F-12-010 residue/delete claimShift=none removal=- propose/tangent note=The one-word paragraph carries no claim (sentence:0).
+F-12-011 residue/delete claimShift=none removal=- propose/tangent note=A bare status code carries no claim (sentence:0).
+F-12-012 term/rewrite claimShift=none removal=missing fix/verified note=Since to because states the same cause (removed:connective:since, added:connective:because).
+F-12-013 term/rewrite claimShift=none removal=- fix/verified note=Checks to validates names the same act (removed:content:checks, added:content:validates).
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== build 12b-retry-complete-file ===
+build-triage: verification: F-12-007 rewrite verdict was made against another candidate (hash differs); record is stale
+build-triage: claims: nominated 12; claimShift material 3, missing 1, none 6, stale 2, unresolved 1; introductions held 2; layout-only 1
+build-triage: buckets author 1, discard 2, fix 3, propose 9
+build-triage: verification: files read 1, ignored 0; verdicts applied 9 (removals 1), items rejected 1
+build-triage: 1 records have an unverified rewrite or removal; spawn CLAIM_VERIFIER for: 12-claims.md
+F-12-002 flow/rewrite claimShift=material removal=- propose/claim-shift note=The rule weakens: must refuse in the source, should refuse in the candidate (removed:modal:must, added:modal:should).
+F-12-003 repetition/delete claimShift=material removal=- propose/claim-shift note=The timestamp rule is stated only in the deleted sentence (line 7), so the claim is lost; the record names the loss as a repetition it is not (sentence:0).
+F-12-004 compression/rewrite claimShift=material removal=- propose/claim-shift note=The candidate states a cause the page does not, that the routing service never reads the cookie content (added:negation:never, added:connective:because, added content).
+F-12-005 term/rewrite claimShift=missing removal=- discard/introduced-missing note=-
+F-12-007 term/rename claimShift=stale removal=- propose/stale note=-
+F-12-008 repetition/delete claimShift=none removal=- propose/tangent note=Both claims survive at line 3: The front door signs the cookie. The journey reads the cookie and must refuse a cookie whose signature fails.
+F-12-009 ambiguity/rewrite claimShift=unresolved removal=- propose/claim-shift note=The source It can be the verdict or the journey; the candidate writes the verdict in (added:content:verdict).
+F-12-010 residue/delete claimShift=none removal=- propose/tangent note=The one-word paragraph carries no claim (sentence:0).
+F-12-011 residue/delete claimShift=none removal=- propose/tangent note=A bare status code carries no claim (sentence:0).
+F-12-012 term/rewrite claimShift=none removal=material fix/verified note=Since to because states the same cause (removed:connective:since, added:connective:because).
+F-12-013 term/rewrite claimShift=none removal=- fix/verified note=Checks to validates names the same act (removed:content:checks, added:content:validates).
+F-13-001 term/rename claimShift=stale removal=- propose/stale note=-
+=== nominated records at none, per build ===
+1-no-files: none=(no record)
+2-valid-file: none=F-12-008,F-12-010,F-12-011,F-12-012,F-12-013
+3-wrong-file-hash: none=(no record)
+4-bad-items: none=F-12-008,F-12-012
+5-stale-page: none=(no record)
+6-unparseable-file: none=(no record)
+7-verifiedBy-not-a-string: none=(no record)
+8-wrong-hash-and-blank-verifiedBy: none=(no record)
+9-items-not-an-array: none=(no record)
+10-deletion-span-changed-old-item-kept: none=F-12-010,F-12-011,F-12-012,F-12-013
+11a-rewrite-verified: none=F-12-008,F-12-010,F-12-011,F-12-012,F-12-013
+11b-rewrite-source-swapped-old-item-kept: none=F-12-008,F-12-010,F-12-011,F-12-012
+12a-retry-removal-part-missing: none=F-12-008,F-12-010,F-12-011,F-12-012,F-12-013
+12b-retry-complete-file: none=F-12-008,F-12-010,F-12-011,F-12-012,F-12-013

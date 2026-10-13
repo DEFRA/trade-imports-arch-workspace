@@ -1,0 +1,101 @@
+##### sample
+sample: wrote WORK/variants/sample/calibration/round-1.md
+sample: round 1 mix (8 items): author/author 1, fix/verified 2, propose/inference 1, propose/no-rewrite 1, propose/removal 1, propose/restructure 1, propose/unresolved 1
+exit-code: 0
+sample: wrote WORK/variants/sample/calibration/round-2.md
+sample: round 2 mix (5 items of 6 requested, targets exhausted): fix/verified 2, propose/no-rewrite 1, propose/removal 2
+exit-code: 0
+grade-triage: round 1 already exists at WORK/variants/sample/calibration/round-1.json. Use --round 2 for the next round, bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/grade-triage.sh render --dir WORK/variants/sample --round 1 to redraw its cards, or --force to re-sample round 1 (labels of clusters that drop out of the round stay in labels.json but are no longer compared).
+exit-code: 1
+grade-triage: no unsampled cluster with a remaining target is left for round 3; every category is exhausted. Raise the targets with --targets, or stop sampling.
+exit-code: 1
+grade-triage: no grades under WORK/variants/sample/calibration/grades/. Have the grader write calibration/grades/<name>.json ({gradedBy, mode, round, items: [{cluster, move, side, confidence, heuristic, why}]}) and re-run score.
+exit-code: 2
+##### label
+sample: wrote WORK/variants/label/calibration/round-1.md
+sample: round 1 mix (6 items): author/author 1, fix/verified 1, propose/inference 1, propose/no-rewrite 1, propose/removal 1, propose/restructure 1
+exit-code: 0
+label: recorded 3 labels for round 1
+label: overwrote C-02-001
+exit-code: 0
+grade-triage: T in entry '6 T' needs a note saying what to decide
+grade-triage: the labels string is refused whole; nothing written. Fix the entries named above (grammar: <n> <M> [note], M in R C W K O I T, K:A or K:B, T needs a note; entries separated by ; or newline).
+exit-code: 1
+label: recorded 3 labels for round 1
+label: overwrote C-03-003
+label: overwrote C-02-005
+exit-code: 0
+label: recorded 1 label for round 1
+label: overwrote C-03-002
+exit-code: 0
+grade-triage: unknown move 'Z' in entry '3 Z' (R remove, C correct, W reword, K keep one side, O record as open, I ignore for now, T tell me what to do)
+grade-triage: the labels string is refused whole; nothing written. Fix the entries named above (grammar: <n> <M> [note], M in R C W K O I T, K:A or K:B, T needs a note; entries separated by ; or newline).
+exit-code: 1
+grade-triage: side ':A' in entry '2 C:A' applies to K only
+grade-triage: side 'C' in entry '1 K:C' is not A or B
+grade-triage: the labels string is refused whole; nothing written. Fix the entries named above (grammar: <n> <M> [note], M in R C W K O I T, K:A or K:B, T needs a note; entries separated by ; or newline).
+exit-code: 1
+grade-triage: card 7 in entry '7 R' is outside the round (cards 1 to 6)
+grade-triage: the labels string is refused whole; nothing written. Fix the entries named above (grammar: <n> <M> [note], M in R C W K O I T, K:A or K:B, T needs a note; entries separated by ; or newline).
+exit-code: 1
+grade-triage: entry '6' is not <n> <M> [note] (M is R C W K O I T; K may be K:A or K:B)
+grade-triage: card 5 appears more than once (entries '5 I', '5 R')
+grade-triage: the labels string is refused whole; nothing written. Fix the entries named above (grammar: <n> <M> [note], M in R C W K O I T, K:A or K:B, T needs a note; entries separated by ; or newline).
+exit-code: 1
+grade-triage: round 3 not found at WORK/variants/label/calibration/round-3.json. Sample it first: bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/grade-triage.sh sample --dir WORK/variants/label --round 3
+exit-code: 1
+##### agree
+sample: wrote WORK/variants/agree/calibration/round-1.md
+sample: round 1 mix (6 items): author/author 1, fix/verified 1, propose/inference 1, propose/no-rewrite 1, propose/removal 1, propose/restructure 1
+exit-code: 0
+label: recorded 6 labels for round 1
+label: overwrote C-02-001
+label: overwrote C-03-003
+label: overwrote C-02-005
+exit-code: 0
+agree: round 1, 3 of 6 items compared (no grade: C-02-006, C-03-003, C-02-005)
+agree: move 1 of 3 (0.33); side where both chose K none
+agree: equivalent moves: 0
+  category             n      move
+  author/author        1  0 (0.00)
+  fix/verified         1  1 (1.00)
+  propose/restructure  1  0 (0.00)
+agree: move confusion (user rows, grader columns, as said)
+     R  C  W  K  O  I  T
+  R  0  0  0  0  0  0  0
+  C  0  1  0  0  0  0  0
+  W  0  0  0  0  0  0  0
+  K  0  0  0  0  1  0  0
+  O  0  0  0  0  0  0  0
+  I  0  0  0  0  0  0  0
+  T  0  0  0  0  0  1  0
+agree: disagreements
+  1. C-03-002 author/author: user K:B (the record is the home of the lifetime) | grader O (H-08: The pointer's target is inferred, so the cookie rule's home is an open point with an owner.)
+  6. C-03-004 propose/restructure: user T (say which page holds the cookie rule) | grader I (H-11: The record carries no rewrite, so the move it supports is to leave the opening as it stands.)
+exit-code: 0
+sample: wrote WORK/variants/agree/calibration/round-2.md
+sample: round 2 mix (6 items): fix/verified 2, propose/no-rewrite 1, propose/removal 2, propose/unresolved 1
+exit-code: 0
+grade-triage: no cluster in round 2 has both a label and a grade (no label: C-02-004, C-xx-001, C-03-005, C-02-003; no grade: C-02-002, C-xx-001, C-03-006, C-03-005, C-02-003). Record labels with bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/grade-triage.sh label --dir WORK/variants/agree --round 2 --labels "..." and have the grader cover the round's clusters.
+exit-code: 2
+##### score
+sample: wrote WORK/variants/score/calibration/round-1.md
+sample: round 1 mix (6 items): author/author 1, fix/verified 1, propose/inference 1, propose/no-rewrite 1, propose/removal 1, propose/restructure 1
+exit-code: 0
+label: recorded 6 labels for round 1
+label: overwrote C-02-001
+label: overwrote C-03-003
+label: overwrote C-02-005
+exit-code: 0
+score: run revise, intent clarify; 12 of 13 clusters graded (coverage 0.92)
+  scope                 graded  R  C  W  K  O  I  T  closed  ignored  load
+  overall                12/13  5  1  2  0  2  2  0    0.67     0.17     2
+  02-sample-routing.md     6/6  4  1  1  0  0  0  0    1.00     0.00     0
+  03-sample-session.md     5/6  0  0  1  0  2  2  0    0.20     0.40     2
+  set                      1/1  1  0  0  0  0  0  0    1.00     0.00     0
+score: closed is the share of grades predicting R, C or W among graded clusters; it consults neither the plan's eligibility nor applied edits
+score: 2 grade(s) name clusters not in triage.json: C-02-007, C-02-008
+score: agreement on 7 labelled clusters: move 1 of 7 (0.14); side where both chose K none; equivalent moves 0
+exit-code: 0
+--- the score section's labels are the agree section's ---
+labels.json identical: yes

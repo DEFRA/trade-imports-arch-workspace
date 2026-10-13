@@ -1,0 +1,41 @@
+--- INS07 ---
+{"added":[{"class":"connective","term":"then"},{"class":"content","term":"ends"}],"removed":[{"class":"connective","term":"but"},{"class":"connective","term":"rather"},{"class":"connective","term":"than"},{"class":"modal","term":"can"},{"class":"quantifier","term":"only"},{"class":"content","term":"decision"}],"missingSentence":["How journeys validate those internal requests is a decision rather than a gap:"],"nominated":true,"layoutOnly":false}
+exit 0
+--- INS15 ---
+{"added":[{"class":"connective","term":"therefore"},{"class":"connective","term":"when"},{"class":"modal","term":"can"},{"class":"negation","term":"not"},{"class":"content","term":"depends"}],"removed":[{"class":"connective","term":"rather"},{"class":"connective","term":"so"},{"class":"connective","term":"than"},{"class":"quantifier","term":"any"},{"class":"content","term":"hangs"},{"class":"content","term":"moment"},{"class":"content","term":"formula"},{"class":"content","term":"operand"}],"missingSentence":[],"nominated":true,"layoutOnly":false}
+exit 0
+--- INS18 ---
+{"added":[{"class":"connective","term":"after"},{"class":"connective","term":"instead"},{"class":"connective","term":"therefore"},{"class":"connective","term":"when"},{"class":"modal","term":"must"},{"class":"negation","term":"refuses"},{"class":"content","term":"works"},{"class":"content","term":"differently"},{"class":"content","term":"explicitly"},{"class":"content","term":"refusals"},{"class":"content","term":"role-staleness"},{"class":"content","term":"depends"},{"class":"content","term":"outcome"},{"class":"content","term":"applies"},{"class":"content","term":"remains"},{"class":"content","term":"unknown"}],"removed":[{"class":"connective","term":"rather"},{"class":"connective","term":"since"},{"class":"connective","term":"so"},{"class":"connective","term":"than"},{"class":"connective","term":"then"},{"class":"negation","term":"not"},{"class":"negation","term":"refusal"},{"class":"content","term":"changes"},{"class":"content","term":"character"},{"class":"content","term":"kept"},{"class":"content","term":"apart"},{"class":"content","term":"inference"},{"class":"content","term":"wrong"},{"class":"content","term":"people"},{"class":"content","term":"read"},{"class":"content","term":"rule"},{"class":"content","term":"holds"},{"class":"content","term":"rests"},{"class":"content","term":"known"}],"missingSentence":["Ending a session for lost access changes character.","Two cases are kept apart from a refusal so that the inference does not sign out the wrong people."],"nominated":true,"layoutOnly":false}
+exit 0
+--- INS11 ---
+{"added":[],"removed":[],"missingSentence":[],"nominated":false,"layoutOnly":false}
+exit 0
+--- named evidence ---
+INS07 missing decision sentence and removed decision: 0
+INS15 added modal can: 0
+INS18 missing non-refusal sentence and removed then: 0
+INS11 unnominated and not layout-only: 0
+--- execution failures ---
+--- no arguments ---
+claim-diff: both --before <file> and --after <file> are required
+exit 1
+--- missing --after ---
+claim-diff: both --before <file> and --after <file> are required
+exit 1
+--- unreadable before ---
+claim-diff: not a readable file: WORK/pairs/nope.before
+exit 1
+--- no library (HOME with no workspace) ---
+claim-diff: nominator library not found at WORK/home-empty/trade-imports-arch-workspace/.claude/tools/editorial-triage/lib/claim-elements.jq; the editorial-triage tools must be present
+exit 1
+--- a library jq cannot compile (jq's own compile message elided; only the wrapper's diagnostic kept) ---
+claim-diff: jq failed (exit 3)
+exit 2
+--- multi-line before, empty after ---
+{"added":[],"removed":[{"class":"number","term":"first"},{"class":"number","term":"second"},{"class":"content","term":"sentence"},{"class":"content","term":"holds"},{"class":"content","term":"claim"}],"missingSentence":["The first sentence holds a claim.","The second sentence holds another claim."],"nominated":true,"layoutOnly":false}
+exit 0
+--- trailing newline only ---
+{"added":[],"removed":[],"missingSentence":[],"nominated":false,"layoutOnly":true}
+exit 0
+trailing newline unnominated and layout-only: 0
+exit-code: 0

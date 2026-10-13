@@ -1,0 +1,39 @@
+{
+  "name": "editorial-triage",
+  "started_at": "2026-09-10T10:21:44Z",
+  "answered_at": null,
+  "scaffolded_at": "2026-09-10T10:22:47Z",
+  "answers": {
+    "purpose": "Close the findings of an editorial review: grade every finding into one closing move against the calibrated rubric, score the run, build the closing plan, spot-check the batch with the user, and apply the removals, corrections and rewordings to the pages as an uncommitted diff.",
+    "dependencies": {
+      "resolution": "none",
+      "declared": [],
+      "justification": ""
+    },
+    "state_shape": "json",
+    "dispatcher": false,
+    "prebake": false,
+    "fanout": {
+      "enabled": true,
+      "workers": [
+        "GRADER",
+        "LEGACY_CLASSIFIER"
+      ]
+    },
+    "walker": false,
+    "helpers": [
+      "build-triage",
+      "grade-triage"
+    ],
+    "triggers": {
+      "phrases": [
+        "triage the review",
+        "triage findings",
+        "editorial triage",
+        "close the review",
+        "triage the editorial review"
+      ],
+      "disambiguation": "Not /init (CLAUDE.md scaffolding). Not editorial (writes and reviews prose) nor editorial-review (produces findings). This skill consumes review findings, decides one closing move for each, and applies the mechanical moves to the pages without committing."
+    }
+  }
+}
