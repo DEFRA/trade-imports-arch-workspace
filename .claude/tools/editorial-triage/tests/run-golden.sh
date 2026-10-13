@@ -11,7 +11,11 @@
 # are copied first, so a case extends a sibling without duplicating its JSON.
 # Combined stdout+stderr (the temp path normalised to WORK, the workspace path
 # to WS) and the files the helpers write (the JSON and markdown at the top of
-# calibration/, plus closing/ and pages/) diff against expected/<case>/. The
+# calibration/, plus closing/ and pages/) diff against expected/<case>/. Only a
+# file the case created or changed is compared: a file still byte-identical to
+# the staged fixture is left out, so an untouched page is asserted by its
+# absence, and a case that changes a file it should not shows that file as an
+# extra one in the diff. The
 # helpers resolve via $HOME/trade-imports-arch-workspace so the pre-commit
 # temp-HOME seam tests the STAGED scripts. A fixture that carries
 # manifest.template.json gets its manifest.json rendered from it before the
@@ -53,6 +57,13 @@ stage_fixture() {  # $1 case dir, $2 work dir - copies the base (if any) then th
 
 normalise() { sed "s|$WORK|WORK|g; s|$REAL_WS|WS|g"; }
 
+written_by_case() {  # $1 a file under $WORK: true unless it is byte-identical to the staged fixture
+    local rel now
+    rel=".${1#"$WORK"}"
+    now=$(shasum "$1" | awk '{print $1}')
+    ! grep -qxF "$now  $rel" "$STAGED"
+}
+
 render_manifest() {  # $1 work dir: manifest.template.json -> manifest.json with the pages' hashes
     local h
     h=$(jq -r '.pages[] | [.page, .path] | @tsv' "$1/manifest.template.json" | while IFS=$'\t' read -r p f; do
@@ -74,6 +85,8 @@ for case_dir in "$TESTS_DIR"/fixtures/*/; do
         continue
     fi
     [[ -f "$WORK/manifest.template.json" ]] && render_manifest "$WORK"
+    STAGED="$ACTUAL.staged"
+    (cd "$WORK" && find . -type f -exec shasum {} +) > "$STAGED"
     out=$(HELPER_DIR="$HELPER_DIR" WORK="$WORK" bash "$WORK/case.sh" 2>&1)
     rc=$?
     if [[ "$rc" -eq 77 ]]; then
@@ -90,6 +103,7 @@ for case_dir in "$TESTS_DIR"/fixtures/*/; do
     # the grader files a fixture stages under calibration/grades/ are inputs and stay out.
     for f in "$WORK"/calibration/*.json "$WORK"/calibration/*.md; do
         [[ -f "$f" ]] || continue
+        written_by_case "$f" || continue
         mkdir -p "$ACTUAL/calibration"
         normalise < "$f" > "$ACTUAL/calibration/$(basename "$f")"
     done
@@ -99,6 +113,7 @@ for case_dir in "$TESTS_DIR"/fixtures/*/; do
     for d in closing pages; do
         for f in "$WORK/$d"/*; do
             [[ -f "$f" ]] || continue
+            written_by_case "$f" || continue
             mkdir -p "$ACTUAL/$d"
             normalise < "$f" > "$ACTUAL/$d/$(basename "$f")"
         done
@@ -123,7 +138,7 @@ for case_dir in "$TESTS_DIR"/fixtures/*/; do
     else
         say "ok $case"
     fi
-    rm -rf "$WORK" "$ACTUAL" "$ACTUAL.diff"
+    rm -rf "$WORK" "$ACTUAL" "$ACTUAL.diff" "$STAGED"
 done
 
 if [[ "$COUNT" -eq 0 ]]; then
