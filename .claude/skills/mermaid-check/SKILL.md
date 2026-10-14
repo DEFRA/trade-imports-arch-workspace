@@ -12,9 +12,9 @@ Diagrams here live in two places. Nearly all are fenced ` ```mermaid ` blocks in
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
-## When to use
+## Usage
 
-| Trigger                  | What to follow                            |
+| Trigger                  | Steps                                     |
 | ------------------------ | ----------------------------------------- |
 | "check mermaid"          | Step 0, then Verify                       |
 | "validate diagrams"      | Step 0, then Verify                       |

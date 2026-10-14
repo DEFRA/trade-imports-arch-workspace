@@ -9,9 +9,9 @@ metadata:
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
-## When to use
+## Usage
 
-| Trigger | What to follow |
+| Trigger | Steps |
 |---------|----------------|
 | "test depend" | TODO - section name |
 

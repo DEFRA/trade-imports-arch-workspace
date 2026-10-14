@@ -1,0 +1,6 @@
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/question-heading.md:3: ## What a journey backend checks
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/question-heading.md:7: ### How is a session started
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/question-heading.md:15: ## Is the cookie sealed?
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/question-heading.md:19: ## Why the database is private
+check-prose: FAQ voice in a heading - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Headings, lists and tables"). Name the topic as a noun phrase in title case: "Session Assertion Checks", not "What a journey backend checks".
+exit-code: 2

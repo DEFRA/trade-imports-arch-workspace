@@ -21,9 +21,9 @@ Why depend rather than port: the publish pipeline is actively maintained in the 
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
-## When to use
+## Usage
 
-| Trigger                 | What to follow |
+| Trigger                 | Steps |
 | ----------------------- | -------------- |
 | "publish to confluence" | Step 0 onward  |
 | "push to confluence"    | Step 0 onward  |

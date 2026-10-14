@@ -16,9 +16,9 @@ Create or edit a GitHub pull request for the workspace or any child repo. The ou
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
-## When to use
+## Usage
 
-| Trigger | What to follow |
+| Trigger | Steps |
 |---------|----------------|
 | "create a pr" | Steps 1-3 |
 | "push to a pr" | Steps 1-3 |

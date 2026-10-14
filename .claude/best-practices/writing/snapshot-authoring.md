@@ -17,7 +17,7 @@ This holds for every document the work produces, deliverables and working artefa
 
 Record how a document changed only where the person who asked for the document asked for that record. Provenance apparatus added unasked is work the reader has to remove before using the document.
 
-## Why
+## Rationale
 
 A dated annotation forces each reader to reconstruct the current position from a sequence of corrections. Version control or the publishing platform already records that history, so repeating it in the document weakens coherence without adding information.
 

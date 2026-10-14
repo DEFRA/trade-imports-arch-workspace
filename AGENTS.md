@@ -5,7 +5,7 @@ follow the [agents.md](https://agents.md/) standard (Cursor, Codex, and
 others) read this file natively; Claude Code loads it through the import
 in `CLAUDE.md`, which adds a Claude-specific layer on top.
 
-## What this workspace is
+## Workspace Purpose
 
 A shared home for AI skills and tooling supporting DEFRA trade-imports
 architecture work. The shared component - and the point of this repo - is
@@ -69,7 +69,7 @@ deterministic work. They are plain bash + curl + jq - runnable by any
 agent or by hand, no harness required. Run any script with `--help` (or
 read its header) for usage.
 
-| Domain | What it provides |
+| Domain | Tools |
 | --- | --- |
 | `jira/` | `fetch.sh` (JQL or batch-key fetch, flat JSON projection), `create-ticket.sh`, `update-description.sh`, `auth.sh` pre-flight |
 | `confluence/` | Hand tools for ad-hoc Confluence page reads, writes and doc sync |

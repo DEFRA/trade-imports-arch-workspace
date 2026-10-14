@@ -9,9 +9,9 @@ Consumes the output of an editorial review (the saved run record of the `editori
 
 The frame is closing, not opening. Every finding gets exactly one closing move: `R` remove, `C` correct, `W` reword, `K` keep one side, `O` record as open with an owner, `I` ignore for now, `T` tell me what to do. Removal is tried first, growth needs a heuristic that allows the growth, and no question is put to the user in chat. The rubric that defines the moves: [`assets/grading-rubric.md`](assets/grading-rubric.md). The record contract and every rule the helpers apply: [`assets/editorial-triage-schema.md`](assets/editorial-triage-schema.md).
 
-## When to use
+## Usage
 
-| Trigger | What to follow |
+| Trigger | Steps |
 |---------|----------------|
 | "triage the review", "triage the editorial review", "close the review" | Steps 1 to 8 on the review's run record |
 | "triage findings" | Steps 1 to 8 on a findings directory (`--from-review`) |

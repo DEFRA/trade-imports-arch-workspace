@@ -1,0 +1,6 @@
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/faq-label.md:3: | Field | What the field holds | When it changes | Set by |
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/faq-label.md:11: - **What John sees.** John sees the dashboard.
+check-prose: FAQ voice in a label - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Headings, lists and tables"). A table header or a bold lead-in names its topic as a noun phrase in title case: "Condition", not "When the session is in it"; "End State", not "What John sees".
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/faq-label.md:3: | Field | What the field holds | When it changes | Set by |
+check-prose: WARN hits are table headers that trail off on a preposition ("Set by", "Used by") - a clause fragment, not a noun phrase: name the role, "Source", "Writer" (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Headings, lists and tables").
+exit-code: 2

@@ -24,9 +24,9 @@ Before either mode, Read these into context (the checklist must be live; anti-pa
 - `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md` - known mis-applications. Grows over time.
 - `~/trade-imports-arch-workspace/.claude/best-practices/skills/scaffold-template.md` - only Read in CREATE mode (the SKILL.md skeleton + decisions.md sidecar).
 
-## When to use
+## Usage
 
-| Trigger | Mode | What to follow |
+| Trigger | Mode | Steps |
 | --- | --- | --- |
 | "scaffold skill `<name>`", "skill-create `<name>`", "new workspace skill `<name>`" | CREATE | Step 0 dispatch → `references/INTERVIEWER.md` (parent-loaded) |
 | "audit skill `<name>`", "review skill `<name>` against patterns" | AUDIT (single) | Step 0 dispatch → spawn one AUDITOR worker |
