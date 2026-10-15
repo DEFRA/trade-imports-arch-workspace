@@ -77,6 +77,8 @@ The publisher's summary counts (`Successful / Failed / Skipped`) are not suffici
 - `❌ Failed to publish <file>: <N> image upload(s) failed: <names>` after an `Updated successfully` or `Created successfully` line - the page text is live, but the named images show as broken until they upload, and the summary counts the page as failed with a non-zero exit. Report: published with failed images, the page link, and the image names verbatim. The remedy is running the same PUBLISH_CMD again: the cause is usually a network failure (`ETIMEDOUT`, `ENOTFOUND`) or an HTTP error, which the preceding `❌ Failed to upload image` line names.
 - `⚠️  Link not resolved to a Confluence page: <url> (<reason>); linking to GitHub` (or `; left unchanged`) - the page published, but that link points to the GitHub source, or stays as written, instead of a Confluence page. Report it as published-degraded with the URL and reason. A target with no page yet resolves on a later publish once its page exists; `not in publishPaths` needs a config entry.
 - `⚠️  Link not rewritten (unsupported markdown link form): <url>` - the link stays relative and is broken in Confluence; report it as published-degraded. The usual cause is a reference-style link, which the source page can change to an inline link.
+- `⚠️  Anchor not found: <url> (...)` - a link names a heading slug no heading in its target, or on its own page, matches; the link goes to the top of the page or stays as written. Report it as published-degraded; the remedy is correcting the anchor in the source page.
+- The run ends with a link check over every page it published: `🔗 Links checked: <n> on <p> page(s); broken <b>, external unreachable <e>`. Each `❌ Broken link on '<page>': <href> (<reason>)` line is a link that fails on Confluence (a missing page, an anchor no heading matches, or a link to a markdown source on GitHub instead of its Confluence page); the publish exits non-zero and the summary prints `Broken links: <b>`. Report every broken line verbatim as published-broken. A `⚠️  External link not reachable from here` line is a warning, because an external site can refuse an anonymous request a signed-in reader passes; list those lines for the user to check.
 - Any other non-zero exit or `Failed: ≥1` - report the `❌` line verbatim.
 
 On success, construct the link from Step 0 facts and the captured ID: `<CONFLUENCE_BASE>/spaces/<SPACE>/pages/<ID>`.
@@ -88,7 +90,8 @@ confluence-publish complete for <PAGE>.
 
 Outcome: created | updated | published with failed images (rerun) | NOT published (<reason>)
 Page: <CONFLUENCE_BASE>/spaces/<SPACE>/pages/<ID>
-Degraded: <missing or failed images and unresolved links, if any - otherwise omit this line>
+Degraded: <missing or failed images, unresolved links and anchors, if any - otherwise omit this line>
+Links: <checked> checked; broken <b> (each verbatim), external unreachable <e>
 
 Next: check the page renders as expected in Confluence.
 ```
