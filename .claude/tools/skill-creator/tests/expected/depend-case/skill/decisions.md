@@ -1,4 +1,4 @@
-# test-depend skill — decisions
+# test-depend skill - decisions
 
 Recorded during CREATE interview. Update if a shape choice
 changes; do not delete entries.
@@ -11,7 +11,7 @@ Fixture skill exercising the depend path and YAML's apostrophe escaping.
 
 **Resolution:** depend
 **Declared:** demo-project demo-tool
-**Why:** fixture justification
+**Reason:** fixture justification
 **Pattern reference:** patterns.md §9
 
 ## 3. State shape

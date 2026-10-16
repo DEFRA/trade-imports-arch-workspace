@@ -1,4 +1,4 @@
-# test-plain skill — decisions
+# test-plain skill - decisions
 
 Recorded during CREATE interview. Update if a shape choice
 changes; do not delete entries.
@@ -11,7 +11,7 @@ Fixture skill with JSON state, fan-out and no dependencies.
 
 **Resolution:** none
 **Declared:** (none)
-**Why:** (not applicable)
+**Reason:** (not applicable)
 **Pattern reference:** patterns.md §9
 
 ## 3. State shape
