@@ -135,3 +135,15 @@ apply: 02-sample-routing.md: would apply 1 of 2 entries, gate pass
 apply:   C-02-003 R skipped-multiple: the phrase occurs 2 times in the page
 apply: see the change with git -C 'WORK/variants/held/pages' diff -- .
 exit-code: 0
+##### ignored-contradiction
+plan: wrote WORK/variants/ignored-contradiction/closing/plan.md
+plan: 13 clusters: R 3, C 2, W 1, K 1, O 1, I 1, T 1; closed without the user 6, left to the user 1, problems 4
+exit-code: 0
+--- problems ---
+C-03-006 C no rewrite: the record carries no replacement text for C
+C-03-005 - ungraded: no label and no grade for this cluster
+C-xx-001 R no page file: the cluster is set-wide
+C-03-004 I ignored contradiction: S2: The opening sentence lists the fields before the reader knows what the record is for; what does the list establish here?
+--- the ignored contradiction is still an I entry ---
+C-02-003 R
+C-03-004 I
