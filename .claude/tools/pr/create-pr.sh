@@ -3,7 +3,7 @@
 #
 # Usage:
 #   bash create-pr.sh --title <title> --body-file <path> [--base main] [--head <branch>] [--repo <owner/name>] [--dry-run]
-#   bash create-pr.sh --edit <number> --body-file <path> [--repo <owner/name>] [--dry-run]
+#   bash create-pr.sh --edit <number> --body-file <path> [--title <title>] [--repo <owner/name>] [--dry-run]
 #   bash create-pr.sh --help
 #
 # Refuses (exit 2) any title or body containing AI attribution (the rule in
@@ -69,6 +69,7 @@ bash "$PROSE_GATE" "$BODY_FILE" \
 
 if [ -n "$EDIT" ]; then
   set -- pr edit "$EDIT" --body-file "$BODY_FILE"
+  [ -n "$TITLE" ] && set -- "$@" --title "$TITLE"
 else
   [ -n "$TITLE" ] || fail "--title is required when creating"
   set -- pr create --title "$TITLE" --body-file "$BODY_FILE" --base "$BASE"
