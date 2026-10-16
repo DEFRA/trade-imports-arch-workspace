@@ -11,7 +11,8 @@ The banked state of the editorial efficiency work at 16 Oct 2026: what the exper
 5. Done on 16 Oct: the redesign spec (`redesign-spec.md`); R2r, the facts-track repeat (stable at 88 to 96%); R3, the layered review (not passed as set up: repetition recall fell to 0.36 under a single capped set pass, while meaning-changing rewrites fell 59%); stage 3 built and tested (S3: 87% of P1's moves exactly, inside the Opus band), with ignored S1 and S2 contradictions now listed under Problems; the blind pack rebuilt with R3 and a scoring sheet. Not committed.
 6. R3b (one set pass per page) passed: recall 0.62, equal to two baseline runs' agreement, 20 new fixes, 39 applied edits, $6.40. Ben ruled on the 13 S1 and S2 design contradictions; the rulings are in `analysis/ins-authnz/session-pages-restructure.md`, session log of 16 October.
 7. Decision 7 taken on 16 Oct: the layered review is stage 2's target, confirmed by the blind pack scores. Stage 2 therefore forks a paragraph, page and set pass per page instead of drill units, structural reviewers and the cold editor, and the facts track becomes the `design-consistency` skill.
-8. Next: Ben scores the blind pack (`blind-pack/SCORING.md`, 8 letters for C3 including R3 and R3b); stage 1 and then stage 2 follow.
+8. The facts track is built as the `design-consistency` skill (16 Oct): per-page extraction cached by page hash, a register script, a checker limited to the register, and questions for `/decide`. Smoke-tested on R2r's facts and contradictions; no live run yet.
+9. Next: Ben scores the small blind pack (`blind-pack/small/SCORING.md`: three letters, a baseline, the package and R3b; the 8-letter pack is optional); stage 1 and then stage 2 follow.
 
 ## Decisions
 

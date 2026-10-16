@@ -29,6 +29,7 @@ analysis/
 .claude/workareas/editorial-triage/
 .claude/workareas/editorial/
 .claude/workareas/confluence-sync/
+.claude/workareas/design-consistency/
 
 # Editorial research run state (run records, cold-reader findings, story cards)
 editorial-research/
