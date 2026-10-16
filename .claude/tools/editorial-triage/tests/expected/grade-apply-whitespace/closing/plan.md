@@ -52,7 +52,7 @@ None.
 
 ## Problems
 
-Clusters the plan cannot close as they stand.
+Clusters the plan cannot close as they stand, and S1 or S2 contradictions the grade ignored, for the user to rule on.
 
 None.
 

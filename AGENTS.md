@@ -5,7 +5,7 @@ follow the [agents.md](https://agents.md/) standard (Cursor, Codex, and
 others) read this file natively; Claude Code loads it through the import
 in `CLAUDE.md`, which adds a Claude-specific layer on top.
 
-## What this workspace is
+## Workspace Purpose
 
 A shared home for AI skills and tooling supporting DEFRA trade-imports
 architecture work. The shared component - and the point of this repo - is
@@ -69,12 +69,14 @@ deterministic work. They are plain bash + curl + jq - runnable by any
 agent or by hand, no harness required. Run any script with `--help` (or
 read its header) for usage.
 
-| Domain | What it provides |
+| Domain | Tools |
 | --- | --- |
 | `jira/` | `fetch.sh` (JQL or batch-key fetch, flat JSON projection), `create-ticket.sh`, `update-description.sh`, `auth.sh` pre-flight |
 | `confluence/` | Hand tools for ad-hoc Confluence page reads, writes and doc sync |
 | `confluence-publish/` | Pre-flight and executor for publishing one docs page to Confluence |
 | `editorial-triage/` | `build-triage.sh` (normalise review findings, resolve anchors, gate rewrites, cluster, partition, rank), `grade-triage.sh` (calibrate the rubric against the user's closing moves, score a run, plan the move that closes each finding, apply the removals, corrections and rewordings to the pages) |
+| `design-consistency/` | `start-design-consistency.sh` (hash a page set and list the pages whose facts need extracting), `build-register.sh` (merge every page's facts into one register sorted by actor and object), `render-design-consistency.sh` (the checker's contradictions as questions, most severe first) |
+| `editorial-metrics/` | `extract-run.sh` (session and workflow transcripts to per-response and per-tool-call records), `summarise.sh` (cost by role and model, file and page visits, context composition, phase timeline), `predict.sh` (process-model formulas against the measured visits and context), `scenario.sh` (reprice a measured run under model, input and context changes), `run-metrics.sh` and `compare-runs.sh` (one run's metrics, and arms against a baseline noise band with recall of its fixes), `refs-inventory.sh` (reference document sizes) |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
 | `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
@@ -91,7 +93,7 @@ run when one fails:
 | `check-auth.sh` | every domain's credentials | on demand | fix the named env var in `.env` |
 | `check-deps.sh` | declared `workspace-deps` resolve on this machine | `make check` | clone the project / install the tool it names |
 | `lint-skills.sh` | declaration format, dangling links, undeclared-invocation sweep | pre-commit (staged index), scaffold tail, `make check` | fix and re-stage; acknowledge soft probes in `workspace-soft-deps` |
-| Golden tests (4 suites) | scaffold, doctor, prose-gate and editorial-triage behaviour vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
+| Golden tests (5 suites) | scaffold, doctor, prose-gate, editorial-triage and editorial-metrics behaviour vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
 | Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
 | Guard hooks (`.claude/hooks/`) | agent Bash and file-edit calls in Claude Code sessions | every matched tool call | follow the sanctioned alternative the denial names |
 | `check-prose.sh` (editorial style gate) | banned punctuation and words (FAIL), vague words and metaphor list (WARN) | `create-pr.sh` on every PR title/body; pre-commit on staged markdown; commit-msg on the message; skill-scoped hooks below | fix the FAIL lines it names; rules in `.claude/best-practices/writing/language.md` |

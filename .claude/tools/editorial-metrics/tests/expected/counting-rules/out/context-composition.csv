@@ -1,0 +1,12 @@
+"role","source","calls","result_tokens_est","share"
+"Drill unit 1 opening","scratch",1,0,0
+"drill","page",2,49,1
+"drill","scratch",1,0,0
+"drill","tool",1,0,0
+"main","page",5,40,0.76
+"main","tool",1,7,0.13
+"main","context-page",1,6,0.11
+"main","no-file:tool",1,0,0
+"verify","reference",1,15,0.59
+"verify","page",1,10,0.41
+"verify","run-state",1,0,0

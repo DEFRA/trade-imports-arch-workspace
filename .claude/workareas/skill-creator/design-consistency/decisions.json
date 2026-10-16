@@ -1,0 +1,40 @@
+{
+  "name": "design-consistency",
+  "started_at": "2026-10-16T19:21:46Z",
+  "answered_at": null,
+  "scaffolded_at": "2026-10-16T19:22:25Z",
+  "answers": {
+    "purpose": "Check a set of design pages for statements that cannot all hold: one extractor per page lists the page rules as structured facts, a script merges them into one register sorted by actor and object, one checker reads only the register and lists the contradictions, and each contradiction goes to the author as a question with both quotes; the skill never edits a page.",
+    "dependencies": {
+      "resolution": "none",
+      "declared": [],
+      "justification": ""
+    },
+    "state_shape": "json",
+    "dispatcher": true,
+    "prebake": false,
+    "fanout": {
+      "enabled": true,
+      "workers": [
+        "FACT_EXTRACTOR",
+        "CONSISTENCY_CHECKER"
+      ]
+    },
+    "walker": false,
+    "helpers": [
+      "start-design-consistency",
+      "build-register",
+      "render-design-consistency"
+    ],
+    "triggers": {
+      "phrases": [
+        "check design consistency",
+        "design consistency check",
+        "check these pages for contradictions",
+        "find contradictions across the pages",
+        "do the pages contradict each other"
+      ],
+      "disambiguation": "Distinct from /init (CLAUDE.md scaffolding). Distinct from editorial, which reviews prose and structure and closes by rewrite: this skill checks the facts the pages state against each other and closes by a question to the author, never a rewrite. Distinct from editorial-triage, which closes review findings, and from /decide, which only puts questions: design-consistency produces the contradictions that /decide then puts."
+    }
+  }
+}

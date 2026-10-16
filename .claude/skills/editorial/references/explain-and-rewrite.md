@@ -1,12 +1,14 @@
-# The reword loop
+# Explain and Rewrite
 
-The clarify reword path, taken when a heuristic or a judge flags a sentence the reader cannot restate after one reading, or when the user asks for a rewrite (an explicit request selects this path). It is never a route to change a claim: a rewrite keeps every claim of the unit, and grows only in the two cases the review brief names (`~/trade-imports-arch-workspace/.claude/skills/editorial/references/review-brief.md`, "Rules for every reviewer"), with the loss named. The rules of prose are `language.md`'s; this page is the procedure.
+Explain and rewrite is how the estate makes text clear through simple language (`language.md`, "Just Enough"). It runs under both intents. Use it when a heuristic or a judge flags a sentence the reader cannot restate after one reading, when a reviewer writes a reword, and when the user asks for a rewrite. A reviewer writing a finding runs steps 1 to 3; the editorial skill and the triage run the rest.
+
+Explain and rewrite never changes a claim: a rewrite keeps every claim of the unit. Under clarify, a rewrite grows only in the two cases the review brief names (`~/trade-imports-arch-workspace/.claude/skills/editorial/references/review-brief.md`, "Rules for every reviewer"), and says what each addition makes clear. Under distil, the paragraph ends no longer than its source. The rules of prose are `language.md`'s; this page is the procedure.
 
 ## The steps
 
 1. **Explain.** Write the sentence's meaning in plain words, as if the reader had asked "what do you mean?". Mark every part of the explanation the source does not establish: the explanation is generated text and can add claims as easily as the source can hide them.
 2. **Compare.** Set the explanation beside the source and list the claims the source holds: every quantity, condition, modal, exception and relation. Anything in the explanation that is not in that list is a question for the author or is dropped; nothing in the list may go.
-3. **Rewrite.** Write the candidate from the supported part of the explanation, in the house voice, with one `changes` line per sentence changed (or one line for a pure split or list).
+3. **Rewrite.** Write the candidate from the supported part of the explanation, in simple language and the house voice, with one `changes` line per sentence changed (or one line for a pure split or list). Check each sentence of the candidate against `language.md`, "Sentences and paragraphs". Explain and rewrite each sentence that still fails, and repeat until every sentence passes. Stop where a further explanation would need a guess, and put that part to the author as a question.
 4. **Check the deviation.** Run the nominator on the source and the candidate:
 
    ```

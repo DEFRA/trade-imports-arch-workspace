@@ -1,0 +1,38 @@
+extract-run: 11 responses, 13 calls from main + 2 subagents + 1 workflow agents -> WORK/out
+summarise: 4 agents, 5 role x model rows, 15 file rows, 6 page rows; total cost $1.18
+role verify claude-fable-5-1 responses=2 cache_write=30200 cache_read=30000 output=70 cost=0.39
+role drill claude-fable-5-1 responses=2 cache_write=25400 cache_read=25000 output=980 cost=0.37
+role main claude-fable-5-1 responses=3 cache_write=20800 cache_read=40500 output=200 cost=0.28
+role main claude-opus-5-5 responses=2 cache_write=21100 cache_read=21000 output=60 cost=0.11
+role Drill unit 1 opening claude-fable-5-1 responses=1 cache_write=400 cache_read=30050 output=300 cost=0.03
+page 00-foundations.md context-page main full=0 ranged=0 searches=1 sweep_share=0.33 edits=0
+page 02a-page.md page drill full=1 ranged=0 searches=0 sweep_share=0 edits=0
+page 02a-page.md page main full=1 ranged=0 searches=1 sweep_share=0.33 edits=1
+page 02a-page.md page verify full=0 ranged=1 searches=0 sweep_share=0 edits=0
+page 02b-page.md page drill full=0 ranged=1 searches=0 sweep_share=0 edits=0
+page 02b-page.md page main full=0 ranged=1 searches=1 sweep_share=0.33 edits=0
+phase review:Review agents:drill responses=2 synthetic=0 human=0 wakeups=0 resets=0
+phase setup main responses=2 synthetic=0 human=1 wakeups=0 resets=0
+phase verify main responses=1 synthetic=1 human=0 wakeups=1 resets=0
+phase triage agents:verify responses=2 synthetic=0 human=0 wakeups=0 resets=0
+phase fork agents:Drill unit 1 opening responses=1 synthetic=0 human=0 wakeups=0 resets=0
+phase plan main responses=2 synthetic=0 human=0 wakeups=0 resets=1
+calls Bash full-read 02a-page.md
+calls Bash filtered-read 02b-page.md
+calls Bash script check-prose.sh+drill-unit-one.txt
+calls Write write drill-1.json
+calls Read full-read CLAIM_VERIFIER.md
+calls Read ranged-read 02a-page.md
+calls Write write claims-02a-page.json
+calls Read full-read 02a-page.md
+calls Bash ranged-read 02b-page.md
+calls Bash search 02a-page.md+02b-page.md+00-foundations.md
+calls Agent tool 
+calls Bash script grade-triage.sh
+calls Edit edit 02a-page.md
+miss main model-switch n=1 tokens=20805
+turn drill n=2 median=27s max=27s
+turn main n=5 median=3s max=5s
+turn Drill unit 1 opening n=1 median=5s max=5s
+turn verify n=2 median=4s max=4s
+fork responses: f1; v1 rows: 1

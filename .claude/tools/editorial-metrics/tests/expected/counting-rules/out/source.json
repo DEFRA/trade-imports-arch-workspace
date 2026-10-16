@@ -1,0 +1,11 @@
+{
+  "session": "S1",
+  "workflows": [
+    "wf_x"
+  ],
+  "since": "",
+  "until": "",
+  "agentFilter": "",
+  "subagents": 2,
+  "workflowAgents": 1
+}

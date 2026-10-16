@@ -663,6 +663,14 @@ def plan_doc($triage; $findings; $grades; $labels; $manifest; $retains; $run):
   | sort_by(._sort) | map(del(._sort)) as $rows
   | [$rows[] | .entry | select(. != null)] as $entries
   | [$rows[] | .problem | select(. != null)] as $problems
+  # An S1 or S2 contradiction the grade ignores stays ignored, and is also a
+  # problem, so the user rules on which statement holds instead of losing it
+  # in the Ignored count.
+  | ($clusters | map({(.id): .}) | add // {}) as $byCluster
+  | [$entries[] | select(.move == "I") | . as $e | ($byCluster[$e.cluster] // {}) as $c
+      | select((($c.kinds // []) | index("contradiction")) != null and (["S1", "S2"] | index($c.severity // "")) != null)
+      | {cluster: $e.cluster, page: $e.page, line: $e.line, move: "I", source: $e.source,
+         reason: "ignored contradiction", note: "\($c.severity): \($e.defect // "no defect recorded")"}] as $ignoredContradictions
   | def n_move($m): [$entries[] | select(.move == $m)] | length;
     # A K, O or T entry the user has already labelled is decided: the answer is
     # in hand and only the edit remains. Only the entries still carrying the
@@ -681,7 +689,7 @@ def plan_doc($triage; $findings; $grades; $labels; $manifest; $retains; $run):
                 presentation: ([$entries[] | select(.source == "presentation")] | length)},
       retains: ($retains.retains // []),
       entries: $entries,
-      problems: $problems };
+      problems: ($problems + $ignoredContradictions) };
 
 # --- plan report -------------------------------------------------------------
 # plan.md reads the plan and the findings: every C, W and held entry shows the
@@ -768,7 +776,7 @@ def plan_md($run; $findings):
                (($p.retains // []) | map(retained_line)); "None.")
      + [ "", "## Ignored", "",
          "\(plural($p.ignored; "cluster"; "clusters")), nothing to change." ]
-     + section("Problems"; "Clusters the plan cannot close as they stand.";
+     + section("Problems"; "Clusters the plan cannot close as they stand, and S1 or S2 contradictions the grade ignored, for the user to rule on.";
                ($p.problems | map("- \(.cluster) \(at_line)"
                  + (if .move == null then "" else " \(.move)" end) + ": \(.reason)"
                  + (if .note == null then "" else " (\(.note))" end))); "None."))

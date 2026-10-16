@@ -311,23 +311,24 @@ const common = [
 // before it can return, so the per-page results are merged below.
 const structuralUnits = docs.map(d => ({ label: basename(d), path: d }))
 
-// The three reviewer roles below carry no model override on purpose. They produce the
-// findings, which is the judgment this workflow exists for, and the triage rubric is
-// calibrated against findings from the session model. Pin a cheaper tier here only
-// after comparing calibration/score.json across a matched pair of runs.
+// The reviewers are pinned to Opus so the session model is spent only on planning
+// and triage: a 16-page set spawns 33 reviewers. The triage rubric was calibrated
+// against findings from Fable reviewers; check calibration/score.json on the first
+// triaged Opus run.
+const REVIEWER_MODEL = 'opus'
 phase('Review')
 const results = await parallel([
   ...units.map(u => () => agent(
     `You are a drill reviewer in a fan-out editorial review.\n${common}\nYour assigned unit: ${u.label} in "${u.path}" - ${u.description}. Read every document whole for context, then review only this unit: on every paragraph, ask the drill questions the brief lists for this run's intent, in the brief's order. Gate scratch file: ${SCRATCH}/drill-${safeLabel(u.label)}.txt.`,
-    { label: `drill:${u.label}`, phase: 'Review', schema: FINDINGS_SCHEMA, agentType: 'general-purpose' },
+    { label: `drill:${u.label}`, phase: 'Review', schema: FINDINGS_SCHEMA, agentType: 'general-purpose', model: REVIEWER_MODEL },
   )),
   ...structuralUnits.map(u => () => agent(
     `You are a structural reviewer in a fan-out editorial review, assigned one page of the set.\n${common}\nYour assigned page: "${u.path}". Read every document whole for context, then apply the structural reviewer role in the brief to this page against the rest of the set: repetitions on this page whose home is elsewhere (one finding per occurrence, related naming the home), sections on this page in the wrong document or mode, headings, lists and tables on this page that do not match their content's job, cross-references on this page that do not resolve, contradictions between a statement on this page and another page, qualifications separated from their rules, and the brief's diagram look-for. Anchor every finding on this page. Cap: at most 12 findings and 6 redundancy entries, the most severe first. Gate scratch file: ${SCRATCH}/structural-${safeLabel(u.label)}.txt.`,
-    { label: `structural:${u.label}`, phase: 'Review', schema: STRUCTURAL_SCHEMA, agentType: 'general-purpose', effort: 'high' },
+    { label: `structural:${u.label}`, phase: 'Review', schema: STRUCTURAL_SCHEMA, agentType: 'general-purpose', model: REVIEWER_MODEL, effort: 'high' },
   )),
   () => agent(
     `You are the cold editor in a fan-out editorial review.\n${common}\nApply the cold editor role in the brief across the whole document set: reading order, page openings and carried-away sentences, the page retains the brief defines, and set-wide patterns; nothing sentence-level inside one unit. Gate scratch file: ${SCRATCH}/editor-pass.txt.`,
-    { label: 'editor-pass', phase: 'Review', schema: EDITOR_SCHEMA, agentType: 'general-purpose' },
+    { label: 'editor-pass', phase: 'Review', schema: EDITOR_SCHEMA, agentType: 'general-purpose', model: REVIEWER_MODEL },
   ),
 ])
 

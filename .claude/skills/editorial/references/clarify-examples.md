@@ -33,7 +33,7 @@ Here "the same" means unchanged between the two designs being compared. What the
 
 **The distinction.** Here, facts sitting in parallel whose order carries no meaning were easier to check as a list than as a coordinated sentence: the reader can count them and find the one they came for. That is what this reader preferred on this passage.
 
-**What this does not establish.** That prose is the wrong form for parallel facts in general: another writer's version kept them as short sentences and was also accepted. And that the whole candidate preserved every claim, which this verdict does not address.
+**Not Established.** That prose is the wrong form for parallel facts in general: another writer's version kept them as short sentences and was also accepted. And that the whole candidate preserved every claim, which this verdict does not address.
 
 ---
 
@@ -55,7 +55,7 @@ CDP is the authority responsible for the platform pattern under discussion. INS 
 
 **The distinction.** A retain is a decision, not an absence of one. A passage can be acceptable as written even when a preferred alternative exists, so "another version is better" is not by itself a reason to change the text.
 
-**What this does not establish.** That retaining was the better choice here, since the other revision was preferred. And it endorses none of the reasoning the reviewer gave for retaining.
+**Not Established.** That retaining was the better choice here, since the other revision was preferred. And it endorses none of the reasoning the reviewer gave for retaining.
 
 ---
 
@@ -87,15 +87,15 @@ That first sentence, without its full stop, is word for word the opening of the 
 
 It differs from the source in three ways. It equates fifty minutes with the renewal interval, where the source contrasts them. It treats the clock allowance as a proposal. And it makes the cookie go stale, where the source makes the roles go stale.
 
-**What is unresolved is which meaning was intended**, on the three differences just listed: whether fifty minutes is the renewal interval or is contrasted with it, whether the clock allowance is in force or proposed, and whether the roles or the cookie go stale. The question was put and never answered. This wording is a suggestion for the rejected opening, not an approved replacement for the passage, and nothing here shows it was tested or found easier to read.
+**The intended meaning is unresolved**, on the three differences just listed: whether fifty minutes is the renewal interval or is contrasted with it, whether the clock allowance is in force or proposed, and whether the roles or the cookie go stale. The question was put and never answered. This wording is a suggestion for the rejected opening, not an approved replacement for the passage, and nothing here shows it was tested or found easier to read.
 
 The scope of the source's "only if" is **not** among the unresolved points: it governs the staleness bound, as stated above.
 
 **The distinction.** Wording that reads more easily can carry a different claim, and a suggestion from any source, including the reader, is not automatically meaning-preserving. Check a candidate against the claim before its cadence.
 
-**Which branch this case is in.** The source's own intended meaning is unresolved here, so the question goes to the author rather than being settled by an edit. `reword-loop.md` carries the rule for choosing between those branches.
+**Branch.** The source's own intended meaning is unresolved here, so the question goes to the author rather than being settled by an edit. `explain-and-rewrite.md` carries the rule for choosing between those branches.
 
-**What this does not establish.** Which meaning was intended, or that the suggested wording is wrong. Only that the two texts differ in the three ways above and that the intended meaning remains unresolved.
+**Not Established.** Which meaning was intended, or that the suggested wording is wrong. Only that the two texts differ in the three ways above and that the intended meaning remains unresolved.
 
 ---
 
@@ -125,7 +125,7 @@ His standard:
 
 The second rejected sentence is the one to study. It ranks nothing and praises nothing, and reads as a plain statement of behaviour.
 
-**What this does not establish.** Any rule for detecting a tone defect. What the second sentence shows is narrower: a sentence carrying no obvious evaluative wording was rejected on tone in this case.
+**Not Established.** Any rule for detecting a tone defect. What the second sentence shows is narrower: a sentence carrying no obvious evaluative wording was rejected on tone in this case.
 
 ---
 
@@ -147,6 +147,6 @@ That is a framing sentence followed by a possessive pronoun. The verdict:
 
 **The distinction.** The objection is to a reference the reader could not resolve, not to pronouns. "Its answer" names the session API, which appears earlier in the same sentence, so that reference resolves where "that design" did not.
 
-**What this does not establish.** That every pronoun should be replaced, or that framing sentences should be deleted. Nor does accepting a candidate endorse each phrase that survived in it; the acceptance was of the whole, and the reader recorded a separate reservation about that passage's scope.
+**Not Established.** That every pronoun should be replaced, or that framing sentences should be deleted. Nor does accepting a candidate endorse each phrase that survived in it; the acceptance was of the whole, and the reader recorded a separate reservation about that passage's scope.
 
 **And it does not reach other rules.** Nothing here weakens the prohibition on changing a claim silently. These two facts bear on pronouns and framing constructions, and on nothing else.

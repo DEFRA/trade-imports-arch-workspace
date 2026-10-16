@@ -30,7 +30,7 @@ jq -c '.records[] | select(.cluster == "<cluster id>")' ~/trade-imports-arch-wor
 
 5. The page each item sits on, with the Read tool, around the item's line. Grade against the page, not against the card alone.
 
-## How to grade
+## Grading Procedure
 
 Two rules stand before every step. A cluster whose kinds hold `presentation`, or any member of which is a presentation record, is `O` and takes no other move (H-30). No `R`, `C` or `W` is returned until H-29's check passes on the edit record's own candidate and verdict, wherever in the steps you made the diagnosis; the rubric's H-29 and the contract's Closing files are the authority, and a grade never guarantees a later Apply.
 
@@ -39,7 +39,7 @@ For each item, follow the rubric's order of work:
 1. **Point.** Read the paragraph and state what the passage is trying to establish. Do not trust the card's `point` without checking. If the point is a judgement of ease, cost, safety or simplicity, the move is `R` (H-01).
 2. **Undecided mechanism.** If the finding describes or demands a mechanism the design has not decided, the move is `R` of that detail (H-02).
 3. **Prefer removal, of a whole unit.** Before any rewrite, ask whether the claim should go: a second justification, a reassurance a later caveat withdraws, a same-page pointer, a clause the set contradicts (H-03, H-04, H-06). A removal deletes a whole sentence, bullet, table row or paragraph, so check the unit the defect sits in: when that unit has to stay, the move is a reword of the sentence and never a cut (H-19). An `R` is graded on the record's own removal candidate; when you think the record names the wrong unit, grade `I` and say so in `why`, because a span that differs from the candidate has no verdict and is held. Subject to H-29.
-4. **Correct or reword.** `C` only for a verified fact with a verbatim span that occurs once (H-10, H-07, H-22). `W` for a cited rule that covers the text when the rewrite keeps every claim and any growth is one of the brief's two cases with `loss` named (H-11), and for any sentence that has to survive with its defect gone (H-19). Subject to H-29.
+4. **Correct or reword.** `C` only for a verified fact with a verbatim span that occurs once (H-10, H-07, H-22). `W` for a cited rule that covers the text when the rewrite keeps every claim and any growth is one of the brief's two cases with `loss` saying what the addition makes clear (H-11), and for any sentence that has to survive with its defect gone (H-19). Subject to H-29.
 5. **Choice of side.** `K` only on a contradiction whose two sides are each whole statements claiming the design (H-12). Give the side (`A` the card's text, `B` the related statement). A contradiction whose contested text is a clause inside a surviving sentence is not a choice: close it by removal or reword. A question about who decides, or about what the design should be, is not an editorial finding at all (H-08).
 6. **Ignore.** `I` when nothing changes for the reader, when a rule has its home elsewhere (H-05), or when another card closes this one (H-09); name the closing card in `why`.
 7. **Confidence and why.** `high` when one heuristic settles the item on evidence you can quote; `medium` when two pull against each other; `low` when you are guessing. Write one sentence naming the evidence.

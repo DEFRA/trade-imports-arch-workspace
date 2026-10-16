@@ -1,0 +1,5 @@
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/inventory-opener.md:3: This page defines what the API gives its callers: the session assertion, the operations and their answers, the rules for sign-out and an organisation switch, and what each component is responsible for.
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/inventory-opener.md:5: This page covers what happens, how long, and how to spot the change.
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/inventory-opener.md:7: The plan carries the opening statement, the inventory, the decision register, the ticket list, and a session log.
+check-prose: WARN hits are an inventory opener - an opener that lists the page's parts as noun phrases: write one sentence per job of the page, each with an actor and a verb (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Headings, lists and tables").
+exit-code: 0

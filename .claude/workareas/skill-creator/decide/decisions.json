@@ -1,0 +1,33 @@
+{
+  "name": "decide",
+  "started_at": "2026-10-16T10:55:48Z",
+  "answered_at": null,
+  "scaffolded_at": "2026-10-16T11:00:04Z",
+  "answers": {
+    "purpose": "Collect every open decision from the conversation and its working records and present them to the user as AskUserQuestion prompts, each framing the problem, the evidence and the consequence, with 2 to 4 options and the recommendation first; then record the answers and act only on explicit instructions.",
+    "dependencies": {
+      "resolution": "none",
+      "declared": [],
+      "justification": ""
+    },
+    "state_shape": "prose",
+    "dispatcher": false,
+    "prebake": false,
+    "fanout": {
+      "enabled": false,
+      "workers": []
+    },
+    "walker": false,
+    "helpers": [],
+    "triggers": {
+      "phrases": [
+        "/decide",
+        "present the decisions",
+        "give me the decisions as prompts",
+        "ask me the open questions",
+        "what do I need to decide"
+      ],
+      "disambiguation": "Distinct from /init (CLAUDE.md scaffolding) and from editorial-triage, whose Decide section and spot check close review findings inside a triage run; /decide gathers any open decisions of the current work, from any domain, and puts them to the user as question prompts. It decides nothing itself and owns no domain state."
+    }
+  }
+}

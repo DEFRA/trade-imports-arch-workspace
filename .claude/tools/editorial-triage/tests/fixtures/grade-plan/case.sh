@@ -68,6 +68,7 @@ pristine() {  # $1 name: a copy of the workarea as the fixture staged it
 }
 pristine review-mode
 pristine held
+pristine ignored-contradiction
 
 # ================================================================ apply-without-plan
 echo "##### apply-without-plan"
@@ -205,3 +206,21 @@ echo "##### held"
 )
 cp "$VARIANTS/held/calibration/labels.json" "$WORK/calibration/held-labels.json"
 for f in plan.json plan.md spot-check.json; do cp "$VARIANTS/held/closing/$f" "$WORK/closing/held-$f"; done
+
+# ================================================================ ignored-contradiction
+echo "##### ignored-contradiction"
+(
+    WORK="$VARIANTS/ignored-contradiction"
+    # C-03-004 (graded I by round 2) becomes an S2 contradiction, and C-02-003
+    # (graded R) a second one that is not ignored. The ignored one stays I and is
+    # also listed under Problems; the other is planned as before.
+    jq '.clusters |= map(if .id == "C-03-004" or .id == "C-02-003" then .kinds = ["contradiction"] | .severity = "S2" else . end)' \
+        "$WORK/triage.json" > "$WORK/triage.json.tmp" && mv "$WORK/triage.json.tmp" "$WORK/triage.json"
+    bash "$HELPER_DIR/grade-triage.sh" plan --dir "$WORK"
+    echo "exit-code: $?"
+    echo "--- problems ---"
+    jq -r '.problems[] | "\(.cluster) \(.move // "-") \(.reason): \(.note // "")"' "$WORK/closing/plan.json"
+    echo "--- the ignored contradiction is still an I entry ---"
+    jq -r '.entries[] | select(.cluster == "C-03-004" or .cluster == "C-02-003") | "\(.cluster) \(.move)"' "$WORK/closing/plan.json"
+)
+cp "$VARIANTS/ignored-contradiction/closing/plan.md" "$WORK/closing/ignored-contradiction-plan.md"

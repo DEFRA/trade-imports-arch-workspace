@@ -1,0 +1,5 @@
+"agent","label","role","unit","phase","models","responses","synthetic","input","cache_read","cache_write","cache_write_1h","output","cost_usd","tool_calls","first_context","peak_context","write_to_peak","start","end","active_min"
+"a1","drill:Unit one","drill","Unit one","review:Review","claude-fable-5-1",2,0,4,25000,25400,0,980,0.37,3,25002,25402,1,"2026-10-01T09:59:02.000Z","2026-10-01T09:59:30.000Z",0.5
+"main","main","main","","plan|setup|verify","<synthetic>|claude-fable-5-1|claude-opus-5-5",5,1,30,61500,41900,0,260,0.39,6,20010,21105,1.99,"2026-10-01T10:00:05.000Z","2026-10-01T18:00:09.000Z",480.1
+"averify-02a-0123456789abcdef","verify-02a","verify","02a","triage","claude-fable-5-1",2,0,6,30000,30200,0,70,0.39,3,30003,30203,1,"2026-10-01T10:00:15.000Z","2026-10-01T10:00:20.000Z",0.1
+"afork1","Drill unit 1 opening","Drill unit 1 opening","","fork","claude-fable-5-1",1,0,2,30050,400,0,300,0.03,1,30452,30452,0.01,"2026-10-01T10:00:35.000Z","2026-10-01T10:00:35.000Z",0

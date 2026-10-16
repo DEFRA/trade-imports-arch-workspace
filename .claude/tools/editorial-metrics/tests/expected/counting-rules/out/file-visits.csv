@@ -1,0 +1,16 @@
+"file","class","role","kind","calls","weighted","sweep_calls","result_tokens_est","carry_tokens_est"
+"00-foundations.md","context-page","main","search",1,0.33,1,6,23
+"02a-page.md","page","drill","full-read",1,1,0,38,38
+"02a-page.md","page","main","edit",1,1,0,0,0
+"02a-page.md","page","main","full-read",1,1,0,21,105
+"02a-page.md","page","main","search",1,0.33,1,6,23
+"02a-page.md","page","verify","ranged-read",1,1,0,10,10
+"02b-page.md","page","drill","filtered-read",1,1,0,11,11
+"02b-page.md","page","main","ranged-read",1,1,0,8,40
+"02b-page.md","page","main","search",1,0.33,1,6,23
+"CLAIM_VERIFIER.md","reference","verify","full-read",1,1,0,15,15
+"check-prose.sh","tool","drill","script",1,0.5,0,0,0
+"claims-02a-page.json","run-state","verify","write",1,1,0,0,0
+"drill-1.json","scratch","Drill unit 1 opening","write",1,1,0,0,0
+"drill-unit-one.txt","scratch","drill","script",1,0.5,0,0,0
+"grade-triage.sh","tool","main","script",1,1,0,7,7

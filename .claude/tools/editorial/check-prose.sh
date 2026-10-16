@@ -11,9 +11,13 @@
 # facilitate, empower, seamless, user-friendly, streamline, load-bearing);
 # lowercase generic "portal" (proper nouns like
 # "CDP Portal" pass); N/A in any case (state the fact: "not applicable",
-# "no data", "not used"); and a sentence or line ending on the pronoun
+# "no data", "not used"); a sentence or line ending on the pronoun
 # "it" - name the noun instead, and put the hidden subject at the front
-# of the sentence. Warnings (exit 0):
+# of the sentence; and FAQ voice in a label - a markdown heading that opens
+# on a question word (what, how, which, when, where, why, who, whether)
+# or ends on "?", a table header cell or a bold lead-in that opens on one
+# - name the topic as a noun phrase in title case instead. Warnings
+# (exit 0):
 # context-sensitive words (deliver, shape, bounds) and vague words
 # (robust, appropriate, overarching, foster) - state the
 # behaviour or criterion instead - the metaphor hard-avoid list -
@@ -21,10 +25,14 @@
 # compression family (language.md, "Reader-pays compression"):
 # ledger phrases ("held open under", "argued under", ...), the
 # contact-clause pattern ("only the front door reaches"), aside
-# stacking (3 or more " - " separators in one sentence) and "alone"
+# stacking (3 or more " - " separators in one sentence), "alone"
 # after a noun ("the front door alone holds" - put only before the noun
-# where it restricts the subject). All WARN judgments stay with the
-# editorial skill.
+# where it restricts the subject), a sentence, list item or cell that
+# opens in FAQ voice (What, How, Which, Why, Whether, Who), a table
+# header that trails off on a preposition ("Set by") and an inventory
+# opener ("This page covers A, B, C and D": a page's parts listed as
+# noun phrases; write a sentence per job with a verb). All
+# WARN judgments stay with the editorial skill.
 # The gate polices what the author writes, not the wider world: fenced
 # code blocks, inline backtick spans, blockquoted (verbatim) text and
 # URLs are blanked (line numbers preserved) so exemplar text, quotes and
@@ -55,6 +63,32 @@ NA_PATTERN='\bn/a\b'
 # Case-sensitive on purpose: lowercase "it" is the pronoun, while "IT" is
 # the abbreviation for information technology and must not match.
 TRAILING_IT_PATTERN='[[:space:]]it[[:space:]]*([.!?]|$)'
+# A heading names its topic; a question or a half-question clause
+# ("What a journey backend checks") is not a heading.
+QUESTION_HEADING_PATTERN='^#{1,6}[[:space:]]+((what|how|which|when|where|why|who|whom|whose|whether)\b|.*\?[[:space:]]*$)'
+# The same half-question opening a sentence, list item, bold lead-in or
+# table cell is a smell: restructure around the actor and the content.
+# Case-sensitive, so only a capitalised opener matches; "When" and
+# "Where" are left out because they usually open a condition, which the
+# house style puts first on purpose.
+QUESTION_OPENER_PATTERN='(^[[:space:]]*(([-*+]|[0-9]+\.)[[:space:]]+)?(\*\*)?|[.!?][[:space:]]+(\*\*)?|\|[[:space:]]*(\*\*)?)(What|How|Which|Why|Whether|Who)\b'
+# A label that stands in for a noun (a table header cell, a bold lead-in)
+# in FAQ voice fails like a heading. Here "When" and "Where" count too,
+# because a label states no condition. Header rows are the lines a
+# `| --- |` separator follows; the opener WARN skips them and the bold
+# lead-ins, so one line is never reported twice.
+LABEL_QUESTION_WORDS='(what|how|which|when|where|why|who|whom|whose|whether)'
+BOLD_LEADIN_FAQ_PATTERN='^[[:space:]]*(([-*+]|[0-9]+\.)[[:space:]]+)?\*\*'"$LABEL_QUESTION_WORDS"'\b'
+HEADER_CELL_FAQ_PATTERN='\|[[:space:]]*(\*\*)?'"$LABEL_QUESTION_WORDS"'\b'
+# A header cell that trails off on a preposition ("Set by", "Used by") is
+# a clause fragment, not a noun phrase. The noun ("Source", "Writer") is
+# a judgment, so WARN not FAIL.
+HEADER_CELL_DANGLING_PATTERN='[[:space:]](by|as|for|to|of|from|with|in|on|at)[[:space:]]*\|'
+# An inventory opener lists a page's parts as noun phrases: an opener on
+# "This page covers ..." carrying three or more items before the first
+# full stop. A sentence per job of the page, each with a verb, is the
+# repair; whether the opener is one is a judgment, so WARN not FAIL.
+INVENTORY_OPENER_PATTERN='(^|[.!?][[:space:]]+)(This|The) (page|document|section|chapter|guide|note|record|proposal|plan|table) (covers|defines|describes|explains|sets out|lists|answers|gives|details|holds|records|states|presents|summari[sz]es|carries|contains|includes|comprises)\b[^.]*(,[^.]*){2,}'
 VAGUE_PATTERN='\b(robust(ly)?|appropriate(ly)?|overarching|foster(s|ed|ing)?)\b'
 CONTEXT_PATTERN='\b(deliver(s|ed|ing)?|shapes?|bounds)\b'
 METAPHOR_PATTERN='\b(prices?|priced|rides?|bites?|spends?|spent|buys?|kills?|collapses?|leaks?|lands?|forecloses?|soften(s|ed|ing)?|bootstrap(s|ped|ping)?|ax[ei]s|postures?)\b|hangs? on'
@@ -65,7 +99,7 @@ CONTACT_PATTERN='\bonly (the |that |its )?([a-zA-Z'\''-]+ ){1,3}(reaches|sees|to
 # ("expiry alone ends no session") is a judgment call, so WARN not FAIL.
 ALONE_PATTERN='\balone\b'
 
-usage() { sed -n '2,31p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,35p' "$0" | sed 's/^# \{0,1\}//'; }
 
 fail() {
   printf 'check-prose: %s\n' "$1" >&2
@@ -108,6 +142,9 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
              printf '%s\n' "$masked" | grep -nE "$PORTAL_PATTERN" || true
              printf '%s\n' "$masked" | grep -inE "$NA_PATTERN" || true
              printf '%s\n' "$masked" | grep -nE "$TRAILING_IT_PATTERN" || true
+             printf '%s\n' "$masked" | grep -inE "$QUESTION_HEADING_PATTERN" || true
+             printf '%s\n' "$masked" | awk '{l[NR]=$0} END{for(i=1;i<=NR;i++){ if(i<NR && l[i+1] ~ /^[[:space:]]*\|[[:space:]]*:?-{3,}/) print l[i]; else print "" }}' | grep -inE "$HEADER_CELL_FAQ_PATTERN" || true
+             printf '%s\n' "$masked" | grep -inE "$BOLD_LEADIN_FAQ_PATTERN" || true
            } | cut -d: -f1 | sort -un )
     [ -n "$lns" ] || return 0
     while IFS= read -r ln; do
@@ -151,6 +188,37 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
     rc=2
   fi
 
+  hits=$(printf '%s\n' "$masked" | grep -inE "$QUESTION_HEADING_PATTERN" || true)
+  if [ -n "$hits" ]; then
+    report_hits "$1" "$2" FAIL "$hits"
+    printf 'check-prose: FAQ voice in a heading - rule: %s ("Headings, lists and tables"). Name the topic as a noun phrase in title case: "Session Assertion Checks", not "What a journey backend checks".\n' "$LANGUAGE_DOC" >&2
+    rc=2
+  fi
+
+  # Table header rows: the line a `| --- |` separator follows. Labels in
+  # FAQ voice fail; the opener WARN below skips these lines.
+  local masked_headers masked_body
+  masked_headers=$(printf '%s\n' "$masked" | awk '{l[NR]=$0} END{for(i=1;i<=NR;i++){ if(i<NR && l[i+1] ~ /^[[:space:]]*\|[[:space:]]*:?-{3,}/) print l[i]; else print "" }}')
+  masked_body=$(printf '%s\n' "$masked" | awk '{l[NR]=$0} END{for(i=1;i<=NR;i++){ if(i<NR && l[i+1] ~ /^[[:space:]]*\|[[:space:]]*:?-{3,}/) print ""; else print l[i] }}')
+  hits=$( { printf '%s\n' "$masked_headers" | grep -inE "$HEADER_CELL_FAQ_PATTERN"; printf '%s\n' "$masked" | grep -inE "$BOLD_LEADIN_FAQ_PATTERN"; } | sort -t: -k1,1n -u || true)
+  if [ -n "$hits" ]; then
+    report_hits "$1" "$2" FAIL "$hits"
+    printf 'check-prose: FAQ voice in a label - rule: %s ("Headings, lists and tables"). A table header or a bold lead-in names its topic as a noun phrase in title case: "Condition", not "When the session is in it"; "End State", not "What John sees".\n' "$LANGUAGE_DOC" >&2
+    rc=2
+  fi
+
+  hits=$(printf '%s\n' "$masked_headers" | grep -inE "$HEADER_CELL_DANGLING_PATTERN" || true)
+  if [ -n "$hits" ]; then
+    report_hits "$1" "$2" WARN "$hits"
+    printf 'check-prose: WARN hits are table headers that trail off on a preposition ("Set by", "Used by") - a clause fragment, not a noun phrase: name the role, "Source", "Writer" (%s, "Headings, lists and tables").\n' "$LANGUAGE_DOC" >&2
+  fi
+
+  hits=$(printf '%s\n' "$masked" | grep -nE "$INVENTORY_OPENER_PATTERN" || true)
+  if [ -n "$hits" ]; then
+    report_hits "$1" "$2" WARN "$hits"
+    printf 'check-prose: WARN hits are an inventory opener - an opener that lists the page'"'"'s parts as noun phrases: write one sentence per job of the page, each with an actor and a verb (%s, "Headings, lists and tables").\n' "$LANGUAGE_DOC" >&2
+  fi
+
   hits=$(printf '%s\n' "$masked" | grep -inE "$VAGUE_PATTERN" || true)
   if [ -n "$hits" ]; then
     report_hits "$1" "$2" WARN "$hits"
@@ -179,6 +247,12 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
   if [ -n "$hits" ]; then
     report_hits "$1" "$2" WARN "$hits"
     printf 'check-prose: WARN hits are the contact-clause pattern - restore the relative pronoun and the capability verb: "a store that only the front door can access" (%s, "Reader-pays compression").\n' "$LANGUAGE_DOC" >&2
+  fi
+
+  hits=$(printf '%s\n' "$masked_body" | grep -nE "$QUESTION_OPENER_PATTERN" | grep -vE '^[0-9]+:#' | grep -vE '^[0-9]+:[[:space:]]*(([-*+]|[0-9]+\.)[[:space:]]+)?\*\*' || true)
+  if [ -n "$hits" ]; then
+    report_hits "$1" "$2" WARN "$hits"
+    printf 'check-prose: WARN hits are FAQ voice - a sentence, list item or cell opens on a half-question (What, How, Which, Why, Whether, Who), a smell: restructure so the actor and the content lead, for example "The backend checks the signature", not "What the backend checks is the signature" (%s, "Headings, lists and tables").\n' "$LANGUAGE_DOC" >&2
   fi
 
   hits=$(printf '%s\n' "$masked" | grep -inE "$ALONE_PATTERN" || true)

@@ -11,7 +11,7 @@
 # words. An empty after file is a deletion. Prints one JSON object,
 # {added, removed, missingSentence, nominated, layoutOnly}, as
 # lib/claim-elements.jq computes it for a record's before and after. A
-# signal for the reword loop, not a verdict on meaning: the nominator
+# signal for explain and rewrite, not a verdict on meaning: the nominator
 # compares words, and a claim can change without a listed element changing.
 # Exit: 0 on any nomination result, nominated true included; 1 with a
 # diagnostic for a missing or unknown argument, an unreadable file or a
