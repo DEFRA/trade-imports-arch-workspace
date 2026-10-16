@@ -1,0 +1,233 @@
+[
+  {
+    "id": "K-001",
+    "severity": "S1",
+    "summary": "The foundations have the routing service copy the session cookie into the session header and strip every cookie from journey requests, while the design and API pages have each journey frontend read the sealed value from the session cookie itself.",
+    "facts": [
+      {"id": "00-090", "page": "00-ins-auth-foundations.md", "line": 111, "quote": "the routing service is its only reader, moving the session value into the session header"},
+      {"id": "00-139", "page": "00-ins-auth-foundations.md", "line": 180, "quote": "reads the configured session cookie and copies its value, sealed so that it reveals nothing without the key that sealed it, into the session header"},
+      {"id": "00-140", "page": "00-ins-auth-foundations.md", "line": 180, "quote": "It removes the session cookie from the request"},
+      {"id": "00-160", "page": "00-ins-auth-foundations.md", "line": 199, "quote": "journeys would need to read the session cookie themselves if the platform router could not set the session header"},
+      {"id": "00-177", "page": "00-ins-auth-foundations.md", "line": 233, "quote": "no journey parses cookies, so only the routing service and the front door need the tolerant parsing"},
+      {"id": "00-184", "page": "00-ins-auth-foundations.md", "line": 244, "quote": "journeys neither receive nor set cookies whatever their code does"},
+      {"id": "00-203", "page": "00-ins-auth-foundations.md", "line": 262, "quote": "Journeys are out of the failure's reach, because the routing service strips the `Cookie` header from their requests."},
+      {"id": "02a-007", "page": "02a-ins-auth-session-service-design.md", "line": 14, "quote": "On every signed-in request, a journey frontend reads the sealed value from the cookie"},
+      {"id": "02a-029", "page": "02a-ins-auth-session-service-design.md", "line": 29, "quote": "The front door and the journey frontends read the sealed value from the session cookie and treat it as an opaque string"},
+      {"id": "02c-009", "page": "02c-ins-auth-session-api.md", "line": 16, "quote": "the sealed value the frontend reads from the session cookie and sends in `Ins-Session-Token`"},
+      {"id": "02c-142", "page": "02c-ins-auth-session-api.md", "line": 179, "quote": "Reads | The session cookie; on `200`, public fields, `csrfSecret` and the session assertion; on `410`, the state"},
+      {"id": "02c-144", "page": "02c-ins-auth-session-api.md", "line": 181, "quote": "a request with no session cookie, which the journey frontend treats as no session without calling the session API"},
+      {"id": "02c-133", "page": "02c-ins-auth-session-api.md", "line": 168, "quote": "Reads | The request path"},
+      {"id": "02c-136", "page": "02c-ins-auth-session-api.md", "line": 171, "quote": "Never | Reads the sealed value; holds a key; holds session logic; calls the session API"}
+    ],
+    "question": "Does a journey frontend take the sealed value from the session header the routing service sets, or from the session cookie, and if from the header, should 02a and 02c say so and drop the frontend's no-cookie check?"
+  },
+  {
+    "id": "K-002",
+    "severity": "S2",
+    "summary": "The foundations call the routing service the session cookie's only reader and say it strips the cookie from every forwarded request, yet also say cookies belong only to the front door and that two components read them, and the API page has the front door read the session cookie.",
+    "facts": [
+      {"id": "00-090", "page": "00-ins-auth-foundations.md", "line": 111, "quote": "the routing service is its only reader, moving the session value into the session header"},
+      {"id": "00-170", "page": "00-ins-auth-foundations.md", "line": 222, "quote": "The routing service copies the cookie's value into the header (3) and strips the session cookie from every forwarded request (4, 5)"},
+      {"id": "00-183", "page": "00-ins-auth-foundations.md", "line": 244, "quote": "Cookies belong only to the front door."},
+      {"id": "00-202", "page": "00-ins-auth-foundations.md", "line": 262, "quote": "Two INS components read browser cookies, the routing service and the front door, and both have to parse cookies tolerantly."},
+      {"id": "02a-029", "page": "02a-ins-auth-session-service-design.md", "line": 29, "quote": "The front door and the journey frontends read the sealed value from the session cookie and treat it as an opaque string"},
+      {"id": "02c-189", "page": "02c-ins-auth-session-api.md", "line": 218, "quote": "Reads | The session cookie; the session assertion answer for its own pages; the binding cookie at a callback"}
+    ],
+    "question": "Does the front door ever receive the session cookie, or only the session header and the binding cookie, so that the routing service stays the session cookie's only reader?"
+  },
+  {
+    "id": "K-003",
+    "severity": "S2",
+    "summary": "The foundations hold the service token as a working assumption and leave open which calls carry it, while other foundations rules and the API page require a valid service token on every session API call and every backend call.",
+    "facts": [
+      {"id": "00-025", "page": "00-ins-auth-foundations.md", "line": 45, "quote": "the `Authorization` header on a call carries a service token, a short-lived JWT signed by AWS STS and bound to the IAM role"},
+      {"id": "00-027", "page": "00-ins-auth-foundations.md", "line": 47, "quote": "which calls must carry one, and which receivers pin the caller to a named service, is to be decided"},
+      {"id": "00-162", "page": "00-ins-auth-foundations.md", "line": 211, "quote": "The `Authorization` header carries the calling service's service token"},
+      {"id": "00-187", "page": "00-ins-auth-foundations.md", "line": 246, "quote": "accepts a session only from a session assertion addressed to that backend, on a request that also carries a valid service token (6)"},
+      {"id": "02c-049", "page": "02c-ins-auth-session-api.md", "line": 76, "quote": "The session API authenticates every call with the CDP service tokens"},
+      {"id": "02c-051", "page": "02c-ins-auth-session-api.md", "line": 76, "quote": "A missing or invalid service token gets `401`"}
+    ],
+    "question": "Is the service token decided for every call into the session service and every journey backend, or does it remain a working assumption with the set of calls still to be decided?"
+  },
+  {
+    "id": "K-004",
+    "severity": "S2",
+    "summary": "The foundations say the in-place organisation switch should be decided with a security review, while the same page and the API page specify the switch as an in-place update of the record.",
+    "facts": [
+      {"id": "00-049", "page": "00-ins-auth-foundations.md", "line": 80, "quote": "this design should be decided with input from a security review"},
+      {"id": "00-044", "page": "00-ins-auth-foundations.md", "line": 76, "quote": "An organisation switch and a delegation selection change the session in place"},
+      {"id": "00-309", "page": "00-ins-auth-foundations.md", "line": 369, "quote": "updates the live session in place: the new organisation and its roles, the new tokens, a new anti-forgery secret, and no acting-for client"},
+      {"id": "02c-068", "page": "02c-ins-auth-session-api.md", "line": 89, "quote": "At a switch, `200`: the record updated in place and the sealed value unchanged"}
+    ],
+    "question": "Has the security review settled the in-place switch, or is it still pending, and if pending, should the pages mark the in-place update as provisional?"
+  },
+  {
+    "id": "K-005",
+    "severity": "S2",
+    "summary": "The foundations say IDM returns the roles claim only when its picker is used, while the record page and the foundations elsewhere have every refresh return a token carrying the current roles, which the session service filters and writes.",
+    "facts": [
+      {"id": "00-291", "page": "00-ins-auth-foundations.md", "line": 347, "quote": "IDM returns the token's `roles` claim only when the picker is used"},
+      {"id": "00-264", "page": "00-ins-auth-foundations.md", "line": 316, "quote": "the session service writes them at sign-in, at an organisation switch and at every refresh"},
+      {"id": "02b-127", "page": "02b-ins-auth-session-record.md", "line": 104, "quote": "IDM re-checks the user's access to the relationships in the session, and the new token carries the roles currently correct for them."},
+      {"id": "02b-130", "page": "02b-ins-auth-session-record.md", "line": 106, "quote": "The session service therefore filters the refreshed roles exactly as it does at sign-in, keeping only the entries for `currentRelationshipId` whose status is `3`."}
+    ],
+    "question": "Does a refreshed ID token carry the roles claim, and if so, should the foundations' rule say the claim needs the picker at sign-in rather than on every token?"
+  },
+  {
+    "id": "K-006",
+    "severity": "S2",
+    "summary": "The record page defines activeOrganisation as the organisation chosen at the provider's picker and roles in IDM's relationshipId:roleName:status form, while the foundations give a B2B session the corporate tenant as its active organisation, no IDM relationship, and one named B2B role whose holding is still open.",
+    "facts": [
+      {"id": "02b-001", "page": "02b-ins-auth-session-record.md", "line": 9, "quote": "The session service builds the record from the tokens IDM or Entra ID issues at sign-in"},
+      {"id": "02b-039", "page": "02b-ins-auth-session-record.md", "line": 44, "quote": "The organisation the user chose at the provider's picker"},
+      {"id": "02b-046", "page": "02b-ins-auth-session-record.md", "line": 46, "quote": "in IDM's `relationshipId:roleName:status` form, filtered to `currentRelationshipId` and to approved entries"},
+      {"id": "00-354", "page": "00-ins-auth-foundations.md", "line": 444, "quote": "Its active organisation is the corporate tenant, with no IDM relationship."},
+      {"id": "00-360", "page": "00-ins-auth-foundations.md", "line": 460, "quote": "The session carries one named role from that catalogue, never Entra group memberships."},
+      {"id": "00-279", "page": "00-ins-auth-foundations.md", "line": 331, "quote": "B2B roles reach the session through Entra ID rather than the IDM token; how they are held is open"}
+    ],
+    "question": "For an Entra ID session, what do activeOrganisation and roles hold, and should the record page define them for both providers or mark the B2B shape as open?"
+  },
+  {
+    "id": "K-007",
+    "severity": "S2",
+    "summary": "The record page re-confirms every live session whose stored ID token has expired by presenting the refresh token to IDM, while the API page sends refreshes only to IDM and the record can come from Entra ID, so an Entra ID session's re-confirmation has no defined target.",
+    "facts": [
+      {"id": "02b-121", "page": "02b-ins-auth-session-record.md", "line": 102, "quote": "When a session assertion request finds that a live session's stored ID token has expired, the session service re-confirms the session before answering"},
+      {"id": "02b-122", "page": "02b-ins-auth-session-record.md", "line": 102, "quote": "it presents the stored refresh token to IDM's token endpoint and updates the live record with IDM's answer"},
+      {"id": "02b-035", "page": "02b-ins-auth-session-record.md", "line": 42, "quote": "The identity service that authenticated the session: IDM or Entra ID. Example: `idm` | Nothing"},
+      {"id": "02c-166", "page": "02c-ins-auth-session-api.md", "line": 205, "quote": "Answers to its callers; code exchanges to IDM and Entra ID; refreshes to IDM"}
+    ],
+    "question": "Does an Entra ID session re-confirm, and if so against which endpoint and on which lifetime?"
+  },
+  {
+    "id": "K-008",
+    "severity": "S2",
+    "summary": "The foundations say the design fixes only what the session captures for delegation and treat the mechanisms as evidence, yet they, the record page and the API page specify a front-door selection form against a grant source, while the IDM intermediaries mechanism takes the client from the token and another rule says no token claim can add to the set.",
+    "facts": [
+      {"id": "00-322", "page": "00-ins-auth-foundations.md", "line": 393, "quote": "the design fixes only what the session captures; the per-mechanism detail below is evidence for the choice, not chosen design"},
+      {"id": "00-323", "page": "00-ins-auth-foundations.md", "line": 402, "quote": "The relationship matching `currentRelationshipId` carries `Agent` as its relationship type, and the organisation on that entry is the client being represented"},
+      {"id": "00-326", "page": "00-ins-auth-foundations.md", "line": 410, "quote": "The set of organisations an agency may act for comes only from the delegation service, and no token claim can add to that set."},
+      {"id": "00-333", "page": "00-ins-auth-foundations.md", "line": 418, "quote": "Selection is a form posted to the front door."},
+      {"id": "02b-042", "page": "02b-ins-auth-session-record.md", "line": 45, "quote": "empty until the user selects a client in the front door"},
+      {"id": "02c-070", "page": "02c-ins-auth-session-api.md", "line": 90, "quote": "Select a client to act for | `PUT /sessions/acting-for` | The front door | The sealed value; the selected client, or none to clear the selection"}
+    ],
+    "question": "Is the delegation mechanism chosen as a front-door selection against a grant source, or still open, and if open, how does acting-for get set under the IDM intermediaries mechanism, where the client comes from the token?"
+  },
+  {
+    "id": "K-009",
+    "severity": "S2",
+    "summary": "The foundations require that a selected delegation never outlive its grant, yet delegated reads continue on the held selection while the grant source is unavailable, re-validation for reads is open, and re-confirmation never re-checks a delegation.",
+    "facts": [
+      {"id": "00-336", "page": "00-ins-auth-foundations.md", "line": 418, "quote": "A selected delegation must not outlive its grant"},
+      {"id": "00-338", "page": "00-ins-auth-foundations.md", "line": 418, "quote": "when a selection is re-validated for reads is still open"},
+      {"id": "00-340", "page": "00-ins-auth-foundations.md", "line": 418, "quote": "reads continue on the selection already held"},
+      {"id": "02b-134", "page": "02b-ins-auth-session-record.md", "line": 106, "quote": "and does not re-check a delegation"}
+    ],
+    "question": "Is \"must not outlive its grant\" a rule only for writes and document releases, or must reads also stop once a grant is withdrawn, and by when?"
+  },
+  {
+    "id": "K-010",
+    "severity": "S2",
+    "summary": "The foundations have the front door query the delegation grant source with an APIM subscription key and a client-credentials bearer token, while the API and record pages say the front door holds no provider secret and no component but the session service holds any key, and the foundations make the session service the only component that talks to Defra's identity services.",
+    "facts": [
+      {"id": "00-325", "page": "00-ins-auth-foundations.md", "line": 410, "quote": "presenting an APIM (Azure API Management) subscription key and a bearer token obtained with OAuth2 client credentials"},
+      {"id": "00-334", "page": "00-ins-auth-foundations.md", "line": 418, "quote": "The front door queries the grant source with the verified issuer and subject and the active organisation, never with a caller-supplied identifier"},
+      {"id": "00-013", "page": "00-ins-auth-foundations.md", "line": 31, "quote": "is the only component that communicates with Defra's identity services"},
+      {"id": "02c-194", "page": "02c-ins-auth-session-api.md", "line": 221, "quote": "Never | Holds a provider secret"},
+      {"id": "02b-172", "page": "02b-ins-auth-session-record.md", "line": 143, "quote": "The session service holds every key in the design, and no other component holds any of them"}
+    ],
+    "question": "Which component holds the APIM subscription key and obtains the client-credentials token for the delegation service, and do the only-holder and only-caller rules exclude those credentials?"
+  },
+  {
+    "id": "K-011",
+    "severity": "S2",
+    "summary": "The API page's ownership table gives permission enforcement only to the journey backend, while the foundations place enforcement in the journey backends and the front door's document download endpoint, which checks permissions itself.",
+    "facts": [
+      {"id": "02c-207", "page": "02c-ins-auth-session-api.md", "line": 239, "quote": "Enforce permissions | | | | Owns"},
+      {"id": "00-270", "page": "00-ins-auth-foundations.md", "line": 320, "quote": "Enforcement belongs to the resource layer, meaning the journey backends and the front door's document download endpoint, which decide on every request and are the authority"},
+      {"id": "00-356", "page": "00-ins-auth-foundations.md", "line": 445, "quote": "The front door reads the role from the session, expands it to permissions against the permissions service, and serves the document only if those permissions allow"}
+    ],
+    "question": "Does the front door's document download endpoint own permission enforcement, and should the API page's ownership table show it?"
+  },
+  {
+    "id": "K-012",
+    "severity": "S2",
+    "summary": "The design specifies sign-out as a browser form post to IDM's end-session endpoint, while the same page records that IDM documents that endpoint as a GET redirect and the foundations leave open whether IDM accepts the form post.",
+    "facts": [
+      {"id": "02a-127", "page": "02a-ins-auth-session-service-design.md", "line": 157, "quote": "At sign-out the browser posts a form to IDM's end-session endpoint"},
+      {"id": "02a-128", "page": "02a-ins-auth-session-service-design.md", "line": 157, "quote": "IDM documents that endpoint as a `GET` redirect"},
+      {"id": "00-255", "page": "00-ins-auth-foundations.md", "line": 304, "quote": "The front door clears the session cookie and returns an HTML form that the browser posts to IDM's `end_session_endpoint`."},
+      {"id": "00-256", "page": "00-ins-auth-foundations.md", "line": 304, "quote": "it is open whether IDM accepts the form post. It is also open whether IDM accepts a hint that has passed its expiry."}
+    ],
+    "question": "Is the end-session form post decided, with a GET fallback if IDM refuses it, or does it stay open until IDM confirms that it accepts the post?"
+  },
+  {
+    "id": "K-013",
+    "severity": "S2",
+    "summary": "The foundations state as fact that the contact identifier is the verified ID token's sub claim and pass it to the delegation service, while the same page says that holds only if IDM issues the B2C object identifier as sub rather than a pairwise value, which is still to be confirmed.",
+    "facts": [
+      {"id": "00-341", "page": "00-ins-auth-foundations.md", "line": 420, "quote": "The contact identifier is the `sub` (subject) claim of the verified ID token"},
+      {"id": "00-324", "page": "00-ins-auth-foundations.md", "line": 402, "quote": "INS calls the service with the verified contact identifier and the selected organisation, and receives the importer organisations delegated to that agency"},
+      {"id": "00-372", "page": "00-ins-auth-foundations.md", "line": 513, "quote": "The token-subject row holds only if IDM issues the B2C object identifier as `sub` rather than a pairwise value"}
+    ],
+    "question": "Has the Customer Identity team confirmed that sub is the B2C object identifier, and if not, should the contact identifier rule be marked conditional?"
+  },
+  {
+    "id": "K-014",
+    "severity": "S3",
+    "summary": "The foundations state the 8-hour absolute end and the 30-minute inactivity end as requirements a session must meet, while the same page calls both working values for product and security to confirm.",
+    "facts": [
+      {"id": "00-033", "page": "00-ins-auth-foundations.md", "line": 66, "quote": "A session ends 8 hours after sign-in regardless of user activity."},
+      {"id": "00-034", "page": "00-ins-auth-foundations.md", "line": 67, "quote": "A session ends after 30 minutes without activity."},
+      {"id": "00-050", "page": "00-ins-auth-foundations.md", "line": 84, "quote": "Product and security are to confirm the working values."},
+      {"id": "00-051", "page": "00-ins-auth-foundations.md", "line": 88, "quote": "8 hours, the absolute end | INS, a working value"},
+      {"id": "00-053", "page": "00-ins-auth-foundations.md", "line": 89, "quote": "30 minutes, the inactivity end | INS, a working value"}
+    ],
+    "question": "Are 8 hours and 30 minutes fixed requirements, or working values that the requirement statements should mark as provisional?"
+  },
+  {
+    "id": "K-015",
+    "severity": "S3",
+    "summary": "The foundations say who sees the switch organisation form is not settled, while the same page puts the form in the page header and the API page has every journey frontend render it.",
+    "facts": [
+      {"id": "00-317", "page": "00-ins-auth-foundations.md", "line": 377, "quote": "Who sees the switch form is not settled."},
+      {"id": "00-302", "page": "00-ins-auth-foundations.md", "line": 367, "quote": "Switch organisation in the page header is a form, like Sign out, posting to the front door with an anti-forgery token"},
+      {"id": "02c-140", "page": "02c-ins-auth-session-api.md", "line": 178, "quote": "checking the anti-forgery token; rendering the sign-out and switch forms with their anti-forgery tokens"}
+    ],
+    "question": "Does every signed-in user see the switch form in the page header, or is its audience still open, and if open, should the API page say so?"
+  },
+  {
+    "id": "K-016",
+    "severity": "S3",
+    "summary": "The record page times IDM's 30-minute session from the user's last authentication, while the foundations call it rolling and imply that activity extends it.",
+    "facts": [
+      {"id": "02b-021", "page": "02b-ins-auth-session-record.md", "line": 29, "quote": "IDM session | 30 minutes from the user's last authentication | IDM"},
+      {"id": "00-068", "page": "00-ins-auth-foundations.md", "line": 94, "quote": "30 minutes rolling for the IDM session, 4 hours for Government Gateway, 1 hour for GOV.UK One Login"},
+      {"id": "00-091", "page": "00-ins-auth-foundations.md", "line": 112, "quote": "The IDM session | IDM | 30 minutes, rolling, reset whenever the user authenticates | Re-prompt of a user returning to IDM"},
+      {"id": "00-102", "page": "00-ins-auth-foundations.md", "line": 123, "quote": "IDM sessions are per browser: activity in one browser does not extend the session in another."}
+    ],
+    "question": "Does IDM's session restart only when the user authenticates, or does activity at IDM also extend it?"
+  },
+  {
+    "id": "K-017",
+    "severity": "S3",
+    "summary": "The foundations say IDM and the credential providers set no INS clock, while IDM's ID token lifetime sets the re-confirmation period and IDM's refresh token lifetime caps the absolute end.",
+    "facts": [
+      {"id": "00-069", "page": "00-ins-auth-foundations.md", "line": 94, "quote": "They decide only whether a user is prompted for credentials or an organisation when INS sends them back to IDM. None of them sets an INS clock"},
+      {"id": "00-057", "page": "00-ins-auth-foundations.md", "line": 90, "quote": "INS sets no period of its own, so a change to IDM's ID token lifetime changes the period with no change to INS"},
+      {"id": "00-066", "page": "00-ins-auth-foundations.md", "line": 93, "quote": "The refresh token's lifetime is the upper limit of a renewing session"},
+      {"id": "02b-097", "page": "02b-ins-auth-session-record.md", "line": 75, "quote": "Of the token lifetimes IDM supplies at sign-in, the cascade uses one: `REFRESH_LIFETIME`"}
+    ],
+    "question": "Does \"none of them sets an INS clock\" refer only to the provider browser sessions, and should it say so, given that IDM's token lifetimes do set INS clocks?"
+  },
+  {
+    "id": "K-018",
+    "severity": "S3",
+    "summary": "The foundations say the session header stops at the journey frontend, while the same page has the journey frontend send the session header to the session service.",
+    "facts": [
+      {"id": "00-164", "page": "00-ins-auth-foundations.md", "line": 212, "quote": "The session header stops at the journey frontend."},
+      {"id": "00-171", "page": "00-ins-auth-foundations.md", "line": 223, "quote": "The session header carries the sealed value; the `Authorization` header carries the calling service's service token"}
+    ],
+    "question": "Does the session header end at the journey frontend's call to the session service, so that the rule means it never reaches a backend?"
+  }
+]
