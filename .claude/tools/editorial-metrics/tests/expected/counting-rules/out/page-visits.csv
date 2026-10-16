@@ -1,0 +1,7 @@
+"file","class","role","full_reads","ranged_reads","searches","sweep_share","edits","scripts","other","result_tokens_est","carry_tokens_est","visits"
+"00-foundations.md","context-page","main",0,0,1,0.33,0,0,0,6,23,1
+"02a-page.md","page","drill",1,0,0,0,0,0,0,38,38,1
+"02a-page.md","page","main",1,0,1,0.33,1,0,0,27,128,3
+"02a-page.md","page","verify",0,1,0,0,0,0,0,10,10,1
+"02b-page.md","page","drill",0,1,0,0,0,0,0,11,11,1
+"02b-page.md","page","main",0,1,1,0.33,0,0,0,14,63,2
