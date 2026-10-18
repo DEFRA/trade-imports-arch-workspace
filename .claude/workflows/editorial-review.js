@@ -1,7 +1,7 @@
 export const meta = {
   name: 'editorial-review',
   description: 'Fan-out editorial review of a document or document set: per-unit drill reviewers, a structural pass and a cold editor pass; returns closable version 3 findings, retains and questions and never edits',
-  whenToUse: 'When the editorial skill reviews a whole document or a set of documents and the user asks for the workflow. Args: docs (array of paths in the ~/ form) or sections (array of {label, path, description}), never both; frame (the reader frame, required); mode (review or revise, required); intent (distil or clarify, required); documentMode (the Diátaxis mode, default explanation); notes. Build the result with build-triage.sh --from-run <run id>.',
+  whenToUse: 'When the editorial skill reviews a whole document or a set of documents and the user asks for the workflow. Args: docs (array of paths in the ~/ form) or sections (array of {label, path, description}), never both; frame (the reader frame, required); mode (review or revise, required); intent (distil or clarify, required); documentMode (the Diátaxis mode, default explanation); notes; context (array of paths the reviewers read but do not review). Build the result with build-triage.sh --from-run <run id>.',
   phases: [
     { title: 'Snapshot', detail: 'hash every page before any reviewer reads one' },
     { title: 'Scope', detail: 'split a single document into review units' },
@@ -9,8 +9,8 @@ export const meta = {
   ],
 }
 
-const BRIEF = '~/trade-imports-arch-workspace/.claude/skills/editorial/references/review-brief.md'
-const SCRATCH = '~/trade-imports-arch-workspace/.claude/workareas/editorial/review'
+const PACKER = 'bash ~/trade-imports-arch-workspace/.claude/tools/editorial/build-review-packet.sh'
+const PACKETS = '~/trade-imports-arch-workspace/.claude/workareas/editorial/review'
 const HASHER = 'bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/build-triage.sh --hash-pages'
 const BUILD = 'bash ~/trade-imports-arch-workspace/.claude/tools/editorial-triage/build-triage.sh --from-run <run id from the Workflow tool result> --dir ~/trade-imports-arch-workspace/.claude/workareas/editorial-triage/<docset>-<date>'
 
@@ -47,6 +47,9 @@ const hasSections = Array.isArray(input.sections) && input.sections.length > 0
 if (hasDocs && hasSections) throw new Error('args.docs and args.sections are alternatives: give one page set, not both')
 if (!hasDocs && !hasSections) throw new Error('args.docs (array of paths) or args.sections (array of {label, path, description}) is required')
 const docs = hasSections ? [...new Set(input.sections.map(s => s.path))] : [...new Set(input.docs)]
+// Pages the reviewers read but do not review, such as shared rules the
+// reviewed pages link into: they go into the packet and are not hashed.
+const context = Array.isArray(input.context) ? input.context.filter(c => !docs.includes(c)) : []
 const basename = p => String(p).split('/').pop()
 
 // The result schemas carry types, enums and required lists only. What each
@@ -249,7 +252,6 @@ const HASH_SCHEMA = {
   },
 }
 
-const safeLabel = s => s.replace(/[^A-Za-z0-9._-]/g, '-')
 // A path as one shell word: single-quoted, with a single quote inside the
 // path written as '\'' so a space, a double quote, a dollar sign or a
 // backtick is data.
@@ -275,6 +277,19 @@ for (const e of (snapshot && snapshot.pages) || []) {
 for (const d of docs) {
   if (!(basename(d) in sourceHashes)) throw new Error(`the snapshot returned no hash for ${basename(d)}; every page under review is hashed before it is read`)
 }
+
+// One work packet for every reviewer: the brief, its sources and the pages
+// with line numbers, so each reviewer reads one file instead of discovering a
+// dozen (experiment X2: turns -51%, cost -14%). The name follows the pages'
+// hashes, so a re-run on unchanged pages rebuilds the same packet.
+const fnv = s => { let h = 0x811c9dc5; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 0x01000193) >>> 0 } return h.toString(16).padStart(8, '0') }
+const packet = `${PACKETS}/packet-${fnv(Object.keys(sourceHashes).sort().map(k => `${k}:${sourceHashes[k]}`).join(','))}.md`
+const LINES = { type: 'object', required: ['ok', 'lines'], properties: { ok: { type: 'boolean' }, lines: { type: 'array', items: { type: 'string' } } } }
+const packed = await agent(
+  `Run exactly this command with the Bash tool, as one call, and return its output lines. Set ok to false when the command exits non-zero. Do not read, open or change any other file.\n\n${PACKER} --out ${packet} ${context.map(c => `--context ${shellWord(c)}`).join(' ')} ${docs.map(shellWord).join(' ')}`,
+  { label: 'packet', phase: 'Snapshot', schema: LINES, agentType: 'general-purpose', model: 'sonnet', effort: 'low' },
+)
+if (!packed || !packed.ok) throw new Error(`the work packet was not built: ${(packed && packed.lines || []).join(' | ')}`)
 
 // Resolve the review units: explicit sections beat docs; several docs mean one unit per file;
 // a single doc is split by a scope agent.
@@ -303,7 +318,7 @@ const common = [
   `Document mode: ${documentMode}`,
   `Run notes: ${notes}`,
   `Documents under review, in reading order: ${docsQuoted}.`,
-  `Follow the binding rules, the finding fields and your role's instructions in ${BRIEF}, read first, then the files it names. Return findings and the selected retains the brief defines; never edit any file. Every finding carries page (the filename) and a verbatim quote, and line from the Read tool when known.`,
+  `Your instructions are in one work packet: ${packet}. It holds the review brief (the binding rules, the finding fields and your role's instructions), every source the brief names, and every document with line numbers. Read the whole packet first, in as few Read calls as the tool allows (allow_large if offered, else consecutive ranges), and open no other file. Return findings and the selected retains the brief defines; never edit any file. Every finding carries page (the filename), a verbatim quote copied from the packet's numbered copy, and line from that copy.`,
 ].join('\n')
 
 // The structural pass is one agent per page, each reviewing its page against the
@@ -319,15 +334,15 @@ const REVIEWER_MODEL = 'opus'
 phase('Review')
 const results = await parallel([
   ...units.map(u => () => agent(
-    `You are a drill reviewer in a fan-out editorial review.\n${common}\nYour assigned unit: ${u.label} in "${u.path}" - ${u.description}. Read every document whole for context, then review only this unit: on every paragraph, ask the drill questions the brief lists for this run's intent, in the brief's order. Gate scratch file: ${SCRATCH}/drill-${safeLabel(u.label)}.txt.`,
+    `You are a drill reviewer in a fan-out editorial review.\n${common}\nYour assigned unit: ${u.label} in "${u.path}" - ${u.description}. With every document in the packet as context, review only this unit: on every paragraph, ask the drill questions the brief lists for this run's intent, in the brief's order.`,
     { label: `drill:${u.label}`, phase: 'Review', schema: FINDINGS_SCHEMA, agentType: 'general-purpose', model: REVIEWER_MODEL },
   )),
   ...structuralUnits.map(u => () => agent(
-    `You are a structural reviewer in a fan-out editorial review, assigned one page of the set.\n${common}\nYour assigned page: "${u.path}". Read every document whole for context, then apply the structural reviewer role in the brief to this page against the rest of the set: repetitions on this page whose home is elsewhere (one finding per occurrence, related naming the home), sections on this page in the wrong document or mode, headings, lists and tables on this page that do not match their content's job, cross-references on this page that do not resolve, contradictions between a statement on this page and another page, qualifications separated from their rules, and the brief's diagram look-for. Anchor every finding on this page. Cap: at most 12 findings and 6 redundancy entries, the most severe first. Gate scratch file: ${SCRATCH}/structural-${safeLabel(u.label)}.txt.`,
+    `You are a structural reviewer in a fan-out editorial review, assigned one page of the set.\n${common}\nYour assigned page: "${u.path}". With every document in the packet as context, apply the structural reviewer role in the brief to this page against the rest of the set: repetitions on this page whose home is elsewhere (one finding per occurrence, related naming the home), sections on this page in the wrong document or mode, headings, lists and tables on this page that do not match their content's job, cross-references on this page that do not resolve, contradictions between a statement on this page and another page, qualifications separated from their rules, and the brief's diagram look-for. Anchor every finding on this page. Cap: at most 12 findings and 6 redundancy entries, the most severe first.`,
     { label: `structural:${u.label}`, phase: 'Review', schema: STRUCTURAL_SCHEMA, agentType: 'general-purpose', model: REVIEWER_MODEL, effort: 'high' },
   )),
   () => agent(
-    `You are the cold editor in a fan-out editorial review.\n${common}\nApply the cold editor role in the brief across the whole document set: reading order, page openings and carried-away sentences, the page retains the brief defines, and set-wide patterns; nothing sentence-level inside one unit. Gate scratch file: ${SCRATCH}/editor-pass.txt.`,
+    `You are the cold editor in a fan-out editorial review.\n${common}\nApply the cold editor role in the brief across the whole document set: reading order, page openings and carried-away sentences, the page retains the brief defines, and set-wide patterns; nothing sentence-level inside one unit.`,
     { label: 'editor-pass', phase: 'Review', schema: EDITOR_SCHEMA, agentType: 'general-purpose', model: REVIEWER_MODEL },
   ),
 ])

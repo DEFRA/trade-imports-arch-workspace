@@ -39,6 +39,7 @@ function harness(snapshot, missing = {}) {
       seen.paths = printed.split('\n').filter(Boolean)
       return snapshot(seen.paths)
     }
+    if (label === 'packet') return { ok: true, lines: ['build-review-packet: packet built'] }
     if (label === 'scope') return { sections: [{ label: 'a', description: 'the first half' }, { label: 'b', description: 'the second half' }] }
     if (label.startsWith('drill:')) return { findings: [], retains: [] }
     if (label.startsWith('structural:')) return { findings: [], redundancies: [] }
@@ -95,10 +96,10 @@ await scenario('two-docs', { ...base, docs: [ONE, TWO] }, null, ctx => [
   `sourceHashes match: ${same(ctx.result.sourceHashes, { 'one.md': HASHES['one.md'], 'two.md': HASHES['two.md'] })}`,
 ])
 
-// 2. one doc: snapshot before the scope read
+// 2. one doc: snapshot first, then the work packet, then the scope read
 await scenario('one-doc', { ...base, docs: [ONE] }, null, ctx => [
   ...okResult(ctx),
-  `snapshot before scope: ${ctx.calls.indexOf('snapshot') === 0 && ctx.calls.indexOf('scope') === 1}`,
+  `snapshot before packet before scope: ${ctx.calls.indexOf('snapshot') === 0 && ctx.calls.indexOf('packet') === 1 && ctx.calls.indexOf('scope') === 2}`,
 ])
 
 // 3. two sections on two paths: the snapshot covers both pages, no scope read
@@ -144,7 +145,7 @@ await scenario('snapshot-short-one-doc', { ...base, docs: [ONE] }, paths => ({ p
 // returns null or undefined in its place; the workflow throws after the wave,
 // names every missing label, returns nothing and logs no completion. A valid
 // empty result (the two-docs scenario above) stays a return.
-const wave = ['snapshot', 'drill:one.md', 'drill:two.md', 'structural:one.md', 'structural:two.md', 'editor-pass']
+const wave = ['snapshot', 'packet', 'drill:one.md', 'drill:two.md', 'structural:one.md', 'structural:two.md', 'editor-pass']
 const missingReviewer = expected => ctx => {
   if (!ctx.error) throw new Error('expected the workflow to throw')
   return [
@@ -158,4 +159,10 @@ await scenario('missing-drill', { ...base, docs: [ONE, TWO] }, null, missingRevi
 await scenario('missing-structural', { ...base, docs: [ONE, TWO] }, null, missingReviewer(['structural:two.md']), { 'structural:two.md': null })
 await scenario('missing-editor', { ...base, docs: [ONE, TWO] }, null, missingReviewer(['editor-pass']), { 'editor-pass': null })
 await scenario('missing-undefined', { ...base, docs: [ONE, TWO] }, null, missingReviewer(['drill:two.md']), { 'drill:two.md': undefined })
+// 8. the work packet fails to build: the workflow throws before any reviewer reads
+await scenario('packet-failed', { ...base, docs: [ONE, TWO] }, null, ctx => {
+  if (!ctx.error) throw new Error('expected the workflow to throw')
+  return [`threw before the wave: ${same(ctx.calls, ['snapshot', 'packet'])}; ${ctx.error.message}`]
+}, { packet: { ok: false, lines: ['build-review-packet: no document at ~/w/two.md'] } })
+
 await scenario('missing-several', { ...base, docs: [ONE, TWO] }, null, missingReviewer(['drill:one.md', 'structural:one.md', 'editor-pass']), { 'drill:one.md': null, 'structural:one.md': null, 'editor-pass': null })

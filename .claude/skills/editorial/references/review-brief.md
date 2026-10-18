@@ -1,10 +1,10 @@
 # Review brief
 
-This document is the single instruction set for the reviewers used by the `editorial-review` workflow. The spawn prompt supplies the reader frame, the output mode (`review` or `revise`), the review intent (`distil` or `clarify`), the document mode, the run notes and the scratch file for the gate. Apply that frame to every finding.
+This document is the single instruction set for the reviewers used by the `editorial-review` workflow. The spawn prompt supplies the reader frame, the output mode (`review` or `revise`), the review intent (`distil` or `clarify`), the document mode, the run notes and the work packet. Apply that frame to every finding.
 
 ## Before reviewing
 
-Read these sources, then read every document under review in full before examining the assigned unit:
+The work packet the spawn prompt names holds this brief, the sources below and every document under review with line numbers. Read the packet whole before examining the assigned unit, and open no other file. Copy each quote verbatim from the packet's numbered copy; do not search the pages to confirm a quote. The packet holds:
 
 1. `~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md`
 2. `~/trade-imports-arch-workspace/.claude/best-practices/writing/ubiquitous-language.md`
@@ -69,17 +69,7 @@ A contradiction is one finding with two sides: `quote` is the side under review 
 
 ## The retain record
 
-A drill unit or an editor page may carry `retains`, each `{line, quote, reason}`. A retain records a passage the reviewer examined against a question, or a signal the gate reports (a metaphor candidate used literally; a sentence over 25 words that restates after one reading), and found working where another reviewer or the gate would likely flag the passage. `reason` is one gated sentence naming the question or signal and why the passage passes. A retain is never every sound paragraph and never a finding in disguise: a passage with a defect is a finding. Retains are shown under Retained in the closing plan and are never clustered or graded.
-
-## Gate
-
-Every prose field passes the style gate before you return: `defect`, `point`, `removes`, `after`, `loss`, `question` and a retain's `reason`. Collect them, one per line, in the scratch file the spawn prompt names under `~/trade-imports-arch-workspace/.claude/workareas/editorial/review/`, written with the Write tool rather than a heredoc, and run:
-
-```
-bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <scratch file>
-```
-
-Fix each FAIL in the field the line came from and re-run until the gate passes. The commonest failure is a sentence ending on the pronoun "it": name the noun. Judge WARNs in context. If the gate cannot run, say so in your return.
+A drill unit or an editor page may carry `retains`, each `{line, quote, reason}`. A retain records a passage the reviewer examined against a question, or a signal the gate reports (a metaphor candidate used literally; a sentence over 25 words that restates after one reading), and found working where another reviewer or the gate would likely flag the passage. `reason` is one sentence naming the question or signal and why the passage passes. A retain is never every sound paragraph and never a finding in disguise: a passage with a defect is a finding. Retains are shown under Retained in the closing plan and are never clustered or graded.
 
 ## Drill reviewer
 
