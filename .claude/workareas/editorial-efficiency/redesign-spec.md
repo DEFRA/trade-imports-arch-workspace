@@ -130,7 +130,7 @@ One loader per run reads the packet once, then forks: one paragraph pass per pag
 
 | Stage | Carries over | Changes under the redesign |
 | --- | --- | --- |
-| 1 Packets, X7, no gate | packet builder, assembler, X7 claim check | the packet carries rule cards per layer instead of one brief |
+| 1 Packets, no gate | packet builder, assembler (the X7 claim check was dropped by decision 18) | the packet carries rule cards per layer instead of one brief |
 | 2 Loader and forks | the loader pattern | forks per layer and page instead of drill units, structural and cold editor |
 | 3 Triage workflow | all of it | design findings bypass verification |
 | 4 Rules-only mode | the delta packet | generalised to per-layer re-runs from the manifest |

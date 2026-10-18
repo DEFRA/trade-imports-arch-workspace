@@ -12,7 +12,11 @@ The banked state of the editorial efficiency work at 16 Oct 2026: what the exper
 6. R3b (one set pass per page) passed: recall 0.62, equal to two baseline runs' agreement, 20 new fixes, 39 applied edits, $6.40. Ben ruled on the 13 S1 and S2 design contradictions; the rulings are in `analysis/ins-authnz/session-pages-restructure.md`, session log of 16 October.
 7. Decision 7 taken on 16 Oct: the layered review is stage 2's target, confirmed by the blind pack scores. Stage 2 therefore forks a paragraph, page and set pass per page instead of drill units, structural reviewers and the cold editor, and the facts track becomes the `design-consistency` skill.
 8. The facts track is built as the `design-consistency` skill (16 Oct): per-page extraction cached by page hash, a register script, a checker limited to the register, and questions for `/decide`. Smoke-tested on R2r's facts and contradictions; no live run yet.
-9. Next: Ben scores the small blind pack (`blind-pack/small/SCORING.md`: three letters, a baseline, the package and R3b; the 8-letter pack is optional); stage 1 and then stage 2 follow.
+9. Ben judged quality on 16 Oct by picking the best version of 12 passages where today's review (B0c) and the layered review (R3b) differ, blind (`experiments/pick/result.json`): R3b 5, B0c 4, 2 ties, 1 where both edits were worse than the original. No quality loss from the layered review; decision 16 stands. The diff-based blind packs are retired: Ben could not use them.
+10. Ben judged X7 the same way on 17 Oct (`experiments/pick/x7-result.json`): baseline 4, X7 2, 6 ties on 12 passages of 02b. Decision 18 drops X7 from stage 1, revising decision 5; rewrite safety comes from the layered review.
+11. Limit of both judgements, from Ben on 17 Oct: the picks were relative, so "no real difference" mixed "the same" with "I like neither", and a large improvement counted the same as a trivial one. They show the cheaper reviews give broadly the same output for less; they do not show the review getting better at its goal, the quality of the writing. No measure of progress toward that goal exists yet.
+12. Stage 1 built and measured on 17 Oct (S1r, one page): `tools/editorial/build-review-packet.sh` (with `--context` pages), `tools/editorial/assemble-review.sh`, no gate step in the brief or the reviewer prompts. Recall 0.84 against the 0.80 floor, cost -12%, turns -44%, tool calls -59%.
+13. Next: stage 2, the layered review as forks per page (one loader, a paragraph, page and set pass per page), with the assembler validating the forks' files.
 
 ## Decisions
 
@@ -22,7 +26,7 @@ The banked state of the editorial efficiency work at 16 Oct 2026: what the exper
 | 2 The package | Build in stages: work packets, then the loader and fork review, then the triage workflow; measure after each stage; keep the old workflow as a fallback until the new review has run twice |
 | 3 Style gate inside reviewers | Drop it; the build and apply keep gating |
 | 4 Rules-only review | Add as a mode; full review stays the default |
-| 5 Claim check and repair at write time (X7) | Adopt now; X7 was tested only with the standard review, so measure it again in stage 1 |
+| 5 Claim check and repair at write time (X7) | Revised on 17 Oct by decision 18: dropped after Ben's blind judgement found its edits no better than the baseline's |
 | 6 Cross-page contradictions | No rubric change; the plan lists every ignored S2 contradiction in Problems for Ben to rule on |
 | 7 Two runs against one | Tested: two package runs merged into one triage fix more than one current run (35 edits against 37 and 26) at slightly lower cost ($10.98 against $12.02) |
 
@@ -30,7 +34,7 @@ The banked state of the editorial efficiency work at 16 Oct 2026: what the exper
 
 | Stage | Change | Files | Prototype | Done when |
 | --- | --- | --- | --- | --- |
-| 1 | Work packet builder; reviewer instructions without the gate step and quote greps, with the X7 claim check and repair; review-result assembler with schema validation | new `tools/editorial/build-review-packet.sh` and `tools/editorial/assemble-review.sh`; `skills/editorial/references/review-brief.md` | `prototypes/build-review-packet.sh`, `prototypes/merge-reviews.sh`, the X7 rule in `register.json` | a one-page run measured against B0a and B0b with `compare-runs.sh` |
+| 1 | Work packet builder; reviewer instructions without the gate step and quote greps; review-result assembler with schema validation (X7 dropped by decision 18) | new `tools/editorial/build-review-packet.sh` and `tools/editorial/assemble-review.sh`; `skills/editorial/references/review-brief.md` | `prototypes/build-review-packet.sh`, `prototypes/merge-reviews.sh` | a one-page run measured against B0a and B0b with `compare-runs.sh` |
 | 2 | Loader and fork review: the editorial skill spawns a loader that reads the packet once and forks the drill units, the structural pass per page and the cold editor | `skills/editorial/SKILL.md` step 6; `workflows/editorial-review.js` kept as the fallback | the X4 and P1 loader prompts in `register.json` and the run transcripts | two runs within the noise band of the baselines |
 | 3 | Triage workflow; the plan's Problems section lists ignored S2 contradictions | new `workflows/editorial-triage.js`; `skills/editorial-triage/SKILL.md` steps 2 to 7; `tools/editorial-triage/grade-triage.sh` plan | `prototypes/editorial-triage-exp.js` | the same closing moves within the Opus noise band; main session down to launch and read |
 | 4 | Rules-only review mode | `skills/editorial/SKILL.md`; a delta packet builder | the X11 delta packet recipe in `register.json` | a rules-only run after the next rule change |
@@ -66,7 +70,7 @@ Taken on 16 Oct through `/decide`; the full record is `redesign.decisions` in `r
 | 8 Blind pack | Judged before the stages that change judgement are built |
 | 9 Uncommitted work | Committed in two commits, not pushed |
 | 10 R2 repeat | Once, with the extractor recording each fact's table and column |
-| 11 Build against judge | Stage 3 now, since it changes no judgement; the blind pack next; stage 1 with X7 after the judgement |
+| 11 Build against judge | Stage 3 now, since it changes no judgement; the blind judgement next; stage 1 after the judgement (which then dropped X7, decision 18) |
 
 ## Constraints of the Fork Design
 

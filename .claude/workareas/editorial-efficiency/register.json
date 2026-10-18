@@ -722,6 +722,29 @@
           "ignore_rate": "0.38 against 0.55"
         },
         "verdict": "Passed. Recall 0.62 equals the agreement between two baseline runs, the best of any cheaper arm, with 20 new fixes and 39 applied edits at the package's cost (-47% against the baselines), and the rewrite-safety gains of R3 hold. Per-page set passes recovered repetition (16 of 25 against R3's 9), confirming R3's diagnosis. One run: P1 and its repeat differed by 0.09 in recall, and the extra fixes need Ben's blind judgement (R3b is in the C3 blind pack)."
+      },
+      {
+        "id": "S1r",
+        "name": "stage 1 measured run (C1, 02b)",
+        "config": "production editorial-review workflow with the work packet (00 as a context page), no gate step in the reviewers, Opus reviewers; production triage workflow to the spot check",
+        "results": {
+          "cost": {
+            "total": 9.19,
+            "review": 6.86,
+            "triage": 2.02,
+            "against": "baselines B0a and B0b 10.39"
+          },
+          "recall_of_baseline_fixes": 0.84,
+          "recall_noise_floor": 0.80,
+          "fixes": 23,
+          "extra_fixes": 7,
+          "turns": "68 against 122",
+          "tool_calls": "73 against 180",
+          "generation_min": "25.2 against 41.9",
+          "ignore_rate": "0.48 against 0.65",
+          "applied": "0: the production triage stops at the spot check"
+        },
+        "verdict": "Stage 1 done: recall above the baseline floor at 12% lower cost, 44% fewer turns and 59% fewer tool calls, matching the X2 prototype on the production tools. The large saving remains stage 2 (forks)."
       }
     ],
     "decisions": {
@@ -819,6 +842,19 @@
           "n": 17,
           "topic": "garbled message on d2b910f",
           "choice": "amend the message",
+          "date": "2026-10-16"
+        },
+        {
+          "n": 18,
+          "topic": "X7 in stage 1 (revises decision 5)",
+          "choice": "drop X7; stage 1 builds the work packet, the assembler and the removal of the reviewers gate step, without the claim check",
+          "date": "2026-10-17",
+          "evidence": "blind picks on 12 passages of 02b: baseline 4, X7 2, 6 ties (experiments/pick/x7-result.json)"
+        },
+        {
+          "n": 19,
+          "topic": "layered review quality (confirms decision 16)",
+          "choice": "confirmed by blind picks on 12 passages: R3b 5, B0c 4, 2 ties, 1 both worse (experiments/pick/result.json)",
           "date": "2026-10-16"
         }
       ]
