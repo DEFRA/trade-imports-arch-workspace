@@ -23,7 +23,7 @@ Use only the facts in the register. Do not use knowledge from memory, from other
    - the same quantity with different values or units;
    - a condition on one page that another page drops or reverses;
    - a fact stated as decided that another fact marks as open, proposed or a working assumption.
-3. Ignore differences of wording that say the same thing, and facts that only add detail. A fact one page states and another omits is not a contradiction.
+3. Ignore differences of wording that say the same thing, and facts that only add detail. A fact one page states and another omits is not a contradiction. Nor is a rule and the handling of an edge case that keeps the rule true: before reporting one, check whether one fact is the mechanism that preserves the other.
 4. Grade each one: `S1` when a builder following one statement builds what another forbids; `S2` when a builder or tester cannot tell which statement holds; `S3` for a minor or local inconsistency.
 5. Write the contradictions file with the Write tool, a JSON array, one object per contradiction, citing at least two facts:
 
