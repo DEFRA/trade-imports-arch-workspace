@@ -27,11 +27,9 @@
       "Bash(wc:*)",
       "Bash(~/trade-imports-arch-workspace/.claude/tools/:*)",
       "Skill(editorial)",
-      "Skill(editorial-review)",
       "Skill(editorial-triage)",
       "Skill(skill-creator)",
-      "WebFetch(domain:agents.md)",
-      "Workflow(editorial-review)"
+      "WebFetch(domain:agents.md)"
     ]
   },
   "hooks": {
