@@ -80,6 +80,12 @@ out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DI
 rm -rf "$WORK"
 record "claim-diff" "$out" "$rc"
 
+# The preferred-names check, the same way.
+WORK=$(mktemp -d)
+out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DIR/fixtures/check-names/case.sh" 2>&1); rc=$?
+rm -rf "$WORK"
+record "check-names" "$out" "$rc"
+
 if [[ "$COUNT" -eq 0 ]]; then
     say "FAIL - no fixtures found under $TESTS_DIR/fixtures/"
     exit 1

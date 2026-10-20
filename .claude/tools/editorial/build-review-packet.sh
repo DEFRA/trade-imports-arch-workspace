@@ -6,13 +6,19 @@
 # this one file instead of discovering and reading a dozen.
 #
 # Usage: build-review-packet.sh --out <packet.md> [--context <page.md>]...
-#          [--cards <layer-cards.md>] [--pointers <pointers.md>] <doc.md>...
+#          [--cards <layer-cards.md>] [--pointers <pointers.md>]
+#          [--names <preferred-names.json>] [--changes <changes.md>]
+#          [--settled <settled.md>] <doc.md>...
 #
 # A --context page is read but not reviewed (for example the shared rules the
 # reviewed pages link into); it is numbered after the documents. --cards builds
 # the layered review's packet: the brief without its drill, structural and cold
 # editor sections, then the layer cards in their place. --pointers adds layer 0
-# pointers for the paragraph pass.
+# pointers for the paragraph pass. --names adds the document set's preferred
+# names, which reviewers treat as settled. --changes and --settled carry a
+# re-review's scope: what changed since the earlier run, and the earlier
+# triage's findings that no pass raises again (start-layered-review.sh writes
+# both).
 #
 # Sections are cut by heading, so an edit to the brief or the contract moves
 # with them. Prints the packet path, lines and bytes. Exit: 0 written, 1 usage
@@ -23,14 +29,17 @@ C="$HOME/trade-imports-arch-workspace/.claude"
 OUT=""
 DOCS=()
 CONTEXT=()
-CARDS="" POINTERS=""
+CARDS="" POINTERS="" NAMES="" CHANGES="" SETTLED=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --out) OUT="${2:?--out needs a path}"; shift 2 ;;
     --context) CONTEXT+=("${2:?--context needs a path}"); shift 2 ;;
     --cards) CARDS="${2:?--cards needs a path}"; shift 2 ;;
     --pointers) POINTERS="${2:?--pointers needs a path}"; shift 2 ;;
-    -h|--help) sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --names) NAMES="${2:?--names needs a path}"; shift 2 ;;
+    --changes) CHANGES="${2:?--changes needs a path}"; shift 2 ;;
+    --settled) SETTLED="${2:?--settled needs a path}"; shift 2 ;;
+    -h|--help) sed -n '2,28p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     -*) echo "build-review-packet: unknown flag $1 (see --help)" >&2; exit 1 ;;
     *) DOCS+=("$1"); shift ;;
   esac
@@ -49,7 +58,10 @@ done
 for d in "${DOCS[@]}" ${CONTEXT[@]+"${CONTEXT[@]}"}; do
   [[ -f "${d/#\~/$HOME}" ]] || { echo "build-review-packet: no document at $d" >&2; exit 1; }
 done
-CARDS="${CARDS/#\~/$HOME}"; POINTERS="${POINTERS/#\~/$HOME}"
+CARDS="${CARDS/#\~/$HOME}"; POINTERS="${POINTERS/#\~/$HOME}"; NAMES="${NAMES/#\~/$HOME}"
+[[ -z "$NAMES" || -f "$NAMES" ]] || { echo "build-review-packet: no names register at $NAMES" >&2; exit 1; }
+CHANGES="${CHANGES/#\~/$HOME}"; SETTLED="${SETTLED/#\~/$HOME}"
+for f in "$CHANGES" "$SETTLED"; do [[ -z "$f" || -f "$f" ]] || { echo "build-review-packet: no file at $f" >&2; exit 1; }; done
 [[ -z "$CARDS" || -f "$CARDS" ]] || { echo "build-review-packet: no layer cards at $CARDS" >&2; exit 1; }
 [[ -z "$POINTERS" || -f "$POINTERS" ]] || { echo "build-review-packet: no pointers file at $POINTERS" >&2; exit 1; }
 grep -q '^### Reviewer-set fields' "$CONTRACT" || { echo "build-review-packet: the contract has no '### Reviewer-set fields' section" >&2; exit 1; }
@@ -76,6 +88,12 @@ TMP="${OUT/#\~/$HOME}.tmp"
     section "Review brief" "$BRIEF"
   fi
   [[ -z "$POINTERS" ]] || section "Layer 0 pointers" "$POINTERS"
+  [[ -z "$CHANGES" ]] || section "Changes since the last review" "$CHANGES"
+  [[ -z "$SETTLED" ]] || section "Settled findings" "$SETTLED"
+  if [[ -n "$NAMES" ]]; then
+    jq -r '"These names are settled for the document set: use the preferred name, and raise no finding against it. The names check has already removed every replaced name.\n", (.names[] | "- \(.preferred), not \(.replaced | map(gsub("\\\\b|\\(s\\?\\)|\\(\\?<?[=!][^)]*\\)"; "")) | join(" or "))")' "$NAMES" \
+      | section "Preferred names" "$NAMES" -
+  fi
   section "language.md" "$C/best-practices/writing/language.md"
   section "ubiquitous-language.md" "$C/best-practices/writing/ubiquitous-language.md"
   section "snapshot-authoring.md" "$C/best-practices/writing/snapshot-authoring.md"

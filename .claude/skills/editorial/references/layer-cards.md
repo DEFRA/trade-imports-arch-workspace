@@ -2,11 +2,13 @@
 
 These cards replace the brief's drill reviewer, structural reviewer and cold editor roles for a layered review. Each pass applies only its own card, reports only the kinds its card owns, and leaves every other defect to the layer that owns its kind. Contradictions between statements, on one page or across pages, belong to the `design-consistency` skill and are never reported by any card.
 
+In a re-review the packet holds "Changes since the last review" and may hold "Settled findings". Every pass then reports only findings that touch a changed line, or that a removed or rewritten paragraph caused, and raises no settled finding again.
+
 ## Paragraph Card (Layer 1)
 
 Kinds owned: `absolute`, `ambiguity`, `compression`, `term`, `flow`, `residue`, and `split` or `list` repairs.
 
-Review one page, paragraph by paragraph. The page is your context; read another page only to check the meaning of a term. When the packet holds layer 0 pointers, start with the paragraphs they name for this page, then cover every paragraph. A pointer is a place to look: report a finding only for a real defect, and nothing because a pointer fired.
+Review one page, paragraph by paragraph; when the spawn names lines, review only the paragraphs on those lines. The page is your context; read another page only to check the meaning of a term. When the packet holds layer 0 pointers, start with the paragraphs they name for this page, then cover every paragraph. A pointer is a place to look: report a finding only for a real defect, and nothing because a pointer fired.
 
 For each paragraph, state its point first, then ask, in this order. Each question carries its exception, so answer with the exception in view:
 
