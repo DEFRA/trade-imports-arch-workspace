@@ -745,6 +745,28 @@
           "applied": "0: the production triage stops at the spot check"
         },
         "verdict": "Stage 1 done: recall above the baseline floor at 12% lower cost, 44% fewer turns and 59% fewer tool calls, matching the X2 prototype on the production tools. The large saving remains stage 2 (forks)."
+      },
+      {
+        "id": "S2",
+        "name": "stage 2 measured run: the production layered review on C3",
+        "config": "start-layered-review.sh (packet with layer-cards.md, 00 as a context page, no layer 0 pointers), one Opus loader from LAYERED_LOADER.md forking a paragraph, page and set pass per page, assemble-review.sh with the start hashes, production triage workflow to the spot check",
+        "results": {
+          "cost": {
+            "total": 7.42,
+            "review": 2.79,
+            "triage": 4.20,
+            "note": "triage includes verifier runs lost to a network outage and a login lapse and run again"
+          },
+          "recall_of_baseline_fixes": 0.61,
+          "recall_noise_floor": 0.62,
+          "repetition": "16 of 25, as R3b",
+          "fixes": 30,
+          "extra_fixes": 12,
+          "h29_ignores": "18 against 24.5",
+          "ignore_rate": "0.51 against 0.55",
+          "applied": "0: the production triage stops at the spot check"
+        },
+        "verdict": "Passed: recall at the baseline floor and repetition as R3b, review cost -63%. Without layer 0 pointers it matches R3b, so the pointers were not doing the work. With R3b, the second layered run within the noise band: stage 2 done when."
       }
     ],
     "decisions": {
@@ -856,6 +878,12 @@
           "topic": "layered review quality (confirms decision 16)",
           "choice": "confirmed by blind picks on 12 passages: R3b 5, B0c 4, 2 ties, 1 both worse (experiments/pick/result.json)",
           "date": "2026-10-16"
+        },
+        {
+          "n": 20,
+          "topic": "retire the editorial-review workflow",
+          "choice": "removed; git history keeps the file; the layered review is the only whole-document review",
+          "date": "2026-10-20"
         }
       ]
     }

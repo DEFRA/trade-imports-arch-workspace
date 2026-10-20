@@ -16,7 +16,9 @@ The banked state of the editorial efficiency work at 16 Oct 2026: what the exper
 10. Ben judged X7 the same way on 17 Oct (`experiments/pick/x7-result.json`): baseline 4, X7 2, 6 ties on 12 passages of 02b. Decision 18 drops X7 from stage 1, revising decision 5; rewrite safety comes from the layered review.
 11. Limit of both judgements, from Ben on 17 Oct: the picks were relative, so "no real difference" mixed "the same" with "I like neither", and a large improvement counted the same as a trivial one. They show the cheaper reviews give broadly the same output for less; they do not show the review getting better at its goal, the quality of the writing. No measure of progress toward that goal exists yet.
 12. Stage 1 built and measured on 17 Oct (S1r, one page): `tools/editorial/build-review-packet.sh` (with `--context` pages), `tools/editorial/assemble-review.sh`, no gate step in the brief or the reviewer prompts. Recall 0.84 against the 0.80 floor, cost -12%, turns -44%, tool calls -59%.
-13. Next: stage 2, the layered review as forks per page (one loader, a paragraph, page and set pass per page), with the assembler validating the forks' files.
+13. Stage 2 built and measured on 18 to 20 Oct (S2, three pages): `references/layer-cards.md`, `references/LAYERED_LOADER.md`, `tools/editorial/start-layered-review.sh`, the packet's `--cards` and `--pointers`, the assembler's `--hashes`, and the editorial skill's whole-document review step. Recall 0.61 against the 0.62 floor, repetition 16 of 25, review cost -63%; with R3b, the second layered run within the noise band. No layer 0 pointers, and recall matched R3b. The triage workflow's runner steps now retry once after a lost connection.
+14. Ben retired the `editorial-review` workflow on 20 Oct (decision 20; git history keeps the file): the layered review is the only whole-document review.
+15. Next: layer 0 (decision 6: pointers and a preferred-names register; S2 matched R3b without pointers, so the register matters more than the pointers) and stage 4 (rules-only re-runs).
 
 ## Decisions
 
