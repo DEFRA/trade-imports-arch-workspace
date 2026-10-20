@@ -28,12 +28,21 @@ const LINES = {
   properties: { ok: { type: 'boolean' }, lines: { type: 'array', items: { type: 'string' } } },
   required: ['ok', 'lines'],
 }
-const run = (cmd, label, phaseTitle) => agent(
-  `Run exactly this command with the Bash tool, as one call, and return its output lines (every line beginning with build-triage:, score:, plan:, page: or clusters:, or the last 40 lines when none do). Set ok to false when the command exits non-zero. Do not read, open or change any other file.\n\n${cmd}`,
-  { label, phase: phaseTitle, schema: LINES, ...RUNNER },
-)
+// A runner that returns nothing lost its connection, not its command: the
+// scripts are idempotent, so the step runs once more before the run fails.
+const run = async (cmd, label, phaseTitle) => {
+  const ask = l => agent(
+    `Run exactly this command with the Bash tool, as one call, and return its output lines (every line beginning with build-triage:, score:, plan:, page: or clusters:, or the last 40 lines when none do). Set ok to false when the command exits non-zero. Do not read, open or change any other file.\n\n${cmd}`,
+    { label: l, phase: phaseTitle, schema: LINES, ...RUNNER },
+  )
+  const first = await ask(label)
+  if (first) return first
+  log(`${label}: the runner returned nothing; running the step once more`)
+  return ask(`${label}-retry`)
+}
 const must = (res, what) => {
-  if (!res || !res.ok) throw new Error(`${what} failed: ${(res && res.lines || []).join(' | ')}`)
+  if (!res) throw new Error(`${what} failed: the runner returned nothing twice, most likely a lost connection; launch the workflow again, which keeps the verdicts already written`)
+  if (!res.ok) throw new Error(`${what} failed: ${(res.lines || []).join(' | ')}`)
   return res.lines
 }
 const tilde = p => p.replace(/^\/Users\/[^/]+\//, '~/')
