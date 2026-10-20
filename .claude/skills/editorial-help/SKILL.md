@@ -49,7 +49,7 @@ For a tool, answer with the row of "Choosing a Tool" in the guide that fits, fil
 1. The tool and why it fits these pages.
 2. The exact command, with the real paths, run id and profile.
 3. The cost: the guide's measured figure scaled by these pages' words, stated as an estimate, with the guide's date. A free script says free.
-4. What happens next, and what the user does at that point.
+4. The next step, and the user's part in that step.
 
 For customising, answer with the level the change belongs at (workspace, document set or one run), the file and the section from "Customising the Tools", and a one-line example of the edit. A rule that holds only for this document set goes in its profile, never in `language.md`. Offer to make the edit; a workspace file changes only through a commit, which the user asks for.
 

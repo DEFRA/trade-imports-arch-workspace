@@ -31,9 +31,9 @@ Every change belongs at one of three levels. A rule that holds for any document 
 | Ban or flag a word or phrase in every document | `best-practices/writing/language.md`, "Words to avoid or examine": add a row with the forms in backticks, a repair and FAIL or WARN | the next prose check, in every hook and commit that runs it |
 | A writing rule | `best-practices/writing/language.md`, the section the rule belongs to | writers and reviewers read the rule; only a rule the prose check implements is enforced |
 | A term never to flag or expand | `best-practices/writing/ubiquitous-language.md`, the register | every review |
-| What a review pass looks for | `skills/editorial/references/layer-cards.md` (paragraph, page and set passes) and `review-brief.md` (finding kinds and fields) | the next review |
-| How a finding closes | `skills/editorial-triage/assets/grading-rubric.md`, or the triage skill's Calibrate mode, which rebuilds the rubric from your own closing decisions | the next triage |
-| What counts as a fact or a contradiction | `skills/design-consistency/references/FACT_EXTRACTOR.md` and `CONSISTENCY_CHECKER.md` | the next consistency check |
+| The checks each review pass makes | `skills/editorial/references/layer-cards.md` (paragraph, page and set passes) and `review-brief.md` (finding kinds and fields) | the next review |
+| The rules for closing a finding | `skills/editorial-triage/assets/grading-rubric.md`, or the triage skill's Calibrate mode, which rebuilds the rubric from your own closing decisions | the next triage |
+| The definitions of a fact and a contradiction | `skills/design-consistency/references/FACT_EXTRACTOR.md` and `CONSISTENCY_CHECKER.md` | the next consistency check |
 
 All paths are under `~/trade-imports-arch-workspace/.claude/`. Workspace files are versioned, so a change goes through a commit.
 
@@ -41,7 +41,7 @@ All paths are under `~/trade-imports-arch-workspace/.claude/`. Workspace files a
 
 A document set keeps its own settings in `editorial-profile.md` beside its pages. Every section is optional:
 
-| Section | Holds | Read by |
+| Section | Holds | Consumer |
 | --- | --- | --- |
 | Reader | the reader frame: who reads the set and what they already know | the review packet |
 | Defaults | mode, intent and document mode | the review packet |
@@ -54,7 +54,7 @@ The format is in the header of `tools/editorial/read-profile.sh`, and `trade-imp
 
 ### One Run
 
-When a run starts, say anything that applies only to that run: a different reader, mode or intent, or an extra run note. What you say wins over the profile, and the profile wins over nothing.
+When a run starts, say anything that applies only to that run: a different reader, mode or intent, or an extra run note. The run's own instructions win over the profile, and the profile wins over nothing.
 
 ## Worked Examples
 
