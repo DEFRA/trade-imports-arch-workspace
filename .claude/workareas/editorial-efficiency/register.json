@@ -767,6 +767,32 @@
           "applied": "0: the production triage stops at the spot check"
         },
         "verdict": "Passed: recall at the baseline floor and repetition as R3b, review cost -63%. Without layer 0 pointers it matches R3b, so the pointers were not doing the work. With R3b, the second layered run within the noise band: stage 2 done when."
+      },
+      {
+        "id": "S2i",
+        "name": "incremental re-review, unscoped page and set passes",
+        "config": "S2 triage edits applied (29 of 30); start-layered-review.sh --since s2-base: 3 of 3 pages changed, 32 changed lines; paragraph pass scoped to those lines, page and set passes on the whole page",
+        "results": {
+          "review_cost": 2.44,
+          "full_review_cost": 2.79,
+          "records": 50,
+          "paragraph_findings": "20, all on changed lines",
+          "page_and_set_findings": "30: 16 repeat findings S2 closed (11 ignored, 5 open), 14 new"
+        },
+        "verdict": "The line scope works for the paragraph pass, but the page and set passes redo the full review and re-raise settled findings; review cost only -13%."
+      },
+      {
+        "id": "S2j",
+        "name": "incremental re-review, scoped and with settled findings",
+        "config": "S2i plus the packet sections Changes since the last review (changed lines and the earlier text of removed or rewritten paragraphs) and Settled findings (S2 triage: 38 ignored, 7 open); every pass reports only what the changes touch",
+        "results": {
+          "review_cost": 2.20,
+          "records": 19,
+          "page_and_set_findings": "4, all new, all on or next to a changed line",
+          "paragraph_findings": "15, all on changed lines",
+          "repeats_of_settled": 0
+        },
+        "verdict": "The scope holds: 19 findings against 50, no settled finding raised again, so the triage and the author handle only what the edits touched. The review itself costs about the same as a full one, because every fork carries the whole packet; a smaller re-review packet is the next lever if that matters."
       }
     ],
     "decisions": {
@@ -883,6 +909,18 @@
           "n": 20,
           "topic": "retire the editorial-review workflow",
           "choice": "removed; git history keeps the file; the layered review is the only whole-document review",
+          "date": "2026-10-20"
+        },
+        {
+          "n": 21,
+          "topic": "layer 0",
+          "choice": "a deterministic preferred-names check only; the register lives beside the docs; INS Auth register: snapshot -> session assertion, cookie value and sealed value -> sealed cookie value, everywhere (128 renames applied in the docs working tree, uncommitted, for Ben to review)",
+          "date": "2026-10-20"
+        },
+        {
+          "n": 22,
+          "topic": "stage 4",
+          "choice": "incremental re-review first; page and set passes scoped to the changes, with the earlier triage settled findings never raised again",
           "date": "2026-10-20"
         }
       ]
