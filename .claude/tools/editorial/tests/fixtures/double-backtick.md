@@ -1,4 +1,4 @@
-# Double backtick masking
+# Double Backtick Masking
 
 A clean line stays out.
 The span ``holds — a dash before the ` inner tick`` and reads as data.

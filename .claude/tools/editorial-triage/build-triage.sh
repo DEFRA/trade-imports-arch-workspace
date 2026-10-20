@@ -140,7 +140,7 @@ fi
 
 # the run fields: what the review was asked to do and what it read
 jq -e '(.version // 0) >= 3' "$DIR/review.json" >/dev/null 2>&1 \
-  || die "review result is not version 3 (found version $(jq -r '.version // "none"' "$DIR/review.json")); re-run the editorial-review workflow, which returns mode, intent and sourceHashes"
+  || die "review result is not version 3 (found version $(jq -r '.version // "none"' "$DIR/review.json")); re-run the editorial skill's layered review, whose assembler writes mode, intent and sourceHashes"
 MODE=$(jq -r '.mode // ""' "$DIR/review.json")
 INTENT=$(jq -r '.intent // ""' "$DIR/review.json")
 [[ "$MODE" == "review" || "$MODE" == "revise" ]] || die "review result has no mode (review or revise); found '$MODE'"

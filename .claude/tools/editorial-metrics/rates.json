@@ -1,0 +1,49 @@
+{
+  "source": "claude-api skill model table and prompt-caching.md, cached 2026-10-06; USD per million tokens, first-party API. Cache write is 1.25x input (5-minute TTL) and 2x input (1-hour TTL). A proxy for allowance weighting, which is not published.",
+  "models": {
+    "claude-fable-5-1": {
+      "input": 10.0,
+      "cache_write_5m": 12.5,
+      "cache_write_1h": 20.0,
+      "cache_read": 0.25,
+      "output": 50.0
+    },
+    "claude-fable-5": {
+      "input": 10.0,
+      "cache_write_5m": 12.5,
+      "cache_write_1h": 20.0,
+      "cache_read": 1.0,
+      "output": 50.0
+    },
+    "claude-opus-5-5": {
+      "input": 4.0,
+      "cache_write_5m": 5.0,
+      "cache_write_1h": 8.0,
+      "cache_read": 0.20,
+      "output": 20.0
+    },
+    "claude-opus-5": {
+      "input": 5.0,
+      "cache_write_5m": 6.25,
+      "cache_write_1h": 10.0,
+      "cache_read": 0.50,
+      "output": 25.0
+    },
+    "claude-sonnet-5-5": {
+      "input": 2.0,
+      "cache_write_5m": 2.5,
+      "cache_write_1h": 4.0,
+      "cache_read": 0.20,
+      "output": 10.0
+    },
+    "claude-haiku-5-5": {
+      "input": 0.10,
+      "cache_write_5m": 0.125,
+      "cache_write_1h": 0.20,
+      "cache_read": 0.01,
+      "output": 0.50
+    }
+  },
+  "context_chars_per_token": 2.1,
+  "context_chars_per_token_source": "Calibrated 2026-10-15 on the 14 Oct session-pages run: per agent, (last-turn context - first-turn context - earlier output tokens) / tool-result characters; drill 2.02, structural 2.16, grade2 2.20, grade3 2.00, main 2.40, cold reader 2.24. Applied to every characters-to-tokens estimate in this tool."
+}

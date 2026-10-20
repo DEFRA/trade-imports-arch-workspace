@@ -34,8 +34,10 @@ baseline_fail_lines() {  # $1 file on disk
   local dir rel
   dir=$(dirname "$1")
   rel=$(git -C "$dir" ls-files --full-name --error-unmatch -- "$(basename "$1")" 2>/dev/null) || return 0
+  # Labelled with the file's own path, so the gate applies the same
+  # editorial profile to the baseline as to the current file.
   git -C "$dir" show "HEAD:$rel" 2>/dev/null \
-    | bash "$GATE" --stdin --label baseline --print-fail-lines 2>/dev/null
+    | bash "$GATE" --stdin --label "$1" --print-fail-lines 2>/dev/null
   return 0
 }
 

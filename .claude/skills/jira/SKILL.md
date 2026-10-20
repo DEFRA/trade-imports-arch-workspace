@@ -16,9 +16,9 @@ All three scripts read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL` from the en
 ~/trade-imports-arch-workspace/.claude/tools/jira/auth.sh
 ```
 
-## When to use
+## Usage
 
-| Trigger                                 | What to follow             |
+| Trigger                                 | Steps                      |
 | --------------------------------------- | -------------------------- |
 | "fetch jira ticket", "read jira ticket" | Reading tickets            |
 | "run jql"                               | Reading tickets (JQL mode) |

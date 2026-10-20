@@ -15,12 +15,24 @@ hooks:
           timeout: 30
 ---
 
-Three goals stand over every path. Growth is a cost: the estate distils, and a rewrite grows only where the rules allow and the loss is named. The document reads as if one author wrote it as a coherent whole. Noise may go at the cost of information when the noise drowns the central point, with the loss named. The rules are [language.md](../../best-practices/writing/language.md)'s.
+The aim is technical writing that is concise, precise and clear. Clarity comes from simple language, never from simplifying the content. A paragraph is finished when adding more would not improve its point and taking anything away would remove useful meaning. The document reads as if one author wrote it as a coherent whole. The rules are [language.md](../../best-practices/writing/language.md)'s, starting with "Just Enough".
 
 Use one of 2 paths:
 
 - **New writing** - establish the brief and outline, draft, then review the result.
 - **Existing prose** - establish the reader, then start with the review path.
+
+## Usage
+
+| Trigger | Steps |
+| --- | --- |
+| "/editorial" or "editorial pass" on a document still to be written | Writing path 1 to 3, then the review path |
+| "/editorial" or "editorial pass" on one page or a short artefact (PR body, ticket, README) | Review path 1 to 6; the session applies the cold-editor role itself |
+| "review the whole document", "review these pages" | Review path step 6, the layered review on the pages, then `editorial-triage` |
+| "re-review the changes", "review what changed" | Review path step 6 with `--since` and `--settled` |
+| "rewrite this", "explain and rewrite" | Explain and Rewrite |
+
+Every run names a mode (`review` or `revise`) and an intent (`clarify` or `distil`); "Modes and intents" defines them. NOT for contradictions between pages (`design-consistency`), closing review findings (`editorial-triage`), fact-checking claims about the world (a separate process), code comments or conversational replies.
 
 ## Sources of truth
 
@@ -32,13 +44,13 @@ Read only the guidance needed for the current path:
 - Read [document-types.md](references/document-types.md) when choosing or checking a document's mode or fixed format.
 - Read [voice-examples.md](references/voice-examples.md) before drafting a full technical document or when prose sounds compressed or mechanical.
 - Read [clarify-examples.md](references/clarify-examples.md) once, when starting a task that edits existing prose under `clarify`.
-- Read [review-brief.md](references/review-brief.md) only when running a cold-reader pass or the whole-document review workflow.
+- Read [review-brief.md](references/review-brief.md) only when running a cold-reader pass; the whole-document review reads it from its work packet.
 
 Other files should point to these authorities rather than copy their rules.
 
 ## Modes and intents
 
-Every run names an output mode and an intent. The modes: `review` returns findings, the retains and the questions for the author, and changes no page; `revise` returns revised text with a change list and, after the closing plan's spot check, applies the batch. The intents: `distil` removes whole units and never grows; `clarify` splits, lists, reorders and rewords with every claim kept, and may still remove noise as a whole unit, named. The growth rules for each are [language.md](../../best-practices/writing/language.md), "Concentrate and distil". A request worded "validate" or "check" is restated as a readability task and its accuracy questions are routed to a separate process; the run still checks that its own edits preserve meaning. The whole-document review workflow runs only on the user's explicit request; its arguments are `docs` or `sections`, `frame`, `mode`, `intent`, and optionally `documentMode` and `notes`.
+Every run names an output mode and an intent. The modes: `review` returns findings, the retains and the questions for the author, and changes no page; `revise` returns revised text with a change list and, after the closing plan's spot check, applies the batch. The intents: `clarify` makes the text clear through simple language and keeps every claim; it explains and rewrites, splits, lists and reorders, and may still remove noise as a whole unit. `distil` removes noise as whole units, and each paragraph ends no longer than its source. Under both intents a dense sentence is unpacked with explain and rewrite before anything is cut. The growth rules for each are [language.md](../../best-practices/writing/language.md), "Just Enough". A request worded "validate" or "check" is restated as a readability task and its accuracy questions are routed to a separate process; the run still checks that its own edits preserve meaning. The whole-document review runs only on the user's explicit request; its inputs are the pages, any context pages, the reader frame, `mode`, `intent`, and optionally the document mode and run notes.
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [agent-skills.md](../../best-practices/skills/agent-skills.md).
 
@@ -65,7 +77,7 @@ For substantial documents, complete the brief and outline before drafting. Fixed
 ### 2. Build the outline
 
 - Open with the information the reader needs first. That information is usually the document's scope or the fixed format's required opening.
-- Use concrete headings that answer the reader's questions.
+- Give each section a heading that names its topic as a noun phrase in title case, never a question or a half-question; the rule is in [language.md](../../best-practices/writing/language.md), "Headings, lists and tables".
 - Put each fact in one place. Link or point to that place instead of restating the fact.
 - Choose prose, steps, bullets and tables using the structure rules in [document-types.md](references/document-types.md).
 - Include what the reader needs and remove what the reader already knows.
@@ -94,9 +106,9 @@ For each section, paragraph and sentence, ask:
 1. What is this trying to say?
 2. Why does the reader need this information?
 3. Has compression hidden an actor, mechanism, condition or consequence?
-4. Can this point be stated more simply without losing meaning?
+4. Can this point be stated in simpler language without losing meaning?
 
-Unpack before cutting. Several plain statements are better than one dense statement. Later, remove whole units the reader does not need; do not compress the surviving explanation back into shorthand.
+Unpack before cutting, with [explain and rewrite](references/explain-and-rewrite.md). Several plain statements are better than one dense statement, so keep unpacking until every sentence passes [language.md](../../best-practices/writing/language.md), "Sentences and paragraphs". Later, remove whole units the reader does not need; do not compress the surviving explanation back into shorthand.
 
 Stop where further explanation would require a guess. Name the missing information instead. If the author clearly holds an omitted rationale, ask for it rather than supplying a plausible one.
 
@@ -128,7 +140,7 @@ A reader should be able to read each sentence aloud once and restate it accurate
 
 ### 5. Remove waste and fix the structure
 
-Apply [language.md](../../best-practices/writing/language.md), "Concentrate and distil". That section is the only home for the removal rules.
+Apply [language.md](../../best-practices/writing/language.md), "Just Enough". That section is the only home for the removal rules.
 
 Give repeated facts one home. Merge sections when their overlap causes repetition.
 
@@ -140,7 +152,13 @@ Under `clarify` the session may split a paragraph at a seam, put a condition bef
 
 For a small artefact, apply the cold-editor role in [review-brief.md](references/review-brief.md) yourself. For a full draft, give that role to a fresh-context reviewer. The reviewer returns findings only and never edits the document. Apply accepted findings in the writing session.
 
-For a full document or document set, run the saved `editorial-review` workflow only when the user asks to "run the editorial-review workflow" on a path, with the arguments "Modes and intents" names. Under `distil` the drill reviewer's paragraph restatement test raises one removal per sentence a restatement of the paragraph drops; under `clarify` the drill reviewer asks the clarify questions. The workflow uses [review-brief.md](references/review-brief.md) for drill, structural and cold-editor passes and reviews without editing. Triage its findings with the `editorial-triage` skill (`~/trade-imports-arch-workspace/.claude/skills/editorial-triage/SKILL.md`), which grades every finding into one closing move against the calibrated rubric and writes the closing plan. In revise mode, apply the remove, correct and reword batch after the plan's spot check, put the keep-one-side and tell-me items to the user, send the open lines to the register, then run one final cold-reader check on the revised result. In review mode the plan is the deliverable and no page changes.
+For a full document or document set, run the layered review only when the user asks for a whole-document review on a path, with the arguments "Modes and intents" names:
+
+1. `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/start-layered-review.sh --run-id <docset>-<date> [--context <page>]... [--profile <editorial-profile.md>] <page>...` hashes the pages, builds the work packet with [layer-cards.md](references/layer-cards.md) in place of the brief's reviewer roles, and prints each page's key. When the document set keeps an `editorial-profile.md` beside its pages, pass it: the packet carries its reader frame, defaults, run notes and context pages, and the review stops while a name its Preferred Names table replaces remains, so `check-names.sh --fix --profile <profile>` renames them for the user to review first. The profile's format is in the header of `tools/editorial/read-profile.sh`. To re-review after edits, give `--since <earlier run id>` and `--settled <that run's triage workarea>`: only pages with changed, new or removed paragraphs are reviewed, every pass reports only what the changes touch, the earlier triage's ignored and open findings are not raised again, and the rest become context; with nothing changed the script exits 3 and no review runs.
+2. Spawn one `general-purpose` agent with `model: opus`, whose prompt begins "Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/editorial/references/LAYERED_LOADER.md." and gives the reader frame, mode, intent, document mode, run notes, packet path, review folder and page keys. It reads the packet once and forks a paragraph, page and set pass per page.
+3. `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/assemble-review.sh --dir <review folder> --mode <mode> --intent <intent> --hashes <run folder>/hashes.json --out <run folder>/review-result.json <page>...` validates every pass's findings and builds the review result; when it refuses, re-run the passes it names.
+
+Contradictions between statements are left to the `design-consistency` skill. The review edits nothing. Triage its findings with the `editorial-triage` skill (`~/trade-imports-arch-workspace/.claude/skills/editorial-triage/SKILL.md`), which grades every finding into one closing move against the calibrated rubric and writes the closing plan. In revise mode, apply the remove, correct and reword batch after the plan's spot check, put the keep-one-side and tell-me items to the user, send the open lines to the register, then run one final cold-reader check on the revised result. In review mode the plan is the deliverable and no page changes.
 
 Run the style gate on every document touched:
 
@@ -154,9 +172,9 @@ Fix every FAIL. Judge every WARN against [language.md](../../best-practices/writ
 
 The gate is the floor, not the finish. After the gate passes, read each paragraph once and say that paragraph back without looking at the text. Where your restatement differs from the paragraph, the paragraph is wrong and the paragraph changes. The work is finished when the restatements match.
 
-## The rewrite path
+## Explain and Rewrite
 
-When a heuristic or a judge flags a sentence the reader cannot restate after one reading, or the user asks for a rewrite, take the clarify reword path in [reword-loop.md](references/reword-loop.md): explain, compare, rewrite, check the deviation, and let a fresh reader judge preservation and benefit. An explicit rewrite request selects this path; it never changes a claim, and a retained source is a normal outcome.
+When a heuristic or a judge flags a sentence the reader cannot restate after one reading, when a reviewer writes a reword, or when the user asks for a rewrite, use [explain and rewrite](references/explain-and-rewrite.md): explain, compare, rewrite, check the deviation, and let a fresh reader judge preservation and benefit. It runs under both intents. An explicit rewrite request selects it; it never changes a claim, and a retained source is a normal outcome.
 
 ## Applying edits
 
@@ -172,7 +190,7 @@ When a heuristic or a judge flags a sentence the reader cannot restate after one
 editorial complete: mode <review|revise>, intent <distil|clarify>.
 
 Pages touched: <list>.
-Revise: removed <n> units (each with its named loss), reworded <n> sentences (change lines in the record), net growth <n> words; changed-page gate <pass|FAIL>.
+Revise: removed <n> units (each naming any information the reader no longer gets), reworded <n> sentences (change lines in the record), net growth <n> words; changed-page gate <pass|FAIL>.
 Review: candidates and findings returned <n>; gate on their prose <pass|FAIL>; no page changed.
 Questions for the author <n>; retains recorded <n>. Nothing committed.
 ```
@@ -182,6 +200,6 @@ Questions for the author <n>; retains recorded <n>. Nothing committed.
 | Script | Purpose |
 | --- | --- |
 | `~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh` | Check deterministic failures and judgment warnings; supports `--stdin --label`, `--print-fail-lines` and `--help` |
-| `~/trade-imports-arch-workspace/.claude/tools/editorial/claim-diff.sh` | The claim nominator on one edit (`--before <file> --after <file>`): the reword loop's deviation check, a signal and not a verdict |
+| `~/trade-imports-arch-workspace/.claude/tools/editorial/claim-diff.sh` | The claim nominator on one edit (`--before <file> --after <file>`): the deviation check in explain and rewrite, a signal and not a verdict |
 | `~/trade-imports-arch-workspace/.claude/tools/editorial/hook-check-written.sh` | Check each write while the skill is active and record touched files |
 | `~/trade-imports-arch-workspace/.claude/tools/editorial/hook-stop.sh` | Prevent the session from ending while a touched file contains a newly introduced failure |

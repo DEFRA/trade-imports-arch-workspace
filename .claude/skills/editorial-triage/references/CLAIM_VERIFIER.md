@@ -23,7 +23,7 @@ jq -c '.records[] | select(.page == "<page>" and (.claimDiff.nominated == true o
 
 Each record carries `id`, `cluster`, `before`, `after`, `candidateHash`, `removes`, `removalHash`, `removalShift`, `loss`, `defect` and `claimDiff` (`added`, `removed`, `missingSentence`). The file you write is the whole page's verdicts: the build reads only that file, so a file that leaves a candidate out, on a retry as on the first pass, leaves that candidate `missing`, whatever an earlier file said about the candidate.
 
-## How to judge
+## Judging Procedure
 
 The nominator says where to look; you say what changed in meaning. For each record, read the paragraph the record sits in and the paragraphs around it, then compare `before` with `after` element by element.
 

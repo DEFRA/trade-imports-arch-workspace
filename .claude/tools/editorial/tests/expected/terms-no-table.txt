@@ -1,0 +1,2 @@
+check-prose: terms table: no FAIL or WARN rows read from ~/trade-imports-arch-workspace/.claude/tools/editorial/tests/fixtures/terms-table/no-table.md, "Words to avoid or examine"
+exit-code: 1

@@ -17,9 +17,9 @@ All hooks receive JSON on stdin (`session_id`, `hook_event_name`, and for tool e
 
 SKILL.md frontmatter accepts a `hooks:` key with the same shape as `settings.json` hooks. These register when the skill is invoked and last for the skill's lifetime - the sanctioned way to enforce a skill's own contract without a global hook. Both this estate's uses live in the pr and editorial skills (write-time prose gate, editorial Stop gate), calling scripts in `.claude/tools/editorial/`.
 
-## Where enforcement code lives
+## Enforcement Code Locations
 
-| Location | Wired from | Who edits |
+| Location | Wiring | Editor |
 | --- | --- | --- |
 | `.claude/hooks/` | `settings.json` (global, every session) | the owner only - `guard-edits.sh` blocks agent edits to both |
 | `.claude/tools/<domain>/` | skill frontmatter hooks, skill steps, other scripts | agents; covered by the blanket `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` allowlist |

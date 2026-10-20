@@ -1,0 +1,38 @@
+--- the profile as JSON ---
+{
+  "profile": "WORK/editorial-profile.md",
+  "dir": "WORK",
+  "reader": "An engineer who builds the service and an architect who reviews it.",
+  "defaults": {
+    "mode": "revise",
+    "intent": "distil",
+    "documentMode": "reference"
+  },
+  "contextPages": [
+    "WORK/context.md"
+  ],
+  "runNotes": [
+    "Times use the 24-hour form.",
+    "The working values have their home in the Constants table."
+  ],
+  "names": [
+    {
+      "preferred": "sealed cookie value",
+      "plural": "sealed cookie values",
+      "forms": [
+        "cookie value",
+        "sealed val*"
+      ],
+      "replaced": [
+        "(?<!sealed )\\bcookie\\s+value\\b(?!s)",
+        "\\bsealed\\s+val[A-Za-z0-9-]*\\b"
+      ]
+    }
+  ]
+}
+exit 0
+--- a bad mode and a missing context page ---
+read-profile: WORK/bad.md: Defaults: Mode is review or revise, not rewrite
+read-profile: WORK/bad.md: Context Pages: no page at WORK/missing.md
+exit 2
+exit-code: 0

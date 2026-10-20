@@ -1,4 +1,4 @@
-# Contact clause fixture
+# Contact Clause Fixture
 
 Sessions live in a store only the front door reaches. Each journey owns a private database that only that backend reaches. The dashboard shows a panel only the auditor sees.
 

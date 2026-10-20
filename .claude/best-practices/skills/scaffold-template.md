@@ -45,7 +45,7 @@ To change the emitted skeleton: edit the heredoc in `scaffold-skill.sh`, run the
 CREATE mode emits a `decisions.md` next to SKILL.md by piping `render-interview.sh`, so the sidecar mirrors the 9 interview questions exactly; the rationale is what a future audit / refactor pass reads to avoid re-deriving the framework.
 
 ```markdown
-# {{NAME}} skill — decisions
+# {{NAME}} skill - decisions
 
 Recorded during CREATE interview. Update if a shape choice changes; do not delete entries.
 
@@ -55,7 +55,7 @@ Recorded during CREATE interview. Update if a shape choice changes; do not delet
 
 ## 2. Dependencies
 
-**Resolution:** {{none | build | port | depend}} **Declared:** {{DEP_TOKENS | (none)}} **Why:** {{JUSTIFICATION | (not applicable)}} **Pattern reference:** patterns.md §9
+**Resolution:** {{none | build | port | depend}} **Declared:** {{DEP_TOKENS | (none)}} **Reason:** {{JUSTIFICATION | (not applicable)}} **Pattern reference:** patterns.md §9
 
 ## 3. State shape
 

@@ -1,0 +1,46 @@
+--- check mode ---
+check-names: page.md:1: "Sealed Value" -> "Sealed Cookie Value"
+check-names: page.md:3: "snapshot" -> "session assertion"
+check-names: page.md:3: "sealed value" -> "sealed cookie value"
+check-names: page.md:4: "Sealed Value" -> "Sealed Cookie Value"
+check-names: page.md:4: "Sealed values" -> "Sealed cookie values"
+check-names: page.md:5: "SNAPSHOT" -> "SESSION ASSERTION"
+check-names: page.md:5: "snapshots" -> "session assertions"
+check-names: page.md:6: "cookie value" -> "sealed cookie value"
+check-names: 8 replaced names across 1 of 1 page; rename them, or run with --fix
+exit 1
+--- fix mode ---
+check-names: page.md:1: "Sealed Value" -> "Sealed Cookie Value"
+check-names: page.md:3: "snapshot" -> "session assertion"
+check-names: page.md:3: "sealed value" -> "sealed cookie value"
+check-names: page.md:4: "Sealed Value" -> "Sealed Cookie Value"
+check-names: page.md:4: "Sealed values" -> "Sealed cookie values"
+check-names: page.md:5: "SNAPSHOT" -> "SESSION ASSERTION"
+check-names: page.md:5: "snapshots" -> "session assertions"
+check-names: page.md:6: "cookie value" -> "sealed cookie value"
+check-names: page.md:1: heading renamed; links to its old anchor need the new one
+check-names: renamed 8 names across 1 of 1 page; review the diff
+exit 0
+--- the fixed page ---
+# The Sealed Cookie Value
+
+The frontend reads the sealed cookie value and asks for a session assertion.
+Sealed cookie values expire. The Sealed Cookie Value travels in a header.
+A SESSION ASSERTION is short-lived, and two session assertions are never shared.
+The sealed cookie value is already right, and so is the sealed cookie value's owner.
+Inline code stays: `sealed value` and `snapshot`.
+<!-- provenance: sealed value -->
+
+```
+sealed value inside a fence
+```
+--- re-check ---
+check-names: 1 page, no replaced name
+exit 0
+--- a profile with no Preferred Names table ---
+check-names: WORK/empty.md has no Preferred Names table
+exit 2
+--- a form that is not plain words ---
+read-profile: WORK/bad.md: Preferred Names: form "tok(en)?" may hold only letters, digits, spaces, hyphens, apostrophes and a trailing *
+exit 2
+exit-code: 0

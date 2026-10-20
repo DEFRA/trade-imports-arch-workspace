@@ -1,0 +1,5 @@
+"role","models","responses","median_turn_s","p90_turn_s","max_turn_s","turns_over_5_min","generation_min"
+"drill","claude-fable-5-1",2,27,27,27,0,0.5
+"main","claude-fable-5-1|claude-opus-5-5",5,3,5,5,0,0.3
+"Drill unit 1 opening","claude-fable-5-1",1,5,5,5,0,0.1
+"verify","claude-fable-5-1",2,4,4,4,0,0.1

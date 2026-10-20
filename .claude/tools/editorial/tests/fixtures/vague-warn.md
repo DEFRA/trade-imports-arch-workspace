@@ -1,4 +1,4 @@
-# Vague words warn only
+# Vague Words Warn Only
 
 A robust design makes appropriate choices.
 

@@ -55,7 +55,7 @@ triggers=$(jq -r '.answers.triggers.phrases // [] | map("- \"" + . + "\"") | joi
 disambig=$(jq -r "$jq_pretty"' .answers.triggers.disambiguation | show' "$target")
 
 cat <<EOF
-# $name skill — decisions
+# $name skill - decisions
 
 Recorded during CREATE interview. Update if a shape choice
 changes; do not delete entries.
@@ -68,7 +68,7 @@ $purpose
 
 **Resolution:** $dep_resolution
 **Declared:** $dep_declared
-**Why:** $dep_why
+**Reason:** $dep_why
 **Pattern reference:** patterns.md §9
 
 ## 3. State shape

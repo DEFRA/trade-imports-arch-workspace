@@ -1,4 +1,4 @@
-# Whitespace repair drill
+# Whitespace Repair Drill
 
 First sentence stands at the head of the paragraph. Second sentence stands at the tail of the paragraph.
 

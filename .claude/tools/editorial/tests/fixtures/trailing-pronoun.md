@@ -1,4 +1,4 @@
-# Trailing pronoun
+# Trailing Pronoun
 
 The routing service provides it.
 

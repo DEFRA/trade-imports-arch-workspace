@@ -1,6 +1,6 @@
 # editorial-triage record contract and state shape
 
-This file is the single home for the finding record, the triage state and the rules the helpers apply. The review workflow's schema mirrors the reviewer-set fields; `build-triage.sh` validates them and writes the state described here; the `CLAIM_VERIFIER` worker writes the verification files, which the build reads on a rebuild; `grade-triage.sh` reads that state and writes the calibration and closing files. This is contract version 3. Change this file first, then the helpers (`build-triage.sh`, `grade-triage.sh`, `lib/normalize-v2.jq`, `lib/triage.jq`, `triage-lib.jq`, `lib/grade.jq`), then the review schema in `editorial-review.js`, then the field table in `review-brief.md`.
+This file is the single home for the finding record, the triage state and the rules the helpers apply. The layered review's assembler, `tools/editorial/assemble-review.sh`, validates the reviewer-set fields before the build; `build-triage.sh` validates them and writes the state described here; the `CLAIM_VERIFIER` worker writes the verification files, which the build reads on a rebuild; `grade-triage.sh` reads that state and writes the calibration and closing files. This is contract version 3. Change this file first, then the helpers (`build-triage.sh`, `grade-triage.sh`, `lib/normalize-v2.jq`, `lib/triage.jq`, `triage-lib.jq`, `lib/grade.jq`), then the review validation in `assemble-review.sh`, then the field table in `review-brief.md` and the output shapes in `layer-cards.md`.
 
 ## Workarea layout
 
@@ -69,7 +69,7 @@ A `split` or `list` finding names the whole paragraph as `before` and gives the 
 
 ### Tool-set fields
 
-| Field | Values | How |
+| Field | Values | Derivation |
 | --- | --- | --- |
 | `id` | `F-<KEY>-<seq>` | `KEY` is the page's leading digits (or `xx`), suffixed `a`, `b` and so on when more than one page in the run carries that number; `seq` is zero-padded per page in source order |
 | `source` | `drill`, `editor`, `structural` | which reviewer produced it |

@@ -1,4 +1,4 @@
-# Vague word fixture
+# Vague Word Fixture
 
 The shape is settled and both shapes align.
 The cache interval bounds how quickly a session lapses.

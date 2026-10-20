@@ -1,4 +1,4 @@
-# Aside stacking fixture
+# Aside Stacking Fixture
 
 The front door - the only OIDC client - signs importers in against IDM - the customer identity service - and writes the session record.
 

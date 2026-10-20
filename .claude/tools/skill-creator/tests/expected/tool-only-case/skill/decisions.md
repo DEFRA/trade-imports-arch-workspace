@@ -1,4 +1,4 @@
-# test-toolonly skill — decisions
+# test-toolonly skill - decisions
 
 Recorded during CREATE interview. Update if a shape choice
 changes; do not delete entries.
@@ -11,7 +11,7 @@ Fixture skill declaring a tool without depending, with zero helpers.
 
 **Resolution:** build
 **Declared:** demo-tool
-**Why:** (not applicable)
+**Reason:** (not applicable)
 **Pattern reference:** patterns.md §9
 
 ## 3. State shape

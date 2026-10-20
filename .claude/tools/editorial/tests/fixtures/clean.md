@@ -1,4 +1,4 @@
-# A clean document
+# A Clean Document
 
 Plain prose with a proper hyphen break - like this one. Straight "double" and 'single' quotes only.
 

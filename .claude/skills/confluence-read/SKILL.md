@@ -7,9 +7,9 @@ Fetches one Confluence page - given a full URL or a bare page id - through the `
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
-## When to use
+## Usage
 
-| Trigger | What to follow |
+| Trigger | Steps |
 | --- | --- |
 | "read confluence page <url>" | Steps 1-3 |
 | "fetch confluence page" | Steps 1-2 (stop after presenting the page) |

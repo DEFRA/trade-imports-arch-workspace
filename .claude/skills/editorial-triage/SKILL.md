@@ -1,23 +1,23 @@
 ---
 name: editorial-triage
-description: 'Close the findings of an editorial review: grade every finding into one closing move (remove, correct, reword, keep one side, record as open, ignore, tell me) against the calibrated rubric, score the run, build the closing plan, spot-check the batch with the user, and apply the remove, correct and reword entries to the pages as an uncommitted diff. Triggers: "triage the review", "triage findings", "editorial triage", "close the review", "triage the editorial review". NOT for producing findings (editorial-review), writing or revising prose (editorial), committing, or publishing (confluence-publish).'
+description: 'Close the findings of an editorial review: grade every finding into one closing move (remove, correct, reword, keep one side, record as open, ignore, tell me) against the calibrated rubric, score the run, build the closing plan, spot-check the batch with the user, and apply the remove, correct and reword entries to the pages as an uncommitted diff. Triggers: "triage the review", "triage findings", "editorial triage", "close the review", "triage the editorial review". NOT for producing findings or writing or revising prose (editorial), committing, or publishing (confluence-publish).'
 ---
 
-Consumes the output of an editorial review (the saved run record of the `editorial-review` workflow, or a directory of version 3 findings files) and closes every finding with one move. The deterministic work (normalise, resolve anchors, gate rewrites, nominate claim changes, dedup, plan, apply) lives in `build-triage.sh` and `grade-triage.sh`; the judgment work (predicting the closing move for each cluster from the rubric) fans out to one `GRADER` per page. The outcome is written to `~/trade-imports-arch-workspace/.claude/workareas/editorial-triage/<run>/`: `calibration/grades/*.json` and `calibration/score.json`, then `closing/plan.md` (the report), `closing/plan.json` and, after the apply step, `closing/applied.json`. The pages change only in the apply step, in the docs working tree, and are never committed here.
+Consumes the output of an editorial review (the review result the editorial skill's layered review assembles, or a directory of version 3 findings files) and closes every finding with one move. The deterministic work (normalise, resolve anchors, gate rewrites, nominate claim changes, dedup, plan, apply) lives in `build-triage.sh` and `grade-triage.sh`; the judgment work (predicting the closing move for each cluster from the rubric) fans out to one `GRADER` per page. The outcome is written to `~/trade-imports-arch-workspace/.claude/workareas/editorial-triage/<run>/`: `calibration/grades/*.json` and `calibration/score.json`, then `closing/plan.md` (the report), `closing/plan.json` and, after the apply step, `closing/applied.json`. The pages change only in the apply step, in the docs working tree, and are never committed here.
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 The frame is closing, not opening. Every finding gets exactly one closing move: `R` remove, `C` correct, `W` reword, `K` keep one side, `O` record as open with an owner, `I` ignore for now, `T` tell me what to do. Removal is tried first, growth needs a heuristic that allows the growth, and no question is put to the user in chat. The rubric that defines the moves: [`assets/grading-rubric.md`](assets/grading-rubric.md). The record contract and every rule the helpers apply: [`assets/editorial-triage-schema.md`](assets/editorial-triage-schema.md).
 
-## When to use
+## Usage
 
-| Trigger | What to follow |
+| Trigger | Steps |
 |---------|----------------|
-| "triage the review", "triage the editorial review", "close the review" | Steps 1 to 8 on the review's run record |
-| "triage findings" | Steps 1 to 8 on a findings directory (`--from-review`) |
-| "editorial triage" | Steps 1 to 8; ask which run if none is named |
+| "triage the review", "triage the editorial review", "close the review" | Step 1, the workflow for Steps 2 to 6, then Steps 6 to 8, on the review's run record |
+| "triage findings" | As above, on a findings directory (`--from-review`) |
+| "editorial triage" | As above; ask which run if none is named |
 
-NOT for producing the findings (run the `editorial-review` workflow first), for writing or revising the prose (the `editorial` skill), for committing (the user commits the diff), or for publishing (`confluence-publish`).
+NOT for producing the findings (run the editorial skill's whole-document review first), for writing or revising the prose (the `editorial` skill), for committing (the user commits the diff), or for publishing (`confluence-publish`).
 
 ## Worker references
 
@@ -59,7 +59,24 @@ Canonical state is JSON under `~/trade-imports-arch-workspace/.claude/workareas/
 
 ## Step 1: Name the run and its inputs
 
-Establish: the review to triage (a run id such as `wf_f07b54c5-79b`, a run record path, or a directory holding `review/*.json` and `review/run.json` with `mode`, `intent` and `sourceHashes`); the state of the pages the reviewers read (`git -C <docs repo> status --short` shows uncommitted edits; pass `--commit` a label such as `e7cbdb0+edits` when the tree is dirty, so the manifest says what was reviewed); and a run slug for the workarea, `<docset>-<date>` (for example `ins-auth-2026-09-10`).
+Establish: the review to triage (the `review-result.json` path the layered review assembled, an older workflow run id such as `wf_f07b54c5-79b`, or a directory holding `review/*.json` and `review/run.json` with `mode`, `intent` and `sourceHashes`); the state of the pages the reviewers read (`git -C <docs repo> status --short` shows uncommitted edits; pass `--commit` a label such as `e7cbdb0+edits` when the tree is dirty, so the manifest says what was reviewed); and a run slug for the workarea, `<docset>-<date>` (for example `ins-auth-2026-09-10`).
+
+## Steps 2 to 6: Run the Triage Workflow
+
+Run Steps 2 to 6 as one workflow, so the session launches the triage and reads one result instead of driving each spawn:
+
+```
+Workflow name: editorial-triage
+args: {"run": "<run id or path>", "workarea": "~/trade-imports-arch-workspace/.claude/workareas/editorial-triage/<run>", "commit": "<label>"}
+```
+
+For a findings directory, pass `"review": "<directory>"` in place of `"run"`. A veto at the spot check is handled by hand as Step 6 describes (calibrate, re-grade the one page, re-plan with a new `--seed`); relaunching the workflow would re-grade every page. The workflow builds, spawns one `CLAIM_VERIFIER` per page the build names and re-spawns a page once when the rebuild still names it, grades every page and the set-wide clusters, then scores and plans with a spot check of 10. It never applies. Read its result:
+
+- `stopped: "verification"`: the rebuild still names pages after one retry. Read the `lines` and continue by hand from Step 3.
+- `stopped: "grading"`: a grader returned nothing, usually a dropped connection. Launch the workflow again: the build applies the verdicts already written, so only the graders run again.
+- `stopped: null`: read `closing/plan.md` and continue at Step 6's spot check. `gradeCountMismatch` names a page whose grader did not grade every cluster; re-grade that page by hand (Step 4) and re-plan before the spot check.
+
+Steps 2 to 6 below are what the workflow does, and the manual fallback when the workflow cannot run.
 
 ## Step 2: Build
 

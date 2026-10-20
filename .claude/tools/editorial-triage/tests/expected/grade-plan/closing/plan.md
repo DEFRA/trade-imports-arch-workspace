@@ -53,7 +53,7 @@ None.
 
 ## Problems
 
-Clusters the plan cannot close as they stand.
+Clusters the plan cannot close as they stand, and S1 or S2 contradictions the grade ignored, for the user to rule on.
 
 - C-03-006 03-sample-session.md:7 C: no rewrite (the record carries no replacement text for C)
 - C-03-005 03-sample-session.md:9: ungraded (no label and no grade for this cluster)

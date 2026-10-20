@@ -1,0 +1,8 @@
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/question-opener.md:8: - **Which** component owns each action
+check-prose: FAQ voice in a label - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Headings, lists and tables"). A table header or a bold lead-in names its topic as a noun phrase in title case: "Condition", not "When the session is in it"; "End State", not "What John sees".
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/question-opener.md:3: What a journey backend checks is the signature, the issuer and the expiry.
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/question-opener.md:7: - How a session starts
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/question-opener.md:12: | Expiry | Why the session ends at 8 hours |
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/question-opener.md:14: The routing service forwards the request. Whether the cookie is sealed is decided separately.
+check-prose: WARN hits are FAQ voice - a sentence, list item or cell opens on a half-question (What, How, Which, Why, Whether, Who), a smell: restructure so the actor and the content lead, for example "The backend checks the signature", not "What the backend checks is the signature" (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Headings, lists and tables").
+exit-code: 2

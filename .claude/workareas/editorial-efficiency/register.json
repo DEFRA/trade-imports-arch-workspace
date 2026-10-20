@@ -1,0 +1,929 @@
+{
+  "baseline": {
+    "configuration": "current process as of 15 Oct 2026: saved editorial-review workflow with reviewers pinned to Opus 5.5 (uncommitted pin), triage workers inheriting the Opus 5.5 session, triage per SKILL.md with an automated spot check, no hand edits for K and T, one cold reader",
+    "corpus": "experiments/corpus/5fc8cd2 (00 context; C1 = 02b; C3 = 02a, 02b, 02c)",
+    "runs": [
+      {
+        "run": "B0a",
+        "corpus": "C1",
+        "review": "wf_a7b40dff-2d4",
+        "status": "complete",
+        "metrics": {
+          "cost": 9.88,
+          "review": 7.18,
+          "triage": 2.70,
+          "fixes": 15,
+          "applied": 14,
+          "h29": 17,
+          "ignore_rate": 0.67,
+          "cold_reader_findings": 3,
+          "review_minutes": 27.7
+        }
+      },
+      {
+        "run": "B0b",
+        "corpus": "C1",
+        "review": "wf_4c46785d-010",
+        "status": "complete",
+        "metrics": {
+          "cost": 10.90,
+          "review": 8.51,
+          "triage": 2.39,
+          "fixes": 20,
+          "applied": 18,
+          "h29": 12,
+          "ignore_rate": 0.62,
+          "cold_reader_findings": 2,
+          "review_minutes": 105.8
+        }
+      },
+      {
+        "run": "B0c",
+        "corpus": "C3",
+        "review": "wf_232ce2b9-c3c",
+        "status": "complete",
+        "review_minutes": 8.4,
+        "metrics": {
+          "cost": 13.17,
+          "review": 7.70,
+          "triage": 5.47,
+          "fixes": 37,
+          "applied": 37,
+          "h29": 20,
+          "ignore_rate": 0.48,
+          "records": 101,
+          "clusters": 84,
+          "cold_reader_findings": 5
+        },
+        "cold_reader_note": "An S2 cross-page contradiction (journey frontends reading the cookie against the foundations routing-service rule) survived: the review raised it in 5 clusters, triage graded 2 as K (keep one side, put to Ben) and 3 as I (H-09, H-12), so no edit applied and the cold reader raised it again."
+      },
+      {
+        "run": "B0d",
+        "corpus": "C3",
+        "review": "wf_0969127f-8da",
+        "status": "complete",
+        "purpose": "C3 noise band: one C3 baseline cannot separate a worse arm from a lucky baseline",
+        "triage": "X9 workflow",
+        "metrics": {
+          "cost": 10.87,
+          "review": 7.21,
+          "triage": 3.48,
+          "fixes": 27,
+          "applied": 26,
+          "h29": 29,
+          "verdict_material": "36 of 72",
+          "records": 99
+        }
+      }
+    ],
+    "noise": {
+      "recall_between_baselines": 0.80,
+      "cost_band_usd": 1.02,
+      "fixes_band": 5
+    },
+    "noise_c3": {
+      "recall_between_baselines": 0.62,
+      "cost_band_usd": 2.3,
+      "applied_band": 11,
+      "verdict_material_band": 14,
+      "note": "B0c and B0d, two identical runs on three pages, agree on 62% of fixes and differ by 11 applied edits and 14 meaning-changing rewrites; the C1 floor of 0.80 borrowed earlier was too strict for C3"
+    }
+  },
+  "experiments": [
+    {
+      "id": "X1",
+      "idea": "I3 reviewers on Opus 5.5 instead of Fable",
+      "status": "adopt",
+      "runs": [
+        {
+          "run": "X1",
+          "corpus": "C1",
+          "review": "wf_e8cc8116-4b9",
+          "config": "variant workflow, reviewers on Fable, all else as baseline"
+        }
+      ],
+      "results": {
+        "cost": 37.09,
+        "review_cost": 34.69,
+        "baseline_review_cost": 7.85,
+        "review_cost_ratio": 4.4,
+        "cache_rewrite_cost": 15.6,
+        "baseline_cache_rewrite_cost": 1.54,
+        "turns_over_5_min": 9,
+        "material_verdicts": 19,
+        "recall_of_baseline_fixes": 0.76,
+        "recall_noise_floor": 0.80,
+        "fixes": 20,
+        "applied": 18,
+        "cold_reader_findings": "2, one a defect introduced by the applied edits (an intro sentence left pointing at deleted table rows)"
+      },
+      "verdict": "Adopt the Opus pin (the uncommitted change in editorial-review.js). Fable reviewers find the same fixes within noise (recall 0.76 against a 0.80 floor) at 4.4 times the review cost, mostly cache rewrites from turns over 5 minutes."
+    },
+    {
+      "id": "X2",
+      "idea": "I6 work packets and I7, I16 script-run tails",
+      "status": "adopt",
+      "runs": [
+        {
+          "run": "X2",
+          "corpus": "C1",
+          "review": "wf_cfb50f68-37b",
+          "config": "variant workflow, Opus reviewers read one work packet (185 KB: brief, sources, numbered documents), no gate step, no quote greps"
+        }
+      ],
+      "results": {
+        "cost": 8.98,
+        "cost_delta_pct": -14,
+        "review_span_min": 4.7,
+        "baseline_review_span_min": "27.7 and 105.8",
+        "turns_delta_pct": -51,
+        "tool_calls_delta_pct": -58,
+        "generation_min_delta_pct": -28,
+        "cache_rewrite_cost": 0,
+        "page_full_reads_per_page": 3,
+        "recall_of_baseline_fixes": 0.74,
+        "recall_noise_floor": 0.80,
+        "fixes": 15,
+        "applied": 15,
+        "skipped": 0,
+        "verdict_material": 19,
+        "verdict_material_band": "16 +/- 2",
+        "cold_reader_findings": "2 (Entra ID scope; REFRESH_LIFETIME source), both also raised in the baselines",
+        "metric_note": "orientation_turns_per_agent counts turns before the first read of a page file; X2 reads a packet, so the metric does not apply"
+      },
+      "verdict": "Adopt. One work packet per run cuts review time from 28 to 106 minutes to 5, turns by half and tool calls by 58%, removes cache rewrites, and costs 14% less, with recall at the noise floor and applied edits within noise. Watch: meaning-changing rewrites rose slightly (19 against 16 +/- 2); pair with X7 write-time checks."
+    },
+    {
+      "id": "X3",
+      "idea": "I5 one reviewer per page with a set digest; I15",
+      "status": "superseded",
+      "runs": [
+        {
+          "run": "X3",
+          "corpus": "C3",
+          "review": "wf_c73ae0fb-11f",
+          "config": "variant workflow, Opus; mergeStructural (one reviewer per page with the structural role); set digest 54 KB in place of the other pages (151 KB)"
+        }
+      ],
+      "results": {
+        "cost": 9.74,
+        "baseline_cost": 13.17,
+        "cost_delta_pct": -26,
+        "review_cost_delta_pct": -29,
+        "duplicate_clusters": "4 against 14",
+        "records": "65 against 101",
+        "fixes": "24 against 37",
+        "applied": "24 against 37",
+        "recall_of_baseline_fixes": 0.59,
+        "recall_noise_floor": "0.80 (from the C1 baseline pair)",
+        "missed_fixes": {
+          "count": 15,
+          "by_source": "drill 10, structural 5",
+          "by_kind": "repetition 6, ambiguity 4, compression 2, absolute 1, omission 1, term 1"
+        },
+        "verdict_material": "23 against 22",
+        "cold_reader_findings": "5 against 5"
+      },
+      "verdict": "Revised against the C3 noise band (B0c, B0d): recall 0.55 against a 0.62 floor and applied edits within noise, so no quality loss is demonstrated; but the cost saving (-19%) is within noise and far below the package (P1, -48%). Superseded by the package.",
+      "follow_up": "Untested variant: keep the structural pass separate and give it the set digest in place of the other pages, keeping the digest saving without overloading the drill reviewer."
+    },
+    {
+      "id": "X4",
+      "idea": "I2 load once, fork per pass",
+      "status": "adopt",
+      "feasibility": "fork-probe-X4: a general-purpose subagent can fork (Agent tool, subagent_type fork); the fork inherited about 35k tokens of context",
+      "runs": [
+        {
+          "run": "X4",
+          "corpus": "C1",
+          "config": "loader agent (Opus) reads the X2 packet once, plans up to 6 units, forks one drill per unit plus a structural and a cold editor fork; no gate or greps (as X2); forks write review/*.json, assembled into a version 3 result",
+          "compare_with": [
+            "X2 (same packet, fresh agents)",
+            "B0a",
+            "B0b"
+          ]
+        }
+      ],
+      "results": {
+        "cost": 3.92,
+        "cost_delta_pct": -62,
+        "review_cost": 1.59,
+        "review_cost_delta_pct": -80,
+        "loader_cost": 0.59,
+        "fork_cost_each": "0.09 to 0.22",
+        "fork_first_turn_cache_read": "about 100k tokens, 99% of the fork starting context",
+        "fork_responses_each": "2 to 3",
+        "review_span_min": 4.9,
+        "turns_delta_pct": -43,
+        "recall_of_baseline_fixes": 0.75,
+        "recall_noise_floor": 0.80,
+        "fixes": 19,
+        "applied": 18,
+        "verdict_material": "16 (baseline 16 +/- 2)",
+        "h29_ignores": "9 (baseline 14.5 +/- 5)",
+        "cold_reader_findings": "2, both also raised in the baselines"
+      },
+      "verdict": "Adopt. One loader reads the work packet once and forks one pass per drill unit, the structural pass and the cold editor: every fork starts from about 100k cached tokens and finishes in 2 or 3 responses. Review cost falls 80% and the run 62%, review time from 28 to 106 minutes to 5, with recall, applied edits and rewrite safety all within the baseline noise band. Constraints: forks share the loader model, cannot fork again, and the current workflow tool cannot host them, so the review runs as a loader agent the session spawns."
+    },
+    {
+      "id": "X5",
+      "idea": "I4 ignore before verifying",
+      "status": "rejected-offline",
+      "evidence": "Across the graded runs of 13 Oct (02b, 02c), 14 Oct and 2 Oct, only 5% to 17% of verification candidates sat in clusters ignored on a rule that does not depend on the verdict (H-03, H-05, H-08, H-09, H-11, H-12, H-15, H-19, H-23, H-25, H-28). The hypothesis needed at least 30%. Most ignores are H-29, which the verdict itself causes, so grading first cannot skip them.",
+      "source": "workareas ins-auth-02b-2026-10-13, ins-auth-02c-2026-10-13, ins-auth-session-pages-2026-10-14, ins-auth-01-cookie-2026-10-02"
+    },
+    {
+      "id": "X6",
+      "idea": "I8 one closer per page",
+      "status": "rejected",
+      "runs": [
+        {
+          "run": "X6",
+          "config": "B0a review result; one closer agent verifies, rebuilds and grades in one context",
+          "workarea": "exp-X6",
+          "baselines": [
+            "exp-B0a",
+            "exp-X8o"
+          ]
+        }
+      ],
+      "results": {
+        "cost": 1.32,
+        "separate_opus_verify_and_grade_cost": 1.55,
+        "saving_pct": 15,
+        "agents": "1 against 2",
+        "turns": "23 against 25",
+        "fixes": 15,
+        "move_agreement_exact": "0.83 and 0.75 against the two Opus triages (noise floor 0.83)",
+        "fix_or_not_agreement": "0.85 and 0.79 (noise floor 0.87)",
+        "verdict_clear_or_block_agreement": "0.89 and 0.85 (noise floor 0.96)"
+      },
+      "verdict": "Reject. One closer per page saves 15% of triage (about $0.23 a page) but its claim verdicts fall below the Opus noise floor (85-89% against 96%): verifying and grading in one context weakens the independent check. Triage is a small share of a run; the review side is where structure pays."
+    },
+    {
+      "id": "X7",
+      "idea": "I9 claim check with repair at write time",
+      "status": "inconclusive-needs-ben",
+      "priority_note": "Raised by the X5 and X10 offline evidence: 120 of 178 pooled ignores (67%) are H-29 verification failures.",
+      "runs": [
+        {
+          "run": "X7",
+          "corpus": "C1",
+          "review": "wf_8fd60a5e-623",
+          "config": "variant workflow, Opus reviewers, extraRule: claim-diff.sh check and repair before returning"
+        }
+      ],
+      "results": {
+        "cost": 9.23,
+        "cost_delta_pct": -11,
+        "h29_ignores": 3,
+        "h29_delta_pct": -79,
+        "material_verdicts": 4,
+        "material_delta_pct": -75,
+        "records": 48,
+        "applied": 11,
+        "applied_delta_pct": -31,
+        "recall_of_baseline_fixes": 0.44,
+        "recall_noise_floor": 0.80,
+        "extra_fixes_not_in_baselines": 7,
+        "turns_delta_pct": 22,
+        "cold_reader_findings": "2 (Entra ID omission and the withdrawal definition, both also raised in the baselines)"
+      },
+      "verdict": "Mixed. Rewrites become far safer (H-29 ignores -79%, material verdicts -75%) and the run is 11% cheaper, but reviewers drop risky rewrites into questions, so 31% fewer edits apply and the fixes differ from the baseline (recall 0.44 against a 0.80 noise floor). Whether the different fixes are better is a quality judgement: into the blind pack for Ben."
+    },
+    {
+      "id": "X8",
+      "idea": "I10 verifiers and graders on Sonnet 5.5 or Haiku 5.5",
+      "status": "rejected",
+      "runs": [
+        {
+          "run": "X8s",
+          "config": "B0a review result, triage workers on Sonnet 5.5",
+          "workarea": "exp-X8s"
+        },
+        {
+          "run": "X8h",
+          "config": "B0a review result, triage workers on Haiku 5.5",
+          "workarea": "exp-X8h"
+        },
+        {
+          "run": "X8o",
+          "config": "B0a review result, a second Opus verifier and grader: the noise floor",
+          "workarea": "exp-X8o"
+        }
+      ],
+      "results": {
+        "verification": {
+          "candidates": 46,
+          "clear_or_block_agreement": {
+            "opus_vs_opus": 0.96,
+            "sonnet_vs_opus": 0.89,
+            "haiku_vs_opus": "0.80 to 0.85"
+          },
+          "exact_agreement": {
+            "opus_vs_opus": 0.91,
+            "sonnet_vs_opus": "0.70 to 0.74",
+            "haiku_vs_opus": "0.78 to 0.83"
+          },
+          "unsafe_clears_where_both_opus_runs_blocked": {
+            "sonnet": 1,
+            "haiku": 4
+          },
+          "verdict": "Both cheaper verifiers fall outside the Opus noise band; Haiku clears 4 rewrites both Opus runs judged unsafe. Verification stays on Opus."
+        },
+        "grading": {
+          "clusters": 52,
+          "exact_move_agreement": {
+            "opus_vs_opus": 0.83,
+            "sonnet_vs_opus": "0.81 to 0.83",
+            "haiku_vs_opus": "0.69 to 0.73"
+          },
+          "fix_or_not_agreement": {
+            "opus_vs_opus": 0.87,
+            "sonnet_vs_opus": "0.81 to 0.87",
+            "haiku_vs_opus": "0.73 to 0.75"
+          },
+          "fixes_neither_opus_run_made": {
+            "sonnet": 4,
+            "haiku": 8
+          }
+        },
+        "cost": {
+          "triage_per_page_usd": {
+            "opus": 1.55,
+            "sonnet": 1.31,
+            "haiku": 0.07
+          },
+          "turns": {
+            "opus": 25,
+            "sonnet": 35,
+            "haiku": 31
+          }
+        }
+      },
+      "verdict": "Reject. Sonnet grades within the Opus noise band but verifies outside it, and saves only 15% because it takes 40% more turns and cache reads cost the same. Haiku is 20 times cheaper and falls outside the noise band on both verification (4 unsafe clears) and grading (8 extra fixes). Triage workers stay on Opus 5.5."
+    },
+    {
+      "id": "X9",
+      "idea": "I11 triage as a workflow script",
+      "status": "adopt",
+      "runs": [
+        {
+          "run": "X9",
+          "corpus": "C1",
+          "workflow": "wf_17fad9b2-0b1",
+          "config": "variants/editorial-triage-exp.js on the B0a review: Sonnet runners for build, rebuild and close; Opus verifier and grader; apply as a dry run",
+          "compare_with": [
+            "exp-B0a (main-session-driven triage of the same review)",
+            "exp-X8o (second Opus triage, noise floor)"
+          ],
+          "main_session_turns_baseline_note": "In this experiment session each C1 triage took about 12 orchestration turns plus 8 to 10 notification wake-ups in the main session; on 14 Oct the real run took 65 verify and grade turns at about 300k context"
+        }
+      ],
+      "results": {
+        "cost": 2.00,
+        "triage_workers_cost": 1.75,
+        "runner_cost": 0.25,
+        "agents": 5,
+        "workflow_minutes": 11.6,
+        "main_session_turns": "1 launch and 1 completion notice, against about 12 orchestration turns and 8 to 10 wake-ups for the main-session-driven triage of the same review",
+        "fixes": 15,
+        "move_agreement_exact": "0.88 and 0.81 against the two Opus triages (floor 0.83)",
+        "fix_or_not_agreement": "0.88 and 0.83 (floor 0.87)",
+        "real_run_reference": "on 14 Oct the main session spent $11.40 on the verify and grade phases alone, at about 300k context a turn"
+      },
+      "verdict": "Adopt. Triage as a workflow script gives the same closing moves within noise at slightly lower worker cost, and takes orchestration out of the main session: 2 main-session turns in place of about 20, so the expensive long-context session no longer drives each step."
+    },
+    {
+      "id": "X10",
+      "idea": "I12 brief stops asking for kinds the rubric ignores",
+      "status": "reframed-offline",
+      "evidence": "Pooled 374 graded clusters from five runs: 178 ignored, 120 of them by H-29 (the rewrite failed verification) and 58 on rules independent of the verdict. No kind exceeds 35% verdict-independent ignores; the high overall ignore rates of omission (82%), fact (83%) and expand (83%) come from failed rewrites. Only the action ask is ignored on its face (14 of 25, 56%, mostly H-08 design questions). The remaining test: stop asking reviewers for design questions; the larger effect belongs to X7.",
+      "source": "workareas ins-auth-02b-2026-10-13, ins-auth-02c-2026-10-13, ins-auth-session-pages-2026-10-14, ins-auth-01-cookie-2026-10-02, ins-auth-09-2026-09-26-clarify"
+    },
+    {
+      "id": "X11",
+      "idea": "I1 delta review for changed heuristics",
+      "status": "adopt-as-mode",
+      "reframe": "The latest heuristic change (06fcec6, FAQ voice) has no instances in the corpus, which already passes the gate. X11 tests the idea instead: a review limited to one changed rule body (the Terms rules: language.md lines 114-126 and ubiquitous-language.md) against the full review B0c on C3.",
+      "runs": [
+        {
+          "run": "X11",
+          "corpus": "C3",
+          "config": "3 delta reviewers (Opus), one per page, reading a 17 KB delta packet, their page and the set digest; findings into review/*.json; triage as baseline",
+          "ground_truth": "B0c clusters of kind term and their fixes"
+        }
+      ],
+      "results": {
+        "cost": 4.54,
+        "delta_review_cost": 1.55,
+        "triage_cost": 2.99,
+        "baseline_full_run_cost": 13.17,
+        "cost_delta_pct": -66,
+        "term_findings": "28 against the full review's 10 term clusters",
+        "baseline_term_clusters_found": "4 of 10",
+        "term_fixes_applied": "10 against the full review's 3",
+        "recall_of_all_baseline_fixes": 0.16,
+        "verdict_material": "3 of 24 rewrites (12.5%) against about a third in full reviews",
+        "metric_note": "cost.review shows 0 because the stage classifier does not know the delta role; the delta reviewers are in cost.total"
+      },
+      "verdict": "Adopt as a mode, not a replacement. To apply a changed rule to pages already reviewed, a delta review limited to that rule costs a third of a full run, finds nearly three times as many findings under the rule and applies 10 fixes against the full review's 3, with safer rewrites. It finds only 4 of the full review's 10 term clusters and none of the other kinds, so a full review remains the tool for a page that has not been reviewed."
+    },
+    {
+      "id": "X12",
+      "idea": "I17 review a single page as one whole-page unit instead of splitting it into up to 6 drill units",
+      "status": "fallback",
+      "evidence_that_raised_it": "B0c reviewed 3 pages for $7.70 while B0a and B0b reviewed 1 page for $7.18 and $8.51: a single page is split into 6 drill agents that each read everything",
+      "runs": [
+        {
+          "run": "X12",
+          "corpus": "C1",
+          "review": "wf_d7f240c9-865",
+          "config": "saved production workflow with sections = [one whole-page section]: 1 drill, 1 structural, 1 editor"
+        }
+      ],
+      "results": {
+        "cost": 4.91,
+        "cost_delta_pct": -53,
+        "review_cost": 3.41,
+        "review_cost_delta_pct": -57,
+        "review_agents": "4 against 10",
+        "review_span_min": 7.6,
+        "records": "35 against 65",
+        "fixes": 11,
+        "applied": 11,
+        "applied_delta_pct": -31,
+        "recall_of_baseline_fixes": 0.76,
+        "recall_noise_floor": 0.80,
+        "recall_caveat": "the loose match (line within 2 or a shared 30-character quote) lets one arm fix match more than one baseline fix, so recall flatters an arm with fewer fixes",
+        "verdict_material": "8 against 16 +/- 2",
+        "h29_ignores": "6 against 14.5 +/- 5",
+        "triage": "run by the X9 workflow"
+      },
+      "verdict": "Fallback. Reviewing a single page as one whole-page unit, which the production workflow already supports through sections, halves the cost of a single-page run (-53%), but applies 31% fewer fixes, below the noise band. X4 removes the same over-splitting cost (forks make extra units nearly free) without losing units, so X12 is the no-code option only if X4 is not built."
+    }
+  ],
+  "adopted_directly": [
+    {
+      "id": "I13",
+      "idea": "main session does not read the pages",
+      "status": "applied in experiment runs"
+    },
+    {
+      "id": "I14",
+      "idea": "saved review workflow run with arguments, not a copy",
+      "status": "applied in experiment runs"
+    }
+  ],
+  "confirmation": [
+    {
+      "run": "P1",
+      "corpus": "C3",
+      "config": "Opus reviewers; work packet; loader with 7 forks (drill and structural per page, cold editor), no gate step, no greps; triage through the X9 workflow",
+      "results": {
+        "cost": 6.25,
+        "baseline_cost": 13.17,
+        "cost_delta_pct": -53,
+        "review_cost": 2.49,
+        "review_cost_delta_pct": -68,
+        "triage_span_min": "7.1 against 14.9",
+        "turns_delta_pct": -44,
+        "applied": "28 against 37",
+        "recall_of_baseline_fixes": 0.49,
+        "extra_fixes": 12,
+        "verdict_material": "35 of 68 against 22 of 72 (+59%)",
+        "h29_ignores": "25 against 20",
+        "cookie_contradiction": "raised in 10 clusters, 9 ignored (3 by H-29, 6 by H-14), 1 open; B0c raised it in 5, put 2 to Ben as K"
+      },
+      "verdict": "Confirmed against the C3 noise band (B0c, B0d): cost -48%, review cost -67%, turns -39%, generation time -30%, all beyond noise; recall 0.58 against a 0.62 floor, applied edits, meaning-changing rewrites and H-29 ignores all within noise. The package delivers the parts' savings without a demonstrated quality loss."
+    },
+    {
+      "run": "P2",
+      "corpus": "C3",
+      "config": "as P1 with the brief gate step kept in every fork",
+      "status": "complete",
+      "results": {
+        "cost": 6.44,
+        "review_cost": 2.87,
+        "triage_cost": 3.40,
+        "gate_step_cost": 0.38,
+        "applied": 23,
+        "fixes": 23,
+        "verdict_material": "27 of 51 (53%)",
+        "h29_ignores": 27
+      },
+      "finding": "Keeping the gate step did not lower the meaning-changing rewrite rate (53% against P1 51%): the gate checks prose style, not claim safety. Every C3 arm (X3, P1, P2) sits at 51-53% against B0c 31%, so B0c may be an outlier; B0d, a second C3 baseline, measures that.",
+      "verdict": "The gate step in forked reviewers costs $0.38 more and changes no quality measure beyond noise (recall 0.51, applied 23, material 27): leave it out; the build gates every rewrite."
+    },
+    {
+      "run": "P3",
+      "corpus": "C3",
+      "config": "repeat of P1",
+      "results": {
+        "cost": 6.90,
+        "review_cost": 2.91,
+        "applied": 21,
+        "recall_of_baseline_fixes": 0.49,
+        "verdict_material": "46 of 70"
+      }
+    },
+    {
+      "run": "P13",
+      "corpus": "C3",
+      "config": "P1 and P3 findings merged into one triage (X9 workflow); 76 duplicate records collapsed",
+      "results": {
+        "cost_total": 10.98,
+        "cost_parts": "reviews 2.49 + 2.91, merged triage 5.58",
+        "baseline_cost": 12.02,
+        "applied": 35,
+        "baseline_applied": "37 and 26",
+        "recall_of_baseline_fixes": 0.66,
+        "recall_noise_floor": 0.62,
+        "extra_fixes": 13,
+        "verification_candidates": 138,
+        "verdict_material": 68
+      },
+      "verdict": "Two package runs merged fix more (35) and agree with the baselines more (0.66) than the baselines agree with each other (0.62), at slightly lower cost ($10.98 against $12.02). With two single package runs measured (28 and 21 applied, recall 0.58 and 0.49), one package run sits inside the noise band but leans lower than one current run. Verification load doubles (138 candidates, 68 meaning-changing), which the adopted X7 repair should reduce."
+    }
+  ],
+  "decisions": {
+    "date": "2026-10-16",
+    "by": "Ben",
+    "items": [
+      {
+        "n": 1,
+        "topic": "Opus reviewer pin (X1)",
+        "choice": "commit the pin"
+      },
+      {
+        "n": 2,
+        "topic": "package (X2, X4, X9)",
+        "choice": "build in stages: packets, then loader and fork review, then the triage workflow; measure after each stage; keep the old workflow as a fallback until the new review has run twice"
+      },
+      {
+        "n": 3,
+        "topic": "style gate inside reviewers",
+        "choice": "drop from reviewers; the build and apply keep gating"
+      },
+      {
+        "n": 4,
+        "topic": "rules-only review (X11)",
+        "choice": "add as a mode; full review stays the default"
+      },
+      {
+        "n": 5,
+        "topic": "claim check and repair at write time (X7)",
+        "choice": "adopt now",
+        "note": "X7 was tested only with the standard review, not with packets and forks; measure it in the staged build"
+      },
+      {
+        "n": 6,
+        "topic": "cross-page contradictions",
+        "choice": "no rubric change; the plan lists every ignored S2 contradiction in Problems for Ben to rule on"
+      },
+      {
+        "n": 7,
+        "topic": "two cheap runs against one",
+        "choice": "test now on the experiment variants",
+        "result": "done: two merged package runs beat one current run at slightly lower cost"
+      }
+    ]
+  },
+  "redesign": {
+    "opened": "2026-10-16",
+    "scope": "Ben brought new skills, separated skills and refactoring for recombination into scope",
+    "tests": [
+      {
+        "id": "R1",
+        "name": "layer 0 reach (offline)",
+        "source": "experiments/layer0-reach.json; bin/layer0-detectors.py",
+        "ground_truth": "299 distinct findings (149 fixed by some run) from every experiment workarea on the frozen pages",
+        "results": {
+          "caught_by_compatible_detector": "33 of 299 (11%); fixes 19 of 149 (13%)",
+          "caught_by_any_detector_same_paragraph": "105 of 299 (35%)",
+          "detector_precision": "0.67 to 1.00 (long sentence 0.86, near-duplicate 0.83, passive 0.71, forbidden term 1.00)",
+          "by_owning_layer": {
+            "paragraph": "172 findings (58%), 98 fixed (57%): ambiguity, compression, term, flow, absolute, residue",
+            "page_and_set": "49 (16%), 40 fixed (82%): repetition, reference, presentation",
+            "facts": "78 (26%), 11 fixed (14%): omission, contradiction, fact"
+          }
+        },
+        "verdict": "Layer 0 catches little on pages that already pass the gate (11-13%); its value is precise attention pointers for the paragraph layer and authoring-time checks. Repetition is semantic (1 of 39 caught textually), so it belongs to the set layer. Term findings are concept naming, which a register of preferred names could mechanise. The strongest result: design-consistency findings are 26% of all findings and only 14% become fixes, which supports a separate facts track that outputs questions, not rewrites."
+      },
+      {
+        "id": "R2",
+        "name": "design-consistency facts track",
+        "config": "one Opus extractor per page (00, 02a, 02b, 02c) writes structured facts (actor, action, object, condition, force, value, quote); facts merged into one register sorted by actor and object (898 facts, rejected-design facts dropped); one Opus checker reads only the register and lists contradictions",
+        "ground_truth": "26 distinct contradiction or reconcile findings from every experiment run on 02a, 02b and 02c; 16 raised by three or more runs; the cookie contradiction at 02a lines 14 and 29",
+        "results": {
+          "found": "25 of 26 (96%)",
+          "robust_found": "16 of 16",
+          "cookie_found": "yes, rated S1",
+          "reported": 18,
+          "reported_matching_ground_truth": 15,
+          "reported_new": "3, all S2, on delegation and provider credentials, plausibly real",
+          "single_review_run_coverage": "6 to 13 of 26 (B0c 9, B0d 10, P1 13, P2 9, P3 8, X3 6)",
+          "cost": {
+            "total": 6.40,
+            "extraction": 5.22,
+            "check": 1.18,
+            "note": "extraction includes the 00 and 02c agents presumed lost to a network outage and re-run; the original 02c agent finished at 16:37, after the register was built, and its later turns are not counted; its 231-fact file is kept as runs/R2/late-02c-ins-auth-session-api-16-37.json and was not used"
+          },
+          "files": "runs/R2/register.json, register.tsv, contradictions.json, score.json"
+        },
+        "caveat": "the match is loose (a reported contradiction within one line of a finding or its related lines), so one reported contradiction can cover several findings; the 3 new contradictions need Ben to judge",
+        "verdict": "The facts track is the redesign's strongest lever: it finds nearly every contradiction the reviews found across all runs, where one review run finds a quarter to a half, at about half the cost of a full review, and its register is reusable: re-extract only changed pages, re-run the $1.18 check."
+      },
+      {
+        "id": "R2r",
+        "name": "facts track repeat, with section, table and column fields",
+        "config": "R2 repeated with the same extractor and checker prompts; the extractor also records each fact's section, and for a table row what the table lists and the column header; the register lines carry them (972 facts, 254 KB against 898 and 188 KB)",
+        "results": {
+          "found": "23 of 26 (88%); R2 25 of 26",
+          "robust_found": "15 of 16; missed 02b:88, the lastSeenAt reader, a prose line R2 caught",
+          "cookie_found": "yes, S1",
+          "reported": 17,
+          "overlap_with_R2": "all 18 R2 contradictions have an R2r counterpart by cited facts within one line; R2r adds 2 S3",
+          "pooled_R2_and_R2r": "26 of 26, all 16 robust",
+          "recurring_new": "the front door querying the delegation grant source with its own keys (S1 in R2r, S2 in R2); sub fixed as the contact identifier while elsewhere conditional on IDM not using a pairwise value",
+          "cost": {
+            "total": 6.51,
+            "extraction": 4.94,
+            "check": 1.57
+          }
+        },
+        "caveats": [
+          "the checker cited the 12 Oct CDP meeting from workspace memory, outside the register, in its note on K-001; K-002 (sign-out GET against form POST) rests on 02a:157, which is in the register, so only the note drew on memory",
+          "the 00 extractor recorded working assumptions with force may, which R2's did not"
+        ],
+        "verdict": "The facts track is stable: one run finds 88 to 96% of the contradictions every review run raised together, and two runs agree almost entirely. The table and column fields made no measurable difference and made the check 33% dearer; drop them unless a later miss traces to a table. The checker's prompt should forbid outside knowledge."
+      },
+      {
+        "id": "R3",
+        "name": "layered review (paragraph, page and set passes) on C3",
+        "config": "one Opus loader reads a packet holding the brief's shared sections, three layer cards (questions verbatim from the brief, split by the redesign spec's map) and 55 layer 0 pointers, then forks a paragraph pass and a page pass per page and one set pass; no pass reports contradictions; findings through the X9 triage workflow; facts from R2 and R2r",
+        "results": {
+          "cost": {
+            "total": 6.52,
+            "review": 2.77,
+            "triage": 3.51,
+            "against": "P1 6.25 and 2.49; baselines 12.02"
+          },
+          "records": 69,
+          "clusters": 58,
+          "applied": 31,
+          "recall_of_baseline_fixes": 0.47,
+          "extra_fixes": 15,
+          "recall_by_kind": {
+            "repetition": "9 of 25 (0.36; P1 0.48; baseline pair 0.67)",
+            "compression": "10 of 12 (0.83)",
+            "ambiguity": "2 of 10 (0.20)",
+            "flow": "5 of 5",
+            "absolute": "0 of 3 (P1 3 of 3)",
+            "contradiction": "1 of 3, handed to the facts track"
+          },
+          "recall_without_contradictions": 0.48,
+          "verdict_material": "12 of 46 against the baselines' 29 (-59%)",
+          "h29_ignores": "11 against 24.5 (-55%)",
+          "ignore_rate": "0.40 against 0.55"
+        },
+        "diagnosis": "Repetition is 39% of the baselines' fixes, and the set pass returned one repetition finding: the R3 set card gave one pass for the whole set a cap of 6 redundancies and 12 findings, where P1's three page-scoped structural reviewers had up to 18 redundancies between them. The setup throttled the commonest fix kind; this is not evidence against layering.",
+        "verdict": "Not passed as set up: recall 0.47 against the 0.49 line. The layering's quality gains are beyond noise: rewrites the verifier finds meaning-changing fall 59%, H-29 ignores 55%, the ignore rate from 0.55 to 0.40, and it finds the most new fixes of any run, at the package's cost. Next test: one set pass per page (repetition and cross-page references anchored on that page, the set as context) at P1's caps."
+      },
+      {
+        "id": "R3b",
+        "name": "layered review with one set pass per page on C3",
+        "config": "R3 unchanged except the set card: one set pass per reviewed page, the whole set as context, findings anchored on that page, worked paragraph by paragraph, capped at 12 findings, 6 redundancies and 2 patterns per page; nine forks from one Opus loader; same X9 triage",
+        "results": {
+          "cost": {
+            "total": 6.40,
+            "review": 2.73,
+            "triage": 3.48,
+            "against": "P1 6.25, R3 6.52, baselines 12.02"
+          },
+          "records": 80,
+          "clusters": 71,
+          "applied": 39,
+          "recall_of_baseline_fixes": 0.62,
+          "recall_noise_floor": 0.62,
+          "extra_fixes": 20,
+          "recall_by_kind": {
+            "repetition": "16 of 25 (0.64; R3 0.36, P1 0.48, baseline pair 0.67)",
+            "compression": "7 of 12",
+            "ambiguity": "5 of 10",
+            "flow": "4 of 5",
+            "term": "3 of 4",
+            "contradiction": "2 of 3",
+            "absolute": "1 of 3",
+            "omission": "1 of 2"
+          },
+          "verdict_material": "16 against the baselines' 29 (-45%)",
+          "h29_ignores": "13 against 24.5 (-47%)",
+          "ignore_rate": "0.38 against 0.55"
+        },
+        "verdict": "Passed. Recall 0.62 equals the agreement between two baseline runs, the best of any cheaper arm, with 20 new fixes and 39 applied edits at the package's cost (-47% against the baselines), and the rewrite-safety gains of R3 hold. Per-page set passes recovered repetition (16 of 25 against R3's 9), confirming R3's diagnosis. One run: P1 and its repeat differed by 0.09 in recall, and the extra fixes need Ben's blind judgement (R3b is in the C3 blind pack)."
+      },
+      {
+        "id": "S1r",
+        "name": "stage 1 measured run (C1, 02b)",
+        "config": "production editorial-review workflow with the work packet (00 as a context page), no gate step in the reviewers, Opus reviewers; production triage workflow to the spot check",
+        "results": {
+          "cost": {
+            "total": 9.19,
+            "review": 6.86,
+            "triage": 2.02,
+            "against": "baselines B0a and B0b 10.39"
+          },
+          "recall_of_baseline_fixes": 0.84,
+          "recall_noise_floor": 0.80,
+          "fixes": 23,
+          "extra_fixes": 7,
+          "turns": "68 against 122",
+          "tool_calls": "73 against 180",
+          "generation_min": "25.2 against 41.9",
+          "ignore_rate": "0.48 against 0.65",
+          "applied": "0: the production triage stops at the spot check"
+        },
+        "verdict": "Stage 1 done: recall above the baseline floor at 12% lower cost, 44% fewer turns and 59% fewer tool calls, matching the X2 prototype on the production tools. The large saving remains stage 2 (forks)."
+      },
+      {
+        "id": "S2",
+        "name": "stage 2 measured run: the production layered review on C3",
+        "config": "start-layered-review.sh (packet with layer-cards.md, 00 as a context page, no layer 0 pointers), one Opus loader from LAYERED_LOADER.md forking a paragraph, page and set pass per page, assemble-review.sh with the start hashes, production triage workflow to the spot check",
+        "results": {
+          "cost": {
+            "total": 7.42,
+            "review": 2.79,
+            "triage": 4.20,
+            "note": "triage includes verifier runs lost to a network outage and a login lapse and run again"
+          },
+          "recall_of_baseline_fixes": 0.61,
+          "recall_noise_floor": 0.62,
+          "repetition": "16 of 25, as R3b",
+          "fixes": 30,
+          "extra_fixes": 12,
+          "h29_ignores": "18 against 24.5",
+          "ignore_rate": "0.51 against 0.55",
+          "applied": "0: the production triage stops at the spot check"
+        },
+        "verdict": "Passed: recall at the baseline floor and repetition as R3b, review cost -63%. Without layer 0 pointers it matches R3b, so the pointers were not doing the work. With R3b, the second layered run within the noise band: stage 2 done when."
+      },
+      {
+        "id": "S2i",
+        "name": "incremental re-review, unscoped page and set passes",
+        "config": "S2 triage edits applied (29 of 30); start-layered-review.sh --since s2-base: 3 of 3 pages changed, 32 changed lines; paragraph pass scoped to those lines, page and set passes on the whole page",
+        "results": {
+          "review_cost": 2.44,
+          "full_review_cost": 2.79,
+          "records": 50,
+          "paragraph_findings": "20, all on changed lines",
+          "page_and_set_findings": "30: 16 repeat findings S2 closed (11 ignored, 5 open), 14 new"
+        },
+        "verdict": "The line scope works for the paragraph pass, but the page and set passes redo the full review and re-raise settled findings; review cost only -13%."
+      },
+      {
+        "id": "S2j",
+        "name": "incremental re-review, scoped and with settled findings",
+        "config": "S2i plus the packet sections Changes since the last review (changed lines and the earlier text of removed or rewritten paragraphs) and Settled findings (S2 triage: 38 ignored, 7 open); every pass reports only what the changes touch",
+        "results": {
+          "review_cost": 2.20,
+          "records": 19,
+          "page_and_set_findings": "4, all new, all on or next to a changed line",
+          "paragraph_findings": "15, all on changed lines",
+          "repeats_of_settled": 0
+        },
+        "verdict": "The scope holds: 19 findings against 50, no settled finding raised again, so the triage and the author handle only what the edits touched. The review itself costs about the same as a full one, because every fork carries the whole packet; a smaller re-review packet is the next lever if that matters."
+      }
+    ],
+    "decisions": {
+      "date": "2026-10-16",
+      "by": "Ben",
+      "via": "/decide",
+      "items": [
+        {
+          "n": 1,
+          "topic": "redesign spec",
+          "choice": "write the spec now, alongside R3"
+        },
+        {
+          "n": 2,
+          "topic": "R3 layered review test",
+          "choice": "run R3 now: paragraph, page and set passes plus the facts track on C3, against B0c and B0d"
+        },
+        {
+          "n": 3,
+          "topic": "which banked stages to build",
+          "choice": "build stages 1 and 3",
+          "note": "ordered by the conflict ruling below: stage 3 now, stage 1 after the blind-pack judgement"
+        },
+        {
+          "n": 4,
+          "topic": "design-consistency track",
+          "choice": "a separate skill built on the fact register; outputs questions, never rewrites"
+        },
+        {
+          "n": 5,
+          "topic": "the 18 R2 contradictions",
+          "choice": "put each one to Ben through /decide, with both quotes and the ways to settle it"
+        },
+        {
+          "n": 6,
+          "topic": "layer 0 scope",
+          "choice": "pointers plus a preferred-names register; part of the build"
+        },
+        {
+          "n": 7,
+          "topic": "default full review",
+          "choice": "decide after R3"
+        },
+        {
+          "n": 8,
+          "topic": "blind-pack judgement",
+          "choice": "judge before building the judgement-changing stages"
+        },
+        {
+          "n": 9,
+          "topic": "commit the uncommitted work",
+          "choice": "two commits on feat/editorial-merge, no trailers, not pushed: the /decide skill, then the R1 and R2 banked results"
+        },
+        {
+          "n": 10,
+          "topic": "repeat R2",
+          "choice": "repeat once with the extractor recording each fact's table and column; compare both runs against the ground truth and each other"
+        },
+        {
+          "n": 11,
+          "topic": "conflict: build (3) against judge first (8)",
+          "choice": "stage 3 now, since it changes no judgement; judge the blind pack next; stage 1 with X7 after the judgement"
+        },
+        {
+          "n": 12,
+          "topic": "commit stage 3 and the banked results",
+          "choice": "three commits, no trailers, not pushed",
+          "date": "2026-10-16"
+        },
+        {
+          "n": 13,
+          "topic": "R3b",
+          "choice": "run now: one set pass per page at P1 caps",
+          "date": "2026-10-16"
+        },
+        {
+          "n": 14,
+          "topic": "design contradictions",
+          "choice": "put the S1 and S2 ones now through /decide; S3 later",
+          "date": "2026-10-16"
+        },
+        {
+          "n": 15,
+          "topic": "commit the R3b results",
+          "choice": "one commit, not pushed",
+          "date": "2026-10-16"
+        },
+        {
+          "n": 16,
+          "topic": "decision 7, the default full review",
+          "choice": "the layered review (per-page set passes plus the facts track) is the target for stage 2, confirmed by the blind pack scores",
+          "date": "2026-10-16"
+        },
+        {
+          "n": 17,
+          "topic": "garbled message on d2b910f",
+          "choice": "amend the message",
+          "date": "2026-10-16"
+        },
+        {
+          "n": 18,
+          "topic": "X7 in stage 1 (revises decision 5)",
+          "choice": "drop X7; stage 1 builds the work packet, the assembler and the removal of the reviewers gate step, without the claim check",
+          "date": "2026-10-17",
+          "evidence": "blind picks on 12 passages of 02b: baseline 4, X7 2, 6 ties (experiments/pick/x7-result.json)"
+        },
+        {
+          "n": 19,
+          "topic": "layered review quality (confirms decision 16)",
+          "choice": "confirmed by blind picks on 12 passages: R3b 5, B0c 4, 2 ties, 1 both worse (experiments/pick/result.json)",
+          "date": "2026-10-16"
+        },
+        {
+          "n": 20,
+          "topic": "retire the editorial-review workflow",
+          "choice": "removed; git history keeps the file; the layered review is the only whole-document review",
+          "date": "2026-10-20"
+        },
+        {
+          "n": 21,
+          "topic": "layer 0",
+          "choice": "a deterministic preferred-names check only; the register lives beside the docs; INS Auth register: snapshot -> session assertion, cookie value and sealed value -> sealed cookie value, everywhere (128 renames applied in the docs working tree, uncommitted, for Ben to review)",
+          "date": "2026-10-20"
+        },
+        {
+          "n": 22,
+          "topic": "stage 4",
+          "choice": "incremental re-review first; page and set passes scoped to the changes, with the earlier triage settled findings never raised again",
+          "date": "2026-10-20"
+        }
+      ]
+    }
+  }
+}

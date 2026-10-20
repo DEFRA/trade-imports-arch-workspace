@@ -1,6 +1,6 @@
-# normalize-v2.jq - turn a version 3 editorial-review result into records.
+# normalize-v2.jq - turn a version 3 editorial review result into records.
 #
-# Input:  the workflow result {version, mode, intent, sourceHashes, units,
+# Input:  the review result {version, mode, intent, sourceHashes, units,
 #         structural, editorPass}, or the {units, extra} form build-triage.sh
 #         assembles from a review directory.
 # Args:   $pages - array of {page, path, no, key, hash} built by build-triage.sh.
@@ -9,7 +9,7 @@
 #         related, cites and guess; and every retain a reviewer recorded.
 #
 # Contract: ../../../skills/editorial-triage/assets/editorial-triage-schema.md
-# Result shapes: ../../../workflows/editorial-review.js (FINDING, STRUCTURAL_SCHEMA, EDITOR_SCHEMA)
+# Result shapes: ../../editorial/assemble-review.sh, which validates the findings and builds the result
 
 def basename: split("/") | last;
 def path_of($pg): ([$pages[] | select(.page == $pg) | .path] | first) // null;

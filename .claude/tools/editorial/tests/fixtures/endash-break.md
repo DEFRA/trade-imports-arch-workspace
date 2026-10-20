@@ -1,4 +1,4 @@
-# Spaced en-dash violation
+# Spaced En-dash Violation
 
 A sentence broken – with a spaced en-dash.
 

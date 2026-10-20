@@ -1,4 +1,4 @@
-# N/A in table cells
+# N/A in Table Cells
 
 | Concern | Estate A | Estate B |
 | --- | --- | --- |
