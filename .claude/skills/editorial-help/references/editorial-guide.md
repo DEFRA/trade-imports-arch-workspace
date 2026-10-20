@@ -18,6 +18,22 @@ The editorial tools review, correct and check technical documents in the workspa
 
 The scripts live in `~/trade-imports-arch-workspace/.claude/tools/editorial/`. Costs are at API prices, measured on the INS Auth session pages between 15 and 20 October 2026; on a subscription they come out of the usage limit instead.
 
+### Starting an Editorial Pass
+
+An editorial pass needs a short brief; without one the session has to guess the reader, and the reader decides the structure. Give seven inputs:
+
+1. **Reader:** who reads the document and what they must know or do after reading.
+2. **Tone:** the house voice by default, a knowledgeable colleague speaking directly to another colleague; a formal register for governance, assessment or external readers; a plain register for readers outside the specialism.
+3. **Mode:** `revise` to change the text, `review` for findings only.
+4. **Intent:** `clarify` for clarity, structure, tone or sentences, keeping every claim; `distil` to cut noise.
+5. **Form:** the document's kind or fixed format, such as a PR body with Change, Reason and Verification.
+6. **Restructuring:** allowed or not.
+7. **Keep:** the facts the edit must not lose, such as numbers, results and commands.
+
+A document set's profile supplies the reader, mode and intent, so a run on that set needs only the rest. `/editorial-help` drafts the whole brief from a sentence about what is wrong, and asks about the audience, the tone and the scope of the edit with a default for each.
+
+### Order of a Full Pass
+
 A full pass on a document set runs in this order: the names check, the layered review, triage, apply, then a re-review of the changes. The design-consistency check is separate: run it when design statements change, not after every edit.
 
 ## Customising the Tools

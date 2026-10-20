@@ -29,7 +29,7 @@ Pass the pages the user named, or none. The first stdout line is `MODE: PAGES` o
 
 ## Step 1: Ask What the User Wants
 
-Put one question with the question tool, header "Goal". The tool takes at most four options, so choose the four goals below that best fit the facts, put the best fit first and label it "(Recommended)"; the tool's "Other" answer covers the rest, and the question names any goal left out:
+When the user's own words already name the goal ("make this clearer", "check these pages agree", "ban this phrase"), take that goal, say which one you took, and skip the question. Otherwise put one question with the question tool, header "Goal". The tool takes at most four options, so choose the four goals below that best fit the facts, put the best fit first and label it "(Recommended)"; the tool's "Other" answer covers the rest, and the question names any goal left out:
 
 | Goal | Fits when |
 | --- | --- |
@@ -51,11 +51,32 @@ For a tool, answer with the row of "Choosing a Tool" in the guide that fits, fil
 3. The cost: the guide's measured figure scaled by these pages' words, stated as an estimate, with the guide's date. A free script says free.
 4. The next step, and the user's part in that step.
 
+For an editorial pass or a review, draft the run's brief so the user never writes one. Take each input from the user's words first, then from the document and its profile, and from "Starting an Editorial Pass" in the guide:
+
+| Input | Source |
+| --- | --- |
+| Reader frame | who the document serves and what that reader must know or do after reading; the profile's Reader when one applies; otherwise inferred from the document's kind and audience (a PR body serves its reviewer) |
+| Tone | the house voice in `best-practices/writing/language.md`, "Voice and tone": a knowledgeable colleague speaking directly to another colleague, matched to the document form; a different register only when the reader needs one |
+| Mode | `revise` when the user wants the text changed; `review` when the user wants findings only |
+| Intent | `clarify` when the complaint is clarity, structure, tone or sentences, because clarify may restructure and keeps every claim; `distil` when the complaint is length or noise |
+| Document form | the dominant mode or fixed format from `skills/editorial/references/document-types.md` (a PR body keeps Change, Reason and Verification) |
+| Restructuring | allowed when the user names structure as a problem; otherwise kept |
+| Keep | the facts the edit must not lose: numbers, results, commands, names |
+
+Then ask, in one call to the question tool, four questions. Each leads with the sensible default, labelled "(Recommended)", so the user confirms with one choice and describes only what differs through Other:
+
+1. **Audience** (header "Audience"): the inferred reader frame first; one or two other readers the document could serve, drawn from its kind and the session's context.
+2. **Tone** (header "Tone"): the house voice first; then a formal register for governance, assessment or external readers, and a plain register for readers outside the specialism.
+3. **Edit** (header "Edit"): the inferred intent and restructuring first, among `clarify` with restructuring, `clarify` keeping the structure, and `distil`.
+4. **Start** (header "Start"): "Start the pass with this brief (Recommended)", whose preview shows the whole brief with the answers above and the inferred form and keep list, against "Show me the brief first".
+
+Say in the question text which inputs were inferred rather than stated by the user. The answers are the brief Step 3 passes on, and choosing Start is the user's go.
+
 For customising, answer with the level the change belongs at (workspace, document set or one run), the file and the section from "Customising the Tools", and a one-line example of the edit. A rule that holds only for this document set goes in its profile, never in `language.md`. Offer to make the edit; a workspace file changes only through a commit, which the user asks for.
 
 ## Step 3: Start on the User's Go
 
-Start nothing that costs money until the user says go. On go, invoke the chosen skill with the recommendation's arguments, or run the free script, and hand over: that skill's own steps run from there. To create a profile, write `editorial-profile.md` beside the pages with the sections the user can fill now, then check it with `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/read-profile.sh <profile>`, and tell the user which publishing configs need the exclusion the guide names.
+Start nothing that costs money until the user says go. On go, invoke the chosen skill with the recommendation's arguments (for an editorial pass, the file and the confirmed brief), or run the free script, and hand over: that skill's own steps run from there. To create a profile, write `editorial-profile.md` beside the pages with the sections the user can fill now, then check it with `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/read-profile.sh <profile>`, and tell the user which publishing configs need the exclusion the guide names.
 
 ## Completion output
 
