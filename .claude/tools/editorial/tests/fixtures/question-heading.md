@@ -1,10 +1,10 @@
 # Question Heading Fixture
 
-## What a journey backend checks
+## What a Journey Backend Checks
 
 The backend checks the assertion's signature, issuer, audience and expiry.
 
-### How is a session started
+### How Is a Session Started
 
 A session starts at sign-in.
 
@@ -12,11 +12,11 @@ A session starts at sign-in.
 
 The session service answers each request with an assertion or a status code.
 
-## Is the cookie sealed?
+## Is the Cookie Sealed?
 
 The session service seals the cookie.
 
-## Why the database is private
+## Why the Database Is Private
 
 The journey database is private to its journey.
 

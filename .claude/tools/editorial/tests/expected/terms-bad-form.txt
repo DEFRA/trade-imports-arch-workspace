@@ -1,0 +1,2 @@
+check-prose: terms table: form "foo(bar)" may hold only letters, digits, spaces, hyphens, apostrophes and a trailing * (~/trade-imports-arch-workspace/.claude/tools/editorial/tests/fixtures/terms-table/bad-terms.md, "Words to avoid or examine")
+exit-code: 1

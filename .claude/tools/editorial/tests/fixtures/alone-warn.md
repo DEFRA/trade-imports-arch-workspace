@@ -1,4 +1,4 @@
-# Restrictive subject fixture
+# Restrictive Subject Fixture
 
 The front door alone holds the signing key. The routing service holds none.
 

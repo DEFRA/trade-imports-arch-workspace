@@ -1,4 +1,4 @@
-# New banned words
+# New Banned Words
 
 The rollout was seamless and the tool is user-friendly.
 

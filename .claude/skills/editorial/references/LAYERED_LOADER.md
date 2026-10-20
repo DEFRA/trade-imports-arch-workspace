@@ -6,7 +6,7 @@ Load a layered editorial review once and fork one copy of yourself per review pa
 
 The spawn prompt gives:
 
-- **Reader frame**, **output mode**, **review intent**, **document mode** and **run notes**: the lens every pass applies.
+- **Reader frame**, **output mode**, **review intent**, **document mode** and **run notes**: the lens every pass applies. Any of them the prompt leaves out comes from the packet's "Document set profile" section, when the packet has one.
 - **Packet:** the work packet, which holds the brief's shared sections, the layer cards, any layer 0 pointers, every source the brief names, the documents under review and any context pages, with line numbers.
 - **Review folder:** where the forks write their files.
 - **Pages:** each page under review with a short key, such as `02a` for `02a-ins-auth-session-service-design.md`, and the lines its paragraph pass reviews: `all`, a list of line numbers (a re-review of what changed since an earlier run), or `none`.

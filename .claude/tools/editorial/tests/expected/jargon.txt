@@ -1,7 +1,11 @@
 check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon.md:3: We will leverage the portal to facilitate onboarding and utilise the API to deliver value.
-check-prose: banned word - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine"). Swap for the plain alternative the table names and re-run.
+check-prose: banned term "leverage" - use, build on, or name what is reused - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine").
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon.md:3: We will leverage the portal to facilitate onboarding and utilise the API to deliver value.
+check-prose: banned term "facilitate" - help or make possible, or name the action - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine").
+check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon.md:3: We will leverage the portal to facilitate onboarding and utilise the API to deliver value.
+check-prose: banned term "utilise" - use - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine").
 check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon.md:3: We will leverage the portal to facilitate onboarding and utilise the API to deliver value.
 check-prose: lowercase generic "portal" - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine"). Use "website" or "service"; proper nouns ("CDP Portal") and URLs pass unchanged.
 check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/jargon.md:3: We will leverage the portal to facilitate onboarding and utilise the API to deliver value.
-check-prose: WARN hits are context-sensitive words - keep literal technical uses; replace vague uses with the specific outcome, limit or structure (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
+check-prose: WARN hits are "deliver" - keep for literal transport or message delivery; otherwise state the actual outcome (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
 exit-code: 2

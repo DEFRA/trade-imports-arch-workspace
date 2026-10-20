@@ -6,13 +6,15 @@
 # and assemble-review.sh builds the review result from the forks' files.
 #
 # Usage: start-layered-review.sh --run-id <id> [--since <earlier run id>]
-#          [--context <page.md>]... [--names <preferred-names.json>]
+#          [--context <page.md>]... [--profile <editorial-profile.md>]
 #          [--settled <earlier triage workarea>] [--pointers <pointers.md>] <doc.md>...
 #
-# --names runs the preferred-names check first and stops while any replaced
-# name remains, because a settled name needs no reviewer: rename with
-# check-names.sh --fix, review the diff, then start again. The register goes
-# into the packet so the reviewers treat its names as settled.
+# --profile takes the document set's editorial profile. When the profile
+# names preferred names, the names check runs first and stops while any
+# replaced name remains, because a settled name needs no reviewer: rename
+# with check-names.sh --fix, review the diff, then start again. The profile's
+# context pages join any --context pages, and the packet carries its reader
+# frame, defaults, run notes and names.
 #
 # --since re-reviews only what changed after an earlier run of the same pages:
 # a page with a changed, new or removed paragraph is reviewed, with the
@@ -31,7 +33,7 @@
 
 set -uo pipefail
 C="$HOME/trade-imports-arch-workspace/.claude"
-RUN_ID="" SINCE="" POINTERS="" NAMES="" SETTLED=""
+RUN_ID="" SINCE="" POINTERS="" PROFILE="" SETTLED=""
 DOCS=()
 CONTEXT=()
 while [[ $# -gt 0 ]]; do
@@ -39,10 +41,10 @@ while [[ $# -gt 0 ]]; do
     --run-id) RUN_ID="${2:?}"; shift 2 ;;
     --since) SINCE="${2:?}"; shift 2 ;;
     --context) CONTEXT+=("${2:?}"); shift 2 ;;
-    --names) NAMES="${2:?}"; shift 2 ;;
+    --profile) PROFILE="${2:?}"; shift 2 ;;
     --settled) SETTLED="${2:?}"; shift 2 ;;
     --pointers) POINTERS="${2:?}"; shift 2 ;;
-    -h|--help) sed -n '2,32p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "$0"; exit 0 ;;
     -*) echo "start-layered-review: unknown flag $1 (see --help)" >&2; exit 1 ;;
     *) DOCS+=("$1"); shift ;;
   esac
@@ -65,12 +67,21 @@ if [[ -n "$SETTLED" ]]; then
   done
 fi
 
-if [[ -n "$NAMES" ]]; then
-  if ! bash "$C/tools/editorial/check-names.sh" --names "$NAMES" "${DOCS[@]}"; then
-    N="${NAMES/#\~/$HOME}"
-    echo "start-layered-review: replaced names remain; run check-names.sh --fix --names ${N/#$HOME/~} with the same pages, review the diff, then start again" >&2
+if [[ -n "$PROFILE" ]]; then
+  PROFILE="${PROFILE/#\~/$HOME}"
+  PJ=$(bash "$C/tools/editorial/read-profile.sh" "$PROFILE") || exit 1
+  if jq -e '.names | length > 0' <<< "$PJ" > /dev/null \
+     && ! bash "$C/tools/editorial/check-names.sh" --profile "$PROFILE" "${DOCS[@]}"; then
+    echo "start-layered-review: replaced names remain; run check-names.sh --fix --profile ${PROFILE/#$HOME/~} with the same pages, review the diff, then start again" >&2
     exit 1
   fi
+  # The profile's context pages, unless a page is itself under review.
+  while IFS= read -r p; do
+    [[ -n "$p" ]] || continue
+    under_review=0
+    for d in "${DOCS[@]}"; do [[ "$(cd "$(dirname "${d/#\~/$HOME}")" && pwd)/$(basename "$d")" == "$p" ]] && under_review=1; done
+    [[ $under_review -eq 1 ]] || CONTEXT+=("$p")
+  done < <(jq -r '.contextPages[]' <<< "$PJ")
 fi
 mkdir -p "$DIR/review"
 
@@ -137,7 +148,7 @@ ARGS=(--out "$DIR/review-packet.md" --cards "$C/skills/editorial/references/laye
 ARGS+=(${ARGS_CHANGES[@]+"${ARGS_CHANGES[@]}"} ${ARGS_SETTLED[@]+"${ARGS_SETTLED[@]}"})
 for c in ${CONTEXT[@]+"${CONTEXT[@]}"}; do ARGS+=(--context "$c"); done
 [[ -z "$POINTERS" ]] || ARGS+=(--pointers "$POINTERS")
-[[ -z "$NAMES" ]] || ARGS+=(--names "$NAMES")
+[[ -z "$PROFILE" ]] || ARGS+=(--profile "$PROFILE")
 bash "$C/tools/editorial/build-review-packet.sh" "${ARGS[@]}" "${REVIEW[@]}" || exit 1
 
 echo "start-layered-review: run $RUN_ID ready; packet ${DIR/#$HOME/~}/review-packet.md; review folder ${DIR/#$HOME/~}/review/"

@@ -1,4 +1,4 @@
-# Em-dash violations
+# Em-dash Violations
 
 A sentence broken — with an em-dash.
 

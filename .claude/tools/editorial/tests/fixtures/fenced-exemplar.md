@@ -1,4 +1,4 @@
-# Exemplar tokens stay maskable
+# Exemplar Tokens Stay Maskable
 
 Teaching docs may show banned tokens in code spans like `an em—dash` or `“curly”` or `leverage`.
 

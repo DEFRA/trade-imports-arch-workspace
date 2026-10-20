@@ -73,6 +73,27 @@ record "stdin-print-fail-lines" "$out" "$rc"
 out=$(bash "$GATE" "$TESTS_DIR/fixtures/does-not-exist.md" 2>&1); rc=$?
 record "missing-file" "$out" "$rc"
 
+# A document set's own terms table, read on top of language.md: a trailing
+# * wildcard, a multi-word phrase across spaces, a Guidance row unchecked.
+TERMS_DIR="$TESTS_DIR/fixtures/terms-table"
+out=$(bash "$GATE" --terms "$TERMS_DIR/terms.md" "$TERMS_DIR/page.md" 2>&1); rc=$?
+record "terms-table" "$out" "$rc"
+
+out=$(bash "$GATE" --terms "$TERMS_DIR/bad-terms.md" "$TERMS_DIR/page.md" 2>&1); rc=$?
+record "terms-bad-form" "$out" "$rc"
+
+out=$(bash "$GATE" --terms "$TERMS_DIR/no-table.md" "$TERMS_DIR/page.md" 2>&1); rc=$?
+record "terms-no-table" "$out" "$rc"
+
+# The nearest editorial-profile.md above a page adds its table with no
+# flag, for a file and for --stdin whose label names the file.
+DISC="$TESTS_DIR/fixtures/profile-discovery/pages/page.md"
+out=$(bash "$GATE" "$DISC" 2>&1); rc=$?
+record "profile-discovery" "$out" "$rc"
+
+out=$(bash "$GATE" --stdin --label "$DISC" --print-fail-lines < "$DISC" 2>&1); rc=$?
+record "profile-discovery-stdin" "$out" "$rc"
+
 # The claim-diff wrapper, through its own case: the case owns and removes the
 # work directory it is given; the runner removes it again as a second line.
 WORK=$(mktemp -d)
@@ -85,6 +106,12 @@ WORK=$(mktemp -d)
 out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DIR/fixtures/check-names/case.sh" 2>&1); rc=$?
 rm -rf "$WORK"
 record "check-names" "$out" "$rc"
+
+# The editorial profile reader, the same way.
+WORK=$(mktemp -d)
+out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DIR/fixtures/read-profile/case.sh" 2>&1); rc=$?
+rm -rf "$WORK"
+record "read-profile" "$out" "$rc"
 
 if [[ "$COUNT" -eq 0 ]]; then
     say "FAIL - no fixtures found under $TESTS_DIR/fixtures/"

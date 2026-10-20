@@ -5,10 +5,17 @@
 #   bash check-prose.sh <file> [<file>...]
 #   printf '%s' "<text>" | bash check-prose.sh --stdin --label "<name>"
 #   bash check-prose.sh --print-fail-lines <file>   # raw FAIL line contents only
+#   bash check-prose.sh --terms <table.md> <file>   # add a document set's own terms table
+#
+# Word lists: the "Words to avoid or examine" table in language.md is
+# read on every run. Its FAIL rows fail and its WARN rows warn, each hit
+# with the row's repair; the run stops if the table yields no terms. A
+# page's nearest editorial-profile.md (beside it or in a folder above, up
+# to the repository root) adds its own table's rows for that page; with
+# --stdin, a --label that names a file finds the profile the same way.
 #
 # Hard failures (exit 2): em-dash; spaced en-dash (sentence-break usage);
-# curly quotes; banned words from the language.md table (utilise, leverage,
-# facilitate, empower, seamless, user-friendly, streamline, load-bearing);
+# curly quotes; the table's FAIL rows;
 # lowercase generic "portal" (proper nouns like
 # "CDP Portal" pass); N/A in any case (state the fact: "not applicable",
 # "no data", "not used"); a sentence or line ending on the pronoun
@@ -18,20 +25,16 @@
 # or ends on "?", a table header cell or a bold lead-in that opens on one
 # - name the topic as a noun phrase in title case instead. Warnings
 # (exit 0):
-# context-sensitive words (deliver, shape, bounds) and vague words
-# (robust, appropriate, overarching, foster) - state the
-# behaviour or criterion instead - the metaphor hard-avoid list -
-# literal uses stay, figurative uses are replaced - and the reader-pays
-# compression family (language.md, "Reader-pays compression"):
-# ledger phrases ("held open under", "argued under", ...), the
+# the table's WARN rows (context-sensitive and vague words, "alone",
+# metaphor candidates, ledger phrases), and the reader-pays
+# compression family (language.md, "Reader-pays compression"): the
 # contact-clause pattern ("only the front door reaches"), aside
-# stacking (3 or more " - " separators in one sentence), "alone"
-# after a noun ("the front door alone holds" - put only before the noun
-# where it restricts the subject), a sentence, list item or cell that
+# stacking (3 or more " - " separators in one sentence), a sentence, list item or cell that
 # opens in FAQ voice (What, How, Which, Why, Whether, Who), a table
-# header that trails off on a preposition ("Set by") and an inventory
+# header that trails off on a preposition ("Set by"), an inventory
 # opener ("This page covers A, B, C and D": a page's parts listed as
-# noun phrases; write a sentence per job with a verb). All
+# noun phrases; write a sentence per job with a verb) and a heading
+# not in title case ("Activity and the idle point"). All
 # WARN judgments stay with the editorial skill.
 # The gate polices what the author writes, not the wider world: fenced
 # code blocks, inline backtick spans, blockquoted (verbatim) text and
@@ -55,7 +58,7 @@ LDQ=$(printf '\342\200\234')      # U+201C
 RDQ=$(printf '\342\200\235')      # U+201D
 
 PUNCT_PATTERN="$EMDASH|[[:space:]]$ENDASH[[:space:]]|$LSQ|$RSQ|$LDQ|$RDQ"
-JARGON_PATTERN='\b(utili[sz]e[sd]?|utili[sz]ing|leverage[sd]?|leveraging|facilitate[sd]?|facilitating|empower(s|ed|ing)?|seamless(ly)?|user-friendly|streamlin(es?|ed|ing)|load-bearing)\b'
+TERMS_DOC="$HOME/trade-imports-arch-workspace/.claude/best-practices/writing/language.md"
 # Case-sensitive on purpose: "CDP Portal" is a product name, "the portal"
 # is the GDS-banned generic. Matched with plain grep, not grep -i.
 PORTAL_PATTERN='\bportal\b'
@@ -66,6 +69,11 @@ TRAILING_IT_PATTERN='[[:space:]]it[[:space:]]*([.!?]|$)'
 # A heading names its topic; a question or a half-question clause
 # ("What a journey backend checks") is not a heading.
 QUESTION_HEADING_PATTERN='^#{1,6}[[:space:]]+((what|how|which|when|where|why|who|whom|whose|whether)\b|.*\?[[:space:]]*$)'
+# Headings are in title case: every word capitalised except articles,
+# short conjunctions and short prepositions after the first word. Only
+# word starts are checked, so "Re-confirmation" passes. A lowercase
+# product name can be a fair exception, so WARN not FAIL.
+HEADING_SMALL_WORDS='a|an|the|and|but|or|nor|for|of|in|on|at|to|by|as|via|vs|with|from|into|per'
 # The same half-question opening a sentence, list item, bold lead-in or
 # table cell is a smell: restructure around the actor and the content.
 # Case-sensitive, so only a capitalised opener matches; "When" and
@@ -89,17 +97,9 @@ HEADER_CELL_DANGLING_PATTERN='[[:space:]](by|as|for|to|of|from|with|in|on|at)[[:
 # full stop. A sentence per job of the page, each with a verb, is the
 # repair; whether the opener is one is a judgment, so WARN not FAIL.
 INVENTORY_OPENER_PATTERN='(^|[.!?][[:space:]]+)(This|The) (page|document|section|chapter|guide|note|record|proposal|plan|table) (covers|defines|describes|explains|sets out|lists|answers|gives|details|holds|records|states|presents|summari[sz]es|carries|contains|includes|comprises)\b[^.]*(,[^.]*){2,}'
-VAGUE_PATTERN='\b(robust(ly)?|appropriate(ly)?|overarching|foster(s|ed|ing)?)\b'
-CONTEXT_PATTERN='\b(deliver(s|ed|ing)?|shapes?|bounds)\b'
-METAPHOR_PATTERN='\b(prices?|priced|rides?|bites?|spends?|spent|buys?|kills?|collapses?|leaks?|lands?|forecloses?|soften(s|ed|ing)?|bootstrap(s|ped|ping)?|ax[ei]s|postures?)\b|hangs? on'
-LEDGER_PATTERN='held open under|argued under|its case is made|stated below the table|collected under|points? back to'
 CONTACT_PATTERN='\bonly (the |that |its )?([a-zA-Z'\''-]+ ){1,3}(reaches|sees|touches)\b'
-# "alone" after a noun: where it restricts the subject ("the front door
-# alone holds"), the rule is "only" before the noun. The by-itself sense
-# ("expiry alone ends no session") is a judgment call, so WARN not FAIL.
-ALONE_PATTERN='\balone\b'
 
-usage() { sed -n '2,35p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "$0"; }
 
 fail() {
   printf 'check-prose: %s\n' "$1" >&2
@@ -120,6 +120,93 @@ strip_masked() {
     | sed -E 's|https?://[^[:space:]<>")]+||g'
 }
 
+# Read the "Words to avoid or examine" table into one line per FAIL or
+# WARN row: gate, grep pattern, first term, repair, tab-separated. Each
+# backticked form in the Term cell is one alternative; a trailing * matches
+# any ending and a space matches any run of spaces. A form with any other
+# character is refused, so the table never carries regex.
+load_terms() {
+  local doc
+  BASE_TERMS=""
+  for doc in "$TERMS_DOC" ${EXTRA_TERMS[@]+"${EXTRA_TERMS[@]}"}; do
+    BASE_TERMS="${BASE_TERMS:+$BASE_TERMS
+}$(terms_from "$doc" required)" || exit 1
+  done
+}
+
+terms_from() {  # $1 table file, $2 "required" when the file must yield rows
+  local shown out bad
+  shown="${1/#$HOME/~}"
+  [ -f "$1" ] || fail "terms table not found: $shown"
+  out=$(read_terms_table "$1" "$shown")
+  bad=$(printf '%s\n' "$out" | grep '^BAD' | cut -f2 | head -1)
+  [ -z "$bad" ] || fail "terms table: form \"$bad\" may hold only letters, digits, spaces, hyphens, apostrophes and a trailing * ($shown, \"Words to avoid or examine\")"
+  [ -n "$out" ] || [ "${2:-}" != required ] || fail "terms table: no FAIL or WARN rows read from $shown, \"Words to avoid or examine\""
+  printf '%s' "$out"
+}
+
+# A page's document set may keep an editorial-profile.md beside its pages
+# or in a folder above them, up to the repository root. Its own "Words to
+# avoid or examine" rows apply to that page on top of language.md's.
+profile_for() {  # $1 page path; prints the nearest profile, or nothing
+  local d
+  [ -e "$1" ] || return 0
+  d=$(cd "$(dirname "$1")" 2>/dev/null && pwd) || return 0
+  while :; do
+    [ -f "$d/editorial-profile.md" ] && { printf '%s\n' "$d/editorial-profile.md"; return 0; }
+    { [ -e "$d/.git" ] || [ "$d" = / ]; } && return 0
+    d=$(dirname "$d")
+  done
+}
+
+terms_for() {  # $1 page path; sets TERMS for that page
+  local prof extra
+  TERMS=$BASE_TERMS
+  prof=$(profile_for "$1")
+  [ -n "$prof" ] || return 0
+  extra=$(terms_from "$prof") || exit 1
+  [ -z "$extra" ] || TERMS="$TERMS
+$extra"
+}
+
+read_terms_table() {  # $1 file, $2 its display path
+  awk -F'|' -v src="$2" '
+    /^## / { insec = ($0 ~ /^## Words to avoid or examine/); next }
+    !insec || !/^\|/ { next }
+    {
+      gate = $4; gsub(/^[ \t]+|[ \t]+$/, "", gate)
+      if (gate != "FAIL" && gate != "WARN") next
+      repair = $3; gsub(/^[ \t]+|[ \t]+$/, "", repair)
+      cell = $2; alt = ""; first = ""
+      while (match(cell, /`[^`]+`/)) {
+        t = substr(cell, RSTART + 1, RLENGTH - 2); cell = substr(cell, RSTART + RLENGTH)
+        if (t !~ /^[A-Za-z0-9][A-Za-z0-9 '\''-]*\*?$/) { print "BAD\t" t; next }
+        if (first == "") first = t
+        if (t ~ /\*$/) { sub(/\*$/, "", t); t = t "[[:alnum:]-]*" }
+        gsub(/ /, "[[:space:]]+", t)
+        alt = alt (alt == "" ? "" : "|") t
+      }
+      if (alt != "") print gate "\t\\b(" alt ")\\b\t" first "\t" repair "\t" src
+    }' "$1"
+}
+
+report_terms() {  # $1 file on disk, $2 display label, $3 masked text, $4 gate; returns 2 on a FAIL hit
+  local gate pat first repair src hits rc=0
+  while IFS=$'\t' read -r gate pat first repair src; do
+    [ "$gate" = "$4" ] || continue
+    hits=$(printf '%s\n' "$3" | grep -inE "$pat" || true)
+    [ -n "$hits" ] || continue
+    report_hits "$1" "$2" "$gate" "$hits"
+    if [ "$gate" = FAIL ]; then
+      printf 'check-prose: banned term "%s" - %s - rule: %s ("Words to avoid or examine").\n' "$first" "$repair" "$src" >&2
+      rc=2
+    else
+      printf 'check-prose: WARN hits are "%s" - %s (%s, "Words to avoid or examine").\n' "$first" "$repair" "$src" >&2
+    fi
+  done <<< "$TERMS"
+  return $rc
+}
+
 report_hits() {  # $1 file on disk, $2 display label, $3 kind, $4 hits
   local kind=$3
   while IFS=: read -r ln _; do
@@ -138,7 +225,9 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
   if [ "$PRINT_FAIL" -eq 1 ]; then
     local lns
     lns=$( { printf '%s\n' "$masked" | grep -nE "$PUNCT_PATTERN" || true
-             printf '%s\n' "$masked" | grep -inE "$JARGON_PATTERN" || true
+             while IFS=$'\t' read -r gate pat _; do
+               [ "$gate" = FAIL ] && { printf '%s\n' "$masked" | grep -inE "$pat" || true; }
+             done <<< "$TERMS"
              printf '%s\n' "$masked" | grep -nE "$PORTAL_PATTERN" || true
              printf '%s\n' "$masked" | grep -inE "$NA_PATTERN" || true
              printf '%s\n' "$masked" | grep -nE "$TRAILING_IT_PATTERN" || true
@@ -160,12 +249,7 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
     rc=2
   fi
 
-  hits=$(printf '%s\n' "$masked" | grep -inE "$JARGON_PATTERN" || true)
-  if [ -n "$hits" ]; then
-    report_hits "$1" "$2" FAIL "$hits"
-    printf 'check-prose: banned word - rule: %s ("Words to avoid or examine"). Swap for the plain alternative the table names and re-run.\n' "$LANGUAGE_DOC" >&2
-    rc=2
-  fi
+  report_terms "$1" "$2" "$masked" FAIL || rc=2
 
   hits=$(printf '%s\n' "$masked" | grep -nE "$PORTAL_PATTERN" || true)
   if [ -n "$hits" ]; then
@@ -195,6 +279,25 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
     rc=2
   fi
 
+  hits=$(printf '%s\n' "$masked" | awk -v small="$HEADING_SMALL_WORDS" '
+    BEGIN { n = split(small, a, "|"); for (i = 1; i <= n; i++) s[a[i]] = 1 }
+    /^#+[ \t]/ {
+      h = $0; sub(/^#+[ \t]+/, "", h); m = split(h, w, /[ \t]+/); first = 1
+      for (i = 1; i <= m; i++) {
+        t = w[i]; sub(/^[^A-Za-z0-9]+/, "", t)
+        if (t == "") continue
+        if (substr(t, 1, 1) ~ /[a-z]/) {
+          lw = t; sub(/[^a-z].*$/, "", lw)
+          if (first || !(lw in s)) { print NR ":" $0; break }
+        }
+        first = 0
+      }
+    }')
+  if [ -n "$hits" ]; then
+    report_hits "$1" "$2" WARN "$hits"
+    printf 'check-prose: WARN hits are headings not in title case - capitalise every word except articles, short conjunctions and short prepositions after the first word: "Activity and the Idle Point", not "Activity and the idle point" (%s, "Capitalisation, numbers, dates and inclusion").\n' "$LANGUAGE_DOC" >&2
+  fi
+
   # Table header rows: the line a `| --- |` separator follows. Labels in
   # FAQ voice fail; the opener WARN below skips these lines.
   local masked_headers masked_body
@@ -219,29 +322,7 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
     printf 'check-prose: WARN hits are an inventory opener - an opener that lists the page'"'"'s parts as noun phrases: write one sentence per job of the page, each with an actor and a verb (%s, "Headings, lists and tables").\n' "$LANGUAGE_DOC" >&2
   fi
 
-  hits=$(printf '%s\n' "$masked" | grep -inE "$VAGUE_PATTERN" || true)
-  if [ -n "$hits" ]; then
-    report_hits "$1" "$2" WARN "$hits"
-    printf 'check-prose: WARN hits are vague words - judge each: state the specific behaviour, quantity or criterion instead, or keep the word where it truly is the criterion (%s, "Words to avoid or examine").\n' "$LANGUAGE_DOC" >&2
-  fi
-
-  hits=$(printf '%s\n' "$masked" | grep -inE "$CONTEXT_PATTERN" || true)
-  if [ -n "$hits" ]; then
-    report_hits "$1" "$2" WARN "$hits"
-    printf 'check-prose: WARN hits are context-sensitive words - keep literal technical uses; replace vague uses with the specific outcome, limit or structure (%s, "Words to avoid or examine").\n' "$LANGUAGE_DOC" >&2
-  fi
-
-  hits=$(printf '%s\n' "$masked" | grep -inE "$METAPHOR_PATTERN" || true)
-  if [ -n "$hits" ]; then
-    report_hits "$1" "$2" WARN "$hits"
-    printf 'check-prose: WARN hits are metaphor candidates - judge each: literal technical uses stay, figurative uses are unpacked (%s, "Reader-pays compression").\n' "$LANGUAGE_DOC" >&2
-  fi
-
-  hits=$(printf '%s\n' "$masked" | grep -inE "$LEDGER_PATTERN" || true)
-  if [ -n "$hits" ]; then
-    report_hits "$1" "$2" WARN "$hits"
-    printf 'check-prose: WARN hits are ledger voice - document bookkeeping written as prose. State the status in plain words: "that is still an open question (see X)" (%s, "Reader-pays compression").\n' "$LANGUAGE_DOC" >&2
-  fi
+  report_terms "$1" "$2" "$masked" WARN
 
   hits=$(printf '%s\n' "$masked" | grep -inE "$CONTACT_PATTERN" || true)
   if [ -n "$hits" ]; then
@@ -253,12 +334,6 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
   if [ -n "$hits" ]; then
     report_hits "$1" "$2" WARN "$hits"
     printf 'check-prose: WARN hits are FAQ voice - a sentence, list item or cell opens on a half-question (What, How, Which, Why, Whether, Who), a smell: restructure so the actor and the content lead, for example "The backend checks the signature", not "What the backend checks is the signature" (%s, "Headings, lists and tables").\n' "$LANGUAGE_DOC" >&2
-  fi
-
-  hits=$(printf '%s\n' "$masked" | grep -inE "$ALONE_PATTERN" || true)
-  if [ -n "$hits" ]; then
-    report_hits "$1" "$2" WARN "$hits"
-    printf 'check-prose: WARN hits are "alone" after a noun - where it restricts the subject, put only before the noun: "only the front door holds"; keep the by-itself sense or write "by itself" (%s, "Words to avoid or examine").\n' "$LANGUAGE_DOC" >&2
   fi
 
   hits=$(printf '%s\n' "$masked" | awk '{
@@ -275,10 +350,11 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
 }
 
 STDIN=0 LABEL="stdin" PRINT_FAIL=0
-FILES=()
+FILES=() EXTRA_TERMS=()
 while [ $# -gt 0 ]; do
   case "$1" in
     --stdin)   STDIN=1; shift ;;
+    --terms)   EXTRA_TERMS+=("${2:?--terms needs a file}"); shift 2 ;;
     --label)   LABEL=${2:?--label needs a value}; shift 2 ;;
     --print-fail-lines) PRINT_FAIL=1; shift ;;
     --help|-h) usage; exit 0 ;;
@@ -287,16 +363,20 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+load_terms
+
 RC=0
 if [ "$STDIN" -eq 1 ]; then
   TMP=$(mktemp "${TMPDIR:-/tmp}/check-prose.XXXXXX") || fail "mktemp failed"
   trap 'rm -f "$TMP"' EXIT
   cat > "$TMP"
+  terms_for "$LABEL"
   check_file "$TMP" "$LABEL" || RC=2
 else
   [ "${#FILES[@]}" -gt 0 ] || fail "no input: pass file paths or --stdin (see --help)"
   for f in "${FILES[@]}"; do
     [ -f "$f" ] || fail "file not found: $f"
+    terms_for "$f"
     check_file "$f" "$f" || RC=2
   done
 fi

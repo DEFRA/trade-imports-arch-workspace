@@ -74,7 +74,7 @@ These 4 rules are for drafting. Write each sentence as you would say it if the r
 
 The named compression patterns live in [review-brief.md](../../skills/editorial/references/review-brief.md), "Compression patterns". They are recognition tests for finished prose. A writer who holds them while drafting produces defensive sentences.
 
-The gate reports the following metaphor candidates as WARNs: `prices`, `priced`, `rides`, `rides in`, `bites`, `spends`, `spent`, `buys`, `kills`, `hangs on`, `collapses`, `leaks`, `lands`, `forecloses`, `softens`, `bootstraps`, `axis` and `posture`. A literal technical use may stay. A figurative use must be rewritten around the mechanism, not swapped for another metaphor.
+The metaphor candidates the gate warns on are rows in "Words to avoid or examine". A literal technical use may stay. A figurative use must be rewritten around the mechanism, not swapped for another metaphor.
 
 ## Just Enough
 
@@ -126,23 +126,47 @@ Common abbreviations that need no explanation for a general UK audience include 
 
 ## Words to avoid or examine
 
-The Gate column records how `~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh` treats each term. FAIL blocks the artefact. WARN asks the author to judge the actual meaning. "Guidance" is not checked mechanically.
+`~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh` reads the table below each time it runs. A FAIL row blocks the artefact, a WARN row asks the author to judge the actual meaning, and a Guidance row is not checked. Each hit prints its row's repair.
 
-The gate fails 9 marketing words outright and names the repair for each, so do not hold them while writing: `leverage`, `empower`, `facilitate`, `utilise`, `seamless`, `user-friendly`, `streamline`, `load-bearing` and generic lowercase `portal`. The table below holds the terms that need a judgement the script cannot make.
+To ban or flag a word or phrase, add a row. Put each form in backticks in the Term cell; a trailing `*` matches any ending, so `utilis*` covers every form. Text outside the backticks is a note and is not matched. Matching ignores case and stops at word boundaries. Generic lowercase `portal` also fails, but the script checks that word itself, because "CDP Portal" is a product name and the check depends on case. A rule about sentence shape, such as FAQ voice or the contact clause, is not a word list and lives in the script.
 
-| Term                       | Repair                                                       | Gate     |
-|----------------------------|--------------------------------------------------------------|----------|
-| `deliver`                  | keep for literal transport or message delivery; otherwise state the actual outcome | WARN |
-| `stands-upon`              | state the assumption directly                                | Guidance |
-| `bounds`                   | keep for mathematical limits or explicit boundary operations; otherwise use determines or constrains | WARN |
-| `shape`                    | keep for literal geometry or data structure; otherwise name the design, proposal, pattern or layout | WARN |
-| `robust`                   | state what withstands retries, redelivery or malformed input | WARN     |
-| `appropriate`              | state the criterion                                          | WARN     |
-| `overarching`              | name what the thing spans                                    | WARN     |
-| `foster`                   | state the action taken                                       | WARN     |
-| `tackle`                   | state the action taken                                       | Guidance |
-| `strengthen`               | state the change                                             | Guidance |
-| `alone` after a noun       | where it restricts the subject ("the front door alone holds"), put only before the noun: "only the front door holds"; keep it for the by-itself sense ("expiry alone ends no provider session") or write "by itself" | WARN |
+| Term | Repair | Gate |
+| --- | --- | --- |
+| `leverage`, `leverages`, `leveraged`, `leveraging` | use, build on, or name what is reused | FAIL |
+| `empower`, `empowers`, `empowered`, `empowering` | let or allow, or state the permission given | FAIL |
+| `facilitate`, `facilitates`, `facilitated`, `facilitating` | help or make possible, or name the action | FAIL |
+| `utilise`, `utilises`, `utilised`, `utilising`, `utilize`, `utilizes`, `utilized`, `utilizing` | use | FAIL |
+| `seamless`, `seamlessly` | state which step the user no longer takes | FAIL |
+| `user-friendly` | state what the user can do | FAIL |
+| `streamline`, `streamlines`, `streamlined`, `streamlining` | state what was removed or shortened | FAIL |
+| `load-bearing` | state what depends on the thing | FAIL |
+| `deliver`, `delivers`, `delivered`, `delivering` | keep for literal transport or message delivery; otherwise state the actual outcome | WARN |
+| `bounds` | keep for mathematical limits or explicit boundary operations; otherwise use determines or constrains | WARN |
+| `shape`, `shapes` | keep for literal geometry or data structure; otherwise name the design, proposal, pattern or layout | WARN |
+| `robust`, `robustly` | state what withstands retries, redelivery or malformed input | WARN |
+| `appropriate`, `appropriately` | state the criterion | WARN |
+| `overarching` | name what the thing spans | WARN |
+| `foster`, `fosters`, `fostered`, `fostering` | state the action taken | WARN |
+| `alone` after a noun | where it restricts the subject ("the front door alone holds"), put only before the noun: "only the front door holds"; keep it for the by-itself sense ("expiry alone ends no provider session") or write "by itself" | WARN |
+| `price`, `prices`, `priced` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `ride`, `rides` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `bite`, `bites` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `spend`, `spends`, `spent` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `buy`, `buys` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `kill`, `kills` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `hang on`, `hangs on` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `collapse`, `collapses` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `leak`, `leaks` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `land`, `lands` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `foreclose`, `forecloses` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `soften`, `softens`, `softened`, `softening` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `bootstrap`, `bootstraps`, `bootstrapped`, `bootstrapping` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `axis`, `axes` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `posture`, `postures` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor | WARN |
+| `held open under`, `argued under`, `its case is made`, `stated below the table`, `collected under`, `point back to`, `points back to` | ledger voice: state the status or pointer in plain words, "that is still an open question (see X)" | WARN |
+| `stands-upon` | state the assumption directly | Guidance |
+| `tackle` | state the action taken | Guidance |
+| `strengthen` | state the change | Guidance |
 
 `transform` remains available for literal data transformation. Challenge it only when it means vague improvement.
 
@@ -205,7 +229,7 @@ Use "select" rather than "click" for interface actions. Use "page" rather than "
 
 ## Capitalisation, numbers, dates and inclusion
 
-- Use sentence case except for proper nouns, official titles and headings. Headings use title case: capitalise every word except articles, short conjunctions and short prepositions that are not the first word.
+- Use sentence case except for proper nouns, official titles and headings. Headings use title case: capitalise every word except articles, short conjunctions and short prepositions that are not the first word. Gate: WARN on a markdown heading with a lowercase word outside that list; the gate checks only the start of each word, so "Re-confirmation" passes.
 - Capitalise department names, a job title attached to a person's name, named benefits and "The Civil Service".
 - Lowercase "government", "civil servants" and general job titles.
 - Write out "one" and use numerals from 2 onwards. Use commas above 999 and write percentages as `50%`.

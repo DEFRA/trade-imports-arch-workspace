@@ -1,38 +1,43 @@
 #!/usr/bin/env bash
 # check-names.sh - the preferred-names check: flag every name a document
-# set's register replaces, and with --fix rename it in place. Deterministic:
-# the register's patterns decide, no judgement.
+# set's profile replaces, and with --fix rename it in place. Deterministic:
+# the profile's Preferred Names table decides, no judgement.
 #
-# Usage: check-names.sh --names <preferred-names.json> [--fix] <page.md>...
+# Usage: check-names.sh --profile <editorial-profile.md> [--fix] <page.md>...
 #
-# The register lives beside the pages it governs:
-#   {"names": [{"preferred": "session assertion", "plural": "session assertions",
-#               "replaced": ["\\bsnapshot(s?)\\b"]}]}
-# Patterns are Oniguruma regular expressions (jq's), matched case-insensitively.
+# The profile lives beside the pages it governs; read-profile.sh describes
+# its Preferred Names table:
+#   | Preferred | Plural | Replaced |
+#   | session assertion | session assertions | `snapshot`, `snapshots` |
+# Matching ignores case. A replaced form inside the preferred name ("cookie
+# value" in "sealed cookie value") is never flagged.
 # Fenced code, inline code and HTML comment lines are skipped: a name there is
 # an exemplar or build metadata. --fix keeps the found name's capitals ("Sealed
 # Value" becomes "Sealed Cookie Value") and its plural, and reports every
 # heading it renames, because a renamed heading changes the heading's anchor.
 #
 # Prints one line per hit: check-names: <page>:<line>: "<found>" -> "<preferred>".
-# Exit: 0 no hit (or every hit fixed), 1 hits found, 2 usage or a bad register.
+# Exit: 0 no hit (or every hit fixed), 1 hits found, 2 usage or a bad profile.
 
 set -uo pipefail
-NAMES="" FIX=0
+PROFILE="" FIX=0
 PAGES=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --names) NAMES="${2:?--names needs a path}"; shift 2 ;;
+    --profile) PROFILE="${2:?--profile needs a path}"; shift 2 ;;
     --fix) FIX=1; shift ;;
-    -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "$0"; exit 0 ;;
     -*) echo "check-names: unknown flag $1 (see --help)" >&2; exit 2 ;;
     *) PAGES+=("$1"); shift ;;
   esac
 done
-NAMES="${NAMES/#\~/$HOME}"
-[[ -f "$NAMES" ]] || { SHOWN="${NAMES:-<none>}"; echo "check-names: no register at ${SHOWN/#$HOME/~}; give --names <preferred-names.json>" >&2; exit 2; }
-jq -e '(.names | type) == "array" and all(.names[]; (.preferred | type) == "string" and (.replaced | type) == "array")' "$NAMES" > /dev/null 2>&1 \
-  || { echo "check-names: ${NAMES/#$HOME/~} is not a register: it needs names[], each with preferred and replaced[]" >&2; exit 2; }
+[[ -n "$PROFILE" ]] || { echo "check-names: give --profile <editorial-profile.md>" >&2; exit 2; }
+REG=$(bash "$HOME/trade-imports-arch-workspace/.claude/tools/editorial/read-profile.sh" "$PROFILE") || exit 2
+jq -e '.names | length > 0' <<< "$REG" > /dev/null \
+  || { P="${PROFILE/#\~/$HOME}"; echo "check-names: ${P/#$HOME/~} has no Preferred Names table" >&2; exit 2; }
+NAMES=$(mktemp "${TMPDIR:-/tmp}/check-names.XXXXXX") || exit 2
+trap 'rm -f "$NAMES"' EXIT
+printf '%s\n' "$REG" > "$NAMES"
 [[ ${#PAGES[@]} -ge 1 ]] || { echo "check-names: give the pages to check" >&2; exit 2; }
 
 # Shared jq: which lines are prose, how a name is recased, and how a line is renamed outside code.
@@ -54,6 +59,7 @@ def rename_outside_code($names):
 '
 
 HITS=0
+HIT_PAGES=0
 for page in "${PAGES[@]}"; do
   f="${page/#\~/$HOME}"
   [[ -f "$f" ]] || { echo "check-names: no page at $page" >&2; exit 2; }
@@ -68,6 +74,7 @@ for page in "${PAGES[@]}"; do
   [[ -z "$OUT" ]] && continue
   n=$(printf '%s\n' "$OUT" | wc -l | tr -d ' ')
   HITS=$((HITS + n))
+  HIT_PAGES=$((HIT_PAGES + 1))
   printf '%s\n' "$OUT"
   if [[ $FIX -eq 1 ]]; then
     jq -R -s -j --slurpfile reg "$NAMES" "$LIB"'
@@ -82,6 +89,6 @@ for page in "${PAGES[@]}"; do
 done
 
 if [[ $HITS -eq 0 ]]; then echo "check-names: ${#PAGES[@]} page$([[ ${#PAGES[@]} -eq 1 ]] || echo s), no replaced name"; exit 0; fi
-if [[ $FIX -eq 1 ]]; then echo "check-names: renamed $HITS names across ${#PAGES[@]} page$([[ ${#PAGES[@]} -eq 1 ]] || echo s); review the diff"; exit 0; fi
-echo "check-names: $HITS replaced names across ${#PAGES[@]} page$([[ ${#PAGES[@]} -eq 1 ]] || echo s); rename them, or run with --fix"
+if [[ $FIX -eq 1 ]]; then echo "check-names: renamed $HITS names across $HIT_PAGES of ${#PAGES[@]} page$([[ ${#PAGES[@]} -eq 1 ]] || echo s); review the diff"; exit 0; fi
+echo "check-names: $HITS replaced names across $HIT_PAGES of ${#PAGES[@]} page$([[ ${#PAGES[@]} -eq 1 ]] || echo s); rename them, or run with --fix"
 exit 1

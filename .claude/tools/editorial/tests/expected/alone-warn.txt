@@ -1,3 +1,3 @@
 check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/alone-warn.md:3: The front door alone holds the signing key. The routing service holds none.
-check-prose: WARN hits are "alone" after a noun - where it restricts the subject, put only before the noun: "only the front door holds"; keep the by-itself sense or write "by itself" (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
+check-prose: WARN hits are "alone" - where it restricts the subject ("the front door alone holds"), put only before the noun: "only the front door holds"; keep it for the by-itself sense ("expiry alone ends no provider session") or write "by itself" (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
 exit-code: 0

@@ -1,0 +1,4 @@
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/heading-case.md:7: ## Activity and the idle point
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/heading-case.md:19: ## of Records and Keys
+check-prose: WARN hits are headings not in title case - capitalise every word except articles, short conjunctions and short prepositions after the first word: "Activity and the Idle Point", not "Activity and the idle point" (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Capitalisation, numbers, dates and inclusion").
+exit-code: 0

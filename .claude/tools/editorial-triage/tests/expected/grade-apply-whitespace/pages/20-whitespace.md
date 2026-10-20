@@ -1,4 +1,4 @@
-# Whitespace repair drill
+# Whitespace Repair Drill
 
 Second sentence stands at the tail of the paragraph.
 

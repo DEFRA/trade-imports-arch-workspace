@@ -22,6 +22,18 @@ Use one of 2 paths:
 - **New writing** - establish the brief and outline, draft, then review the result.
 - **Existing prose** - establish the reader, then start with the review path.
 
+## Usage
+
+| Trigger | Steps |
+| --- | --- |
+| "/editorial" or "editorial pass" on a document still to be written | Writing path 1 to 3, then the review path |
+| "/editorial" or "editorial pass" on one page or a short artefact (PR body, ticket, README) | Review path 1 to 6; the session applies the cold-editor role itself |
+| "review the whole document", "review these pages" | Review path step 6, the layered review on the pages, then `editorial-triage` |
+| "re-review the changes", "review what changed" | Review path step 6 with `--since` and `--settled` |
+| "rewrite this", "explain and rewrite" | Explain and Rewrite |
+
+Every run names a mode (`review` or `revise`) and an intent (`clarify` or `distil`); "Modes and intents" defines them. NOT for contradictions between pages (`design-consistency`), closing review findings (`editorial-triage`), fact-checking claims about the world (a separate process), code comments or conversational replies.
+
 ## Sources of truth
 
 Read only the guidance needed for the current path:
@@ -142,7 +154,7 @@ For a small artefact, apply the cold-editor role in [review-brief.md](references
 
 For a full document or document set, run the layered review only when the user asks for a whole-document review on a path, with the arguments "Modes and intents" names:
 
-1. `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/start-layered-review.sh --run-id <docset>-<date> [--context <page>]... [--names <preferred-names.json>] <page>...` hashes the pages, builds the work packet with [layer-cards.md](references/layer-cards.md) in place of the brief's reviewer roles, and prints each page's key. When the document set keeps a `preferred-names.json` beside its pages, pass it: the review stops while a replaced name remains, and `check-names.sh --fix` renames them for the user to review first. To re-review after edits, give `--since <earlier run id>` and `--settled <that run's triage workarea>`: only pages with changed, new or removed paragraphs are reviewed, every pass reports only what the changes touch, the earlier triage's ignored and open findings are not raised again, and the rest become context; with nothing changed the script exits 3 and no review runs.
+1. `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/start-layered-review.sh --run-id <docset>-<date> [--context <page>]... [--profile <editorial-profile.md>] <page>...` hashes the pages, builds the work packet with [layer-cards.md](references/layer-cards.md) in place of the brief's reviewer roles, and prints each page's key. When the document set keeps an `editorial-profile.md` beside its pages, pass it: the packet carries its reader frame, defaults, run notes and context pages, and the review stops while a name its Preferred Names table replaces remains, so `check-names.sh --fix --profile <profile>` renames them for the user to review first. The profile's format is in the header of `tools/editorial/read-profile.sh`. To re-review after edits, give `--since <earlier run id>` and `--settled <that run's triage workarea>`: only pages with changed, new or removed paragraphs are reviewed, every pass reports only what the changes touch, the earlier triage's ignored and open findings are not raised again, and the rest become context; with nothing changed the script exits 3 and no review runs.
 2. Spawn one `general-purpose` agent with `model: opus`, whose prompt begins "Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/editorial/references/LAYERED_LOADER.md." and gives the reader frame, mode, intent, document mode, run notes, packet path, review folder and page keys. It reads the packet once and forks a paragraph, page and set pass per page.
 3. `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/assemble-review.sh --dir <review folder> --mode <mode> --intent <intent> --hashes <run folder>/hashes.json --out <run folder>/review-result.json <page>...` validates every pass's findings and builds the review result; when it refuses, re-run the passes it names.
 
