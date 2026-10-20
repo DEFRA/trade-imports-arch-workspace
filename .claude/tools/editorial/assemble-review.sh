@@ -3,29 +3,33 @@
 # review files written outside the review workflow (forked passes write JSON
 # files, and nothing checks them against a schema): drill-*.json, structural-*.json
 # and editor-*.json in one directory. Validates every finding's required fields
-# and values against the workflow's schema first and refuses, naming each
+# and values against the review contract first and refuses, naming each
 # failing record, before anything is written.
 #
 # Usage: assemble-review.sh --dir <review files dir> --mode <review|revise>
-#          --intent <distil|clarify> --out <result.json> <doc.md>...
+#          --intent <distil|clarify> --out <result.json> [--hashes <hashes.json>] <doc.md>...
+#
+# --hashes uses the page hashes taken before the review began (from
+# start-layered-review.sh); without it the pages are hashed now.
 #
 # drill-<key>.json   {"unit": "<page filename>", "findings": [...], "retains": [...]}
 # structural-*.json  {"findings": [...], "redundancies": [{fact, home, occurrences}]}
 # editor-*.json      {"pages": [...], "order": [...], "patterns": [...]}
-# The docs are hashed now, so the result must be assembled before any page is
+# Without --hashes the docs are hashed now, so the result must be assembled before any page is
 # edited. Exit: 0 written, 1 usage or missing input, 2 invalid findings.
 
 set -uo pipefail
 C="$HOME/trade-imports-arch-workspace/.claude"
-DIR="" MODE="" INTENT="" OUT=""
+DIR="" MODE="" INTENT="" OUT="" HASHFILE=""
 DOCS=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dir) DIR="${2:?}"; shift 2 ;;
+    --hashes) HASHFILE="${2:?}"; shift 2 ;;
     --mode) MODE="${2:?}"; shift 2 ;;
     --intent) INTENT="${2:?}"; shift 2 ;;
     --out) OUT="${2:?}"; shift 2 ;;
-    -h|--help) sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     -*) echo "assemble-review: unknown flag $1 (see --help)" >&2; exit 1 ;;
     *) DOCS+=("$1"); shift ;;
   esac
@@ -43,7 +47,15 @@ for f in "${FILES[@]}"; do
   jq -e . "$f" > /dev/null 2>&1 || { echo "assemble-review: $(basename "$f") is not valid JSON; re-run that pass" >&2; exit 1; }
 done
 
-HASHES=$(bash "$C/tools/editorial-triage/build-triage.sh" --hash-pages "${DOCS[@]/#\~/$HOME}") || { echo "assemble-review: hashing the documents failed" >&2; exit 1; }
+if [[ -n "$HASHFILE" ]]; then
+  HASHFILE="${HASHFILE/#\~/$HOME}"
+  HASHES=$(jq -c . "$HASHFILE" 2>/dev/null) || { echo "assemble-review: no hashes at ${HASHFILE/#$HOME/~}" >&2; exit 1; }
+  for d in "${DOCS[@]}"; do
+    jq -e --arg p "$(basename "$d")" 'has($p)' <<< "$HASHES" > /dev/null || { echo "assemble-review: ${HASHFILE/#$HOME/~} holds no hash for $(basename "$d")" >&2; exit 1; }
+  done
+else
+  HASHES=$(bash "$C/tools/editorial-triage/build-triage.sh" --hash-pages "${DOCS[@]/#\~/$HOME}") || { echo "assemble-review: hashing the documents failed" >&2; exit 1; }
+fi
 PATHS=$(for d in "${DOCS[@]}"; do p="${d/#$HOME/~}"; printf '%s\t%s\n' "$(basename "$d")" "$p"; done | jq -R -s 'split("\n") | map(select(. != "") | split("\t") | {(.[0]): .[1]}) | add')
 
 ALL=$(for f in "${FILES[@]}"; do jq -c --arg k "$(basename "$f" | sed 's/-.*//')" --arg f "$(basename "$f")" '{kind: $k, file: $f, d: .}' "$f"; done | jq -s -c .)

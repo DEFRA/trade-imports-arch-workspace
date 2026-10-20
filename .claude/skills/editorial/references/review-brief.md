@@ -1,6 +1,6 @@
 # Review brief
 
-This document is the single instruction set for the reviewers used by the `editorial-review` workflow. The spawn prompt supplies the reader frame, the output mode (`review` or `revise`), the review intent (`distil` or `clarify`), the document mode, the run notes and the work packet. Apply that frame to every finding.
+This document is the instruction set for every editorial reviewer: the layered review's passes read it with [layer-cards.md](layer-cards.md) in place of its reviewer roles, and a cold-reader pass applies its cold editor role. The spawn prompt supplies the reader frame, the output mode (`review` or `revise`), the review intent (`distil` or `clarify`), the document mode, the run notes and the work packet. Apply that frame to every finding.
 
 ## Before reviewing
 

@@ -5,10 +5,14 @@
 # under review with line numbers as the Read tool gives them. A reviewer reads
 # this one file instead of discovering and reading a dozen.
 #
-# Usage: build-review-packet.sh --out <packet.md> [--context <page.md>]... <doc.md>...
+# Usage: build-review-packet.sh --out <packet.md> [--context <page.md>]...
+#          [--cards <layer-cards.md>] [--pointers <pointers.md>] <doc.md>...
 #
 # A --context page is read but not reviewed (for example the shared rules the
-# reviewed pages link into); it is numbered after the documents.
+# reviewed pages link into); it is numbered after the documents. --cards builds
+# the layered review's packet: the brief without its drill, structural and cold
+# editor sections, then the layer cards in their place. --pointers adds layer 0
+# pointers for the paragraph pass.
 #
 # Sections are cut by heading, so an edit to the brief or the contract moves
 # with them. Prints the packet path, lines and bytes. Exit: 0 written, 1 usage
@@ -19,11 +23,14 @@ C="$HOME/trade-imports-arch-workspace/.claude"
 OUT=""
 DOCS=()
 CONTEXT=()
+CARDS="" POINTERS=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --out) OUT="${2:?--out needs a path}"; shift 2 ;;
     --context) CONTEXT+=("${2:?--context needs a path}"); shift 2 ;;
-    -h|--help) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --cards) CARDS="${2:?--cards needs a path}"; shift 2 ;;
+    --pointers) POINTERS="${2:?--pointers needs a path}"; shift 2 ;;
+    -h|--help) sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     -*) echo "build-review-packet: unknown flag $1 (see --help)" >&2; exit 1 ;;
     *) DOCS+=("$1"); shift ;;
   esac
@@ -42,6 +49,9 @@ done
 for d in "${DOCS[@]}" ${CONTEXT[@]+"${CONTEXT[@]}"}; do
   [[ -f "${d/#\~/$HOME}" ]] || { echo "build-review-packet: no document at $d" >&2; exit 1; }
 done
+CARDS="${CARDS/#\~/$HOME}"; POINTERS="${POINTERS/#\~/$HOME}"
+[[ -z "$CARDS" || -f "$CARDS" ]] || { echo "build-review-packet: no layer cards at $CARDS" >&2; exit 1; }
+[[ -z "$POINTERS" || -f "$POINTERS" ]] || { echo "build-review-packet: no pointers file at $POINTERS" >&2; exit 1; }
 grep -q '^### Reviewer-set fields' "$CONTRACT" || { echo "build-review-packet: the contract has no '### Reviewer-set fields' section" >&2; exit 1; }
 
 section() {  # $1 title, $2 file; stdin overrides the file's content when $3 is "-"
@@ -57,7 +67,15 @@ mkdir -p "$(dirname "${OUT/#\~/$HOME}")"
 TMP="${OUT/#\~/$HOME}.tmp"
 {
   printf '# Review work packet\n\nEverything a reviewer of this run needs, in one file: the review brief, the sources it names, and the documents. Cite page lines from the numbered copies below.\n'
-  section "Review brief" "$BRIEF"
+  if [[ -n "$CARDS" ]]; then
+    # The layer cards replace the brief's three reviewer roles.
+    awk '/^## /{ skip = ($0 ~ /^## (Drill reviewer|Structural reviewer|Cold editor)$/) } !skip' "$BRIEF" \
+      | section "Review brief, without the reviewer roles the layer cards replace" "$BRIEF" -
+    section "Layer cards" "$CARDS"
+  else
+    section "Review brief" "$BRIEF"
+  fi
+  [[ -z "$POINTERS" ]] || section "Layer 0 pointers" "$POINTERS"
   section "language.md" "$C/best-practices/writing/language.md"
   section "ubiquitous-language.md" "$C/best-practices/writing/ubiquitous-language.md"
   section "snapshot-authoring.md" "$C/best-practices/writing/snapshot-authoring.md"
