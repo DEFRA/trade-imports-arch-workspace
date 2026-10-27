@@ -78,6 +78,8 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Test-driven porting.** Each port starts with behaviour tests written from the bash tool's behaviour, its golden tests and its callers. The tests cover the key behaviours and invariants as for a pure function, and table tests are welcome. The tests carry the intention, and the golden tests check byte-for-byte parity. Where no golden tests exist, fixtures are committed against the bash version first. An intended change of behaviour is its own commit with a reviewed re-bless and an entry in this file.
 
+**Fixtures for the Atlassian reads.** The workspace repository is public, so no real ticket or page is committed. The inputs are invented Jira and Confluence answers with the key sets of real answers, served from a loopback server, and the outputs are what `fetch.sh` and `page.sh` printed for them, with the loopback address replaced by the test site's. A hedy test projects each input and must give the tool's output byte for byte. The Confluence input avoids one pattern the bash converter mangles, a `<b>` tag after a `<br>`, so that fixing the converter later does not need a re-bless; the flattening of a nested list is kept, because real pages hold nested lists and the port must match the tool until a deliberate change.
+
 **Order.** Clients and `auth` come first, then reads, writes and publish, then the estate ports as the editorial skills need them. The roster comes last.
 
 **Not built.** No interactive menu, no `--verbose` option and no logging library. No command for a service this workspace does not use. A command is added only with the skill that calls the command.

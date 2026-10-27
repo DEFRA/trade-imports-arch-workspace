@@ -1,0 +1,222 @@
+{
+  "issues": [
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "100101",
+      "self": "https://example.atlassian.net/rest/api/2/issue/100101",
+      "key": "HEDY-101",
+      "fields": {
+        "summary": "Capture the read projections as fixtures",
+        "status": {
+          "self": "https://example.atlassian.net/rest/api/2/status/3",
+          "description": "Work has started.",
+          "iconUrl": "https://example.atlassian.net/images/icons/statuses/inprogress.png",
+          "name": "In Progress",
+          "id": "3",
+          "statusCategory": {
+            "self": "https://example.atlassian.net/rest/api/2/statuscategory/4",
+            "id": 4,
+            "key": "indeterminate",
+            "colorName": "yellow",
+            "name": "In Progress"
+          }
+        },
+        "issuetype": {
+          "self": "https://example.atlassian.net/rest/api/2/issuetype/10002",
+          "id": "10002",
+          "description": "A small, distinct piece of work.",
+          "iconUrl": "https://example.atlassian.net/images/icons/issuetypes/task.svg",
+          "name": "Task",
+          "subtask": false,
+          "avatarId": 10318,
+          "entityId": "00000000-0000-4000-8000-000000000002",
+          "hierarchyLevel": 0
+        },
+        "priority": {
+          "self": "https://example.atlassian.net/rest/api/2/priority/3",
+          "iconUrl": "https://example.atlassian.net/images/icons/priorities/medium.svg",
+          "name": "Medium",
+          "id": "3"
+        },
+        "assignee": {
+          "self": "https://example.atlassian.net/rest/api/2/user?accountId=000000:00000000-0000-4000-8000-000000000001",
+          "accountId": "000000:00000000-0000-4000-8000-000000000001",
+          "avatarUrls": {
+            "48x48": "https://example.atlassian.net/avatar/48",
+            "24x24": "https://example.atlassian.net/avatar/24"
+          },
+          "displayName": "Ada Lovelace",
+          "active": true,
+          "timeZone": "Europe/London",
+          "accountType": "atlassian"
+        },
+        "labels": ["fixtures", "hedy"],
+        "parent": {
+          "id": "100100",
+          "key": "HEDY-100",
+          "self": "https://example.atlassian.net/rest/api/2/issue/100100",
+          "fields": {
+            "summary": "Port the Atlassian reads",
+            "status": {
+              "self": "https://example.atlassian.net/rest/api/2/status/3",
+              "description": "Work has started.",
+              "iconUrl": "https://example.atlassian.net/images/icons/statuses/inprogress.png",
+              "name": "In Progress",
+              "id": "3",
+              "statusCategory": {
+                "self": "https://example.atlassian.net/rest/api/2/statuscategory/4",
+                "id": 4,
+                "key": "indeterminate",
+                "colorName": "yellow",
+                "name": "In Progress"
+              }
+            },
+            "priority": {
+              "self": "https://example.atlassian.net/rest/api/2/priority/3",
+              "iconUrl": "https://example.atlassian.net/images/icons/priorities/medium.svg",
+              "name": "Medium",
+              "id": "3"
+            },
+            "issuetype": {
+              "self": "https://example.atlassian.net/rest/api/2/issuetype/10000",
+              "id": "10000",
+              "description": "A collection of related work.",
+              "iconUrl": "https://example.atlassian.net/images/icons/issuetypes/epic.svg",
+              "name": "Epic",
+              "subtask": false,
+              "avatarId": 10307,
+              "entityId": "00000000-0000-4000-8000-000000000000",
+              "hierarchyLevel": 1
+            }
+          }
+        },
+        "created": "2026-10-01T09:15:30.000+0000",
+        "updated": "2026-10-05T16:42:08.000+0000"
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "100102",
+      "self": "https://example.atlassian.net/rest/api/2/issue/100102",
+      "key": "HEDY-102",
+      "fields": {
+        "summary": "Write the markdown converter tests",
+        "status": {
+          "self": "https://example.atlassian.net/rest/api/2/status/10000",
+          "description": "",
+          "iconUrl": "https://example.atlassian.net/",
+          "name": "To Do",
+          "id": "10000",
+          "statusCategory": {
+            "self": "https://example.atlassian.net/rest/api/2/statuscategory/2",
+            "id": 2,
+            "key": "new",
+            "colorName": "blue-gray",
+            "name": "To Do"
+          }
+        },
+        "issuetype": {
+          "self": "https://example.atlassian.net/rest/api/2/issuetype/10001",
+          "id": "10001",
+          "description": "Functionality expressed as a user goal.",
+          "iconUrl": "https://example.atlassian.net/images/icons/issuetypes/story.svg",
+          "name": "Story",
+          "subtask": false,
+          "avatarId": 10315,
+          "entityId": "00000000-0000-4000-8000-000000000001",
+          "hierarchyLevel": 0
+        },
+        "priority": null,
+        "assignee": null,
+        "labels": [],
+        "parent": null,
+        "created": "2026-10-02T11:00:00.000+0000",
+        "updated": "2026-10-02T11:00:00.000+0000"
+      }
+    },
+    {
+      "expand": "operations,versionedRepresentations,editmeta,changelog,renderedFields",
+      "id": "100103",
+      "self": "https://example.atlassian.net/rest/api/2/issue/100103",
+      "key": "HEDY-103",
+      "fields": {
+        "summary": "Review the search pagination & the \"max\" cap",
+        "status": {
+          "self": "https://example.atlassian.net/rest/api/2/status/10001",
+          "description": "",
+          "iconUrl": "https://example.atlassian.net/",
+          "name": "Done",
+          "id": "10001",
+          "statusCategory": {
+            "self": "https://example.atlassian.net/rest/api/2/statuscategory/3",
+            "id": 3,
+            "key": "done",
+            "colorName": "green",
+            "name": "Done"
+          }
+        },
+        "issuetype": {
+          "self": "https://example.atlassian.net/rest/api/2/issuetype/10004",
+          "id": "10004",
+          "description": "A problem or error.",
+          "iconUrl": "https://example.atlassian.net/images/icons/issuetypes/bug.svg",
+          "name": "Bug",
+          "subtask": false,
+          "avatarId": 10303,
+          "entityId": "00000000-0000-4000-8000-000000000004",
+          "hierarchyLevel": 0
+        },
+        "priority": {
+          "self": "https://example.atlassian.net/rest/api/2/priority/2",
+          "iconUrl": "https://example.atlassian.net/images/icons/priorities/high.svg",
+          "name": "High",
+          "id": "2"
+        },
+        "assignee": null,
+        "labels": ["review"],
+        "parent": {
+          "id": "100100",
+          "key": "HEDY-100",
+          "self": "https://example.atlassian.net/rest/api/2/issue/100100",
+          "fields": {
+            "summary": "Port the Atlassian reads",
+            "status": {
+              "self": "https://example.atlassian.net/rest/api/2/status/3",
+              "description": "Work has started.",
+              "iconUrl": "https://example.atlassian.net/images/icons/statuses/inprogress.png",
+              "name": "In Progress",
+              "id": "3",
+              "statusCategory": {
+                "self": "https://example.atlassian.net/rest/api/2/statuscategory/4",
+                "id": 4,
+                "key": "indeterminate",
+                "colorName": "yellow",
+                "name": "In Progress"
+              }
+            },
+            "priority": {
+              "self": "https://example.atlassian.net/rest/api/2/priority/3",
+              "iconUrl": "https://example.atlassian.net/images/icons/priorities/medium.svg",
+              "name": "Medium",
+              "id": "3"
+            },
+            "issuetype": {
+              "self": "https://example.atlassian.net/rest/api/2/issuetype/10000",
+              "id": "10000",
+              "description": "A collection of related work.",
+              "iconUrl": "https://example.atlassian.net/images/icons/issuetypes/epic.svg",
+              "name": "Epic",
+              "subtask": false,
+              "avatarId": 10307,
+              "entityId": "00000000-0000-4000-8000-000000000000",
+              "hierarchyLevel": 1
+            }
+          }
+        },
+        "created": "2026-10-03T08:05:12.000+0000",
+        "updated": "2026-10-07T13:20:45.000+0000"
+      }
+    }
+  ],
+  "isLast": true
+}

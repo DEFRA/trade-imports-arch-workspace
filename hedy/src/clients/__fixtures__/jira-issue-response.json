@@ -1,0 +1,95 @@
+{
+  "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+  "id": "100101",
+  "self": "https://example.atlassian.net/rest/api/2/issue/100101",
+  "key": "HEDY-101",
+  "fields": {
+    "summary": "Capture the read projections as fixtures",
+    "status": {
+      "self": "https://example.atlassian.net/rest/api/2/status/3",
+      "description": "Work has started.",
+      "iconUrl": "https://example.atlassian.net/images/icons/statuses/inprogress.png",
+      "name": "In Progress",
+      "id": "3",
+      "statusCategory": {
+        "self": "https://example.atlassian.net/rest/api/2/statuscategory/4",
+        "id": 4,
+        "key": "indeterminate",
+        "colorName": "yellow",
+        "name": "In Progress"
+      }
+    },
+    "issuetype": {
+      "self": "https://example.atlassian.net/rest/api/2/issuetype/10002",
+      "id": "10002",
+      "description": "A small, distinct piece of work.",
+      "iconUrl": "https://example.atlassian.net/images/icons/issuetypes/task.svg",
+      "name": "Task",
+      "subtask": false,
+      "avatarId": 10318,
+      "entityId": "00000000-0000-4000-8000-000000000002",
+      "hierarchyLevel": 0
+    },
+    "priority": {
+      "self": "https://example.atlassian.net/rest/api/2/priority/3",
+      "iconUrl": "https://example.atlassian.net/images/icons/priorities/medium.svg",
+      "name": "Medium",
+      "id": "3"
+    },
+    "assignee": {
+      "self": "https://example.atlassian.net/rest/api/2/user?accountId=000000:00000000-0000-4000-8000-000000000001",
+      "accountId": "000000:00000000-0000-4000-8000-000000000001",
+      "avatarUrls": {
+        "48x48": "https://example.atlassian.net/avatar/48",
+        "24x24": "https://example.atlassian.net/avatar/24"
+      },
+      "displayName": "Ada Lovelace",
+      "active": true,
+      "timeZone": "Europe/London",
+      "accountType": "atlassian"
+    },
+    "labels": ["fixtures", "hedy"],
+    "parent": {
+      "id": "100100",
+      "key": "HEDY-100",
+      "self": "https://example.atlassian.net/rest/api/2/issue/100100",
+      "fields": {
+        "summary": "Port the Atlassian reads",
+        "status": {
+          "self": "https://example.atlassian.net/rest/api/2/status/3",
+          "description": "Work has started.",
+          "iconUrl": "https://example.atlassian.net/images/icons/statuses/inprogress.png",
+          "name": "In Progress",
+          "id": "3",
+          "statusCategory": {
+            "self": "https://example.atlassian.net/rest/api/2/statuscategory/4",
+            "id": 4,
+            "key": "indeterminate",
+            "colorName": "yellow",
+            "name": "In Progress"
+          }
+        },
+        "priority": {
+          "self": "https://example.atlassian.net/rest/api/2/priority/3",
+          "iconUrl": "https://example.atlassian.net/images/icons/priorities/medium.svg",
+          "name": "Medium",
+          "id": "3"
+        },
+        "issuetype": {
+          "self": "https://example.atlassian.net/rest/api/2/issuetype/10000",
+          "id": "10000",
+          "description": "A collection of related work.",
+          "iconUrl": "https://example.atlassian.net/images/icons/issuetypes/epic.svg",
+          "name": "Epic",
+          "subtask": false,
+          "avatarId": 10307,
+          "entityId": "00000000-0000-4000-8000-000000000000",
+          "hierarchyLevel": 1
+        }
+      }
+    },
+    "created": "2026-10-01T09:15:30.000+0000",
+    "updated": "2026-10-05T16:42:08.000+0000",
+    "description": "h3. Context\n\nThe read commands need fixtures captured from the bash tools before the tools go.\n\n* Capture the {{fetch.sh}} projection\n* Capture the {{page.sh}} markdown\n\nh3. Acceptance criteria\n\n# A hedy test projects each input and gives the tool's output byte for byte.\n# No real ticket or page content is committed.\n\n||Field||Value||\n|timeout|30 s|\n|retries|0|"
+  }
+}
