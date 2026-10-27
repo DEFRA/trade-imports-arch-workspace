@@ -5,7 +5,7 @@ export const SCHEMA_VERSION = 1
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 
 /**
- * The version field of cli/package.json.
+ * The version field of hedy/package.json.
  */
 export const hedyVersion = () => version
 

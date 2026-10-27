@@ -1,15 +1,15 @@
 ---
 paths:
-  - "cli/src/**"
+  - "hedy/src/**"
 ---
 
 # `hedy` Source Rules
 
-These rules apply to every file under `cli/src/`, tests included. A breach is a defect to fix in the same change. "Pre-existing" and "a nearby file does it" are not reasons to keep one.
+These rules apply to every file under `hedy/src/`, tests included. A breach is a defect to fix in the same change. "Pre-existing" and "a nearby file does it" are not reasons to keep one.
 
 ## Commands and Output
 
-- One command per file under `cli/src/commands/`, exporting `register(program)`.
+- One command per file under `hedy/src/commands/`, exporting `register(program)`.
 - zod validates every option before any side effect. No network call, file write or child process runs before validation passes.
 - Every command's output goes through `run-action.js`. No command writes to stdout, builds an envelope or chooses an exit code itself.
 - stdout carries output only. Notes, progress and warnings go to stderr.
@@ -23,13 +23,13 @@ These rules apply to every file under `cli/src/`, tests included. A breach is a 
 - Named exports only.
 - Use Node 24 built-ins before a package: the global `fetch`, `node:child_process`, `node:fs/promises`, `node:crypto`.
 - Runtime code shells out through `node:child_process`. `execa` is a dev dependency for tests only.
-- Add no dependency, runtime or dev, without a line in `cli/DECISIONS.md` giving the reason.
+- Add no dependency, runtime or dev, without a line in `hedy/DECISIONS.md` giving the reason.
 
 ## Comments
 
 - Write code that needs no comment. If a name or an extracted function can say it, rename or extract instead.
 - A comment describes only the lines directly below the comment. The comment never describes callers, other modules, a library or a test, and gives no counts.
-- Rationale goes in `cli/DECISIONS.md`, never in code.
+- Rationale goes in `hedy/DECISIONS.md`, never in code.
 - A comment that explains a name means the name is wrong. Rename, then delete the comment in the same change.
 - Delete a stale comment. Do not reword a stale comment.
 - A marker that a tool reads, such as an `eslint-disable` line, is not a comment to delete.

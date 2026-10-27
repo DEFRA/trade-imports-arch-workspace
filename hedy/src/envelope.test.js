@@ -6,7 +6,7 @@ import { HedyError } from './errors.js'
 const packageVersion = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version
 
 describe('hedyVersion', () => {
-  it('returns the version in cli/package.json', () => {
+  it('returns the version in hedy/package.json', () => {
     expect(hedyVersion()).toBe(packageVersion)
   })
 })

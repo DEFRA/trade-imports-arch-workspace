@@ -14,11 +14,11 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Runtime dependencies.** commander parses the command line and zod validates options, and nothing else ships at runtime. Everything else uses Node built-ins. `execa` is a dev dependency for tests, and runtime code shells out through `node:child_process`.
 
-**Pins and lockfile.** Every dependency is pinned exactly, and `cli/.npmrc` follows the DEFRA standard with `save-exact`, `ignore-scripts` and `min-release-age`. The lockfile is committed, as the standard requires.
+**Pins and lockfile.** Every dependency is pinned exactly, and `hedy/.npmrc` follows the DEFRA standard with `save-exact`, `ignore-scripts` and `min-release-age`. The lockfile is committed, as the standard requires.
 
 ## Location and Install
 
-**Folder.** The CLI lives at `cli/` in the workspace root, not under `.claude/`, and has no nested `.claude/` folder. The edit guard blocks agent writes to any `.claude/hooks/` folder and any `.claude/settings.json`, and a session started inside `cli/` would lose the workspace skills. The rails are therefore root-scoped: `cli/CLAUDE.md`, the CLI rule files in `.claude/rules/`, and hooks in `.claude/hooks/`.
+**Folder.** The CLI lives at `hedy/` in the workspace root, not under `.claude/`, and has no nested `.claude/` folder. The edit guard blocks agent writes to any `.claude/hooks/` folder and any `.claude/settings.json`, and a session started inside `hedy/` would lose the workspace skills. The rails are therefore root-scoped: `hedy/CLAUDE.md`, the CLI rule files in `.claude/rules/`, and hooks in `.claude/hooks/`.
 
 **Install.** `make link` runs `npm link` from the checkout's real path, because the Bash guard denies `npm --prefix` across the canonical symlink. Agents type the bare name `hedy` under the `Bash(hedy:*)` allowlist entry.
 
@@ -68,7 +68,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Coverage.** `npm test` runs with coverage at 80% on lines, functions, branches and statements, and only the entry file is excluded. Local runs, the pre-commit hook and CI therefore enforce the same gate. `tim` sets the threshold but its CI never runs coverage.
 
-**Hooks.** Hooks scoped to `cli/` refuse a new source file without a sibling test and a spy assertion without an override comment. Lint and tests run in the pre-commit hook. A guard against unrequested `npm install` is left out until an unattended run adds a package nobody asked for.
+**Hooks.** Hooks scoped to `hedy/` refuse a new source file without a sibling test and a spy assertion without an override comment. Lint and tests run in the pre-commit hook. A guard against unrequested `npm install` is left out until an unattended run adds a package nobody asked for.
 
 ## Porting the Bash Tools
 
@@ -84,6 +84,6 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Claude Code only and other agents.** `AGENTS.md` says colleagues use Cursor, Codex and other tools. The CLI works for them through `--json`, but the rails and hooks act only in Claude Code.
 
-**Lockfile.** The root `.gitignore` ignores `package-lock.json` at any depth, and DEFRA's standard requires the lockfile committed. A negation line keeps `cli/package-lock.json` tracked. Any other lockfile added under the root is still ignored.
+**Lockfile.** The root `.gitignore` ignores `package-lock.json` at any depth, and DEFRA's standard requires the lockfile committed. A negation line keeps `hedy/package-lock.json` tracked. Any other lockfile added under the root is still ignored.
 
 **Research outside the repository.** The research behind these decisions sits in a gitignored analysis folder. This file is the only committed record, so it changes in the same commit as the decision.

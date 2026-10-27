@@ -1,8 +1,8 @@
 #!/bin/bash
-# PreToolUse guard for Write: a new source file under cli/src/ needs its
+# PreToolUse guard for Write: a new source file under hedy/src/ needs its
 # sibling *.test.js to exist first. Rewrites of existing files, test files,
 # test-support/ and __fixtures__/ pass. The rule lives in
-# .claude/rules/cli-tests.md.
+# .claude/rules/hedy-tests.md.
 #
 # stdin: PreToolUse hook JSON. Deny via hookSpecificOutput JSON, exit 0.
 # A clean call prints nothing.
@@ -44,7 +44,7 @@ dir=$(dirname "$abs"); base=$(basename "$abs")
 rdir=$(realpath "$dir" 2>/dev/null) && abs="$rdir/$base"
 
 case "$abs" in
-  */cli/src/*.js) ;;
+  */hedy/src/*.js) ;;
   *) exit 0 ;;
 esac
 
@@ -57,4 +57,4 @@ esac
 sibling="${abs%.js}.test.js"
 [ -e "$sibling" ] && exit 0
 
-deny "Blocked: $base is a new source file under cli/src/ and has no sibling test. Write $sibling first, with the behavioural test the new file must pass, then write $base. Files exempt from this rule: *.test.js files, anything under test-support/ or __fixtures__/, and rewrites of files that already exist. Rule: .claude/rules/cli-tests.md."
+deny "Blocked: $base is a new source file under hedy/src/ and has no sibling test. Write $sibling first, with the behavioural test the new file must pass, then write $base. Files exempt from this rule: *.test.js files, anything under test-support/ or __fixtures__/, and rewrites of files that already exist. Rule: .claude/rules/hedy-tests.md."

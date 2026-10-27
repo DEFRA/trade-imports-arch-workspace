@@ -1,7 +1,7 @@
 #!/bin/bash
 # PreToolUse guard for Edit and Write: no spy assertions in test files under
-# cli/. A block that holds `// allow-spy-assertion: <why>` passes. The rule
-# lives in .claude/rules/cli-tests.md.
+# hedy/. A block that holds `// allow-spy-assertion: <why>` passes. The rule
+# lives in .claude/rules/hedy-tests.md.
 #
 # stdin: PreToolUse hook JSON. Deny via hookSpecificOutput JSON, exit 0.
 # A clean call prints nothing.
@@ -37,7 +37,7 @@ case "$abs" in
 esac
 
 case "$abs" in
-  */cli/*.test.js) ;;
+  */hedy/*.test.js) ;;
   *) exit 0 ;;
 esac
 
@@ -51,4 +51,4 @@ VERDICT=$(printf '%s' "$INPUT" | jq -r '
 
 [ "$VERDICT" = "deny" ] || exit 0
 
-deny "Blocked: $(basename "$abs") holds a spy assertion (toHaveBeenCalled, toHaveBeenCalledWith or toHaveBeenCalledTimes). Assert behaviour instead: call the function and assert its return value or thrown error; spawn the CLI through cli/src/test-support/cli.js and assert the parsed envelope and exit code; or capture the request at the nock boundary and assert on its payload. Only when the call is itself the external side effect, put '// allow-spy-assertion: <why>' in the block and assert on the captured payload, not the spy record. Rule: .claude/rules/cli-tests.md."
+deny "Blocked: $(basename "$abs") holds a spy assertion (toHaveBeenCalled, toHaveBeenCalledWith or toHaveBeenCalledTimes). Assert behaviour instead: call the function and assert its return value or thrown error; spawn the CLI through hedy/src/test-support/cli.js and assert the parsed envelope and exit code; or capture the request at the nock boundary and assert on its payload. Only when the call is itself the external side effect, put '// allow-spy-assertion: <why>' in the block and assert on the captured payload, not the spy record. Rule: .claude/rules/hedy-tests.md."

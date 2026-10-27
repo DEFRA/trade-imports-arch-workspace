@@ -4,9 +4,9 @@
 
 ## Rule Files
 
-- `.claude/rules/cli-code.md` holds the source rules and loads for files under `cli/src/`.
-- `.claude/rules/cli-tests.md` holds the test rules and loads for `*.test.js` files under `cli/`.
-- `cli/DECISIONS.md` records each design decision and its reason.
+- `.claude/rules/hedy-code.md` holds the source rules and loads for files under `hedy/src/`.
+- `.claude/rules/hedy-tests.md` holds the test rules and loads for `*.test.js` files under `hedy/`.
+- `hedy/DECISIONS.md` records each design decision and its reason.
 
 ## Integrations
 
@@ -23,7 +23,7 @@
 
 ## Source Layout
 
-All paths are under `cli/src/`.
+All paths are under `hedy/src/`.
 
 - `cli.js` is the bin entry. It only parses `process.argv`.
 - `program.js` exports `buildProgram()`, which sets the global options `--json` and `--workspace`, sets `exitOverride()`, and routes commander's own errors through the exit map in one catch.
@@ -41,8 +41,8 @@ All paths are under `cli/src/`.
 Run npm as `command npm`, which skips any shell function named `npm`, against the checkout's real path. The Bash guard denies `npm --prefix` across the canonical symlink.
 
 ```
-command npm --prefix <real checkout path>/cli test
-command npm --prefix <real checkout path>/cli run lint
+command npm --prefix <real checkout path>/hedy test
+command npm --prefix <real checkout path>/hedy run lint
 ```
 
 ## User-Facing Text
