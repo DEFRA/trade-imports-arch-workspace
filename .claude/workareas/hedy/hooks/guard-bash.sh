@@ -386,7 +386,7 @@ check_config_command() {
 # 10 on one segment. $1 is the segment as typed. Parentheses and braces become
 # spaces, so a subshell or a group is read like a plain command.
 check_git_segment() {
-  local w i=0 n
+  local IFS=' ' w i=0 n
   local -a W
   W=()
   while IFS= read -r w; do
