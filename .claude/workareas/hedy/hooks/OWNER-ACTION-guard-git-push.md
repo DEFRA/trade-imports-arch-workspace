@@ -52,12 +52,27 @@ The draft also denies `git config` when it writes an alias that pushes or a `rem
 
 Every denial names the allowed form: `git push -u origin <branch>`, with the branch written out, then a pull request.
 
+## Choice Between Two Drafts
+
+Two drafts implement the same rule, and the owner copies one of them.
+
+- `guard-git-push.sh`, 303 lines, is the full scanner. It splits the command the way the shell does, rescans a quoted command such as `sh -c "..."`, and denies a `-c` alias that pushes, a variable in the subcommand or a refspec, and a `git config` write that could redirect a later push.
+- `guard-git-push-minimal.sh`, 77 lines, strips quotes, splits at `;`, `&`, `|` and newlines, skips `VAR=value` words and git's global options, and applies the force, main and no-destination rules to each simple command. It leaves three routes open: a push wrapped in `sh -c`, `eval` or a command substitution, a git alias that pushes, and a variable holding `main`.
+
+Both share one cost: an agent must always write the destination branch out. The minimal draft was tested against the payloads in the verification section on 27 Oct 2026 with the same decisions as the full draft, apart from the three open routes.
+
 ## Steps
 
-1. Copy the draft over the live hook:
+1. Copy the chosen draft over the live hook:
 
    ```
    cp ~/trade-imports-arch-workspace/.claude/workareas/hedy/hooks/guard-git-push.sh ~/trade-imports-arch-workspace/.claude/hooks/guard-git-push.sh
+   ```
+
+   or
+
+   ```
+   cp ~/trade-imports-arch-workspace/.claude/workareas/hedy/hooks/guard-git-push-minimal.sh ~/trade-imports-arch-workspace/.claude/hooks/guard-git-push.sh
    ```
 
 2. Run the verification below against the live path.
