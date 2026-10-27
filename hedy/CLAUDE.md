@@ -41,7 +41,7 @@ All paths are under `hedy/src/`.
 - `run-action.js` writes a command's result: one JSON line on stdout with `--json`, text otherwise, notes on stderr, and the exit code from the map. An `AggregateError` reports several errors at once, one envelope entry or stderr line per error, with the lowest exit code among them.
 - `workspace-root.js` resolves the workspace from `--workspace`, then `HEDY_WORKSPACE`, then `~/trade-imports-arch-workspace`. It never walks up from the current folder.
 - `test-support/cli.js` spawns the entry and returns stdout, stderr, the exit code and the parsed envelope.
-- `test-support/http.js` sets up nock for a test file: real connections are refused, and interceptors are removed after each test. It also holds the test credentials, the credentials environment, the Basic header builder, the failure table the client tests share, and a loopback server that never answers for timeout tests.
+- `test-support/http.js` sets up nock for a test file: real connections are refused, and interceptors are removed after each test. It also holds the test credentials, the credentials environment, the Basic header builder, the failure table the client tests share, a reader for JSON fixtures, and a loopback server that never answers for timeout tests.
 - `test-support/io.js` captures what a command or `runAction` writes to stdout and stderr and the exit codes it sets.
 - `__fixtures__/` folders beside the tests hold captured data.
 

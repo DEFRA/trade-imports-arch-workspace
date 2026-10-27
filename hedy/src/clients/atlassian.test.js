@@ -64,8 +64,68 @@ describe('credentialsFromEnv', () => {
 
 const PROBE = '/rest/probe'
 
-const probe = (baseUrl = ATLASSIAN_BASE_URL, options = {}) =>
-  createAtlassianHttp({ service: 'Jira', user: TEST_CREDENTIALS.user, token: TEST_CREDENTIALS.token, baseUrl, ...options }).get(PROBE, 'probe')
+const httpFor = (baseUrl = ATLASSIAN_BASE_URL, options = {}) =>
+  createAtlassianHttp({ service: 'Jira', user: TEST_CREDENTIALS.user, token: TEST_CREDENTIALS.token, baseUrl, ...options })
+
+const probe = (baseUrl = ATLASSIAN_BASE_URL, options = {}) => httpFor(baseUrl, options).get(PROBE, 'probe')
+
+describe('createAtlassianHttp normalisedBaseUrl', () => {
+  it.each(['', '/', '///'])('holds the base URL without the trailing %j', (slashes) => {
+    expect(httpFor(`${ATLASSIAN_BASE_URL}${slashes}`).normalisedBaseUrl).toBe(ATLASSIAN_BASE_URL)
+  })
+})
+
+const SHARE_LINK = '/wiki/x/AQAB'
+
+const redirectOf = (baseUrl = ATLASSIAN_BASE_URL) => httpFor(baseUrl).redirectTarget(SHARE_LINK, 'probe')
+
+describe('createAtlassianHttp redirectTarget', () => {
+  it.each([
+    ['an absolute', 302, `${ATLASSIAN_BASE_URL}/wiki/spaces/DOCS/pages/123/Title`],
+    ['a relative', 301, '/wiki/spaces/DOCS/pages/123/Title']
+  ])('resolves to %s Location header as given, without following it, sending the Basic header', async (_label, status, location) => {
+    nock(ATLASSIAN_BASE_URL)
+      .matchHeader('authorization', TEST_AUTHORIZATION)
+      .get(SHARE_LINK)
+      .reply(status, '', { Location: location })
+    expect(await redirectOf()).toBe(location)
+  })
+
+  it('drops a trailing slash from the base URL before adding the path', async () => {
+    nock(ATLASSIAN_BASE_URL).get(SHARE_LINK).reply(302, '', { Location: '/wiki/spaces/DOCS/pages/123' })
+    expect(await redirectOf(`${ATLASSIAN_BASE_URL}/`)).toBe('/wiki/spaces/DOCS/pages/123')
+  })
+
+  it.each([
+    ['a 200 answer', (interceptor) => interceptor.reply(200, { id: '123' })],
+    ['a 302 answer without a Location header', (interceptor) => interceptor.reply(302, '')]
+  ])('rejects %s with USAGE saying the address did not redirect to a page', async (_label, reply) => {
+    reply(nock(ATLASSIAN_BASE_URL).get(SHARE_LINK))
+    const error = await rejectionOf(redirectOf())
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'USAGE',
+      message: 'probe: Jira did not redirect the address to a page. Check that the address is a share link to a page, then run the command again.'
+    })
+  })
+
+  it.each([
+    [404, 'NOT_FOUND'],
+    [401, 'AUTH'],
+    [500, 'NETWORK']
+  ])('maps status %i to %s through the status map', async (status, code) => {
+    nock(ATLASSIAN_BASE_URL).get(SHARE_LINK).reply(status, { message: `echo ${TEST_CREDENTIALS.token}` })
+    const error = await rejectionOf(redirectOf())
+    expect(error).toMatchObject({ name: 'HedyError', code, message: expect.stringMatching(/^probe: Jira /) })
+    expect(printedError(error)).not.toContain(TEST_CREDENTIALS.token)
+  })
+
+  it('maps a refused connection to NETWORK', async () => {
+    nock(ATLASSIAN_BASE_URL).get(SHARE_LINK).replyWithError('connect ECONNREFUSED')
+    const error = await rejectionOf(redirectOf())
+    expect(error).toMatchObject({ name: 'HedyError', code: 'NETWORK', message: expect.stringMatching(/^probe: Jira could not be reached\. /) })
+  })
+})
 
 describe('createAtlassianHttp get', () => {
   it('resolves to the parsed body, sending the Basic header for user and token and asking for JSON', async () => {

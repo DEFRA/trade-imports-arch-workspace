@@ -77,37 +77,57 @@ const statusError = (context, { status, text }) => {
   }
 }
 
-const fetchText = async (url, { headers, timeoutMs }, context) => {
+const fetchAnswer = async (url, { timeoutMs, ...init }, context) => {
   try {
-    const response = await fetch(url, { headers, signal: AbortSignal.timeout(timeoutMs) })
-    return { status: response.status, text: await response.text() }
+    const response = await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) })
+    return { status: response.status, location: response.headers.get('location'), text: await response.text() }
   } catch (error) {
     throw fetchFailureError(context, timeoutMs, error)
   }
 }
 
+const noRedirectError = ({ service, action }) => new HedyError(
+  'USAGE',
+  `${action}: ${service} did not redirect the address to a page. Check that the address is a share link to a page, then run the command again.`
+)
+
 /**
- * Returns get(path, action), which resolves to the parsed JSON body of a
- * GET on baseUrl + path. A request with no full answer within timeoutMs
- * fails. Every failure is a HedyError whose message starts with the action
- * and names the service.
+ * Returns the base URL without trailing slashes as normalisedBaseUrl, and
+ * two requests on normalisedBaseUrl + path. get(path, action) resolves to
+ * the parsed JSON body of a GET. redirectTarget(path, action) sends a GET
+ * that does not follow redirects and resolves to the Location header of a
+ * 3xx answer; any other answer below 400 rejects with USAGE. A request with
+ * no full answer within timeoutMs fails. Every failure is a HedyError whose
+ * message starts with the action and names the service.
  *
  * @param {{ service: string, user: string, token: string, baseUrl: string, timeoutMs?: number }} options
  *   service is the product name used in messages; timeoutMs defaults to 30000
- * @returns {{ get: (path: string, action: string) => Promise<unknown> }}
+ * @returns {{
+ *   normalisedBaseUrl: string,
+ *   get: (path: string, action: string) => Promise<unknown>,
+ *   redirectTarget: (path: string, action: string) => Promise<string>
+ * }}
  */
 export const createAtlassianHttp = ({ service, user, token, baseUrl, timeoutMs = 30000 }) => {
-  const root = baseUrl.replace(/\/+$/, '')
+  const normalisedBaseUrl = baseUrl.replace(/\/+$/, '')
   const request = {
     headers: { Authorization: basicAuthorization(user, token), Accept: 'application/json' },
     timeoutMs
   }
   return {
+    normalisedBaseUrl,
     get: async (path, action) => {
       const context = { service, action }
-      const response = await fetchText(`${root}${path}`, request, context)
+      const response = await fetchAnswer(`${normalisedBaseUrl}${path}`, request, context)
       if (response.status >= 400) throw statusError(context, response)
       return parsedBody(response.text, context)
+    },
+    redirectTarget: async (path, action) => {
+      const context = { service, action }
+      const response = await fetchAnswer(`${normalisedBaseUrl}${path}`, { ...request, redirect: 'manual' }, context)
+      if (response.status >= 400) throw statusError(context, response)
+      if (response.status < 300 || !response.location) throw noRedirectError(context)
+      return response.location
     }
   }
 }

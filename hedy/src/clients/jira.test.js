@@ -7,12 +7,17 @@ import {
   TEST_CREDENTIALS,
   interceptNetworkPerTest,
   printedError,
+  readJsonFixture,
   rejectionOf,
   startSilentServer
 } from '../test-support/http.js'
 import { createJiraClient } from './jira.js'
 
 interceptNetworkPerTest()
+
+const issueResponse = await readJsonFixture(new URL('./__fixtures__/jira-issue-response.json', import.meta.url))
+const searchProjection = await readJsonFixture(new URL('./__fixtures__/jira-search-projection.json', import.meta.url))
+const searchResponse = await readJsonFixture(new URL('./__fixtures__/jira-search-response.json', import.meta.url))
 
 const MYSELF = '/rest/api/2/myself'
 
@@ -50,5 +55,133 @@ describe('the Jira client whoami', () => {
     for (const fragment of fragments) expect(error.message).toContain(fragment)
     expect(printedError(error)).not.toContain(TEST_CREDENTIALS.token)
     expect(printedError(error)).not.toContain(TEST_CREDENTIALS.user)
+  })
+})
+
+const SEARCH = '/rest/api/2/search/jql'
+const SEARCH_FIELDS = 'summary,status,issuetype,priority,assignee,labels,parent,created,updated'
+const JQL = 'project = HEDY ORDER BY key'
+
+const searchQuery = (maxResults, nextPageToken) => ({
+  jql: JQL,
+  fields: SEARCH_FIELDS,
+  maxResults: String(maxResults),
+  ...(nextPageToken ? { nextPageToken } : {})
+})
+
+const stageSearchPage = (query, body) => nock(ATLASSIAN_BASE_URL).get(SEARCH).query(query).reply(200, body)
+
+describe('the Jira client issue', () => {
+  it('returns the search projection plus the description from /rest/api/2/issue/<key>, asking for those fields with the Basic header', async () => {
+    nock(ATLASSIAN_BASE_URL)
+      .matchHeader('authorization', TEST_AUTHORIZATION)
+      .get('/rest/api/2/issue/HEDY-101')
+      .query({ fields: `${SEARCH_FIELDS},description` })
+      .reply(200, issueResponse)
+    const issue = await createJiraClient(TEST_CREDENTIALS).issue('HEDY-101')
+    expect(issue).toEqual({ ...searchProjection[0], description: issueResponse.fields.description })
+    expect(Object.keys(issue)).toEqual([...Object.keys(searchProjection[0]), 'description'])
+  })
+
+  it('gives a null description, empty labels and null for every other absent field', async () => {
+    nock(ATLASSIAN_BASE_URL).get('/rest/api/2/issue/HEDY-102').query(true).reply(200, { key: 'HEDY-102', fields: {} })
+    expect(await createJiraClient(TEST_CREDENTIALS).issue('HEDY-102')).toEqual({
+      key: 'HEDY-102',
+      url: `${ATLASSIAN_BASE_URL}/browse/HEDY-102`,
+      summary: null,
+      status: null,
+      type: null,
+      priority: null,
+      assignee: null,
+      labels: [],
+      parent: null,
+      created: null,
+      updated: null,
+      description: null
+    })
+  })
+
+  it('builds the url without a double slash when the base URL ends in a slash', async () => {
+    nock(ATLASSIAN_BASE_URL).get('/rest/api/2/issue/HEDY-101').query(true).reply(200, issueResponse)
+    const client = createJiraClient({ ...TEST_CREDENTIALS, baseUrl: `${ATLASSIAN_BASE_URL}/` })
+    expect((await client.issue('HEDY-101')).url).toBe(`${ATLASSIAN_BASE_URL}/browse/HEDY-101`)
+  })
+
+  it('encodes the key into the path', async () => {
+    nock(ATLASSIAN_BASE_URL).get('/rest/api/2/issue/HEDY%2F1%3F').query(true).reply(200, issueResponse)
+    expect((await createJiraClient(TEST_CREDENTIALS).issue('HEDY/1?')).key).toBe('HEDY-101')
+  })
+
+  it('rejects a 404 with NOT_FOUND, naming the key in the action', async () => {
+    nock(ATLASSIAN_BASE_URL).get('/rest/api/2/issue/HEDY-404').query(true).reply(404, { errorMessages: ['Issue does not exist.'] })
+    const error = await rejectionOf(createJiraClient(TEST_CREDENTIALS).issue('HEDY-404'))
+    expect(error).toMatchObject({ name: 'HedyError', code: 'NOT_FOUND', message: expect.stringMatching(/^issue HEDY-404: Jira found nothing/) })
+  })
+})
+
+describe('the Jira client search', () => {
+  it('returns { issues } equal to the projection fetch.sh printed for the same page, sending the Basic header', async () => {
+    nock(ATLASSIAN_BASE_URL)
+      .matchHeader('authorization', TEST_AUTHORIZATION)
+      .get(SEARCH)
+      .query(searchQuery(100))
+      .reply(200, searchResponse)
+    const result = await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 200 })
+    expect(result).toEqual({ issues: searchProjection })
+    expect(result.issues.map(Object.keys)).toEqual(searchProjection.map(Object.keys))
+  })
+
+  it.each([
+    [200, 100],
+    [5, 5]
+  ])('for max %i asks for maxResults %i on the first page', async (max, maxResults) => {
+    stageSearchPage(searchQuery(maxResults), searchResponse)
+    expect((await createJiraClient(TEST_CREDENTIALS).search(JQL, { max })).issues).toHaveLength(3)
+  })
+
+  it('joins two pages, sending the first page\'s nextPageToken on the second request', async () => {
+    stageSearchPage(searchQuery(100), { issues: searchResponse.issues.slice(0, 1), nextPageToken: 'page-2' })
+    stageSearchPage(searchQuery(99, 'page-2'), { issues: searchResponse.issues.slice(1) })
+    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 100 })).toEqual({ issues: searchProjection })
+  })
+
+  it('stops after a page without a nextPageToken', async () => {
+    stageSearchPage(searchQuery(100), { issues: searchResponse.issues.slice(0, 1), isLast: true })
+    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 200 })).toEqual({ issues: searchProjection.slice(0, 1) })
+  })
+
+  it('stops after a page without issues even when the page has a nextPageToken', async () => {
+    stageSearchPage(searchQuery(100), { issues: [], nextPageToken: 'page-2' })
+    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 200 })).toEqual({ issues: [] })
+  })
+
+  it('stops at max, returning max issues and sending no second request', async () => {
+    stageSearchPage(searchQuery(2), { ...searchResponse, nextPageToken: 'page-2' })
+    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 2 })).toEqual({ issues: searchProjection.slice(0, 2) })
+  })
+
+  it('asks a later page for only the issues still wanted: maxResults 50 after 100 issues for max 150', async () => {
+    const fullPage = Array.from({ length: 100 }, (_, index) => ({ ...searchResponse.issues[1], key: `HEDY-${1000 + index}` }))
+    stageSearchPage(searchQuery(100), { issues: fullPage, nextPageToken: 'page-2' })
+    stageSearchPage(searchQuery(50, 'page-2'), searchResponse)
+    const { issues } = await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 150 })
+    expect(issues).toHaveLength(103)
+    expect(issues.slice(100)).toEqual(searchProjection)
+  })
+
+  it('builds each url without a double slash when the base URL ends in a slash', async () => {
+    stageSearchPage(searchQuery(100), searchResponse)
+    const client = createJiraClient({ ...TEST_CREDENTIALS, baseUrl: `${ATLASSIAN_BASE_URL}/` })
+    expect((await client.search(JQL, { max: 200 })).issues.map(({ url }) => url)).toEqual(searchProjection.map(({ url }) => url))
+  })
+
+  it('rejects a 400 with USAGE carrying Jira\'s message', async () => {
+    nock(ATLASSIAN_BASE_URL).get(SEARCH).query(true).reply(400, { errorMessages: ['Error in the JQL Query: the field nope does not exist.'] })
+    const error = await rejectionOf(createJiraClient(TEST_CREDENTIALS).search('nope = 1', { max: 10 }))
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'USAGE',
+      message: 'search: Jira refused the request. Jira said "Error in the JQL Query: the field nope does not exist.". Correct the request, then run the command again.'
+    })
   })
 })

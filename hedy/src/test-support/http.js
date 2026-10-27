@@ -1,4 +1,5 @@
 import { once } from 'node:events'
+import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { inspect } from 'node:util'
 import nock from 'nock'
@@ -86,6 +87,12 @@ export const interceptNetworkPerTest = () => {
     expect(unused).toEqual([])
   })
 }
+
+/**
+ * Resolves to the parsed JSON file at url, such as a captured response
+ * under a __fixtures__ folder.
+ */
+export const readJsonFixture = async (url) => JSON.parse(await readFile(url, 'utf8'))
 
 /**
  * Resolves to the error the promise rejects with; throws when it resolves.
