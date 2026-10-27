@@ -1,23 +1,21 @@
-import { join } from 'node:path'
 import { z } from 'zod'
-import { credentialsFromEnv } from '../clients/atlassian.js'
 import { createConfluenceClient } from '../clients/confluence.js'
 import { createJiraClient } from '../clients/jira.js'
-import { fillEnvFromFile } from '../env-file.js'
+import { loadCredentials } from '../credentials.js'
 import { runAction } from '../run-action.js'
 
 const authOptionsSchema = z.object({}).strict()
 
 /**
- * Probes Jira and Confluence together with the credentials in env. Rejects with
- * the AUTH HedyError from credentialsFromEnv before any request, or with an
- * AggregateError holding each failing service's error, Jira first.
+ * Probes Jira and Confluence together with the credentials from loadCredentials.
+ * Rejects with the HedyError from loadCredentials before any request, or with
+ * an AggregateError holding each failing service's error, Jira first.
  *
- * @param {{ env: Record<string, string | undefined> }} options
+ * @param {{ env: Record<string, string | undefined>, workspaceRoot: () => string }} options
  * @returns {Promise<{ jira: { displayName: string | null }, confluence: { displayName: string | null } }>}
  */
-export const runAuth = async ({ env }) => {
-  const credentials = credentialsFromEnv(env)
+export const runAuth = async ({ env, workspaceRoot }) => {
+  const credentials = loadCredentials({ env, workspaceRoot })
   const [jira, confluence] = await Promise.allSettled([
     createJiraClient(credentials).whoami(),
     createConfluenceClient(credentials).whoami()
@@ -39,8 +37,7 @@ export const register = (program, { stdout, stderr, setExitCode, env, workspaceR
     .description('Check the Jira and Confluence credentials, reporting names only')
     .action((options, command) => runAction(() => {
       authOptionsSchema.parse(options)
-      fillEnvFromFile(env, join(workspaceRoot(), '.env'))
-      return runAuth({ env })
+      return runAuth({ env, workspaceRoot })
     }, {
       json: command.optsWithGlobals().json === true,
       render: renderAuth,

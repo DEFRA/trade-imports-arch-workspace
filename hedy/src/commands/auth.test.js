@@ -40,7 +40,7 @@ describe('runAuth', () => {
   it('returns each service display name when both services accept the credentials', async () => {
     stageJira(200, { displayName: 'Ada Lovelace', emailAddress: 'ada@example.com' })
     stageConfluence(200, { displayName: 'Ada L.', accountId: '557058:0a1b' })
-    expect(await runAuth({ env: credentialsEnv() })).toEqual({
+    expect(await runAuth({ env: credentialsEnv(), workspaceRoot: () => root })).toEqual({
       jira: { displayName: 'Ada Lovelace' },
       confluence: { displayName: 'Ada L.' }
     })
@@ -49,7 +49,7 @@ describe('runAuth', () => {
   it('throws an AggregateError holding only the Jira AUTH error when Jira answers 401 and Confluence 200', async () => {
     stageJira(401, {})
     stageConfluence(200, { displayName: 'Ada L.' })
-    const error = await rejectionOf(runAuth({ env: credentialsEnv() }))
+    const error = await rejectionOf(runAuth({ env: credentialsEnv(), workspaceRoot: () => root }))
     expect(error).toBeInstanceOf(AggregateError)
     expect(error.errors).toHaveLength(1)
     expect(error.errors[0].code).toBe('AUTH')
@@ -59,7 +59,7 @@ describe('runAuth', () => {
   it('throws an AggregateError holding both AUTH errors, Jira first, when both services answer 401', async () => {
     stageJira(401, {})
     stageConfluence(401, {})
-    const error = await rejectionOf(runAuth({ env: credentialsEnv() }))
+    const error = await rejectionOf(runAuth({ env: credentialsEnv(), workspaceRoot: () => root }))
     expect(error).toBeInstanceOf(AggregateError)
     expect(error.errors.map(({ code }) => code)).toEqual(['AUTH', 'AUTH'])
     expect(error.errors[0].message).toMatch(/^whoami: Jira /)
@@ -67,7 +67,7 @@ describe('runAuth', () => {
   })
 
   it('throws one AUTH error naming each missing variable and sends no request when env lacks them', async () => {
-    const error = await rejectionOf(runAuth({ env: { JIRA_USER: TEST_CREDENTIALS.user } }))
+    const error = await rejectionOf(runAuth({ env: { JIRA_USER: TEST_CREDENTIALS.user }, workspaceRoot: () => root }))
     expect(isHedyError(error)).toBe(true)
     expect(error.code).toBe('AUTH')
     expect(error.message).toContain('JIRA_TOKEN and JIRA_BASE_URL are not set')

@@ -19,7 +19,8 @@
 
 - Both Atlassian clients read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL`. Confluence sits at `${JIRA_BASE_URL}/wiki` with the same token.
 - The docs repo's publisher reads `CONFLUENCE_USERNAME` and `CONFLUENCE_API_TOKEN`. `hedy` sets them in the child process environment from `JIRA_USER` and `JIRA_TOKEN`.
-- The environment wins. A command reads the root `.env` after validating its options and fills only the variables the environment lacks, through Node's `util.parseEnv`, the parser behind `process.loadEnvFile`, and expands `$NAME` and `${NAME}` references, which direnv also expands, from the file's own values only. A reference never reads the process environment. A single-quoted value stays literal, and `\$` is a literal `$`. A variable set to the empty string counts as set.
+- `credentials.js` is the one place a command gets the three values. A command calls it after validating its options. It loads the root `.env`, then reads the three values.
+- The environment wins. The root `.env` fills only the variables the environment lacks, through Node's `util.parseEnv`, the parser behind `process.loadEnvFile`, and expands `$NAME` and `${NAME}` references, which direnv also expands, from the file's own values only. A reference never reads the process environment. A single-quoted value stays literal, and `\$` is a literal `$`. A variable set to the empty string counts as set.
 - `hedy` never prints a credential value. The `auth` command reports only each account's display name or each service's error.
 
 ## Source Layout
@@ -32,6 +33,7 @@ All paths are under `hedy/src/`.
 - `commands/auth.js` probes Jira and Confluence together with one set of credentials and reports each service's failure.
 - `errors.js` holds `HedyError` and the error codes: `USAGE`, `UNKNOWN`, `AUTH`, `NOT_FOUND`, `RATE_LIMIT`, `NETWORK` and `PARSE`.
 - `env-file.js` fills the environment from the root `.env`, setting only the variables the environment lacks.
+- `credentials.js` holds `loadCredentials`, which fills the environment from the root `.env` and returns the three Atlassian credentials.
 - `clients/atlassian.js` holds `credentialsFromEnv`, the only reader of the three credential variables, and `createAtlassianHttp`, which sends the Basic header, stops a request after `timeoutMs`, and maps every remote outcome to an error code.
 - `clients/jira.js` and `clients/confluence.js` hold the Jira and Confluence clients. Each client holds only its endpoints and the projections it returns.
 - `exit-codes.js` is the exit map: 0 for success, 1 for an error, 2 for a usage error.
