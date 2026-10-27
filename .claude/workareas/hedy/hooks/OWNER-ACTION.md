@@ -10,7 +10,7 @@ Agents cannot write under `.claude/hooks/`, so the three fixed hooks wait here a
 
 ## Verify the Drafts
 
-Commit both runners first, because the bash guard denies an uncommitted script. Each runner takes a draft as its argument, so the drafts can be checked before the copy:
+Both runners are committed. Each takes a draft as its argument, so the drafts can be checked before the copy:
 
 ```bash
 bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-bash-tests.sh ~/trade-imports-arch-workspace/.claude/workareas/hedy/hooks/guard-bash.sh
