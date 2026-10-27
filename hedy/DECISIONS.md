@@ -32,6 +32,8 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Closed error codes.** The codes are `USAGE`, `UNKNOWN`, `AUTH`, `NOT_FOUND`, `RATE_LIMIT`, `NETWORK` and `PARSE`, and a new code is added with the command that raises the code. The Atlassian HTTP helper maps every remote outcome at one boundary. A failed connection is `NETWORK`, 401 and 403 are `AUTH`, 404 is `NOT_FOUND`, 429 is `RATE_LIMIT`, 400 is `USAGE` with the service's reasons, any other failing status is `NETWORK`, and a body that is not JSON is `PARSE`. A missing or empty credential variable is `AUTH`, the base URL included, because the fix is the same `.env` line. In `tim`, 10 codes fall outside its set, a missing base URL is a usage error, and an auth failure exits 1, 2 or 3 depending on which path raised the failure.
 
+**Several errors at once.** An action that fails for several reasons throws an `AggregateError` of `HedyError` values. The envelope lists each error in `errors`, and text mode writes one line per error. The exit code is the lowest among the errors' exit codes. `auth` uses this to report a failure from Jira and a failure from Confluence in one run.
+
 **Validation first.** zod validates every option before any side effect, so a usage error never leaves a half-done write behind.
 
 ## Workspace Root
@@ -48,7 +50,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **No GitHub wrapper.** `gh` already does the GitHub work. `create-pr.sh` is a gate around `gh` that refuses attribution content, not a client, and it stays bash.
 
-**Credentials.** The environment wins. For any variable it lacks, the CLI loads the root `.env` through Node's `process.loadEnvFile`, which accepts `export KEY=value` lines. No command prints a value, and `auth` reports names and HTTP status only. The publisher's `CONFLUENCE_USERNAME` and `CONFLUENCE_API_TOKEN` are set in its child environment from `JIRA_USER` and `JIRA_TOKEN`, so no new variables are needed.
+**Credentials.** The environment wins. A command reads the root `.env` after validating its options and fills only the variables the environment lacks. The file is parsed with Node's `util.parseEnv`, the parser behind `process.loadEnvFile`, which accepts `export KEY=value` lines. A variable set to the empty string counts as set. No command prints a credential value, and `auth` reports only each account's display name or each service's error. The publisher's `CONFLUENCE_USERNAME` and `CONFLUENCE_API_TOKEN` are set in its child environment from `JIRA_USER` and `JIRA_TOKEN`, so no new variables are needed.
 
 ## Write Contract
 

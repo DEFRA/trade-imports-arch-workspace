@@ -19,8 +19,8 @@
 
 - Both Atlassian clients read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL`. Confluence sits at `${JIRA_BASE_URL}/wiki` with the same token.
 - The docs repo's publisher reads `CONFLUENCE_USERNAME` and `CONFLUENCE_API_TOKEN`. `hedy` sets them in the child process environment from `JIRA_USER` and `JIRA_TOKEN`.
-- The environment wins. For any variable it lacks, `hedy` loads the root `.env` through Node's `process.loadEnvFile`.
-- `hedy` never prints a credential value. The `auth` command reports variable names and HTTP status only.
+- The environment wins. A command reads the root `.env` after validating its options and fills only the variables the environment lacks, through Node's `util.parseEnv`, the parser behind `process.loadEnvFile`. A variable set to the empty string counts as set.
+- `hedy` never prints a credential value. The `auth` command reports only each account's display name or each service's error.
 
 ## Source Layout
 
@@ -29,12 +29,14 @@ All paths are under `hedy/src/`.
 - `cli.js` is the bin entry. It only parses `process.argv`.
 - `program.js` exports `buildProgram()`, which sets the global options `--json` and `--workspace`, sets `exitOverride()`, and routes commander's own errors through the exit map in one catch.
 - `commands/<name>.js` holds one command.
+- `commands/auth.js` probes Jira and Confluence together with one set of credentials and reports each service's failure.
 - `errors.js` holds `HedyError` and the error codes: `USAGE`, `UNKNOWN`, `AUTH`, `NOT_FOUND`, `RATE_LIMIT`, `NETWORK` and `PARSE`.
+- `env-file.js` fills the environment from the root `.env`, setting only the variables the environment lacks.
 - `clients/atlassian.js` holds `credentialsFromEnv`, the only reader of the three credential variables, and `createAtlassianHttp`, which sends the Basic header and maps every remote outcome to an error code.
 - `clients/jira.js` and `clients/confluence.js` hold the Jira and Confluence clients. Each client holds only its endpoints and the projections it returns.
 - `exit-codes.js` is the exit map: 0 for success, 1 for an error, 2 for a usage error.
 - `envelope.js` builds the JSON envelope: `ok`, `schema_version`, `hedy_version`, `result`, `errors`, and `metadata.ranAt` on success only.
-- `run-action.js` writes a command's result: one JSON line on stdout with `--json`, text otherwise, notes on stderr, and the exit code from the map.
+- `run-action.js` writes a command's result: one JSON line on stdout with `--json`, text otherwise, notes on stderr, and the exit code from the map. An `AggregateError` reports several errors at once, one envelope entry or stderr line per error, with the lowest exit code among them.
 - `workspace-root.js` resolves the workspace from `--workspace`, then `HEDY_WORKSPACE`, then `~/trade-imports-arch-workspace`. It never walks up from the current folder.
 - `test-support/cli.js` spawns the entry and returns stdout, stderr, the exit code and the parsed envelope.
 - `test-support/http.js` sets up nock for a test file: real connections are refused, and interceptors are removed after each test. It also holds the test credentials and the failure table the client tests share.

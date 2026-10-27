@@ -106,3 +106,42 @@ describe('runAction', () => {
     expect(h.codes).toEqual([1])
   })
 })
+
+describe('runAction on an AggregateError', () => {
+  const failures = () => new AggregateError([
+    new HedyError('USAGE', 'Jira refused the request.'),
+    new HedyError('AUTH', 'Confluence rejected the credentials.')
+  ], 'Several failures')
+
+  it('in JSON mode prints one envelope whose errors hold each error in order, nothing on stderr, and returns the lowest exit code', async () => {
+    const h = harness()
+    const code = await runAction(() => { throw failures() }, { ...h.options, json: true })
+    const envelope = singleJsonLine(h.out)
+    expect(envelope.ok).toBe(false)
+    expect(envelope.errors).toEqual([
+      { code: 'USAGE', message: 'Jira refused the request.' },
+      { code: 'AUTH', message: 'Confluence rejected the credentials.' }
+    ])
+    expect(h.err).toEqual([])
+    expect(code).toBe(1)
+    expect(h.codes).toEqual([1])
+  })
+
+  it('in text mode writes each message on its own stderr line, nothing on stdout, and returns the lowest exit code', async () => {
+    const h = harness()
+    const code = await runAction(() => { throw failures() }, h.options)
+    expect(h.err.join('')).toBe('Jira refused the request.\nConfluence rejected the credentials.\n')
+    expect(h.out).toEqual([])
+    expect(code).toBe(1)
+    expect(h.codes).toEqual([1])
+  })
+
+  it('returns 2 when every error it holds is USAGE', async () => {
+    const h = harness()
+    const code = await runAction(() => {
+      throw new AggregateError([new HedyError('USAGE', 'First.'), new HedyError('USAGE', 'Second.')])
+    }, h.options)
+    expect(code).toBe(2)
+    expect(h.codes).toEqual([2])
+  })
+})

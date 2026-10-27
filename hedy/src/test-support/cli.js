@@ -22,7 +22,8 @@ const envelopeOf = (stdout) => {
  * else undefined.
  *
  * @param {string[]} args
- * @param {{ env?: Record<string, string>, cwd?: string }} [options] env is merged over process.env
+ * @param {{ env?: Record<string, string | undefined>, cwd?: string }} [options]
+ *   env is merged over process.env; a name set to undefined is left out of the child's environment
  * @returns {Promise<{ stdout: string, stderr: string, exitCode: number, envelope: unknown }>}
  */
 export const runCli = async (args, { env = {}, cwd } = {}) => {

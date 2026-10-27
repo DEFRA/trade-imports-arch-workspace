@@ -28,6 +28,7 @@ These rules apply to every test file under `hedy/`. Hooks under `.claude/hooks/`
 
 - Test a command's behaviour in-process, by calling its exported `run*` function under nock. Every path that reaches the network is tested this way, because nock patches the test process and cannot reach a child process.
 - Test the envelope, the exit codes and argument parsing by spawning the entry through `hedy/src/test-support/cli.js`. A spawned test never reaches the network.
+- A spawned test that needs a server starts a loopback `node:http` server of its own and points the child at the server through `.env` or the environment, and never reaches a real service.
 
 ## Sibling Tests
 

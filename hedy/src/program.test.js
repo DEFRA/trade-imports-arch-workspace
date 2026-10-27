@@ -1,4 +1,5 @@
-import { readFile, rm } from 'node:fs/promises'
+import { readFile, rm, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import { runProgram } from './program.js'
 import { createWorkspace, runCli } from './test-support/cli.js'
@@ -97,6 +98,18 @@ describe('runProgram in JSON mode', () => {
   })
 })
 
+describe('runProgram auth', () => {
+  it('reads the .env file at the resolved workspace root, so only the variables missing from both are named', async () => {
+    await writeFile(join(root, '.env'), 'JIRA_USER=file-user\n')
+    const result = await run(['auth', '--json'])
+    const envelope = envelopeOf(result.stdout)
+    expect(envelope.errors).toHaveLength(1)
+    expect(envelope.errors[0].code).toBe('AUTH')
+    expect(envelope.errors[0].message).toMatch(/^JIRA_TOKEN and JIRA_BASE_URL are not set\./)
+    expect(result.codes).toEqual([1])
+  })
+})
+
 describe('runProgram help and version', () => {
   it.each([
     [['--help']],
@@ -116,6 +129,11 @@ describe('runProgram help and version', () => {
     expect(stdout).toContain('--json')
     expect(stdout).toContain('--workspace <path>')
     expect(stdout).toMatch(/^ {2}hello\s/m)
+  })
+
+  it('lists the auth command in the top-level help', async () => {
+    const { stdout } = await run(['--help'])
+    expect(stdout).toMatch(/^ {2}auth\s/m)
   })
 
   it.each([[['--version']], [['-V']], [['--version', '--json']]])('prints the package version for %j and exits 0', async (args) => {

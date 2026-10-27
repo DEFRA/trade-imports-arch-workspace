@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { ERROR_CODES, HedyError, isHedyError, toHedyError } from './errors.js'
+import { ERROR_CODES, HedyError, isHedyError, toHedyError, toHedyErrors } from './errors.js'
 
 describe('ERROR_CODES', () => {
   it('holds exactly the seven codes and cannot be changed', () => {
@@ -70,5 +70,39 @@ describe('toHedyError', () => {
     const wrapped = toHedyError(value)
     expect(wrapped.code).toBe('UNKNOWN')
     expect(wrapped.message).toBe(message)
+  })
+})
+
+describe('toHedyErrors', () => {
+  it('returns each error an AggregateError holds, in order, keeping a HedyError unchanged', () => {
+    const auth = new HedyError('AUTH', 'Jira rejected the credentials.')
+    const usage = new HedyError('USAGE', 'Confluence refused the request.')
+    expect(toHedyErrors(new AggregateError([auth, usage], 'Several failures'))).toEqual([auth, usage])
+  })
+
+  it('wraps a plain Error inside an AggregateError as UNKNOWN, keeping it as the cause', () => {
+    const auth = new HedyError('AUTH', 'Jira rejected the credentials.')
+    const original = new TypeError('x is not a function')
+    const [first, second] = toHedyErrors(new AggregateError([auth, original]))
+    expect(first).toBe(auth)
+    expect(second).toMatchObject({ name: 'HedyError', code: 'UNKNOWN', message: 'x is not a function', cause: original })
+  })
+
+  it('returns a single HedyError unchanged as the only entry', () => {
+    const error = new HedyError('USAGE', 'Bad flag.')
+    expect(toHedyErrors(error)).toEqual([error])
+  })
+
+  it('wraps a single non-HedyError as the only entry, UNKNOWN', () => {
+    const [only, ...rest] = toHedyErrors(new Error('disk full'))
+    expect(rest).toEqual([])
+    expect(only).toMatchObject({ code: 'UNKNOWN', message: 'disk full' })
+  })
+
+  it('treats an AggregateError holding no errors as one UNKNOWN error, keeping it as the cause', () => {
+    const empty = new AggregateError([], 'Nothing inside')
+    const [only, ...rest] = toHedyErrors(empty)
+    expect(rest).toEqual([])
+    expect(only).toMatchObject({ code: 'UNKNOWN', message: 'Nothing inside', cause: empty })
   })
 })

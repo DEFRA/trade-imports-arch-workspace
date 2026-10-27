@@ -25,3 +25,14 @@ export const toHedyError = (error) => {
   if (isHedyError(error)) return error
   return new HedyError('UNKNOWN', error?.message || String(error), { cause: error })
 }
+
+/**
+ * Returns each error an AggregateError holds through toHedyError, in order. Anything
+ * else, an AggregateError holding no errors included, gives [toHedyError(error)].
+ *
+ * @returns {HedyError[]} one or more errors
+ */
+export const toHedyErrors = (error) =>
+  error instanceof AggregateError && error.errors.length > 0
+    ? error.errors.map((inner) => toHedyError(inner))
+    : [toHedyError(error)]

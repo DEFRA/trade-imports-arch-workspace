@@ -1,5 +1,6 @@
 import { homedir as osHomedir } from 'node:os'
 import { Command, CommanderError } from 'commander'
+import { register as registerAuth } from './commands/auth.js'
 import { register as registerHello } from './commands/hello.js'
 import { hedyVersion } from './envelope.js'
 import { HedyError } from './errors.js'
@@ -60,6 +61,7 @@ const usageMessage = ({ code, message }) => {
  */
 export const buildProgram = (deps) => {
   const { stdout, stderr, setExitCode, env, homedir } = withDefaults(deps)
+  let root
   const program = new Command()
     .name('hedy')
     .description('Workspace CLI for the trade-imports architecture tooling')
@@ -75,9 +77,11 @@ export const buildProgram = (deps) => {
       outputError: () => {}
     })
     .hook('preAction', (_program, actionCommand) => {
-      resolveWorkspaceRoot({ workspace: actionCommand.optsWithGlobals().workspace, env, homedir })
+      root = resolveWorkspaceRoot({ workspace: actionCommand.optsWithGlobals().workspace, env, homedir })
     })
-  registerHello(program, { stdout, stderr, setExitCode })
+  const commandDeps = { stdout, stderr, setExitCode, env, workspaceRoot: () => root }
+  registerHello(program, commandDeps)
+  registerAuth(program, commandDeps)
   return program
 }
 
