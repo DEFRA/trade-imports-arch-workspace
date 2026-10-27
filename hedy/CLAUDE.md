@@ -38,11 +38,12 @@ All paths are under `hedy/src/`.
 
 ## npm
 
-Run npm as `command npm`, which skips any shell function named `npm`, against the checkout's real path. The Bash guard denies `npm --prefix` across the canonical symlink.
+Run npm against the checkout's real path and type plain `npm`. Where the shell wraps `npm` in a function, that function routes installs through Socket Firewall, and `command npm` would skip the check. The Bash guard denies `npm --prefix` across the canonical symlink and for install-like commands on any workspace path, so install from inside the folder.
 
 ```
-command npm --prefix <real checkout path>/hedy test
-command npm --prefix <real checkout path>/hedy run lint
+(cd <real checkout path>/hedy; npm ci)
+npm --prefix <real checkout path>/hedy run lint
+npm --prefix <real checkout path>/hedy test
 ```
 
 ## User-Facing Text
