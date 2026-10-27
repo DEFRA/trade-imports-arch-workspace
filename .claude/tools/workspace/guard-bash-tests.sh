@@ -1,11 +1,13 @@
 #!/bin/bash
-# Runs every case against the guard given as $1 and prints ok or FAIL per case.
-# Invoke with bash:
-#   bash ~/trade-imports-arch-workspace/.claude/workareas/hedy/hooks/guard-bash-tests.sh ~/trade-imports-arch-workspace/.claude/hooks/guard-bash.sh
-# The dirty-tree cases create and remove an untracked probe file under hedy/src.
+# Runs every case against the bash guard and prints ok or FAIL per case.
+# Invoke with bash; $1 names the guard to test, the live hook by default:
+#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-bash-tests.sh
+#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-bash-tests.sh <draft guard>
+# The dirty-tree cases create and remove an untracked probe file under hedy/src
+# and a probe script under /tmp. Exit 1 when any case fails.
 set -u
-GUARD=$1
 WS="$HOME/trade-imports-arch-workspace"
+GUARD=${1:-$WS/.claude/hooks/guard-bash.sh}
 HEDY="$WS/hedy"
 PROBE="$HEDY/src/zz-guard-probe.js"
 OUTSIDE="/tmp/hedy-guard-probe.sh"

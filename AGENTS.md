@@ -82,7 +82,7 @@ read its header) for usage.
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
 | `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
-| `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs `hedy auth` and every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine) and `lint-skills.sh` (repo-only estate lint) |
+| `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs `hedy auth` and every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine), `lint-skills.sh` (repo-only estate lint) and `guard-bash-tests.sh` (the bash guard's deny and allow cases) |
 
 ### Enforcement map
 
@@ -98,6 +98,7 @@ run when one fails:
 | Golden tests (5 suites) | scaffold, doctor, prose-gate, editorial-triage and editorial-metrics behaviour vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
 | Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
 | Guard hooks (`.claude/hooks/`) | agent Bash and file-edit calls in Claude Code sessions | every matched tool call | follow the sanctioned alternative the denial names |
+| `guard-bash-tests.sh` | the bash guard's 68 deny and allow cases against the live hook, or against a draft given as its argument: `bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-bash-tests.sh` | on demand, after any change to `guard-bash.sh` | the user fixes the hook; agents cannot edit `.claude/hooks/` |
 | `check-prose.sh` (editorial style gate) | banned punctuation (FAIL); the words and phrases in `language.md`'s "Words to avoid or examine" table, FAIL or WARN per row, plus any `--terms` table; sentence-shape rules (FAIL or WARN) | `create-pr.sh` on every PR title/body; pre-commit on staged markdown; commit-msg on the message; skill-scoped hooks below | fix the FAIL lines it names; rules in `.claude/best-practices/writing/language.md` |
 | Skill-scoped hooks (pr, editorial) | the prose each Write/Edit just produced; editorial close-out at turn-end | while those skills are active | fix the violation the injected feedback names; the editorial Stop hook blocks the turn while a FAIL line the session introduced remains |
 
