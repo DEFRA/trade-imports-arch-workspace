@@ -4,6 +4,8 @@
 #
 # Syncs a Confluence folder tree to local Markdown files.
 # Re-runnable — overwrites existing files on each run.
+# Each page body comes from the page's view format through hedy, so
+# attachment and image links are site-relative.
 #
 # Default root: https://eaflood.atlassian.net/wiki/spaces/EUDP/folder/6447269328
 #

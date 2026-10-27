@@ -37,7 +37,7 @@ describe('runSearch', () => {
   it('returns the issues the query matches as the search projection', async () => {
     stageSearch(true, searchResponse)
     expect(await runSearch({ jql: 'project = HEDY', max: 200, env: credentialsEnv(), workspaceRoot: () => root }))
-      .toEqual({ issues: searchProjection })
+      .toEqual({ issues: searchProjection, truncated: false })
   })
 
   it('throws AUTH naming the missing variables and sends no request when the credentials are incomplete', async () => {
@@ -89,6 +89,40 @@ describe('the jira search command', () => {
     const h = harness()
     await h.program.parseAsync(['search', 'project = HEDY', '--max', '2', '--json'], { from: 'user' })
     expect(JSON.parse(h.out[0]).result.issues.map(({ key }) => key)).toEqual(['HEDY-101', 'HEDY-102'])
+  })
+
+  it.each([
+    ['text', []],
+    ['json', ['--json']]
+  ])('in %s mode writes one stderr note naming --max when Jira offers more issues than --max allows', async (_mode, modeArgs) => {
+    stageSearch((query) => query.maxResults === '2', { ...searchResponse, nextPageToken: 'page-2' })
+    const h = harness()
+    await h.program.parseAsync(['search', 'project = HEDY', '--max', '2', ...modeArgs], { from: 'user' })
+    expect(h.err).toEqual(['Stopped at --max 2. More issues match the query. Raise --max to read them.\n'])
+    expect(h.out).toHaveLength(1)
+    expect(h.out[0]).not.toContain('Stopped at')
+    expect(h.codes).toEqual([0])
+  })
+
+  it.each([
+    ['text', []],
+    ['json', ['--json']]
+  ])('in %s mode writes nothing on stderr when every matching issue fits within --max', async (_mode, modeArgs) => {
+    stageSearch(true, searchResponse)
+    const h = harness()
+    await h.program.parseAsync(['search', 'project = HEDY', ...modeArgs], { from: 'user' })
+    expect(h.err).toEqual([])
+    expect(h.codes).toEqual([0])
+  })
+
+  it.each([
+    [true, { ...searchResponse, nextPageToken: 'page-2' }],
+    [false, searchResponse]
+  ])('gives result.truncated %s in the envelope', async (truncated, body) => {
+    stageSearch((query) => query.maxResults === '2', body)
+    const h = harness()
+    await h.program.parseAsync(['search', 'project = HEDY', '--max', '2', '--json'], { from: 'user' })
+    expect(JSON.parse(h.out[0]).result.truncated).toBe(truncated)
   })
 
   it.each([

@@ -60,6 +60,24 @@ describe('credentialsFromEnv', () => {
     expect(error.message).not.toContain(TEST_CREDENTIALS.user)
     expect(error.message).not.toContain(TEST_CREDENTIALS.token)
   })
+
+  it.each([
+    ['an address without a scheme', 'example.atlassian.net'],
+    ['an address on another scheme', 'ftp://example.atlassian.net'],
+    ['a text that is not an address', 'not a url']
+  ])('with JIRA_BASE_URL set to %s throws one AUTH error asking for an absolute address', (_label, baseUrl) => {
+    const error = refusalOf({ ...credentialsEnv(), JIRA_BASE_URL: baseUrl })
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'AUTH',
+      message: 'JIRA_BASE_URL must be an absolute address such as https://example.atlassian.net. Set it in the workspace .env file.'
+    })
+  })
+
+  it('accepts a JIRA_BASE_URL that ends in a slash, returning it as given', () => {
+    expect(credentialsFromEnv({ ...credentialsEnv(), JIRA_BASE_URL: 'https://example.atlassian.net/' }).baseUrl)
+      .toBe('https://example.atlassian.net/')
+  })
 })
 
 const PROBE = '/rest/probe'
@@ -135,6 +153,15 @@ describe('createAtlassianHttp get', () => {
       .get(PROBE)
       .reply(200, { displayName: 'Ada Lovelace', nested: { kept: true } })
     expect(await probe()).toEqual({ displayName: 'Ada Lovelace', nested: { kept: true } })
+  })
+
+  it('follows a redirect to another origin without sending the Authorization header there', async () => {
+    nock(ATLASSIAN_BASE_URL).get(PROBE).reply(302, '', { Location: 'https://elsewhere.example/x' })
+    nock('https://elsewhere.example')
+      .matchHeader('authorization', (value) => value == null)
+      .get('/x')
+      .reply(200, { landed: true })
+    expect(await probe()).toEqual({ landed: true })
   })
 
   it.each(['/', '///'])('drops the trailing %j from the base URL before adding the path', async (slashes) => {

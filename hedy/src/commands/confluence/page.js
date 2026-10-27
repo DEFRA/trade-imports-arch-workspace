@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createConfluenceClient } from '../../clients/confluence.js'
+import { createConfluenceClient, pageIdInPath } from '../../clients/confluence.js'
 import { loadCredentials } from '../../credentials.js'
 import { HedyError } from '../../errors.js'
 import { markdownFromHtml } from '../../html-to-markdown.js'
@@ -21,7 +21,7 @@ const pageInputSchema = z.object({
 export const pageReferenceOf = (reference) => {
   if (/^\d+$/.test(reference)) return { id: reference }
   const url = URL.parse(reference)
-  const pageId = url && /\/pages\/(\d+)/.exec(url.pathname)?.[1]
+  const pageId = url && pageIdInPath(url.pathname)
   if (pageId) return { id: pageId }
   if (url?.pathname.startsWith('/wiki/x/')) return { shareLink: reference }
   throw new HedyError(
@@ -30,10 +30,13 @@ export const pageReferenceOf = (reference) => {
   )
 }
 
+const markdownBodyOf = (html) => (html === '' ? '' : markdownFromHtml(html))
+
 /**
  * Returns the Confluence client's page projection for the reference, with the
- * body as markdown unless format is html. Rejects with USAGE for a reference
- * pageReferenceOf refuses, before loadCredentials runs.
+ * body as markdown unless format is html. An empty body stays empty in both
+ * formats. Rejects with USAGE for a reference pageReferenceOf refuses, before
+ * loadCredentials runs.
  *
  * @param {{ reference: string, format?: 'markdown' | 'html', env: Record<string, string | undefined>, workspaceRoot: () => string }} options
  */
@@ -42,7 +45,7 @@ export const runPage = async ({ reference, format = 'markdown', env, workspaceRo
   const client = createConfluenceClient(loadCredentials({ env, workspaceRoot }))
   const id = pageReference.id ?? await client.pageIdFromShortLink(pageReference.shareLink)
   const page = await client.page(id)
-  return format === 'html' ? page : { ...page, body: markdownFromHtml(page.body) }
+  return format === 'html' ? page : { ...page, body: markdownBodyOf(page.body) }
 }
 
 const renderPage = ({ title, space, version, url, body }) => [
@@ -50,7 +53,7 @@ const renderPage = ({ title, space, version, url, body }) => [
   `Space: ${space} | Version: ${version.number} (${version.when}) | By: ${version.by ?? 'unknown'}`,
   `Source: ${url}`,
   '',
-  body.replace(/\n$/, '')
+  ...(body === '' ? [] : [body.replace(/\n$/, '')])
 ].join('\n')
 
 export const register = (group, { stdout, stderr, setExitCode, env, workspaceRoot }) => {

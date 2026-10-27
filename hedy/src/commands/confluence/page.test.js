@@ -89,6 +89,13 @@ describe('runPage', () => {
     expect(page.body).toBe(pageResponse.body.view.value)
   })
 
+  it.each(['markdown', 'html'])('returns an empty body in %s format when the answer holds no body', async (format) => {
+    const { body: _body, ...pageWithoutBody } = pageResponse
+    stagePage(pageWithoutBody)
+    const page = await runPage({ reference: '123456', format, env: credentialsEnv(), workspaceRoot: () => root })
+    expect(page.body).toBe('')
+  })
+
   it('follows a share link on the site to the page it redirects to', async () => {
     nock(ATLASSIAN_BASE_URL).get('/wiki/x/AbCd').reply(302, '', { Location: '/wiki/spaces/DOCS/pages/123456/Synthetic+Page' })
     stagePage(pageResponse)
@@ -136,6 +143,16 @@ describe('the confluence page command', () => {
     const h = harness()
     await h.program.parseAsync(['page', '123456'], { from: 'user' })
     expect(h.out.join('').split('\n')[1]).toBe('Space: DOCS | Version: 4 (2026-10-20T10:30:00.000Z) | By: unknown')
+  })
+
+  it.each([[[]], [['--format', 'html']]])('with %j prints only the three header lines and a blank line when the answer holds no body', async (formatArgs) => {
+    const { body: _body, ...pageWithoutBody } = pageResponse
+    stagePage(pageWithoutBody)
+    const h = harness()
+    await h.program.parseAsync(['page', '123456', ...formatArgs], { from: 'user' })
+    expect(h.out.join('')).toBe(`${pageText.split('\n').slice(0, 3).join('\n')}\n\n`)
+    expect(h.err).toEqual([])
+    expect(h.codes).toEqual([0])
   })
 
   it('with --format html prints the HTML body under the same header', async () => {

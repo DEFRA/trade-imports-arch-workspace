@@ -33,7 +33,8 @@ const nextPageTokenOf = (page) => (page.issues?.length > 0 ? page.nextPageToken 
  * Takes the credentials credentialsFromEnv returns and an optional timeoutMs
  * for each request, 30000 when not given. Every method rejects with a
  * HedyError whose message names Jira. search returns at most max issues,
- * following nextPageToken across pages.
+ * following nextPageToken across pages, and truncated, true only when it
+ * stopped at max while Jira offered another page.
  *
  * @param {{ user: string, token: string, baseUrl: string }} credentials
  * @param {{ timeoutMs?: number }} [options]
@@ -59,7 +60,7 @@ export const createJiraClient = ({ user, token, baseUrl }, { timeoutMs } = {}) =
         issues.push(...(page.issues ?? []).slice(0, maxResults).map(project))
         nextPageToken = nextPageTokenOf(page)
       } while (nextPageToken && issues.length < max)
-      return { issues }
+      return { issues, truncated: Boolean(nextPageToken) }
     }
   }
 }

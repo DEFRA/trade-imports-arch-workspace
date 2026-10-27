@@ -120,14 +120,14 @@ describe('the Jira client issue', () => {
 })
 
 describe('the Jira client search', () => {
-  it('returns { issues } equal to the projection fetch.sh printed for the same page, sending the Basic header', async () => {
+  it('returns the captured projection as issues and truncated false for one page, sending the Basic header', async () => {
     nock(ATLASSIAN_BASE_URL)
       .matchHeader('authorization', TEST_AUTHORIZATION)
       .get(SEARCH)
       .query(searchQuery(100))
       .reply(200, searchResponse)
     const result = await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 200 })
-    expect(result).toEqual({ issues: searchProjection })
+    expect(result).toEqual({ issues: searchProjection, truncated: false })
     expect(result.issues.map(Object.keys)).toEqual(searchProjection.map(Object.keys))
   })
 
@@ -142,22 +142,27 @@ describe('the Jira client search', () => {
   it('joins two pages, sending the first page\'s nextPageToken on the second request', async () => {
     stageSearchPage(searchQuery(100), { issues: searchResponse.issues.slice(0, 1), nextPageToken: 'page-2' })
     stageSearchPage(searchQuery(99, 'page-2'), { issues: searchResponse.issues.slice(1) })
-    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 100 })).toEqual({ issues: searchProjection })
+    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 100 })).toEqual({ issues: searchProjection, truncated: false })
   })
 
-  it('stops after a page without a nextPageToken', async () => {
+  it('stops after a page without a nextPageToken, with truncated false', async () => {
     stageSearchPage(searchQuery(100), { issues: searchResponse.issues.slice(0, 1), isLast: true })
-    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 200 })).toEqual({ issues: searchProjection.slice(0, 1) })
+    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 200 })).toEqual({ issues: searchProjection.slice(0, 1), truncated: false })
   })
 
-  it('stops after a page without issues even when the page has a nextPageToken', async () => {
+  it('stops after a page without issues even when the page has a nextPageToken, with truncated false', async () => {
     stageSearchPage(searchQuery(100), { issues: [], nextPageToken: 'page-2' })
-    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 200 })).toEqual({ issues: [] })
+    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 200 })).toEqual({ issues: [], truncated: false })
   })
 
-  it('stops at max, returning max issues and sending no second request', async () => {
+  it('gives truncated false when max is reached on a page without a nextPageToken', async () => {
+    stageSearchPage(searchQuery(3), { ...searchResponse, isLast: true })
+    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 3 })).toEqual({ issues: searchProjection, truncated: false })
+  })
+
+  it('stops at max while Jira offers another page, returning max issues with truncated true and sending no second request', async () => {
     stageSearchPage(searchQuery(2), { ...searchResponse, nextPageToken: 'page-2' })
-    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 2 })).toEqual({ issues: searchProjection.slice(0, 2) })
+    expect(await createJiraClient(TEST_CREDENTIALS).search(JQL, { max: 2 })).toEqual({ issues: searchProjection.slice(0, 2), truncated: true })
   })
 
   it('asks a later page for only the issues still wanted: maxResults 50 after 100 issues for max 150', async () => {

@@ -11,9 +11,21 @@ import {
   rejectionOf,
   startSilentServer
 } from '../test-support/http.js'
-import { createConfluenceClient } from './confluence.js'
+import { createConfluenceClient, pageIdInPath } from './confluence.js'
 
 interceptNetworkPerTest()
+
+describe('pageIdInPath', () => {
+  it.each([
+    ['a page path with a title', '123456', '/wiki/spaces/DOCS/pages/123456/Synthetic+Page'],
+    ['a page path without a title', '123456', '/wiki/spaces/DOCS/pages/123456'],
+    ['the path of an absolute page URL', '42', new URL(`${ATLASSIAN_BASE_URL}/wiki/spaces/DOCS/pages/42?focusedCommentId=7`).pathname],
+    ['the tiny URL path', undefined, '/wiki/pages/tinyurl.action'],
+    ['a space path', undefined, '/wiki/spaces/DOCS/overview']
+  ])('for %s returns %s', (_label, expected, path) => {
+    expect(pageIdInPath(path)).toBe(expected)
+  })
+})
 
 const pageResponse = await readJsonFixture(new URL('./__fixtures__/confluence-page-response.json', import.meta.url))
 
@@ -102,6 +114,12 @@ describe('the Confluence client page', () => {
     })
   })
 
+  it('gives an empty body when the answer holds no body', async () => {
+    const { body: _body, ...pageWithoutBody } = pageResponse
+    nock(ATLASSIAN_BASE_URL).get(PAGE).query(true).reply(200, pageWithoutBody)
+    expect((await createConfluenceClient(TEST_CREDENTIALS).page('123456')).body).toBe('')
+  })
+
   it('builds the url without a double slash when the base URL ends in a slash', async () => {
     nock(ATLASSIAN_BASE_URL).get(PAGE).query(true).reply(200, pageResponse)
     const client = createConfluenceClient({ ...TEST_CREDENTIALS, baseUrl: `${ATLASSIAN_BASE_URL}/` })
@@ -159,13 +177,43 @@ describe('the Confluence client pageIdFromShortLink', () => {
     })
   })
 
-  it('rejects a redirect location that holds no page id with USAGE naming the location', async () => {
-    nock(ATLASSIAN_BASE_URL).get(SHARE_PATH).reply(302, '', { Location: '/wiki/spaces/DOCS/overview' })
+  it('follows a share link through the tiny URL redirect to the page, sending the Basic header on each hop', async () => {
+    nock(ATLASSIAN_BASE_URL)
+      .matchHeader('authorization', TEST_AUTHORIZATION)
+      .get(SHARE_PATH)
+      .reply(302, '', { Location: `${ATLASSIAN_BASE_URL}/wiki/pages/tinyurl.action?urlIdentifier=AQAB` })
+    nock(ATLASSIAN_BASE_URL)
+      .matchHeader('authorization', TEST_AUTHORIZATION)
+      .get('/wiki/pages/tinyurl.action')
+      .query({ urlIdentifier: 'AQAB' })
+      .reply(302, '', { Location: '/wiki/spaces/DOCS/pages/123/Title' })
+    expect(await createConfluenceClient(TEST_CREDENTIALS).pageIdFromShortLink(SHARE_LINK)).toBe('123')
+  })
+
+  it.each([
+    ['another host', 'https://elsewhere.example.com/wiki/spaces/DOCS/pages/123/Title'],
+    ['another host without a scheme', '//elsewhere.example.com/wiki/spaces/DOCS/pages/123/Title'],
+    ['another scheme', 'http://example.atlassian.net/wiki/spaces/DOCS/pages/123/Title']
+  ])('rejects a redirect to %s with USAGE, even when the location holds a page id, and sends it no request', async (_label, location) => {
+    nock(ATLASSIAN_BASE_URL).get(SHARE_PATH).reply(302, '', { Location: location })
     const error = await rejectionOf(createConfluenceClient(TEST_CREDENTIALS).pageIdFromShortLink(SHARE_LINK))
     expect(error).toMatchObject({
       name: 'HedyError',
       code: 'USAGE',
-      message: `page ${SHARE_LINK}: Confluence redirected the link to /wiki/spaces/DOCS/overview, which holds no page id. Open the link in a browser and give the page id from the address, then run the command again.`
+      message: `page ${SHARE_LINK}: Confluence share link led off the Atlassian site in JIRA_BASE_URL, to ${location}, so hedy will not send the credentials there. Open the link in a browser and give the page id from the address, then run the command again.`
+    })
+  })
+
+  it('stops after five redirects that reach no page, rejecting with USAGE naming the last location', async () => {
+    const hops = [SHARE_PATH, '/wiki/hop/1', '/wiki/hop/2', '/wiki/hop/3', '/wiki/hop/4', '/wiki/hop/5']
+    for (const [index, path] of hops.slice(0, -1).entries()) {
+      nock(ATLASSIAN_BASE_URL).get(path).reply(302, '', { Location: hops[index + 1] })
+    }
+    const error = await rejectionOf(createConfluenceClient(TEST_CREDENTIALS).pageIdFromShortLink(SHARE_LINK))
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'USAGE',
+      message: `page ${SHARE_LINK}: Confluence redirected the share link 5 times without reaching a page, last to /wiki/hop/5. Open the link in a browser and give the page id from the address, then run the command again.`
     })
   })
 

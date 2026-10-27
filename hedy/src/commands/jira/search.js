@@ -11,7 +11,8 @@ const searchInputSchema = z.object({
 })
 
 /**
- * Returns the Jira client's search result for jql: { issues }, at most max of them.
+ * Returns the Jira client's search result for jql: { issues, truncated }, at
+ * most max issues, with truncated true when more issues match than max allows.
  * Rejects with the HedyError from loadCredentials before any request.
  *
  * @param {{ jql: string, max: number, env: Record<string, string | undefined>, workspaceRoot: () => string }} options
@@ -29,9 +30,11 @@ export const register = (group, { stdout, stderr, setExitCode, env, workspaceRoo
     .description('List the Jira issues a JQL query matches, one line each')
     .argument('<jql>', 'The JQL query, quoted as one argument')
     .option('--max <n>', 'Return at most this many issues', 200)
-    .action((jql, options, command) => runAction(() => {
+    .action((jql, options, command) => runAction(async () => {
       const validated = searchInputSchema.parse({ jql, max: options.max })
-      return runSearch({ ...validated, env, workspaceRoot })
+      const result = await runSearch({ ...validated, env, workspaceRoot })
+      if (result.truncated) stderr.write(`Stopped at --max ${validated.max}. More issues match the query. Raise --max to read them.\n`)
+      return result
     }, {
       json: command.optsWithGlobals().json === true,
       render: renderSearch,

@@ -7,9 +7,12 @@ const missingCredentialsError = (names) => new HedyError('AUTH', names.length ==
   ? `${names[0]} is not set. Set it in the workspace .env file.`
   : `${listInProse(names)} are not set. Set them in the workspace .env file.`)
 
+const isWebAddress = (value) => ['http:', 'https:'].includes(URL.parse(value)?.protocol)
+
 /**
  * Reads the Atlassian credentials from JIRA_USER, JIRA_TOKEN and JIRA_BASE_URL.
- * Throws one AUTH HedyError naming every variable that is missing or empty.
+ * Throws one AUTH HedyError naming every variable that is missing or empty,
+ * else one AUTH HedyError when JIRA_BASE_URL is not an http or https address.
  *
  * @param {Record<string, string | undefined>} env
  * @returns {{ user: string, token: string, baseUrl: string }}
@@ -20,6 +23,9 @@ export const credentialsFromEnv = (env) => {
     .filter(([, value]) => !value)
     .map(([name]) => name)
   if (missing.length > 0) throw missingCredentialsError(missing)
+  if (!isWebAddress(baseUrl)) {
+    throw new HedyError('AUTH', 'JIRA_BASE_URL must be an absolute address such as https://example.atlassian.net. Set it in the workspace .env file.')
+  }
   return { user, token, baseUrl }
 }
 
