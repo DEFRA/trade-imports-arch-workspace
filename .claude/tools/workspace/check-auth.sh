@@ -1,27 +1,29 @@
 #!/usr/bin/env bash
-# Auth doctor - verifies credentials for every service domain that ships one.
-# Discovers tools/*/auth.sh and runs each, so a new domain joins the sweep by
-# adding its own auth.sh; nothing to register here.
+# Auth doctor - verifies credentials for every service.
+# Runs `hedy auth` (Jira and Confluence) first, then any tools/*/auth.sh, so a
+# new domain still joins the sweep by adding its own auth.sh; nothing to
+# register here.
 # Invoke with bash (no execute bit required):
 #   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh
-# Exit 1 when any service check fails (or none are found).
+# Exit 1 when hedy is missing or any service check fails.
 
 set -u
 
 TOOLS="$HOME/trade-imports-arch-workspace/.claude/tools"
 
-failed=0
-found=0
-for check in "$TOOLS"/*/auth.sh; do
-    [ -f "$check" ] || continue
-    found=1
-    bash "$check" || failed=1
-done
-
-if [ "$found" -eq 0 ]; then
-    echo "auth-check: FAIL no */auth.sh found under $TOOLS"
+if ! command -v hedy >/dev/null 2>&1; then
+    echo "auth-check: FAIL hedy CLI not on PATH (run: make -C ~/trade-imports-arch-workspace link)"
+    echo "auth-check: FAIL one or more services failed"
     exit 1
 fi
+
+failed=0
+hedy auth || failed=1
+
+for check in "$TOOLS"/*/auth.sh; do
+    [ -f "$check" ] || continue
+    bash "$check" || failed=1
+done
 
 if [ "$failed" -eq 0 ]; then
     echo "auth-check: ok all services authenticated"

@@ -71,7 +71,7 @@ read its header) for usage.
 
 | Domain | Tools |
 | --- | --- |
-| `jira/` | `fetch.sh` (JQL or batch-key fetch, flat JSON projection), `create-ticket.sh`, `update-description.sh`, `auth.sh` pre-flight |
+| `jira/` | `fetch.sh` (JQL or batch-key fetch, flat JSON projection), `create-ticket.sh`, `update-description.sh` |
 | `confluence/` | Hand tools for ad-hoc Confluence page reads, writes and doc sync |
 | `confluence-publish/` | Pre-flight and executor for publishing one docs page to Confluence |
 | `editorial/` | `check-prose.sh` (the style gate), `claim-diff.sh` (the claims a rewrite adds, drops or changes), `check-names.sh` (flag, or with `--fix` rename, the names a document set's editorial profile replaces), `read-profile.sh` (a document set's `editorial-profile.md` as JSON: reader frame, defaults, context pages, run notes, preferred names), `build-review-packet.sh` (one file holding the review brief, its sources and the pages with line numbers, for every reviewer), `start-layered-review.sh` (hash the pages and build the layered review's packet and run folder), `assemble-review.sh` (validate review files written outside the workflow and build the version 3 review result) |
@@ -82,7 +82,7 @@ read its header) for usage.
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
 | `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
-| `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine) and `lint-skills.sh` (repo-only estate lint) |
+| `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs `hedy auth` and every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine) and `lint-skills.sh` (repo-only estate lint) |
 
 ### Enforcement map
 
@@ -92,7 +92,7 @@ run when one fails:
 | Mechanism | Checks | Fires | On failure |
 | --- | --- | --- | --- |
 | `check-workspace.sh` | canonical root, child repos, baseline tools, hooksPath | `make` / `make check` | follow the remedy line (usually `make link` / `make clone`) |
-| `check-auth.sh` | every domain's credentials | on demand | fix the named env var in `.env` |
+| `check-auth.sh` | the Atlassian credentials through `hedy auth`, plus any domain `auth.sh` | on demand | fix the named env var in `.env`; run `make link` when `hedy` is missing |
 | `check-deps.sh` | declared `workspace-deps` resolve on this machine | `make check` | clone the project / install the tool it names |
 | `lint-skills.sh` | declaration format, dangling links, undeclared-invocation sweep | pre-commit (staged index), scaffold tail, `make check` | fix and re-stage; acknowledge soft probes in `workspace-soft-deps` |
 | Golden tests (5 suites) | scaffold, doctor, prose-gate, editorial-triage and editorial-metrics behaviour vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |

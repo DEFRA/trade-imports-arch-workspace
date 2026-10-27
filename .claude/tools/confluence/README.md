@@ -10,7 +10,6 @@ Scripts mirror the `jira/` helpers and use the same `JIRA_USER`/`JIRA_TOKEN` cre
 
 ## Scripts
 
-- `auth.sh` - verify Confluence auth
 - `page.sh` - fetch page details/content by page ID **or full page URL** (the numeric id is extracted from `/pages/<id>/` URLs)
 - `html_to_md.js` - Confluence HTML → markdown, stdin→stdout, no npm dependencies (used by `page.sh md`; needs node)
 - `create-page.sh` / `update-page.sh` - create/update a page from wiki markup. `update-page.sh` refuses pages carrying the pipeline's `generated` label (override name via `GENERATED_LABEL`; `--force` to overwrite anyway) so hand edits can't clobber confluence-publish-managed pages.
@@ -19,7 +18,7 @@ Scripts mirror the `jira/` helpers and use the same `JIRA_USER`/`JIRA_TOKEN` cre
 
 ```bash
 # Check auth
-./confluence/auth.sh
+hedy auth
 
 # Full page output (HTML body included) — by id or URL
 ./confluence/page.sh 12345678
@@ -35,4 +34,4 @@ Scripts mirror the `jira/` helpers and use the same `JIRA_USER`/`JIRA_TOKEN` cre
 ./confluence/page.sh 12345678 json
 ```
 
-The `confluence-read` skill wraps the read path (auth → `page.sh md` → analysis) for agent sessions.
+The `confluence-read` skill wraps the read path (`hedy auth` → `page.sh md` → analysis) for agent sessions.

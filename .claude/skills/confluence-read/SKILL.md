@@ -24,8 +24,10 @@ Prerequisites: `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL` in the environment 
 Skip if this session has already verified Confluence auth.
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/confluence/auth.sh
+hedy auth
 ```
+
+If `hedy` is not found, run `make -C ~/trade-imports-arch-workspace link`.
 
 On failure, relay the error - it names the missing variable or the rejected credential. Do not print credential values.
 
@@ -58,6 +60,5 @@ All under `~/trade-imports-arch-workspace/.claude/tools/confluence/` (the shared
 
 | Script | Purpose |
 | --- | --- |
-| `auth.sh` | Verify Confluence credentials (never prints values) |
 | `page.sh` | Fetch a page by URL or id; formats `full`, `summary`, `json`, `md` |
 | `html_to_md.js` | stdin HTML → stdout markdown; used by `page.sh md` (needs node) |

@@ -13,8 +13,10 @@ Create, read and update JIRA issues from any session in this workspace. Reading 
 All three scripts read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL` from the environment (loaded from the workspace `.env` by direnv). Creation additionally needs `JIRA_PROJECT_KEY`. If any call fails with an auth or unset-variable error, run the pre-flight and report its output:
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/jira/auth.sh
+hedy auth
 ```
+
+If `hedy` is not found, run `make -C ~/trade-imports-arch-workspace link`.
 
 ## Usage
 
@@ -103,4 +105,3 @@ All under `~/trade-imports-arch-workspace/.claude/tools/jira/`:
 | `fetch.sh` | JQL or batch-key fetch, paginated, flat JSON projection |
 | `create-ticket.sh` | Create one issue (type, priority, labels, parent, description file) |
 | `update-description.sh` | Replace one issue's description (Jira wiki markup) |
-| `auth.sh` | Credential pre-flight - verifies the API accepts `JIRA_USER`/`JIRA_TOKEN` |
