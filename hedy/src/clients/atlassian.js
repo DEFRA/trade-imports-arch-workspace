@@ -25,11 +25,16 @@ export const credentialsFromEnv = (env) => {
 
 const basicAuthorization = (user, token) => `Basic ${Buffer.from(`${user}:${token}`).toString('base64')}`
 
-const connectionError = ({ service, action }, cause) => new HedyError(
-  'NETWORK',
-  `${action}: ${service} could not be reached. Check the network connection and JIRA_BASE_URL in the workspace .env file, then run the command again.`,
-  { cause }
-)
+const fetchFailureError = ({ service, action }, timeoutMs, cause) => {
+  const failure = cause?.name === 'TimeoutError'
+    ? `did not answer within ${timeoutMs / 1000} seconds`
+    : 'could not be reached'
+  return new HedyError(
+    'NETWORK',
+    `${action}: ${service} ${failure}. Check the network connection and JIRA_BASE_URL in the workspace .env file, then run the command again.`,
+    { cause }
+  )
+}
 
 const parsedBody = (text, { service, action }) => {
   try {
@@ -52,11 +57,13 @@ const badRequestError = ({ service, action }, body) => {
     : `${action}: ${service} refused the request. ${service} said ${listInProse(reasons.map((reason) => `"${reason}"`))}. Correct the request, then run the command again.`)
 }
 
+const serverError = ({ service, action }, status) =>
+  new HedyError('NETWORK', `${action}: ${service} answered ${status}. Run the command again. If the failure repeats, check the Atlassian status page.`)
+
 const statusError = (context, { status, text }) => {
   const { service, action } = context
+  if (status >= 500) return serverError(context, status)
   switch (status) {
-    case 400:
-      return badRequestError(context, parsedBody(text, context))
     case 401:
       return new HedyError('AUTH', `${action}: ${service} rejected the credentials in JIRA_USER and JIRA_TOKEN. Check both in the workspace .env file.`)
     case 403:
@@ -66,35 +73,39 @@ const statusError = (context, { status, text }) => {
     case 429:
       return new HedyError('RATE_LIMIT', `${action}: ${service} is rate limiting requests. Wait a minute and run the command again.`)
     default:
-      return new HedyError('NETWORK', `${action}: ${service} answered ${status}. Run the command again. If the failure repeats, check the Atlassian status page.`)
+      return badRequestError(context, parsedBody(text, context))
   }
 }
 
-const fetchText = async (url, headers, context) => {
+const fetchText = async (url, { headers, timeoutMs }, context) => {
   try {
-    const response = await fetch(url, { headers })
+    const response = await fetch(url, { headers, signal: AbortSignal.timeout(timeoutMs) })
     return { status: response.status, text: await response.text() }
   } catch (error) {
-    throw connectionError(context, error)
+    throw fetchFailureError(context, timeoutMs, error)
   }
 }
 
 /**
  * Returns get(path, action), which resolves to the parsed JSON body of a
- * GET on baseUrl + path. Every failure is a HedyError whose message starts
- * with the action and names the service.
+ * GET on baseUrl + path. A request with no full answer within timeoutMs
+ * fails. Every failure is a HedyError whose message starts with the action
+ * and names the service.
  *
- * @param {{ service: string, user: string, token: string, baseUrl: string }} options
- *   service is the product name used in messages
+ * @param {{ service: string, user: string, token: string, baseUrl: string, timeoutMs?: number }} options
+ *   service is the product name used in messages; timeoutMs defaults to 30000
  * @returns {{ get: (path: string, action: string) => Promise<unknown> }}
  */
-export const createAtlassianHttp = ({ service, user, token, baseUrl }) => {
+export const createAtlassianHttp = ({ service, user, token, baseUrl, timeoutMs = 30000 }) => {
   const root = baseUrl.replace(/\/+$/, '')
-  const headers = { Authorization: basicAuthorization(user, token), Accept: 'application/json' }
+  const request = {
+    headers: { Authorization: basicAuthorization(user, token), Accept: 'application/json' },
+    timeoutMs
+  }
   return {
     get: async (path, action) => {
       const context = { service, action }
-      const response = await fetchText(`${root}${path}`, headers, context)
+      const response = await fetchText(`${root}${path}`, request, context)
       if (response.status >= 400) throw statusError(context, response)
       return parsedBody(response.text, context)
     }

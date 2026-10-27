@@ -7,7 +7,8 @@ import {
   TEST_CREDENTIALS,
   interceptNetworkPerTest,
   printedError,
-  rejectionOf
+  rejectionOf,
+  startSilentServer
 } from '../test-support/http.js'
 import { createConfluenceClient } from './confluence.js'
 
@@ -33,6 +34,23 @@ describe('the Confluence client whoami', () => {
     nock(ATLASSIAN_BASE_URL).get(CURRENT_USER).reply(200, { displayName: 'Ada Lovelace' })
     const client = createConfluenceClient({ ...TEST_CREDENTIALS, baseUrl: `${ATLASSIAN_BASE_URL}/` })
     expect(await client.whoami()).toEqual({ displayName: 'Ada Lovelace' })
+  })
+
+  it('rejects with AUTH when Confluence answers that the caller is anonymous', async () => {
+    nock(ATLASSIAN_BASE_URL).get(CURRENT_USER).reply(200, { type: 'anonymous', displayName: 'Anonymous' })
+    const error = await rejectionOf(createConfluenceClient(TEST_CREDENTIALS).whoami())
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'AUTH',
+      message: 'whoami: Confluence treats the credentials as anonymous, so the account has no Confluence access. Check the account\'s Confluence licence, then run the command again.'
+    })
+  })
+
+  it('rejects with NETWORK when Confluence does not answer within the timeoutMs given', async () => {
+    const server = await startSilentServer()
+    const client = createConfluenceClient({ ...TEST_CREDENTIALS, baseUrl: server.baseUrl }, { timeoutMs: 50 })
+    const error = await rejectionOf(client.whoami()).finally(server.close)
+    expect(error).toMatchObject({ name: 'HedyError', code: 'NETWORK', message: expect.stringMatching(/^whoami: Confluence did not answer within 0\.05 seconds\. /) })
   })
 
   it.each(FAILURE_REPLIES)('on %s rejects with %s, naming Confluence and whoami and holding neither the user nor the token', async (_label, code, reply, fragments) => {

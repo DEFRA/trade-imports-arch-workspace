@@ -1,3 +1,5 @@
+import { once } from 'node:events'
+import { createServer } from 'node:http'
 import { inspect } from 'node:util'
 import nock from 'nock'
 import { afterEach, beforeEach, expect } from 'vitest'
@@ -11,6 +13,21 @@ export const TEST_CREDENTIALS = Object.freeze({
 })
 
 export const TEST_AUTHORIZATION = 'Basic aGVkeS50ZXN0ZXJAZXhhbXBsZS5jb206dGVzdC10b2tlbi03ZDFj'
+
+/**
+ * A new environment object holding JIRA_USER, JIRA_TOKEN and JIRA_BASE_URL
+ * from TEST_CREDENTIALS and nothing else.
+ */
+export const credentialsEnv = () => ({
+  JIRA_USER: TEST_CREDENTIALS.user,
+  JIRA_TOKEN: TEST_CREDENTIALS.token,
+  JIRA_BASE_URL: TEST_CREDENTIALS.baseUrl
+})
+
+/**
+ * The Basic Authorization header value for user and token.
+ */
+export const basicAuthorizationFor = (user, token) => `Basic ${Buffer.from(`${user}:${token}`).toString('base64')}`
 
 /**
  * Rows of [label, code, reply, fragments]: reply stages the answer on a nock
@@ -30,6 +47,28 @@ export const FAILURE_REPLIES = [
   ['a refused connection', 'NETWORK', (interceptor) => interceptor.replyWithError('connect ECONNREFUSED'), ['could not be reached']],
   ['a 200 body that is not JSON', 'PARSE', (interceptor) => interceptor.reply(200, `<html>${TEST_CREDENTIALS.token}</html>`), ['not JSON']]
 ]
+
+/**
+ * Starts a loopback server that accepts every connection and never answers,
+ * and lets the calling test connect to it through nock. close() drops every
+ * connection and stops the server.
+ *
+ * @returns {Promise<{ baseUrl: string, close: () => Promise<void> }>}
+ */
+export const startSilentServer = async () => {
+  const server = createServer(() => {})
+  server.listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  nock.enableNetConnect('127.0.0.1')
+  return {
+    baseUrl: `http://127.0.0.1:${server.address().port}`,
+    close: async () => {
+      server.closeAllConnections()
+      server.close()
+      await once(server, 'close')
+    }
+  }
+}
 
 /**
  * Registers hooks in the calling test file: real connections are refused in

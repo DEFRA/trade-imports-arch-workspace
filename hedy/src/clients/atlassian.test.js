@@ -4,19 +4,15 @@ import {
   ATLASSIAN_BASE_URL,
   TEST_AUTHORIZATION,
   TEST_CREDENTIALS,
+  credentialsEnv,
   interceptNetworkPerTest,
   printedError,
-  rejectionOf
+  rejectionOf,
+  startSilentServer
 } from '../test-support/http.js'
 import { createAtlassianHttp, credentialsFromEnv } from './atlassian.js'
 
 interceptNetworkPerTest()
-
-const FULL_ENV = Object.freeze({
-  JIRA_USER: TEST_CREDENTIALS.user,
-  JIRA_TOKEN: TEST_CREDENTIALS.token,
-  JIRA_BASE_URL: TEST_CREDENTIALS.baseUrl
-})
 
 const refusalOf = (env) => {
   try {
@@ -38,7 +34,7 @@ const MISSING_SETS = [
 ]
 
 const envWithout = (names, form) => {
-  const env = { ...FULL_ENV }
+  const env = credentialsEnv()
   for (const name of names) {
     if (form === 'missing') delete env[name]
     else env[name] = ''
@@ -48,7 +44,7 @@ const envWithout = (names, form) => {
 
 describe('credentialsFromEnv', () => {
   it('returns user, token and baseUrl from JIRA_USER, JIRA_TOKEN and JIRA_BASE_URL, ignoring other variables', () => {
-    expect(credentialsFromEnv({ ...FULL_ENV, HOME: '/home/hedy' })).toEqual({
+    expect(credentialsFromEnv({ ...credentialsEnv(), HOME: '/home/hedy' })).toEqual({
       user: TEST_CREDENTIALS.user,
       token: TEST_CREDENTIALS.token,
       baseUrl: TEST_CREDENTIALS.baseUrl
@@ -68,8 +64,8 @@ describe('credentialsFromEnv', () => {
 
 const PROBE = '/rest/probe'
 
-const probe = (baseUrl = ATLASSIAN_BASE_URL) =>
-  createAtlassianHttp({ service: 'Jira', user: TEST_CREDENTIALS.user, token: TEST_CREDENTIALS.token, baseUrl }).get(PROBE, 'probe')
+const probe = (baseUrl = ATLASSIAN_BASE_URL, options = {}) =>
+  createAtlassianHttp({ service: 'Jira', user: TEST_CREDENTIALS.user, token: TEST_CREDENTIALS.token, baseUrl, ...options }).get(PROBE, 'probe')
 
 describe('createAtlassianHttp get', () => {
   it('resolves to the parsed body, sending the Basic header for user and token and asking for JSON', async () => {
@@ -91,7 +87,6 @@ describe('createAtlassianHttp get', () => {
     [403, 'AUTH', 'probe: Jira refused the account in JIRA_USER access to this resource. Check the account\'s Jira permissions, then run the command again.'],
     [404, 'NOT_FOUND', 'probe: Jira found nothing at the requested address. Check the key or id given, and that JIRA_BASE_URL in the workspace .env file is the Atlassian site address.'],
     [429, 'RATE_LIMIT', 'probe: Jira is rate limiting requests. Wait a minute and run the command again.'],
-    [405, 'NETWORK', 'probe: Jira answered 405. Run the command again. If the failure repeats, check the Atlassian status page.'],
     [500, 'NETWORK', 'probe: Jira answered 500. Run the command again. If the failure repeats, check the Atlassian status page.'],
     [503, 'NETWORK', 'probe: Jira answered 503. Run the command again. If the failure repeats, check the Atlassian status page.']
   ])('maps status %i to %s with a message naming the service, the action and the next step', async (status, code, message) => {
@@ -113,6 +108,28 @@ describe('createAtlassianHttp get', () => {
     nock(ATLASSIAN_BASE_URL).get(PROBE).reply(400, body)
     const error = await rejectionOf(probe())
     expect(error).toMatchObject({ name: 'HedyError', code: 'USAGE', message })
+  })
+
+  it.each([405, 409, 422])('maps status %i to USAGE carrying the reasons the service gives', async (status) => {
+    nock(ATLASSIAN_BASE_URL).get(PROBE).reply(status, { errorMessages: ['The request conflicts with the issue state.'] })
+    const error = await rejectionOf(probe())
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'USAGE',
+      message: 'probe: Jira refused the request. Jira said "The request conflicts with the issue state.". Correct the request, then run the command again.'
+    })
+  })
+
+  it('maps a service that does not answer within timeoutMs to NETWORK, naming the wait in seconds and holding neither the user nor the token', async () => {
+    const server = await startSilentServer()
+    const error = await rejectionOf(probe(server.baseUrl, { timeoutMs: 50 })).finally(server.close)
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'NETWORK',
+      message: 'probe: Jira did not answer within 0.05 seconds. Check the network connection and JIRA_BASE_URL in the workspace .env file, then run the command again.'
+    })
+    expect(printedError(error)).not.toContain(TEST_CREDENTIALS.token)
+    expect(printedError(error)).not.toContain(TEST_CREDENTIALS.user)
   })
 
   it('maps a refused connection to NETWORK, naming the service and the next step', async () => {

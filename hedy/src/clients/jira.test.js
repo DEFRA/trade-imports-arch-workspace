@@ -7,7 +7,8 @@ import {
   TEST_CREDENTIALS,
   interceptNetworkPerTest,
   printedError,
-  rejectionOf
+  rejectionOf,
+  startSilentServer
 } from '../test-support/http.js'
 import { createJiraClient } from './jira.js'
 
@@ -33,6 +34,13 @@ describe('the Jira client whoami', () => {
     nock(ATLASSIAN_BASE_URL).get(MYSELF).reply(200, { displayName: 'Ada Lovelace' })
     const client = createJiraClient({ ...TEST_CREDENTIALS, baseUrl: `${ATLASSIAN_BASE_URL}/` })
     expect(await client.whoami()).toEqual({ displayName: 'Ada Lovelace' })
+  })
+
+  it('rejects with NETWORK when Jira does not answer within the timeoutMs given', async () => {
+    const server = await startSilentServer()
+    const client = createJiraClient({ ...TEST_CREDENTIALS, baseUrl: server.baseUrl }, { timeoutMs: 50 })
+    const error = await rejectionOf(client.whoami()).finally(server.close)
+    expect(error).toMatchObject({ name: 'HedyError', code: 'NETWORK', message: expect.stringMatching(/^whoami: Jira did not answer within 0\.05 seconds\. /) })
   })
 
   it.each(FAILURE_REPLIES)('on %s rejects with %s, naming Jira and whoami and holding neither the user nor the token', async (_label, code, reply, fragments) => {

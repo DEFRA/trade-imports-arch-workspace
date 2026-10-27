@@ -1,22 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { HedyError } from './errors.js'
 import { runAction } from './run-action.js'
-
-const harness = () => {
-  const out = []
-  const err = []
-  const codes = []
-  return {
-    out,
-    err,
-    codes,
-    options: {
-      stdout: { write: (chunk) => out.push(chunk) },
-      stderr: { write: (chunk) => err.push(chunk) },
-      setExitCode: (code) => codes.push(code)
-    }
-  }
-}
+import { captureIo } from './test-support/io.js'
 
 const singleJsonLine = (chunks) => {
   const lines = chunks.join('').split('\n')
@@ -27,9 +12,9 @@ const singleJsonLine = (chunks) => {
 
 describe('runAction', () => {
   it('in text mode prints the rendered result to stdout and returns 0', async () => {
-    const h = harness()
+    const h = captureIo()
     const code = await runAction(() => ({ name: 'hedy' }), {
-      ...h.options,
+      ...h,
       render: (result) => `name: ${result.name}`
     })
     expect(code).toBe(0)
@@ -39,14 +24,14 @@ describe('runAction', () => {
   })
 
   it('in text mode defaults to String(result) when no render is given', async () => {
-    const h = harness()
-    await runAction(() => 7, h.options)
+    const h = captureIo()
+    await runAction(() => 7, h)
     expect(h.out).toEqual(['7\n'])
   })
 
   it('in JSON mode prints exactly one line that parses to a success envelope', async () => {
-    const h = harness()
-    const code = await runAction(() => ({ answer: 42 }), { ...h.options, json: true })
+    const h = captureIo()
+    const code = await runAction(() => ({ answer: 42 }), { ...h, json: true })
     const envelope = singleJsonLine(h.out)
     expect(code).toBe(0)
     expect(envelope.ok).toBe(true)
@@ -57,8 +42,8 @@ describe('runAction', () => {
   })
 
   it('on a USAGE HedyError in JSON mode prints one failure envelope line, nothing on stderr, and returns 2', async () => {
-    const h = harness()
-    const code = await runAction(() => { throw new HedyError('USAGE', 'Unknown flag --nope.') }, { ...h.options, json: true })
+    const h = captureIo()
+    const code = await runAction(() => { throw new HedyError('USAGE', 'Unknown flag --nope.') }, { ...h, json: true })
     const envelope = singleJsonLine(h.out)
     expect(code).toBe(2)
     expect(envelope.ok).toBe(false)
@@ -68,8 +53,8 @@ describe('runAction', () => {
   })
 
   it('on a thrown TypeError in text mode prints only the message to stderr, nothing on stdout, and returns 1', async () => {
-    const h = harness()
-    const code = await runAction(() => { throw new TypeError('x is not a function') }, h.options)
+    const h = captureIo()
+    const code = await runAction(() => { throw new TypeError('x is not a function') }, h)
     expect(code).toBe(1)
     expect(h.err).toEqual(['x is not a function\n'])
     expect(h.err.join('')).not.toMatch(/\n\s+at /)
@@ -78,16 +63,16 @@ describe('runAction', () => {
   })
 
   it('awaits an async action that resolves later', async () => {
-    const h = harness()
+    const h = captureIo()
     const action = () => new Promise((resolve) => setTimeout(() => resolve('late'), 20))
-    const code = await runAction(action, h.options)
+    const code = await runAction(action, h)
     expect(code).toBe(0)
     expect(h.out).toEqual(['late\n'])
   })
 
   it('treats a rejected async action like a thrown error', async () => {
-    const h = harness()
-    const code = await runAction(async () => { throw new HedyError('USAGE', 'Missing argument.') }, h.options)
+    const h = captureIo()
+    const code = await runAction(async () => { throw new HedyError('USAGE', 'Missing argument.') }, h)
     expect(code).toBe(2)
     expect(h.err).toEqual(['Missing argument.\n'])
     expect(h.out).toEqual([])
@@ -95,9 +80,9 @@ describe('runAction', () => {
   })
 
   it('treats a render that throws as an UNKNOWN failure and writes nothing to stdout', async () => {
-    const h = harness()
+    const h = captureIo()
     const code = await runAction(() => 'x', {
-      ...h.options,
+      ...h,
       render: () => { throw new Error('render failed') }
     })
     expect(code).toBe(1)
@@ -114,8 +99,8 @@ describe('runAction on an AggregateError', () => {
   ], 'Several failures')
 
   it('in JSON mode prints one envelope whose errors hold each error in order, nothing on stderr, and returns the lowest exit code', async () => {
-    const h = harness()
-    const code = await runAction(() => { throw failures() }, { ...h.options, json: true })
+    const h = captureIo()
+    const code = await runAction(() => { throw failures() }, { ...h, json: true })
     const envelope = singleJsonLine(h.out)
     expect(envelope.ok).toBe(false)
     expect(envelope.errors).toEqual([
@@ -128,8 +113,8 @@ describe('runAction on an AggregateError', () => {
   })
 
   it('in text mode writes each message on its own stderr line, nothing on stdout, and returns the lowest exit code', async () => {
-    const h = harness()
-    const code = await runAction(() => { throw failures() }, h.options)
+    const h = captureIo()
+    const code = await runAction(() => { throw failures() }, h)
     expect(h.err.join('')).toBe('Jira refused the request.\nConfluence rejected the credentials.\n')
     expect(h.out).toEqual([])
     expect(code).toBe(1)
@@ -137,10 +122,10 @@ describe('runAction on an AggregateError', () => {
   })
 
   it('returns 2 when every error it holds is USAGE', async () => {
-    const h = harness()
+    const h = captureIo()
     const code = await runAction(() => {
       throw new AggregateError([new HedyError('USAGE', 'First.'), new HedyError('USAGE', 'Second.')])
-    }, h.options)
+    }, h)
     expect(code).toBe(2)
     expect(h.codes).toEqual([2])
   })

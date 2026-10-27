@@ -7,19 +7,21 @@ import nock from 'nock'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import { isHedyError } from '../errors.js'
 import { createWorkspace, runCli } from '../test-support/cli.js'
-import { ATLASSIAN_BASE_URL, TEST_CREDENTIALS, interceptNetworkPerTest, rejectionOf } from '../test-support/http.js'
+import {
+  ATLASSIAN_BASE_URL,
+  TEST_CREDENTIALS,
+  basicAuthorizationFor,
+  credentialsEnv,
+  interceptNetworkPerTest,
+  rejectionOf
+} from '../test-support/http.js'
+import { captureIo } from '../test-support/io.js'
 import { register, runAuth } from './auth.js'
 
 interceptNetworkPerTest()
 
 const MYSELF = '/rest/api/2/myself'
 const CURRENT_USER = '/wiki/rest/api/user/current'
-
-const credentialsEnv = () => ({
-  JIRA_USER: TEST_CREDENTIALS.user,
-  JIRA_TOKEN: TEST_CREDENTIALS.token,
-  JIRA_BASE_URL: TEST_CREDENTIALS.baseUrl
-})
 
 const stageJira = (status, body) => nock(ATLASSIAN_BASE_URL).get(MYSELF).reply(status, body)
 const stageConfluence = (status, body) => nock(ATLASSIAN_BASE_URL).get(CURRENT_USER).reply(status, body)
@@ -73,18 +75,10 @@ describe('runAuth', () => {
 })
 
 const harness = (env) => {
-  const out = []
-  const err = []
-  const codes = []
+  const io = captureIo()
   const program = new Command().option('--json').exitOverride()
-  register(program, {
-    stdout: { write: (chunk) => out.push(chunk) },
-    stderr: { write: (chunk) => err.push(chunk) },
-    setExitCode: (code) => codes.push(code),
-    env,
-    workspaceRoot: () => root
-  })
-  return { program, out, err, codes }
+  register(program, { ...io, env, workspaceRoot: () => root })
+  return { program, ...io }
 }
 
 describe('the auth command', () => {
@@ -121,8 +115,6 @@ describe('the auth command', () => {
     expect(h.codes).toEqual([1])
   })
 })
-
-const basicFor = (user, token) => `Basic ${Buffer.from(`${user}:${token}`).toString('base64')}`
 
 const startRefusingServer = async () => {
   const requests = []
@@ -181,8 +173,8 @@ describe('hedy auth, spawned', () => {
     expect(result.exitCode).toBe(1)
     expect(result.envelope.errors.map(({ code }) => code)).toEqual(['AUTH', 'AUTH'])
     expect([...server.requests].sort((a, b) => a.url.localeCompare(b.url))).toEqual([
-      { url: MYSELF, authorization: basicFor('file-user', 'file-token') },
-      { url: CURRENT_USER, authorization: basicFor('file-user', 'file-token') }
+      { url: MYSELF, authorization: basicAuthorizationFor('file-user', 'file-token') },
+      { url: CURRENT_USER, authorization: basicAuthorizationFor('file-user', 'file-token') }
     ])
   })
 
@@ -191,8 +183,8 @@ describe('hedy auth, spawned', () => {
     const result = await runCli(['auth', '--json'], { env: childEnv({ JIRA_TOKEN: 'env-token' }) })
     expect(result.exitCode).toBe(1)
     expect(server.requests.map(({ authorization }) => authorization)).toEqual([
-      basicFor('file-user', 'env-token'),
-      basicFor('file-user', 'env-token')
+      basicAuthorizationFor('file-user', 'env-token'),
+      basicAuthorizationFor('file-user', 'env-token')
     ])
   })
 })

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Auth doctor - verifies credentials for every service.
-# Runs `hedy auth` (Jira and Confluence) first, then any tools/*/auth.sh, so a
-# new domain still joins the sweep by adding its own auth.sh; nothing to
-# register here.
+# Runs `hedy auth` (Jira and Confluence) first. The tools/*/auth.sh loop is a
+# compatibility path for a service hedy does not cover; a new Atlassian check
+# belongs in hedy, not in a new auth.sh.
 # Invoke with bash (no execute bit required):
 #   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh
 # Exit 1 when hedy is missing or any service check fails.

@@ -55,10 +55,16 @@ describe('fillEnvFromFile', () => {
     expect(env).toEqual({ KEPT: 'from-env' })
   })
 
-  it('rethrows a read error other than a missing file', async () => {
+  it('throws an UNKNOWN HedyError naming the path and the next step on a read error other than a missing file, keeping the read error as the cause', async () => {
     const folder = await tempFolder()
     const env = {}
-    expect(readErrorOf(env, folder).code).toBe('EISDIR')
+    const error = readErrorOf(env, folder)
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'UNKNOWN',
+      message: `The .env file at ${folder} could not be read. Check that the path is a regular file with read permission, then run the command again.`
+    })
+    expect(error.cause.code).toBe('EISDIR')
     expect(env).toEqual({})
   })
 
@@ -90,11 +96,18 @@ describe('fillEnvFromFile', () => {
     expect(env).toEqual({ FIRST: 'deep!', SECOND: 'deep!', THIRD: 'deep' })
   })
 
-  it('expands a reference to a name env holds to the env value, even when the file defines that name', async () => {
+  it('expands a reference to the file value of a name env also holds, leaving the env variable untouched', async () => {
     const path = await envFileHolding('JIRA_TOKEN=$ATLASSIAN_TOKEN\nATLASSIAN_TOKEN=from-file\n')
     const env = { ATLASSIAN_TOKEN: 'from-env' }
     expect(fillEnvFromFile(env, path)).toEqual(['JIRA_TOKEN'])
-    expect(env).toEqual({ ATLASSIAN_TOKEN: 'from-env', JIRA_TOKEN: 'from-env' })
+    expect(env).toEqual({ ATLASSIAN_TOKEN: 'from-env', JIRA_TOKEN: 'from-file' })
+  })
+
+  it('expands a reference to a name only env holds to the empty string', async () => {
+    const path = await envFileHolding(`BARE=a$SECRETb\nBRACED=a${bracedReference('SECRET')}b\n`)
+    const env = { SECRET: 'from-env' }
+    expect(fillEnvFromFile(env, path)).toEqual(['BARE', 'BRACED'])
+    expect(env).toEqual({ SECRET: 'from-env', BARE: 'a', BRACED: 'ab' })
   })
 
   it('expands a reference to a name neither env nor the file defines to the empty string', async () => {
@@ -102,6 +115,48 @@ describe('fillEnvFromFile', () => {
     const env = {}
     expect(fillEnvFromFile(env, path)).toEqual(['BARE', 'BRACED'])
     expect(env).toEqual({ BARE: 'a', BRACED: 'ab' })
+  })
+
+  it('expands a reference to a name the file does not define but every object inherits to the empty string', async () => {
+    const path = await envFileHolding('INHERITED=a$constructor\n')
+    const env = {}
+    expect(fillEnvFromFile(env, path)).toEqual(['INHERITED'])
+    expect(env).toEqual({ INHERITED: 'a' })
+  })
+
+  it.each([
+    ['a plain line', "JIRA_TOKEN='abc$def'\n"],
+    ['an export line with spaces around the equals sign', "  export JIRA_TOKEN = 'abc$def'\n"]
+  ])('keeps a single-quoted value literal on %s', async (_, text) => {
+    const path = await envFileHolding(`${text}def=expanded\n`)
+    const env = {}
+    fillEnvFromFile(env, path)
+    expect(env.JIRA_TOKEN).toBe('abc$def')
+  })
+
+  it('takes the quoting of the last definition of a name', async () => {
+    const path = await envFileHolding("JIRA_TOKEN='first'\nJIRA_TOKEN=\"abc$SITE\"\nSITE=defra\n")
+    const env = {}
+    fillEnvFromFile(env, path)
+    expect(env.JIRA_TOKEN).toBe('abcdefra')
+  })
+
+  it.each([
+    ['a double-quoted value', 'OTHER="x\\$HOME"\nHOME=from-file\n', 'x$HOME'],
+    ['an unquoted value', 'OTHER=x\\$HOME\nHOME=from-file\n', 'x$HOME'],
+    ['a braced reference', `OTHER="x\\${bracedReference('HOME')}"\nHOME=from-file\n`, `x${bracedReference('HOME')}`]
+  ])('reads a backslash before $ in %s as a literal $ and no reference', async (_, text, expected) => {
+    const path = await envFileHolding(text)
+    const env = {}
+    fillEnvFromFile(env, path)
+    expect(env.OTHER).toBe(expected)
+  })
+
+  it('expands a double-quoted reference', async () => {
+    const path = await envFileHolding('JIRA_TOKEN="$ATLASSIAN_TOKEN"\nATLASSIAN_TOKEN=abc\n')
+    const env = {}
+    fillEnvFromFile(env, path)
+    expect(env.JIRA_TOKEN).toBe('abc')
   })
 
   it('expands a reference inside a longer value in place', async () => {

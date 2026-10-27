@@ -1,18 +1,13 @@
 import { Command } from 'commander'
 import { describe, it, expect } from 'vitest'
+import { captureIo } from '../test-support/io.js'
 import { register, runHello } from './hello.js'
 
 const harness = () => {
-  const out = []
-  const err = []
-  const codes = []
+  const io = captureIo()
   const program = new Command().option('--json').exitOverride()
-  register(program, {
-    stdout: { write: (chunk) => out.push(chunk) },
-    stderr: { write: (chunk) => err.push(chunk) },
-    setExitCode: (code) => codes.push(code)
-  })
-  return { program, out, err, codes }
+  register(program, io)
+  return { program, ...io }
 }
 
 describe('runHello', () => {

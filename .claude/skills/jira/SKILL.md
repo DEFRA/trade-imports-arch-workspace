@@ -10,7 +10,7 @@ Create, read and update JIRA issues from any session in this workspace. Reading 
 
 ## Credentials
 
-All three scripts read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL` from the environment (loaded from the workspace `.env` by direnv). Creation additionally needs `JIRA_PROJECT_KEY`. If any call fails with an auth or unset-variable error, run the pre-flight and report its output:
+All three scripts read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL` from the environment (loaded from the workspace `.env` by direnv). Creation additionally needs `JIRA_PROJECT_KEY`, which the pre-flight below does not check: when that variable is unset, `create-ticket.sh` fails naming the variable, and the fix is a line in the workspace `.env`. If any call fails with an auth or unset-variable error, run the pre-flight and report its output:
 
 ```bash
 hedy auth
