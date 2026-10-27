@@ -5,9 +5,11 @@
 #   make clone      clone the child repos; wires origin on any that
 #                   exist without one (idempotent)
 #   make pull       fast-forward the children
-#   make link       create ~/trade-imports-arch-workspace -> this checkout
-#                   and point core.hooksPath at .githooks (pre-commit lint)
-#   make check      run the doctors, the skills lint and the golden tests
+#   make link       create ~/trade-imports-arch-workspace -> this checkout,
+#                   point core.hooksPath at .githooks (pre-commit lint),
+#                   install cli/ and npm-link hedy onto PATH
+#   make check      run the doctors, the skills lint, the golden tests
+#                   and the hedy CLI lint and tests
 #
 # Clones over HTTPS by default; override for SSH:
 #   make GIT_BASE=git@github.com:DEFRA
@@ -15,6 +17,8 @@
 GIT_BASE ?= https://github.com/DEFRA
 CHILDREN := trade-imports-documentation delivery-info-arch-tooling trade-imports-schemas
 CANONICAL := $(HOME)/trade-imports-arch-workspace
+# Resolved checkout path: npm never runs across the canonical symlink.
+REAL := $(shell cd "$(CURDIR)" && pwd -P)
 
 .PHONY: setup clone pull link check
 
@@ -40,6 +44,8 @@ pull:
 		git -C $$repo pull --ff-only || exit 1; \
 	done
 
+# hedy: a bare `npm link` from inside cli/, never `npm --prefix`: asdf's
+# npm wrapper reshims only after the bare form, which puts hedy on PATH.
 link:
 	@if [ -e $(CANONICAL) ] || [ -L $(CANONICAL) ]; then \
 		echo "link: $(CANONICAL) already present"; \
@@ -49,6 +55,10 @@ link:
 	fi
 	@git config core.hooksPath .githooks
 	@echo "link: core.hooksPath -> .githooks (pre-commit skills lint)"
+	@echo "link: npm ci in $(REAL)/cli"
+	@cd "$(REAL)/cli" && npm ci
+	@echo "link: npm link in $(REAL)/cli (hedy onto PATH)"
+	@cd "$(REAL)/cli" && npm link
 
 check:
 	@bash .claude/tools/workspace/check-workspace.sh
@@ -59,3 +69,5 @@ check:
 	@bash .claude/tools/editorial/tests/run-golden.sh
 	@bash .claude/tools/editorial-triage/tests/run-golden.sh
 	@bash .claude/tools/editorial-metrics/tests/run-golden.sh
+	@cd "$(REAL)/cli" && npm run lint
+	@cd "$(REAL)/cli" && npm test
