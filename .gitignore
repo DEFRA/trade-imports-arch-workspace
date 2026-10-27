@@ -51,6 +51,7 @@ node_modules/
 
 # Root npm manifest and lockfile
 package-lock.json
+!cli/package-lock.json
 
 # Don't push Claude local settings
 settings.local.json
