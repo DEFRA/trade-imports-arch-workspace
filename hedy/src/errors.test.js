@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { z } from 'zod'
 import { ERROR_CODES, HedyError, isHedyError, toHedyError, toHedyErrors } from './errors.js'
 
 describe('ERROR_CODES', () => {
@@ -60,6 +61,19 @@ describe('toHedyError', () => {
     expect(wrapped.code).toBe('UNKNOWN')
     expect(wrapped.message).toBe('x is not a function')
     expect(wrapped.cause).toBe(original)
+  })
+
+  it('turns a ZodError into one USAGE error joining each issue message with a space, keeping it as the cause', () => {
+    const schema = z.object({
+      key: z.string('The key must be text.'),
+      max: z.number('--max must be a whole number greater than 0.')
+    })
+    const zodError = schema.safeParse({ key: 1, max: 'x' }).error
+    const wrapped = toHedyError(zodError)
+    expect(isHedyError(wrapped)).toBe(true)
+    expect(wrapped.code).toBe('USAGE')
+    expect(wrapped.message).toBe('The key must be text. --max must be a whole number greater than 0.')
+    expect(wrapped.cause).toBe(zodError)
   })
 
   it.each([

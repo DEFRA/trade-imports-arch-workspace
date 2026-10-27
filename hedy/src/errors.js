@@ -1,3 +1,5 @@
+import { ZodError } from 'zod'
+
 export const ERROR_CODES = Object.freeze(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE'])
 
 export class HedyError extends Error {
@@ -19,10 +21,14 @@ export class HedyError extends Error {
 export const isHedyError = (error) => error instanceof HedyError
 
 /**
- * Returns a HedyError unchanged; wraps anything else as UNKNOWN, keeping it as the cause.
+ * Returns a HedyError unchanged. Wraps a ZodError as USAGE, its issue messages
+ * joined with a space, and anything else as UNKNOWN, keeping either as the cause.
  */
 export const toHedyError = (error) => {
   if (isHedyError(error)) return error
+  if (error instanceof ZodError) {
+    return new HedyError('USAGE', error.issues.map(({ message }) => message).join(' '), { cause: error })
+  }
   return new HedyError('UNKNOWN', error?.message || String(error), { cause: error })
 }
 

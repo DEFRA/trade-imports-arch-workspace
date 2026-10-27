@@ -29,8 +29,11 @@ All paths are under `hedy/src/`.
 
 - `cli.js` is the bin entry. It only parses `process.argv`.
 - `program.js` exports `buildProgram()`, which sets the global options `--json` and `--workspace`, sets `exitOverride()`, and routes commander's own errors through the exit map in one catch.
-- `commands/<name>.js` holds one command.
+- `commands/<name>.js` holds one command. `commands/<group>/index.js` holds a group, and the group's subcommands sit beside it, one per file.
 - `commands/auth.js` probes Jira and Confluence together with one set of credentials and reports each service's failure.
+- `commands/jira/` holds `ticket`, which prints one issue, and `search`, which lists the issues a JQL query matches.
+- `commands/confluence/` holds `page`, which prints one page by id, URL or share link.
+- `html-to-markdown.js` holds `markdownFromHtml`, which turns a Confluence page body into markdown.
 - `errors.js` holds `HedyError` and the error codes: `USAGE`, `UNKNOWN`, `AUTH`, `NOT_FOUND`, `RATE_LIMIT`, `NETWORK` and `PARSE`.
 - `env-file.js` fills the environment from the root `.env`, setting only the variables the environment lacks.
 - `credentials.js` holds `loadCredentials`, which fills the environment from the root `.env` and returns the three Atlassian credentials.
@@ -41,7 +44,7 @@ All paths are under `hedy/src/`.
 - `run-action.js` writes a command's result: one JSON line on stdout with `--json`, text otherwise, notes on stderr, and the exit code from the map. An `AggregateError` reports several errors at once, one envelope entry or stderr line per error, with the lowest exit code among them.
 - `workspace-root.js` resolves the workspace from `--workspace`, then `HEDY_WORKSPACE`, then `~/trade-imports-arch-workspace`. It never walks up from the current folder.
 - `test-support/cli.js` spawns the entry and returns stdout, stderr, the exit code and the parsed envelope.
-- `test-support/http.js` sets up nock for a test file: real connections are refused, and interceptors are removed after each test. It also holds the test credentials, the credentials environment, the Basic header builder, the failure table the client tests share, a reader for JSON fixtures, and a loopback server that never answers for timeout tests.
+- `test-support/http.js` sets up nock for a test file: real connections are refused, and interceptors are removed after each test. It also holds the test credentials, the credentials environment, the Basic header builder, the failure table the client tests share, a reader for JSON fixtures, a loopback server that never answers for timeout tests, and `startAnsweringServer`, a loopback server for spawned tests that answers with the status and JSON body the test gives and records each request's URL and Authorization header.
 - `test-support/io.js` captures what a command or `runAction` writes to stdout and stderr and the exit codes it sets.
 - `__fixtures__/` folders beside the tests hold captured data.
 

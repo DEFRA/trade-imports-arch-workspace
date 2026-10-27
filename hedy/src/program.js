@@ -1,7 +1,9 @@
 import { homedir as osHomedir } from 'node:os'
 import { Command, CommanderError } from 'commander'
 import { register as registerAuth } from './commands/auth.js'
+import { register as registerConfluence } from './commands/confluence/index.js'
 import { register as registerHello } from './commands/hello.js'
+import { register as registerJira } from './commands/jira/index.js'
 import { hedyVersion } from './envelope.js'
 import { HedyError } from './errors.js'
 import { EXIT } from './exit-codes.js'
@@ -37,6 +39,8 @@ const usageMessage = ({ code, message }) => {
       return `The command ${quoted} is not recognised. ${suggestion ? hint : 'Run hedy --help to list the commands.'}`
     case 'commander.optionMissingArgument':
       return `The option ${quoted} needs a value. Put the value after the option.`
+    case 'commander.missingArgument':
+      return `The command needs the argument '${quoted}'. Run it with --help to see its arguments.`
     case 'commander.excessArguments':
       return `The command ${quoted} does not take the arguments ${message.match(/got \d+: (.*)\.$/)?.[1]}. Run it with --help to see its arguments.`
     case 'commander.help':
@@ -82,6 +86,8 @@ export const buildProgram = (deps) => {
   const commandDeps = { stdout, stderr, setExitCode, env, workspaceRoot: () => root }
   registerHello(program, commandDeps)
   registerAuth(program, commandDeps)
+  registerJira(program, commandDeps)
+  registerConfluence(program, commandDeps)
   return program
 }
 

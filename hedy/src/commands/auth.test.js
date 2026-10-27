@@ -1,6 +1,4 @@
-import { once } from 'node:events'
 import { rm, writeFile } from 'node:fs/promises'
-import { createServer } from 'node:http'
 import { join } from 'node:path'
 import { Command } from 'commander'
 import nock from 'nock'
@@ -13,7 +11,8 @@ import {
   basicAuthorizationFor,
   credentialsEnv,
   interceptNetworkPerTest,
-  rejectionOf
+  rejectionOf,
+  startAnsweringServer
 } from '../test-support/http.js'
 import { captureIo } from '../test-support/io.js'
 import { register, runAuth } from './auth.js'
@@ -116,31 +115,11 @@ describe('the auth command', () => {
   })
 })
 
-const startRefusingServer = async () => {
-  const requests = []
-  const server = createServer((request, response) => {
-    requests.push({ url: request.url, authorization: request.headers.authorization })
-    response.writeHead(401, { 'content-type': 'application/json' })
-    response.end(JSON.stringify({ message: 'Unauthorized' }))
-  })
-  server.listen(0, '127.0.0.1')
-  await once(server, 'listening')
-  return {
-    requests,
-    baseUrl: `http://127.0.0.1:${server.address().port}`,
-    close: async () => {
-      server.closeAllConnections()
-      server.close()
-      await once(server, 'close')
-    }
-  }
-}
-
 describe('hedy auth, spawned', () => {
   let server
 
   beforeEach(async () => {
-    server = await startRefusingServer()
+    server = await startAnsweringServer(() => ({ status: 401, body: { message: 'Unauthorized' } }))
   })
 
   afterEach(async () => {

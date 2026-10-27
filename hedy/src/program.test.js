@@ -50,6 +50,7 @@ describe('runProgram in text mode', () => {
     [['helo'], 'The command helo is not recognised. Did you mean one of hello, help?'],
     [['hello', 'extra'], 'The command hello does not take the arguments extra. Run it with --help to see its arguments.'],
     [['hello', '--', '--json'], 'The command hello does not take the arguments --json. Run it with --help to see its arguments.'],
+    [['jira', 'ticket'], "The command needs the argument 'key'. Run it with --help to see its arguments."],
     [['--workspace'], 'The option --workspace <path> needs a value. Put the value after the option.'],
     [[], 'No command was given. Run hedy --help to list the commands.']
   ])('turns the parse error for %j into one stderr line, nothing on stdout, exit 2', async (args, message) => {
@@ -131,9 +132,9 @@ describe('runProgram help and version', () => {
     expect(stdout).toMatch(/^ {2}hello\s/m)
   })
 
-  it('lists the auth command in the top-level help', async () => {
+  it.each(['auth', 'jira', 'confluence'])('lists the %s command in the top-level help', async (name) => {
     const { stdout } = await run(['--help'])
-    expect(stdout).toMatch(/^ {2}auth\s/m)
+    expect(stdout).toMatch(new RegExp(`^ {2}${name}\\s`, 'm'))
   })
 
   it.each([[['--version']], [['-V']], [['--version', '--json']]])('prints the package version for %j and exits 0', async (args) => {
@@ -175,10 +176,12 @@ describe('the hedy entry, spawned', () => {
     expect(result.stderr).toBe('')
   })
 
-  it('--help exits 0', async () => {
+  it('--help lists the jira and confluence commands and exits 0', async () => {
     const result = await runCli(['--help'], { env: env() })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toMatch(/^Usage: hedy/)
+    expect(result.stdout).toMatch(/^ {2}jira\s/m)
+    expect(result.stdout).toMatch(/^ {2}confluence\s/m)
   })
 
   it('--version prints the version from package.json and exits 0', async () => {

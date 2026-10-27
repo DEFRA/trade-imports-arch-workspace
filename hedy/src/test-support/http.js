@@ -49,18 +49,9 @@ export const FAILURE_REPLIES = [
   ['a 200 body that is not JSON', 'PARSE', (interceptor) => interceptor.reply(200, `<html>${TEST_CREDENTIALS.token}</html>`), ['not JSON']]
 ]
 
-/**
- * Starts a loopback server that accepts every connection and never answers,
- * and lets the calling test connect to it through nock. close() drops every
- * connection and stops the server.
- *
- * @returns {Promise<{ baseUrl: string, close: () => Promise<void> }>}
- */
-export const startSilentServer = async () => {
-  const server = createServer(() => {})
+const listenOnLoopback = async (server) => {
   server.listen(0, '127.0.0.1')
   await once(server, 'listening')
-  nock.enableNetConnect('127.0.0.1')
   return {
     baseUrl: `http://127.0.0.1:${server.address().port}`,
     close: async () => {
@@ -69,6 +60,39 @@ export const startSilentServer = async () => {
       await once(server, 'close')
     }
   }
+}
+
+/**
+ * Starts a loopback server that accepts every connection and never answers,
+ * and lets the calling test connect to it through nock. close() drops every
+ * connection and stops the server.
+ *
+ * @returns {Promise<{ baseUrl: string, close: () => Promise<void> }>}
+ */
+export const startSilentServer = async () => {
+  const loopback = await listenOnLoopback(createServer(() => {}))
+  nock.enableNetConnect('127.0.0.1')
+  return loopback
+}
+
+/**
+ * Starts a loopback server for spawned tests. It answers each request with
+ * the status and the JSON body replyFor(request) returns, and records the
+ * request's url and Authorization header in requests, in arrival order.
+ * close() drops every connection and stops the server.
+ *
+ * @param {(request: import('node:http').IncomingMessage) => { status: number, body: unknown }} replyFor
+ * @returns {Promise<{ baseUrl: string, requests: { url: string, authorization: string | undefined }[], close: () => Promise<void> }>}
+ */
+export const startAnsweringServer = async (replyFor) => {
+  const requests = []
+  const server = createServer((request, response) => {
+    requests.push({ url: request.url, authorization: request.headers.authorization })
+    const { status, body } = replyFor(request)
+    response.writeHead(status, { 'content-type': 'application/json' })
+    response.end(JSON.stringify(body))
+  })
+  return { requests, ...await listenOnLoopback(server) }
 }
 
 /**
