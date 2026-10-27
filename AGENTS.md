@@ -62,6 +62,19 @@ by direnv. Never read it - not with file readers, not with `jq`/`grep`
 style tools. Scripts consume its variables from the environment; verify
 credentials with the auth doctor below rather than inspecting the file.
 
+## The `hedy` CLI
+
+`hedy` is the workspace's command-line tool, a Node 24 program in `hedy/`. `make link` puts `hedy` on PATH. The commands read Jira and Confluence:
+
+- `hedy auth` checks the Atlassian credentials and reports display names only.
+- `hedy jira ticket <key>` reads one issue, description included.
+- `hedy jira search '<jql>'` reads the issues a JQL query matches, up to `--max` (200 by default).
+- `hedy confluence page <reference>` reads one page by id, URL or share link, as markdown by default.
+
+With `--json`, every command prints one envelope line, `{ ok, schema_version, hedy_version, result, errors, metadata }`, where `errors` lists `{ code, message }` entries. A command exits 0 on success, 1 on an error and 2 on a usage error.
+
+Prefer `hedy <command> --json` over ad-hoc `curl` or `jq` against Jira or Confluence.
+
 ## Runnable tooling
 
 Per-domain shell scripts under `.claude/tools/<domain>/` do the
@@ -71,8 +84,8 @@ read its header) for usage.
 
 | Domain | Tools |
 | --- | --- |
-| `jira/` | `fetch.sh` (JQL or batch-key fetch, flat JSON projection), `create-ticket.sh`, `update-description.sh` |
-| `confluence/` | Hand tools for ad-hoc Confluence page reads, writes and doc sync |
+| `jira/` | `create-ticket.sh`, `update-description.sh` |
+| `confluence/` | Hand tools for Confluence page writes and the folder sync. Reads are `hedy confluence page` |
 | `confluence-publish/` | Pre-flight and executor for publishing one docs page to Confluence |
 | `editorial/` | `check-prose.sh` (the style gate), `claim-diff.sh` (the claims a rewrite adds, drops or changes), `check-names.sh` (flag, or with `--fix` rename, the names a document set's editorial profile replaces), `read-profile.sh` (a document set's `editorial-profile.md` as JSON: reader frame, defaults, context pages, run notes, preferred names), `build-review-packet.sh` (one file holding the review brief, its sources and the pages with line numbers, for every reviewer), `start-layered-review.sh` (hash the pages and build the layered review's packet and run folder), `assemble-review.sh` (validate review files written outside the workflow and build the version 3 review result) |
 | `editorial-help/` | `start-editorial-help.sh` (facts about a page set before choosing an editorial tool: words, prose FAIL lines, the profile, the names check, earlier reviews and triages); the decision guide, readable without Claude Code, is `skills/editorial-help/references/editorial-guide.md` |
