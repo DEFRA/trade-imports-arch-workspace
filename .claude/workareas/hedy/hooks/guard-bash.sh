@@ -22,7 +22,8 @@
 #      not be read by an ad-hoc reader (jq, grep, awk, ...). The Read deny in the
 #      settings is the primary control; this is the Bash-layer backstop.
 # On the whole command:
-#   5. git commit --no-verify skips the pre-commit gates.
+#   5. git commit --no-verify, and any change to core.hooksPath, skip the
+#      pre-commit gates.
 #   6. git commit --amend when HEAD is already on a remote branch rewrites
 #      published history.
 # Redirects, with no security weight, each naming the sanctioned form:
@@ -175,6 +176,10 @@ check_segment() {
     | sed -E 's/^[ `(]*//; s/^([A-Za-z_][A-Za-z0-9_]*=[^ ]* +)*//')
   while :; do
     case "$seg" in
+      direnv\ exec\ *)
+        seg=${seg#* }
+        seg=${seg#* }
+        case "$seg" in *\ *) seg=${seg#* } ;; *) seg='' ;; esac ;;
       sudo\ *|command\ *|exec\ *|nohup\ *|time\ *|nice\ *|stdbuf\ *|setsid\ *) seg=${seg#* } ;;
       timeout\ *)
         seg=${seg#* }
@@ -233,6 +238,12 @@ fi
 
 if printf '%s' "$CMD" | grep -Eq 'git[[:space:]]+commit[^|;&]*--no-verify'; then
   deny "git commit --no-verify skips the pre-commit gates. Fix what the hook names and commit again. If a hook is wrong, the user runs the commit: ! git commit ..."
+fi
+
+# Setting, unsetting or overriding core.hooksPath detaches the same gates.
+# Reading it (git config --get core.hooksPath) stays allowed.
+if printf '%s' "$CMD" | grep -Eq 'core\.hooksPath=|config[^|;&]*--unset(-all)?[^|;&]*core\.hooksPath|config[^|;&]*core\.hooksPath[[:space:]]+[^-[:space:]]'; then
+  deny "Changing core.hooksPath detaches the pre-commit gates. Leave the hooks path as make link set it. If a hook is wrong, the user runs the command: ! git ..."
 fi
 
 if printf '%s' "$CMD" | grep -Eq 'git[[:space:]]+commit[^|;&]*--amend'; then

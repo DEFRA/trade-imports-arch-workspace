@@ -86,7 +86,17 @@ rm -f "$OUTSIDE"
 echo "== commits =="
 run deny  "$WS" 'git commit -m "x" --no-verify'
 run deny  "$WS" 'git commit --no-verify -m "x"'
+run deny  "$WS" 'git -c core.hooksPath=/dev/null commit -m "x"'
+run deny  "$WS" 'git config core.hooksPath /tmp/hooks'
+run deny  "$WS" 'git config --unset core.hooksPath'
+run allow "$WS" 'git config --get core.hooksPath'
 run allow "$WS" 'git commit -m "x"'
+
+echo "== direnv exec as a wrapper =="
+run deny  "$WS" 'direnv exec . chmod +x x.sh'
+run deny  "$WS" 'direnv exec . grep token ~/trade-imports-arch-workspace/.env'
+run allow "$WS" 'direnv exec . bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh'
+run allow "$WS" 'direnv exec . env'
 
 echo "== redirects =="
 run deny  /tmp  'ls /Users/benoit/projects'
