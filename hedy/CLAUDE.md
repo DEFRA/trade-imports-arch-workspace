@@ -19,7 +19,7 @@
 
 - Both Atlassian clients read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL`. Confluence sits at `${JIRA_BASE_URL}/wiki` with the same token.
 - The docs repo's publisher reads `CONFLUENCE_USERNAME` and `CONFLUENCE_API_TOKEN`. `hedy` sets them in the child process environment from `JIRA_USER` and `JIRA_TOKEN`.
-- The environment wins. A command reads the root `.env` after validating its options and fills only the variables the environment lacks, through Node's `util.parseEnv`, the parser behind `process.loadEnvFile`. A variable set to the empty string counts as set.
+- The environment wins. A command reads the root `.env` after validating its options and fills only the variables the environment lacks, through Node's `util.parseEnv`, the parser behind `process.loadEnvFile`, and expands `$NAME` and `${NAME}` references, which direnv also expands. A variable set to the empty string counts as set.
 - `hedy` never prints a credential value. The `auth` command reports only each account's display name or each service's error.
 
 ## Source Layout

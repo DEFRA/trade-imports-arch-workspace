@@ -50,7 +50,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **No GitHub wrapper.** `gh` already does the GitHub work. `create-pr.sh` is a gate around `gh` that refuses attribution content, not a client, and it stays bash.
 
-**Credentials.** The environment wins. A command reads the root `.env` after validating its options and fills only the variables the environment lacks. The file is parsed with Node's `util.parseEnv`, the parser behind `process.loadEnvFile`, which accepts `export KEY=value` lines. A variable set to the empty string counts as set. No command prints a credential value, and `auth` reports only each account's display name or each service's error. The publisher's `CONFLUENCE_USERNAME` and `CONFLUENCE_API_TOKEN` are set in its child environment from `JIRA_USER` and `JIRA_TOKEN`, so no new variables are needed.
+**Credentials.** The environment wins. A command reads the root `.env` after validating its options and fills only the variables the environment lacks. The file is parsed with Node's `util.parseEnv`, the parser behind `process.loadEnvFile`, which accepts `export KEY=value` lines. The loader then expands `$NAME` and `${NAME}` references, which direnv also expands, taking the environment's value first, then the file's value, then the empty string. The workspace `.env` defines the Atlassian token once and refers to the token from the names each tool reads. A variable set to the empty string counts as set. No command prints a credential value, and `auth` reports only each account's display name or each service's error. The publisher's `CONFLUENCE_USERNAME` and `CONFLUENCE_API_TOKEN` are set in its child environment from `JIRA_USER` and `JIRA_TOKEN`, so no new variables are needed.
 
 ## Write Contract
 
