@@ -30,7 +30,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **One exit map.** Exit 0 means success, 1 an error, and 2 a usage error. commander's own parse errors go through the same map through `exitOverride()`. Without it, commander exits 1 on an unknown option, and a usage error looks like a failure.
 
-**Closed error codes.** The codes are `USAGE` and `UNKNOWN`, and a new code is added with the command that raises the code. In `tim`, 10 codes fall outside its set and an auth failure exits 1, 2 or 3 depending on which path raised the failure.
+**Closed error codes.** The codes are `USAGE`, `UNKNOWN`, `AUTH`, `NOT_FOUND`, `RATE_LIMIT`, `NETWORK` and `PARSE`, and a new code is added with the command that raises the code. The Atlassian HTTP helper maps every remote outcome at one boundary. A failed connection is `NETWORK`, 401 and 403 are `AUTH`, 404 is `NOT_FOUND`, 429 is `RATE_LIMIT`, 400 is `USAGE` with the service's reasons, any other failing status is `NETWORK`, and a body that is not JSON is `PARSE`. A missing or empty credential variable is `AUTH`, the base URL included, because the fix is the same `.env` line. In `tim`, 10 codes fall outside its set, a missing base URL is a usage error, and an auth failure exits 1, 2 or 3 depending on which path raised the failure.
 
 **Validation first.** zod validates every option before any side effect, so a usage error never leaves a half-done write behind.
 
@@ -42,7 +42,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 ## Integrations
 
-**Library-first.** Jira and Confluence are reached through in-process clients over the global `fetch`. The bash tools pass the token on the `curl` command line, where the process list shows it, and the in-process clients remove that exposure.
+**Library-first.** Jira and Confluence are reached through in-process clients over the global `fetch`. The bash tools pass the token on the `curl` command line, where the process list shows it, and the in-process clients remove that exposure. Both clients share one HTTP helper, so the status map is written once, where `tim` repeats the map in each client.
 
 **Local tools.** `git` and `npm` are run as child processes, because they are local programs with no service behind them.
 
@@ -62,7 +62,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 ## Tests
 
-**Tools.** Tests use vitest with explicit imports, nock at the network boundary, and real temp folders.
+**Tools.** Tests use vitest with explicit imports, nock at the network boundary, and real temp folders. nock is a dev dependency because it intercepts the global `fetch` inside the test process, which is the network boundary the test rules name.
 
 **In-process and spawned tests.** Network behaviour is tested in-process through exported `run*` functions, because nock cannot reach a child process. The envelope and exit codes are tested by spawning the entry.
 

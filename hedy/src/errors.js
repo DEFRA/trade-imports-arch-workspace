@@ -1,4 +1,4 @@
-export const ERROR_CODES = Object.freeze(['USAGE', 'UNKNOWN'])
+export const ERROR_CODES = Object.freeze(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE'])
 
 export class HedyError extends Error {
   /**

@@ -6,6 +6,7 @@
 
 - `.claude/rules/hedy-code.md` holds the source rules and loads for files under `hedy/src/`.
 - `.claude/rules/hedy-tests.md` holds the test rules and loads for `*.test.js` files under `hedy/`.
+- `.claude/rules/hedy-clients.md` holds the client rules and loads for files under `hedy/src/clients/`.
 - `hedy/DECISIONS.md` records each design decision and its reason.
 
 ## Integrations
@@ -28,12 +29,15 @@ All paths are under `hedy/src/`.
 - `cli.js` is the bin entry. It only parses `process.argv`.
 - `program.js` exports `buildProgram()`, which sets the global options `--json` and `--workspace`, sets `exitOverride()`, and routes commander's own errors through the exit map in one catch.
 - `commands/<name>.js` holds one command.
-- `errors.js` holds `HedyError` and the error codes, today `USAGE` and `UNKNOWN`.
+- `errors.js` holds `HedyError` and the error codes: `USAGE`, `UNKNOWN`, `AUTH`, `NOT_FOUND`, `RATE_LIMIT`, `NETWORK` and `PARSE`.
+- `clients/atlassian.js` holds `credentialsFromEnv`, the only reader of the three credential variables, and `createAtlassianHttp`, which sends the Basic header and maps every remote outcome to an error code.
+- `clients/jira.js` and `clients/confluence.js` hold the Jira and Confluence clients. Each client holds only its endpoints and the projections it returns.
 - `exit-codes.js` is the exit map: 0 for success, 1 for an error, 2 for a usage error.
 - `envelope.js` builds the JSON envelope: `ok`, `schema_version`, `hedy_version`, `result`, `errors`, and `metadata.ranAt` on success only.
 - `run-action.js` writes a command's result: one JSON line on stdout with `--json`, text otherwise, notes on stderr, and the exit code from the map.
 - `workspace-root.js` resolves the workspace from `--workspace`, then `HEDY_WORKSPACE`, then `~/trade-imports-arch-workspace`. It never walks up from the current folder.
 - `test-support/cli.js` spawns the entry and returns stdout, stderr, the exit code and the parsed envelope.
+- `test-support/http.js` sets up nock for a test file: real connections are refused, and interceptors are removed after each test. It also holds the test credentials and the failure table the client tests share.
 - `__fixtures__/` folders beside the tests hold captured data.
 
 ## npm

@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { ERROR_CODES, HedyError, isHedyError, toHedyError } from './errors.js'
 
 describe('ERROR_CODES', () => {
-  it('holds exactly USAGE and UNKNOWN and cannot be changed', () => {
-    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN'])
+  it('holds exactly the seven codes and cannot be changed', () => {
+    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE'])
     expect(Object.isFrozen(ERROR_CODES)).toBe(true)
   })
 })
@@ -17,7 +17,7 @@ describe('HedyError', () => {
     expect(error.message).toBe('Something went wrong.')
   })
 
-  it.each(['NOT_A_CODE', 'usage', '', undefined])('refuses the code %j, naming it', (code) => {
+  it.each(['NOT_A_CODE', 'usage', 'auth', 'MISSING_DEP', '', undefined])('refuses the code %j, naming it', (code) => {
     let thrown
     try {
       new HedyError(code, 'x') // eslint-disable-line no-new
