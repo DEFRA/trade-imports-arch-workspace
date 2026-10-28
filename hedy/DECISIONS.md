@@ -96,7 +96,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Order.** Clients and `auth` come first, then reads, writes and publish, then the estate ports as the editorial skills need them. The roster comes last.
 
-**Not built.** No interactive menu, no `--verbose` option and no logging library. No command for a service this workspace does not use. A command is added only with the skill that calls the command.
+**Not built.** No `--verbose` option and no logging library. No command for a service this workspace does not use. A command is added only with the skill that calls the command. A text user interface for people is wanted and comes as an increment of its own; the earlier line here that ruled out an interactive menu was the research's inference from `tim`'s files, not a decision, and the menu's shape, scope and trigger are decided with that increment.
 
 ## Open Tensions
 
