@@ -22,7 +22,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Install.** `make link` runs `npm link` from the checkout's real path, because the Bash guard denies `npm --prefix` across the canonical symlink. Agents type the bare name `hedy` under the `Bash(hedy:*)` allowlist entry.
 
-**Push guard.** A workspace hook denies force pushes and any push to `main`, and names the branch form to use. Unattended runs make an unreviewed push to `main` possible, and the hook removes that path.
+**Push guard.** A workspace hook denies force pushes and any push to `main`, and names the branch form to use. Unattended runs make an unreviewed push to `main` possible, and the hook guards against that path. The residual is that the hook sees only commands typed through the Bash tool, so until a ruleset exists on `main`, GitHub accepts a push to `main` from any other route.
 
 ## Output Contract
 

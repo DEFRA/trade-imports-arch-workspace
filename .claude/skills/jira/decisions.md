@@ -45,5 +45,7 @@ Create, read and update JIRA tickets from the workspace. Reads go through the `h
 - "fetch jira ticket"
 - "read jira ticket"
 - "run jql"
+- "update jira description"
+- "rewrite the ticket"
 
-**Disambiguation:** Distinct from confluence-publish (Atlassian Confluence pages, not JIRA issues) and from the built-in /init (CLAUDE.md scaffolding). Owns JIRA issue creation and reading only - not updates, transitions or comments.
+**Disambiguation:** Distinct from confluence-publish (Atlassian Confluence pages, not JIRA issues) and from the built-in /init (CLAUDE.md scaffolding). Owns JIRA issue creation, reading and description updates - not transitions or comments.

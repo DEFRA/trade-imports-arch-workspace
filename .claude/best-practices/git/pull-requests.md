@@ -23,11 +23,11 @@ Conventional-commit style, same mechanics as a commit subject ([commits.md](comm
 
 Clarity is the governing requirement: write for a cold reader who has not seen the branch or the conversation that produced the change. Establish the brief and house voice before drafting - the [editorial skill](../../skills/editorial/SKILL.md) Writing path - rather than fixing the prose afterwards.
 
-Shape:
+The body has three sections under these headings. The prose gate refuses the headings `What` and `Why` as FAQ voice, so the section names are nouns.
 
-- **What** - the change, led by its outcome.
-- **Why** - the problem or need; link the ticket if one exists.
-- **Verification** - what was run and the results, stated plainly. If something failed or was skipped, say so.
+- **Change** - the change made, led by its outcome.
+- **Reason** - the problem or need; link the ticket if one exists.
+- **Verification** - the commands run and their results, stated plainly. If something failed or was skipped, say so.
 
 ## Tooling
 
