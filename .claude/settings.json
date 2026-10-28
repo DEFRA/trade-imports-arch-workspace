@@ -31,6 +31,14 @@
       "Skill(editorial-triage)",
       "Skill(skill-creator)",
       "WebFetch(domain:agents.md)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(~/.npmrc)",
+      "Read(~/.netrc)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)"
     ]
   },
   "hooks": {
