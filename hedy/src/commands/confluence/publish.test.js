@@ -164,7 +164,7 @@ describe('runPublish pre-flight refusals', () => {
     await installScenario('updated')
     const error = await rejectionOf(publish({ page: 'docs/systems/HEDY/components.md', env: {} }))
     expect(error.code).toBe('USAGE')
-    expect(error.message).toBe('The page docs/systems/HEDY/components.md embeds diagrams whose exports are missing or stale: mermaid hedy-flow (missing). Run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run build:mmd, then run the command again. The page also holds 1 fenced Mermaid block(s). Check each block renders before the build.')
+    expect(error.message).toBe('The page docs/systems/HEDY/components.md embeds diagrams whose exports are missing or stale: mermaid "hedy-flow" (missing). Run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run build:mmd, then run the command again. The page also holds 1 fenced Mermaid block(s). Check each block renders before the build.')
     expect(await publisherRan()).toBe(false)
   })
 

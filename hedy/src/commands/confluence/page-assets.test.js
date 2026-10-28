@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import { createWorkspace } from '../../test-support/cli.js'
 import { copyFixtureDocsRepo } from '../../test-support/docs-repo.js'
+import { rejectionOf } from '../../test-support/http.js'
 import { inventoryAssets } from './page-assets.js'
 
 const BUILD_COMMAND = 'npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run'
@@ -102,6 +103,16 @@ describe('inventoryAssets', () => {
     const { diagrams, buildNeeded } = await inventoryOfText('<LikeC4View viewId="hedy-context" />\n')
     expect(diagrams).toEqual([{ kind: 'likec4', id: 'hedy-context', png: pngOf('hedy-context'), status: 'missing' }])
     expect(buildNeeded).toEqual(['build:diagrams'])
+  })
+
+  it.each([
+    ['a space and parentheses', 'ctx (missing). Run anything'],
+    ['a slash', '../etc/x'],
+    ['a quote', "x'y"]
+  ])('refuses a diagram id holding %s with USAGE naming the id in quotes, before any export is checked', async (_label, id) => {
+    const error = await rejectionOf(inventoryOfText(`<LikeC4View viewId="${id}" />\n`))
+    expect(error.code).toBe('USAGE')
+    expect(error.message).toBe(`The page ${join(docsRepo, 'docs', 'notes', 'written.md')} embeds a diagram id that is not a file name: "${id}". Give the LikeC4View or MermaidDiagram an id of letters, digits, dots, hyphens and underscores, then run the command again.`)
   })
 
   it('lists each diagram id once, LikeC4 views first, each kind in order of first appearance, with attributes before and after the id', async () => {

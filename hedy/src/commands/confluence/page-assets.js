@@ -1,5 +1,6 @@
 import { readdir, stat } from 'node:fs/promises'
 import { basename, dirname, extname, join, resolve } from 'node:path'
+import { HedyError } from '../../errors.js'
 import { findStat } from './docs-repo.js'
 
 const DIAGRAM_KINDS = [
@@ -37,14 +38,20 @@ const exportStatus = (pngStat, newestSourceTime) => {
   return newestSourceTime > pngStat.mtimeMs ? 'stale' : 'present'
 }
 
-const embeddedDiagrams = (docsRepo, text) =>
+const checkDiagramId = (id, pagePath) => {
+  if (/^[A-Za-z0-9_.-]+$/.test(id)) return
+  throw new HedyError('USAGE', `The page ${pagePath} embeds a diagram id that is not a file name: "${id}". Give the LikeC4View or MermaidDiagram an id of letters, digits, dots, hyphens and underscores, then run the command again.`)
+}
+
+const embeddedDiagrams = ({ docsRepo, pagePath, text }) =>
   DIAGRAM_KINDS.flatMap(({ kind, tag }) => {
     const ids = new Set([...text.matchAll(tag)].map(([, id]) => id))
+    ids.forEach((id) => checkDiagramId(id, pagePath))
     return [...ids].map((id) => ({ kind, id, png: join(docsRepo, 'generated', 'diagrams', `${id}.png`) }))
   })
 
-const diagramsOf = async (docsRepo, text) => {
-  const embedded = embeddedDiagrams(docsRepo, text)
+const diagramsOf = async ({ docsRepo, pagePath, text }) => {
+  const embedded = embeddedDiagrams({ docsRepo, pagePath, text })
   if (embedded.length === 0) return []
   const sourceTimes = await newestSourceTimes(docsRepo)
   return Promise.all(embedded.map(async (diagram) =>
@@ -84,9 +91,11 @@ const buildScriptsFor = (diagrams) =>
     .map(([, script]) => script)
 
 /**
- * Resolves to what the page embeds and the builds its diagrams need. Each
- * distinct LikeC4 viewId, then each distinct MermaidDiagram diagramId, gives one
- * diagram whose export is generated/diagrams/<id>.png: missing when absent or
+ * Resolves to what the page embeds and the builds its diagrams need. Rejects
+ * USAGE naming the id when a viewId or diagramId holds a character outside
+ * letters, digits, dots, hyphens and underscores. Each distinct LikeC4 viewId,
+ * then each distinct MermaidDiagram diagramId, gives one diagram whose export
+ * is generated/diagrams/<id>.png: missing when absent or
  * empty, stale when a .c4 or .mmd file, outside folders named node_modules,
  * generated and .git, is newer, else present. Each markdown image, read with
  * the publisher's own pattern so a title inside the brackets is part of the
@@ -105,7 +114,7 @@ const buildScriptsFor = (diagrams) =>
  * }>} buildNeeded lists build:mmd, then build:diagrams, for the kinds with an export not present
  */
 export const inventoryAssets = async ({ docsRepo, pagePath, text }) => {
-  const diagrams = await diagramsOf(docsRepo, text)
+  const diagrams = await diagramsOf({ docsRepo, pagePath, text })
   const buildNeeded = buildScriptsFor(diagrams)
   return {
     diagrams,

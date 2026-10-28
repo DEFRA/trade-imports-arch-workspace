@@ -36,7 +36,7 @@ const checkDiagramExports = (assets, pagePath) => {
   if (assets.buildNeeded.length === 0) return
   const notPresent = assets.diagrams
     .filter(({ status }) => status !== 'present')
-    .map(({ kind, id, status }) => `${kind} ${id} (${status})`)
+    .map(({ kind, id, status }) => `${kind} "${id}" (${status})`)
   throw new HedyError('USAGE', `The page ${pagePath} embeds diagrams whose exports are missing or stale: ${notPresent.join(', ')}. Run ${assets.buildCommands.join(' and ')}, then run the command again.${fencedMermaidNote(assets)}`)
 }
 
