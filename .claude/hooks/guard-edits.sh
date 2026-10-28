@@ -5,6 +5,9 @@
 # determined agent could neuter its own guardrails. This blocks edits to:
 #   - .claude/settings.json / .claude/settings.local.json (the permission rules)
 #   - .claude/hooks/**                                     (the guard scripts)
+#   - .githooks/**                                         (the commit and push gates)
+#   - .git/config, .git/config.worktree, .git/hooks/**     (core.hooksPath, aliases, local hooks)
+#   - ~/.gitconfig, ~/.config/git/config                   (global aliases and core.hooksPath)
 #
 # Repo-scoped and self-referential by design (the user chose the no-sudo option):
 # it cannot stop a human, and a sufficiently determined edit to THIS file would
@@ -39,6 +42,12 @@ case "$abs" in
     deny "Blocked: $base is the Claude Code permission config and is protected from agent edits. If a change is genuinely intended, the user must make it directly (e.g. open it themselves or run via !), not the agent." ;;
   */.claude/hooks/*)
     deny "Blocked: files under .claude/hooks/ are the security guard scripts and are protected from agent edits. The user must change them directly." ;;
+  */.githooks/*)
+    deny "Blocked: files under .githooks/ are the commit and push gates and are protected from agent edits. Fix what a gate names instead. If a gate is wrong, the user changes it directly." ;;
+  */.git/config|*/.git/config.worktree|*/.git/hooks/*)
+    deny "Blocked: .git/config and .git/hooks/ set and hold the commit and push gates (core.hooksPath, aliases, local hooks) and are protected from agent edits. Read config with git config --get <key>. If a change is genuinely intended, the user makes it directly." ;;
+  */.gitconfig|*/.config/git/config)
+    deny "Blocked: $base is the global git config, where an alias or core.hooksPath applies to every repository, and is protected from agent edits. Read config with git config --get <key>. If a change is genuinely intended, the user makes it directly." ;;
 esac
 
 exit 0
