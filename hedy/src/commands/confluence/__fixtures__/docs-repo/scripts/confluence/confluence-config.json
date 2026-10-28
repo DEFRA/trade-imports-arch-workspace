@@ -1,0 +1,38 @@
+{
+  "_comment": "Synthetic publish configuration for the hedy tests. No real space, page or site.",
+  "confluenceBaseUrl": "https://example.atlassian.net/wiki",
+  "confluenceSpaceKey": "INJECTED_FROM_VARIABLE",
+  "atlassianUsername": "INJECTED_FROM_SECRET",
+  "folderToPublish": "docs",
+  "contentRoot": "docs",
+  "parentPageId": "INJECTED_FROM_VARIABLE",
+  "spaceMapping": {
+    "_comment": "Maps system folder names to Confluence space keys",
+    "HEDY": "HEDYDOCS",
+    "Trade": "TRADEDOCS"
+  },
+  "options": {
+    "createPages": true,
+    "updatePages": true,
+    "deletePages": false,
+    "dryRun": false
+  },
+  "publishPaths": [
+    {
+      "path": "systems/HEDY/Guide/*.md",
+      "exclude": ["editorial-profile.md"],
+      "type": "markdown",
+      "description": "The HEDY guide pages"
+    },
+    {
+      "path": "systems/HEDY/components.md",
+      "type": "markdown",
+      "description": "The components page, listed by name"
+    },
+    {
+      "path": "Trade/overview.md",
+      "type": "markdown",
+      "description": "The trade overview"
+    }
+  ]
+}
