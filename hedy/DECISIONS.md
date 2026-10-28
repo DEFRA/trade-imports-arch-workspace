@@ -96,7 +96,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Order.** Clients and `auth` come first, then reads, writes and publish, then the estate ports as the editorial skills need them. The roster comes last.
 
-**Not built.** No `--verbose` option and no logging library. No command for a service this workspace does not use. A command is added only with the skill that calls the command. A text user interface for people is wanted and comes as an increment of its own; the earlier line here that ruled out an interactive menu was the research's inference from `tim`'s files, not a decision, and the menu's shape, scope and trigger are decided with that increment.
+**Not built.** No `--verbose` option and no logging library. No command for a service this workspace does not use. A command is added only with the skill that calls the command. A text user interface for people is wanted and comes as the next increment; the earlier line here that ruled out an interactive menu was the research's inference from `tim`'s files, not a decision. The menu follows `tim`'s Ink model, with React and Ink added to the runtime dependencies when it lands, opens on a bare `hedy` when stdout is a terminal and neither `--json` nor `--no-ui` is set, so an agent never sees it, and covers every command, each write behind a screen that shows the plan or the pre-flight facts and asks for a confirm, with the same plan id check underneath.
 
 ## Open Tensions
 
