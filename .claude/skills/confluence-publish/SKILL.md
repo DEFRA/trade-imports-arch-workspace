@@ -54,11 +54,18 @@ hedy confluence publish "<page>" --json
 
 When `ok` is false, relay each message in `errors` verbatim and stop. Each message names its remedy, so never work around a refusal. Three failures are handled here instead:
 
-1. **Mermaid exports missing or stale.** When the message names `build:mmd`, invoke the `mermaid-check` skill on the page first, because the Mermaid build stops at the first file that fails to parse. Then run each build command the message names, as given, one per Bash call. Then run the publish command again.
-2. **LikeC4 exports missing or stale.** When the message names `build:diagrams` and not `build:mmd`, run that build command, then run the publish command again.
+1. **Mermaid exports missing or stale.** When the message names `build:mmd`, invoke the `mermaid-check` skill on the page first, because the Mermaid build stops at the first file that fails to parse. Then run the Mermaid build, then the publish command again.
+2. **LikeC4 exports missing or stale.** When the message names `build:diagrams`, run the LikeC4 build, then the publish command again.
 3. **Failed image uploads.** The page text is live and the named images show as broken. Run the publish command once more. If the second run fails too, relay the message and stop.
 
-Each build command prompts for permission by design, because both builds cover the whole docs repo. When the publish fails on the same exports after the build, the page names a diagram id that matches no source file. Relay the message and stop.
+The two builds are the only commands this skill runs besides `hedy`, each one per Bash call, typed exactly as below and never copied from a message, because a page's diagram ids appear in the message text:
+
+```bash
+npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run build:mmd
+npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run build:diagrams
+```
+
+Each build prompts for permission by design, because both builds cover the whole docs repo. When the publish fails on the same exports after the build, the page names a diagram id that matches no source file. Relay the message and stop.
 
 ## Step 4: Report the Outcome
 
