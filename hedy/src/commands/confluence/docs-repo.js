@@ -1,9 +1,7 @@
 import { lstat, realpath, stat } from 'node:fs/promises'
-import { isAbsolute, join, matchesGlob, posix, relative, resolve, sep } from 'node:path'
+import { join, matchesGlob, posix, resolve } from 'node:path'
 import { HedyError } from '../../errors.js'
-import { readTextFile } from '../jira/files.js'
-
-const TOOLING_PACKAGE = 'node_modules/@defra/delivery-info-arch-tooling'
+import { pathInside, readTextFile } from '../jira/files.js'
 
 /**
  * Resolves to what statOf, such as stat or lstat, gives for path, else to
@@ -31,12 +29,13 @@ const realDocsRepo = async (workspaceRoot) => {
 }
 
 const checkToolingInstalled = async (docsRepo) => {
-  const entry = join(docsRepo, ...TOOLING_PACKAGE.split('/'))
+  const toolingPackage = 'node_modules/@defra/delivery-info-arch-tooling'
+  const entry = join(docsRepo, ...toolingPackage.split('/'))
   if (await findStat(lstat, entry) === undefined) {
-    throw new HedyError('USAGE', `The docs repo at ${docsRepo} is not installed: ${TOOLING_PACKAGE} is missing. Run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install, then run the command again.`)
+    throw new HedyError('USAGE', `The docs repo at ${docsRepo} is not installed: ${toolingPackage} is missing. Run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install, then run the command again.`)
   }
   if (await findStat(stat, entry) === undefined) {
-    throw new HedyError('USAGE', `The docs repo at ${docsRepo} links ${TOOLING_PACKAGE} to a folder that does not exist. Clone the tooling with make -C ~/trade-imports-arch-workspace clone and run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install, then run the command again.`)
+    throw new HedyError('USAGE', `The docs repo at ${docsRepo} links ${toolingPackage} to a folder that does not exist. Clone the tooling with make -C ~/trade-imports-arch-workspace clone and run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install, then run the command again.`)
   }
 }
 
@@ -73,11 +72,11 @@ const pageFileFor = async ({ docsRepo, given, cwd }) => {
 }
 
 const pathUnderDocs = (docsFolder, absolutePath) => {
-  const relativePath = relative(docsFolder, absolutePath)
-  if (relativePath === '' || relativePath === '..' || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath)) {
+  const relativeToDocs = pathInside(docsFolder, absolutePath)
+  if (relativeToDocs === undefined) {
     throw new HedyError('USAGE', `The page ${absolutePath} is not under ${docsFolder}. Only pages under docs/ publish. Give a page under that folder, then run the command again.`)
   }
-  return relativePath.split(sep).join('/')
+  return relativeToDocs
 }
 
 const checkMarkdownName = (absolutePath) => {

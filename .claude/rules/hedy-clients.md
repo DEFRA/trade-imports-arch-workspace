@@ -15,7 +15,7 @@ These rules apply to every file under `hedy/src/clients/`, alongside the source 
 - The helper offers `get`, which resolves to the parsed body, and `redirectTarget`, which does not follow a redirect and resolves to the `Location` of a 3xx answer. The helper's `post` and `put` send the body as JSON with the content type `application/json`, and resolve to the parsed body, or to `null` when the answer is 204. The helper also exposes `normalisedBaseUrl`, the base URL without trailing slashes, and every URL in a projection is built from that value.
 - A client method returns a projection of the fields its callers use, never the raw response.
 - A read method takes the key or id its command takes and returns the projection the command documents. The projection is built once, in the client.
-- The Confluence lookup `pageByTitle(title, spaceKey)` sends one GET to `/wiki/rest/api/content` with `spaceKey`, `title` and `expand=version,metadata.labels` in a query built by `URLSearchParams`. The lookup resolves to `{ id, title, status, version, url, labels }` for the first result, or to `undefined` when the answer holds no result.
+- The Confluence lookup `pageByTitle(title, spaceKey)` sends one GET to `/wiki/rest/api/content` with `spaceKey`, `title` and `expand=version,metadata.labels` in a query built by `URLSearchParams`. The lookup resolves to `{ id, url, labels }` for the first result, or to `undefined` when the answer holds no result. The Confluence client also exposes `siteAddress` and `pageUrl(spaceKey, id)`, so a command builds no page address itself.
 
 ## Status Map
 
@@ -40,6 +40,6 @@ A client test runs under nock and covers success with the Basic header asserted 
 
 A read method's test proves the projection against the fixture captured from the bash tool, and proves 404. For a paginated read, the test also proves that pages join and that the cap stops the reading.
 
-The `pageByTitle` test proves the request's query and the projection against the captured fixture, the encoding of a title holding spaces, a colon, an ampersand, a plus and a hash, and `undefined` for the empty fixture. The test also proves empty labels without metadata, a null author without `version.by`, and the messages for 401, 404 and a refused connection.
+The `pageByTitle` test proves the request's query and the projection against the captured fixture, the encoding of a title holding spaces, a colon, an ampersand, a plus and a hash, and `undefined` for the empty fixture. The test also proves empty labels without metadata, the site address and page address the client exposes, and the messages for 401, 404 and a refused connection.
 
 A write method's test proves that the body sent equals the fixture captured from the bash tool, proves the projection of the answer, and proves 400.

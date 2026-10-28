@@ -1,12 +1,13 @@
 import { readFile, realpath } from 'node:fs/promises'
-import { sep } from 'node:path'
+import { isAbsolute, relative, sep } from 'node:path'
 import { HedyError } from '../../errors.js'
 
 /**
  * Returns true when realPath names a secrets file, by the Bash guard's
- * patterns: a path that ends in .env or holds .env. anywhere, a file named
- * .npmrc, .netrc, credentials or secrets, a file whose name starts with
- * credentials. or secrets., or any file under a folder named .aws or .ssh.
+ * patterns applied to the file name: a name that ends in .env or holds
+ * .env., a file named .npmrc, .netrc, credentials or secrets, a name that
+ * starts with credentials. or secrets., or any file under a folder named
+ * .aws or .ssh.
  *
  * @param {string} realPath
  */
@@ -14,9 +15,22 @@ export const isSecretPath = (realPath) => {
   const segments = realPath.split(sep)
   const name = segments.at(-1)
   const secretFolders = ['.aws', '.ssh']
-  return realPath.endsWith('.env') || realPath.includes('.env.') ||
+  return name.endsWith('.env') || name.includes('.env.') ||
     /^(\.npmrc|\.netrc|credentials(\..*)?|secrets(\..*)?)$/.test(name) ||
     segments.slice(0, -1).some((segment) => secretFolders.includes(segment))
+}
+
+/**
+ * Returns the path of realPath inside realFolder with / separators, or
+ * undefined when realPath is realFolder itself or lies outside the folder.
+ *
+ * @param {string} realFolder
+ * @param {string} realPath
+ */
+export const pathInside = (realFolder, realPath) => {
+  const relativePath = relative(realFolder, realPath)
+  const outside = relativePath === '' || relativePath === '..' || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath)
+  return outside ? undefined : relativePath.split(sep).join('/')
 }
 
 const refuseSecretPath = ({ path, realPath, kind }) => {

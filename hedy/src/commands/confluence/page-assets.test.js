@@ -75,6 +75,7 @@ describe('inventoryAssets', () => {
   it.each([
     ['node_modules', join('node_modules', 'pkg', 'model.c4')],
     ['generated', join('generated', 'model.c4')],
+    ['.git', join('.git', 'model.c4')],
     ['a nested node_modules', join('architecture', 'node_modules', 'model.c4')]
   ])('ignores a newer model file under a folder named %s', async (_, relativePath) => {
     const path = join(docsRepo, relativePath)
@@ -130,17 +131,29 @@ describe('inventoryAssets', () => {
     expect(images).toEqual([{ path: 'diagrams/nothing.svg', status: 'missing' }])
   })
 
-  it('leaves out images with an http, an https or a /-absolute target, and resolves a relative target against the page\'s folder', async () => {
+  it('reads each image target as the publisher does: remote targets left out, a /likec4-exports/ target under astro/public unless the page embeds that view, a /-rooted target as itself, and a title inside the brackets as part of the target', async () => {
     await writeFile(join(docsRepo, 'docs', 'notes', 'here.png'), 'png')
+    await mkdir(join(docsRepo, 'astro', 'public', 'likec4-exports'), { recursive: true })
+    await writeFile(join(docsRepo, 'astro', 'public', 'likec4-exports', 'exported.png'), 'png')
     const text = [
       '![remote](https://example.com/a.png)',
       '![plain](http://example.com/b.png)',
       '![rooted](/images/c.png)',
-      '![local](here.png "A title")',
+      '![titled](here.png "A title")',
+      '![local](here.png)',
+      '![exported](/likec4-exports/exported.png)',
+      '![view](/likec4-exports/hedy-context.png)',
+      '<LikeC4View viewId="hedy-context" />',
       '![folder](../notes)'
     ].join('\n')
     const { images } = await inventoryOfText(text)
-    expect(images).toEqual([{ path: 'here.png', status: 'present' }, { path: '../notes', status: 'missing' }])
+    expect(images).toEqual([
+      { path: '/images/c.png', status: 'missing' },
+      { path: 'here.png "A title"', status: 'missing' },
+      { path: 'here.png', status: 'present' },
+      { path: '/likec4-exports/exported.png', status: 'present' },
+      { path: '../notes', status: 'missing' }
+    ])
   })
 
   it('counts only lines that start with a mermaid fence', async () => {

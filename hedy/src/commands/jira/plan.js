@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto'
 import { realpath } from 'node:fs/promises'
-import { resolve, sep } from 'node:path'
+import { resolve } from 'node:path'
 import { z } from 'zod'
 import { HedyError } from '../../errors.js'
-import { readTextFile } from './files.js'
+import { pathInside, readTextFile } from './files.js'
 
 export const MAX_DESCRIPTION_LENGTH = 32767
 
@@ -92,14 +92,14 @@ export const readDescription = async (path) => {
   return description
 }
 
+const realPathOf = (path) => realpath(path).catch((error) => {
+  if (['ENOENT', 'ENOTDIR', 'ELOOP'].includes(error.code)) return undefined
+  throw error
+})
+
 const refuseDescriptionOutsideFolder = async ({ path, folder }) => {
-  const realPath = await realpath(path).catch((error) => {
-    if (error.code === 'ENOENT') return null
-    throw error
-  })
-  if (realPath === null) return
-  const realFolder = await realpath(folder)
-  if (realPath.startsWith(`${realFolder}${sep}`)) return
+  const realPath = await realPathOf(path)
+  if (realPath === undefined || pathInside(await realpath(folder), realPath) !== undefined) return
   throw new HedyError(
     'USAGE',
     `The description file ${path} is a link to ${realPath}, outside the manifest's folder ${folder}. Put the description file inside that folder, then run the command again.`

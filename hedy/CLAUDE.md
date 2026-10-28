@@ -22,7 +22,7 @@
 - `credentials.js` is the one place a command gets the three values. A command calls it after validating its options. It loads the root `.env`, then reads the three values.
 - The environment wins. The root `.env` fills only the variables the environment lacks, through Node's `util.parseEnv`, the parser behind `process.loadEnvFile`, and expands `$NAME` and `${NAME}` references, which direnv also expands, from the file's own values only. A reference never reads the process environment. A single-quoted value stays literal, and `\$` is a literal `$`. A variable set to the empty string counts as set.
 - `hedy` never prints a credential value. The `auth` command reports only each account's display name or each service's error.
-- The file readers refuse a secrets file by its real path, so a symbolic link cannot route around the rule. The set is the Bash guard's: a path that ends in `.env` or holds `.env.` anywhere, a file named `.npmrc`, `.netrc`, `credentials` or `secrets`, a name starting `credentials.` or `secrets.`, and any file under a `.aws` or `.ssh` folder.
+- The file readers refuse a secrets file by its real path, so a symbolic link cannot route around the rule. The set is the Bash guard's, applied to the file name: a name that ends in `.env` or holds `.env.`, a file named `.npmrc`, `.netrc`, `credentials` or `secrets`, a name starting `credentials.` or `secrets.`, and any file under a `.aws` or `.ssh` folder.
 
 ## Source Layout
 

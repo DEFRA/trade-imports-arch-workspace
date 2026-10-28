@@ -14,8 +14,6 @@ const publishInputSchema = z.object({
   page: z.string().min(1, 'The page path is empty. Give the path of a docs page, then run the command again.')
 })
 
-const siteAddressOf = (baseUrl) => baseUrl.replace(/\/+$/, '')
-
 const checkListed = (config, { relativeToDocs, configPath }) => {
   if (publishEntryFor(config, relativeToDocs) === undefined) {
     throw new HedyError('USAGE', `The page ${relativeToDocs} is not listed in publishPaths in ${configPath}, or its entry excludes the page, so the publisher would publish nothing. Add an entry with path ${relativeToDocs}, then run the command again.`)
@@ -76,7 +74,7 @@ const checkConfluence = async ({ env, workspaceRoot, title, space }) => {
   return { credentials, client }
 }
 
-const runPublisher = async ({ docsRepo, pagePath, env, credentials, timeoutMs, stderr }) => {
+const runPublisher = async ({ docsRepo, pagePath, env, credentials, client, timeoutMs, stderr }) => {
   const result = await runLocalTool({
     command: 'npm',
     args: ['run', 'publish:confluence', '--', '--file', pagePath],
@@ -85,7 +83,7 @@ const runPublisher = async ({ docsRepo, pagePath, env, credentials, timeoutMs, s
       ...env,
       CONFLUENCE_USERNAME: credentials.user,
       CONFLUENCE_API_TOKEN: credentials.token,
-      CONFLUENCE_URL: siteAddressOf(credentials.baseUrl)
+      CONFLUENCE_URL: client.siteAddress
     },
     timeoutMs,
     onOutput: ({ chunk }) => stderr.write(chunk)
@@ -128,10 +126,10 @@ const readBack = async (client, reading, { title, pageUrl }) => {
   }
 }
 
-const publishedOutcome = async ({ result, client, credentials, preflight }) => {
+const publishedOutcome = async ({ result, client, preflight }) => {
   const reading = readPublisherLog(result)
   if (reading.id === undefined) throw notWrittenError(reading, preflight)
-  const pageUrl = `${siteAddressOf(credentials.baseUrl)}/wiki/spaces/${preflight.space}/pages/${reading.id}`
+  const pageUrl = client.pageUrl(preflight.space, reading.id)
   if (result.exitCode !== 0) throw writtenThenFailedError(reading, { ...preflight, pageUrl })
   const back = await readBack(client, reading, { title: preflight.title, pageUrl })
   return {
@@ -171,8 +169,8 @@ const publishedOutcome = async ({ result, client, credentials, preflight }) => {
 export const runPublish = async ({ page, env, workspaceRoot, cwd = process.cwd(), timeoutMs = 600000, stderr }) => {
   const preflight = await checkLocalFiles({ page, workspaceRoot, cwd })
   const { credentials, client } = await checkConfluence({ env, workspaceRoot, ...preflight })
-  const result = await runPublisher({ ...preflight, env, credentials, timeoutMs, stderr })
-  return publishedOutcome({ result, client, credentials, preflight })
+  const result = await runPublisher({ ...preflight, env, credentials, client, timeoutMs, stderr })
+  return publishedOutcome({ result, client, preflight })
 }
 
 const linksLine = ({ checked, pages, broken, unreachable }) =>

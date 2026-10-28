@@ -19,6 +19,14 @@ const isAlive = (pid) => {
   }
 }
 
+const waitUntilGone = async (pid) => {
+  for (let attempt = 0; attempt < 50; attempt++) {
+    if (!isAlive(pid)) return true
+    await new Promise((resolve) => setTimeout(resolve, 20))
+  }
+  return false
+}
+
 let folder
 
 beforeEach(async () => {
@@ -54,6 +62,21 @@ describe('runLocalTool', () => {
     )
     expect(result).toMatchObject({ timedOut: true, exitCode: null, signal: 'SIGKILL' })
     expect(isAlive(Number(result.stdout))).toBe(false)
+  })
+
+  it('ends the programs a child started when the timeout fires, so none outlives the stop', async () => {
+    const code = [
+      "const { spawn } = require('node:child_process')",
+      "process.on('SIGTERM', () => {})",
+      "const grandchild = spawn(process.execPath, ['-e', \"process.on('SIGTERM', () => {}); setInterval(() => {}, 1000)\"], { stdio: 'ignore' })",
+      "process.stdout.write(process.pid + ' ' + grandchild.pid)",
+      'setInterval(() => {}, 1000)'
+    ].join('; ')
+    const result = await runNode(code, { timeoutMs: 400, killGraceMs: 200 })
+    expect(result).toMatchObject({ timedOut: true, exitCode: null, signal: 'SIGKILL' })
+    const [childPid, grandchildPid] = result.stdout.split(' ').map(Number)
+    expect(grandchildPid).toBeGreaterThan(0)
+    expect([await waitUntilGone(childPid), await waitUntilGone(grandchildPid)]).toEqual([true, true])
   })
 
   it('refuses a missing executable with USAGE naming the command and the next step', async () => {

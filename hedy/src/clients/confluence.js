@@ -53,9 +53,6 @@ const pageByTitlePath = (title, spaceKey) => {
 
 const titledPageProjection = (data, normalisedBaseUrl, spaceKey) => ({
   id: data.id,
-  title: data.title ?? null,
-  status: data.status ?? null,
-  version: versionProjection(data.version),
   url: pageUrl(normalisedBaseUrl, spaceKey, data.id),
   labels: labelNames(data)
 })
@@ -92,8 +89,9 @@ const pageIdAtEndOfRedirects = async ({ http, siteOrigin, action }, shareLink) =
  * whoami rejects with AUTH when Confluence answers as the anonymous user.
  * page gives an empty body when the answer holds none.
  * pageByTitle(title, spaceKey) resolves to the first page with that title in
- * the space, as { id, title, status, version, url, labels }, or to undefined
- * when Confluence finds no such page.
+ * the space, as { id, url, labels }, or to undefined when Confluence finds no
+ * such page. siteAddress is the site's address without trailing slashes, and
+ * pageUrl(spaceKey, id) is a page's address on the site.
  * pageIdFromShortLink follows at most 5 redirects, each on the origin of
  * baseUrl, to the first location whose path holds a page id. It sends no
  * request off that origin and rejects with USAGE instead, and rejects with
@@ -106,6 +104,8 @@ export const createConfluenceClient = ({ user, token, baseUrl }, { timeoutMs } =
   const http = createAtlassianHttp({ service: 'Confluence', user, token, baseUrl, timeoutMs })
   const siteOrigin = new URL(http.normalisedBaseUrl).origin
   return {
+    siteAddress: http.normalisedBaseUrl,
+    pageUrl: (spaceKey, id) => pageUrl(http.normalisedBaseUrl, spaceKey, id),
     whoami: async () => {
       const data = await http.get('/wiki/rest/api/user/current', 'whoami')
       if (data.type === 'anonymous') throw anonymousCallerError()

@@ -21,7 +21,7 @@ These rules apply to every test file under `hedy/`. Hooks under `.claude/hooks/`
 - Import `describe`, `it`, `expect` and any other helper from `vitest` explicitly. No globals.
 - Mock only at the network boundary, with nock. Never `vi.mock()` a module under `hedy/src/`.
 - Use real temp folders from `fs.mkdtemp` under `os.tmpdir()` and remove them after the test. Never mock `fs`.
-- Fixtures are captured data from the real service or tool, with credentials and personal data removed. They live in a `__fixtures__/` folder beside the test.
+- Fixtures are captured data from the real service or tool, with credentials and personal data removed. Where the repository is public and the real data cannot be committed, a fixture is invented with the key set of a real answer, and `hedy/DECISIONS.md` records the method. They live in a `__fixtures__/` folder beside the test.
 - Set-up used by more than one test goes in `hedy/src/test-support/`. Promoting a helper deletes the local copies.
 
 ## In-Process and Spawned Tests

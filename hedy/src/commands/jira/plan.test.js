@@ -119,6 +119,15 @@ describe('buildCreatePlan', () => {
     const plan = await buildCreatePlan({ manifest: fixtureManifest, folder })
     expect(plan.description).toBe('A reason.')
   })
+
+  it('reports a description file that is a link loop as UNKNOWN naming the path, through the reader', async () => {
+    const linkPath = join(folder, fixtureManifest.descriptionFile)
+    await symlink(linkPath, linkPath)
+    const error = await rejectionOf(buildCreatePlan({ manifest: fixtureManifest, folder }))
+    expect(error.code).toBe('UNKNOWN')
+    expect(error.message).toBe(`The description file at ${linkPath} could not be read. Check that the path is a regular file with read permission, then run the command again.`)
+    expect(error.cause.code).toBe('ELOOP')
+  })
 })
 
 describe('readDescription', () => {

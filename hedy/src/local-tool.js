@@ -22,13 +22,21 @@ const collectStream = (stream, streamName, onOutput) => {
   return () => chunks.join('')
 }
 
+const signalGroup = (child, signal) => {
+  try {
+    process.kill(-child.pid, signal)
+  } catch (error) {
+    if (error.code !== 'ESRCH') throw error
+  }
+}
+
 const scheduleTermination = (child, { timeoutMs, killGraceMs }) => {
   const termination = { timedOut: false, timers: [] }
   if (timeoutMs === undefined) return termination
   termination.timers.push(setTimeout(() => {
     termination.timedOut = true
-    child.kill('SIGTERM')
-    termination.timers.push(setTimeout(() => child.kill('SIGKILL'), killGraceMs))
+    signalGroup(child, 'SIGTERM')
+    termination.timers.push(setTimeout(() => signalGroup(child, 'SIGKILL'), killGraceMs))
   }, timeoutMs))
   return termination
 }
@@ -41,10 +49,12 @@ const cancelTermination = ({ timers }) => {
  * Runs command with args and resolves to { exitCode, signal, stdout, stderr, timedOut }
  * on any exit, a non-zero exit included. env is the child's whole environment. stdout
  * and stderr are collected in full as UTF-8, and onOutput, when given, receives
- * { stream, chunk } for each chunk in arrival order. A child still running after
- * timeoutMs gets SIGTERM, then SIGKILL after killGraceMs, and resolves with timedOut
- * true and exitCode null. Rejects with USAGE when the executable is not found and
- * with UNKNOWN, keeping the spawn error as the cause, for any other spawn error.
+ * { stream, chunk } for each chunk in arrival order. The child starts in a process
+ * group of its own, and a child still running after timeoutMs gets SIGTERM, then
+ * SIGKILL after killGraceMs, each sent to the whole group so the programs the child
+ * started stop with it, and the result then has timedOut true and exitCode null. Rejects
+ * with USAGE when the executable is not found and with UNKNOWN, keeping the spawn
+ * error as the cause, for any other spawn error.
  *
  * @param {{
  *   command: string, args?: string[], cwd?: string, env?: NodeJS.ProcessEnv,
@@ -55,7 +65,7 @@ const cancelTermination = ({ timers }) => {
  */
 export const runLocalTool = async ({ command, args = [], cwd, env, timeoutMs, killGraceMs = 5000, onOutput }) =>
   new Promise((resolve, reject) => {
-    const child = spawn(command, args, { cwd, env, shell: false, stdio: ['ignore', 'pipe', 'pipe'] })
+    const child = spawn(command, args, { cwd, env, shell: false, detached: true, stdio: ['ignore', 'pipe', 'pipe'] })
     const stdoutText = collectStream(child.stdout, 'stdout', onOutput)
     const stderrText = collectStream(child.stderr, 'stderr', onOutput)
     const termination = scheduleTermination(child, { timeoutMs, killGraceMs })

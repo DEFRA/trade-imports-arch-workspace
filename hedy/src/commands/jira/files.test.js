@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import { rejectionOf } from '../../test-support/http.js'
-import { isSecretPath, parseJsonText, readTextFile } from './files.js'
+import { isSecretPath, parseJsonText, pathInside, readTextFile } from './files.js'
 
 let folder
 
@@ -76,7 +76,6 @@ describe('isSecretPath', () => {
     'sub/.env.production',
     'production.env',
     'my.env.txt',
-    '.env.d/one',
     '.npmrc',
     '.netrc',
     'credentials',
@@ -97,9 +96,24 @@ describe('isSecretPath', () => {
     'dotenv-guide.md',
     '.envrc',
     'credentials-guide.md',
-    'aws/config'
-  ])('is false for the real path <tmp>/%s', (relativePath) => {
+    'aws/config',
+    '.env.d/one',
+    'defra.env.staging/docs/page.md'
+  ])('is false for the real path <tmp>/%s, since the .env patterns apply to the file name and not to its folders', (relativePath) => {
     expect(isSecretPath(join(folder, relativePath))).toBe(false)
+  })
+})
+
+describe('pathInside', () => {
+  it.each([
+    [join('a', 'b'), 'b'],
+    [join('a', 'b', 'c'), 'b/c']
+  ])('gives the / separated path of <tmp>/%s inside <tmp>/a', (relativePath, expected) => {
+    expect(pathInside(join(folder, 'a'), join(folder, relativePath))).toBe(expected)
+  })
+
+  it.each(['a', 'ab/c', '', 'other/a/b'])('is undefined for <tmp>/%s, which is not inside <tmp>/a', (relativePath) => {
+    expect(pathInside(join(folder, 'a'), join(folder, relativePath))).toBeUndefined()
   })
 })
 

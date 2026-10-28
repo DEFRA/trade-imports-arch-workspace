@@ -1,5 +1,5 @@
 import { readdir, stat } from 'node:fs/promises'
-import { dirname, extname, join, resolve } from 'node:path'
+import { basename, dirname, extname, join, resolve } from 'node:path'
 import { findStat } from './docs-repo.js'
 
 const DIAGRAM_KINDS = [
@@ -9,7 +9,7 @@ const DIAGRAM_KINDS = [
 
 const filesOfEntry = (folder, entry) => {
   const path = join(folder, entry.name)
-  if (entry.isDirectory()) return ['node_modules', 'generated'].includes(entry.name) ? [] : filesUnder(path)
+  if (entry.isDirectory()) return ['node_modules', 'generated', '.git'].includes(entry.name) ? [] : filesUnder(path)
   return entry.isFile() ? [path] : []
 }
 
@@ -52,12 +52,24 @@ const diagramsOf = async (docsRepo, text) => {
   ))
 }
 
-const isLocalTarget = (target) => !['http://', 'https://', '/'].some((prefix) => target.startsWith(prefix))
+const LIKEC4_EXPORTS = '/likec4-exports/'
 
-const imagesOf = async (pagePath, text) => {
-  const targets = [...text.matchAll(/!\[[^\]]*\]\(\s*([^)\s]+)[^)]*\)/g)].map(([, target]) => target)
-  return Promise.all(targets.filter(isLocalTarget).map(async (target) => {
-    const found = await findStat(stat, resolve(dirname(pagePath), target))
+const imageTargets = (text) => [...text.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(([, target]) => target)
+
+const isRemoteTarget = (target) => target.startsWith('http://') || target.startsWith('https://')
+
+const isExportOfEmbeddedView = (target, diagrams) =>
+  target.startsWith(LIKEC4_EXPORTS) &&
+  diagrams.some(({ kind, id }) => kind === 'likec4' && id === basename(target, extname(target)))
+
+const imageFileOf = ({ docsRepo, pagePath }, target) => target.startsWith(LIKEC4_EXPORTS)
+  ? join(docsRepo, 'astro', 'public', target)
+  : resolve(dirname(pagePath), target)
+
+const imagesOf = async ({ docsRepo, pagePath, text, diagrams }) => {
+  const targets = imageTargets(text).filter((target) => !isRemoteTarget(target) && !isExportOfEmbeddedView(target, diagrams))
+  return Promise.all(targets.map(async (target) => {
+    const found = await findStat(stat, imageFileOf({ docsRepo, pagePath }, target))
     return { path: target, status: found?.isFile() === true ? 'present' : 'missing' }
   }))
 }
@@ -75,10 +87,13 @@ const buildScriptsFor = (diagrams) =>
  * Resolves to what the page embeds and the builds its diagrams need. Each
  * distinct LikeC4 viewId, then each distinct MermaidDiagram diagramId, gives one
  * diagram whose export is generated/diagrams/<id>.png: missing when absent or
- * empty, stale when a .c4 or .mmd file, outside folders named node_modules and
- * generated, is newer, else present. Each markdown image whose target does not
- * start with http://, https:// or / gives one image, present when the target,
- * resolved against the page's folder, is a regular file.
+ * empty, stale when a .c4 or .mmd file, outside folders named node_modules,
+ * generated and .git, is newer, else present. Each markdown image, read with
+ * the publisher's own pattern so a title inside the brackets is part of the
+ * target, gives one image unless the target starts with http:// or https://,
+ * or is the /likec4-exports/ export of a LikeC4 view the page embeds. A
+ * /likec4-exports/ target resolves under astro/public and any other against
+ * the page's folder, and the image is present when that is a regular file.
  *
  * @param {{ docsRepo: string, pagePath: string, text: string }} options
  * @returns {Promise<{
@@ -94,7 +109,7 @@ export const inventoryAssets = async ({ docsRepo, pagePath, text }) => {
   const buildNeeded = buildScriptsFor(diagrams)
   return {
     diagrams,
-    images: await imagesOf(pagePath, text),
+    images: await imagesOf({ docsRepo, pagePath, text, diagrams }),
     fencedMermaidBlocks: fencedMermaidBlockCount(text),
     buildNeeded,
     buildCommands: buildNeeded.map((script) => `npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run ${script}`)

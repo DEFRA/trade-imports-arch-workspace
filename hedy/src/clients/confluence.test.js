@@ -148,9 +148,6 @@ const TITLE_QUERY = { spaceKey: SPACE_KEY, title: TITLE, expand: 'version,metada
 
 const TITLE_PROJECTION = {
   id: '201',
-  title: TITLE,
-  status: 'current',
-  version: { number: 3, when: '2026-10-28T09:00:00.000Z', by: 'Hedy Tester' },
   url: `${ATLASSIAN_BASE_URL}/wiki/spaces/HEDYDOCS/pages/201`,
   labels: ['generated', 'hedy']
 }
@@ -166,7 +163,13 @@ describe('the Confluence client pageByTitle', () => {
       .reply(200, titleResponse)
     const page = await createConfluenceClient(TEST_CREDENTIALS).pageByTitle(TITLE, SPACE_KEY)
     expect(page).toEqual(TITLE_PROJECTION)
-    expect(Object.keys(page)).toEqual(['id', 'title', 'status', 'version', 'url', 'labels'])
+    expect(Object.keys(page)).toEqual(['id', 'url', 'labels'])
+  })
+
+  it('exposes the site address without trailing slashes and builds a page address from a space key and an id', () => {
+    const client = createConfluenceClient({ ...TEST_CREDENTIALS, baseUrl: `${ATLASSIAN_BASE_URL}/` })
+    expect(client.siteAddress).toBe(ATLASSIAN_BASE_URL)
+    expect(client.pageUrl('HEDYDOCS', '201')).toBe(TITLE_PROJECTION.url)
   })
 
   it.each([
@@ -189,16 +192,6 @@ describe('the Confluence client pageByTitle', () => {
     const { metadata: _metadata, ...resultWithoutMetadata } = titleResponse.results[0]
     nock(ATLASSIAN_BASE_URL).get(CONTENT).query(true).reply(200, answerWithOnly(resultWithoutMetadata))
     expect(await createConfluenceClient(TEST_CREDENTIALS).pageByTitle(TITLE, SPACE_KEY)).toEqual({ ...TITLE_PROJECTION, labels: [] })
-  })
-
-  it('gives a null version author when the version has no author', async () => {
-    const result = titleResponse.results[0]
-    const { by: _by, ...versionWithoutAuthor } = result.version
-    nock(ATLASSIAN_BASE_URL).get(CONTENT).query(true).reply(200, answerWithOnly({ ...result, version: versionWithoutAuthor }))
-    expect(await createConfluenceClient(TEST_CREDENTIALS).pageByTitle(TITLE, SPACE_KEY)).toEqual({
-      ...TITLE_PROJECTION,
-      version: { ...TITLE_PROJECTION.version, by: null }
-    })
   })
 
   it('builds the url without a double slash when the base URL ends in a slash', async () => {
