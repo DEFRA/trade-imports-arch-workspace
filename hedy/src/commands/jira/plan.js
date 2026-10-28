@@ -1,23 +1,26 @@
 import { createHash } from 'node:crypto'
-import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { z } from 'zod'
 import { HedyError } from '../../errors.js'
+import { readTextFile } from './files.js'
 
 export const MAX_DESCRIPTION_LENGTH = 32767
 
 /**
- * Returns the Jira create payload's fields for a validated manifest. priority
- * and parent appear only when the manifest sets them, and labels is a copy.
+ * Returns the Jira create payload's fields for a create plan's content.
+ * priority and parent appear only when the content sets them, and labels
+ * is a copy.
+ *
+ * @param {{ project: string, type: string, summary: string, description: string, priority: string | null, parent: string | null, labels: string[] }} content
  */
-export const buildFields = (manifest, description) => ({
-  project: { key: manifest.project },
-  summary: manifest.summary,
+export const buildFields = ({ project, type, summary, description, priority, parent, labels }) => ({
+  project: { key: project },
+  summary,
   description,
-  issuetype: { name: manifest.type },
-  labels: [...manifest.labels],
-  ...(manifest.priority ? { priority: { name: manifest.priority } } : {}),
-  ...(manifest.parent ? { parent: { key: manifest.parent } } : {})
+  issuetype: { name: type },
+  labels: [...labels],
+  ...(priority ? { priority: { name: priority } } : {}),
+  ...(parent ? { parent: { key: parent } } : {})
 })
 
 /**
@@ -25,20 +28,18 @@ export const buildFields = (manifest, description) => ({
  * @returns {string[]} one warning when the description is longer than MAX_DESCRIPTION_LENGTH, else none
  */
 export const findWarnings = (description) => description.length > MAX_DESCRIPTION_LENGTH
-  ? [`The description is ${description.length.toLocaleString('en-GB')} characters, over Jira's limit of ${MAX_DESCRIPTION_LENGTH.toLocaleString('en-GB')}. Shorten the description file, then run the command again.`]
+  ? [`The description is ${description.length.toLocaleString('en-GB')} characters, over Jira's limit of ${MAX_DESCRIPTION_LENGTH.toLocaleString('en-GB')}. Shorten the description file before confirming.`]
   : []
 
 /**
- * Returns the SHA-256 hex digest of the plan's content: project, type,
- * summary, description, priority, parent and labels, as JSON with sorted
- * keys. The labels' order does not change the id, an absent priority or
- * parent counts as null, and every other key the argument holds is ignored.
+ * Returns the SHA-256 hex digest of the content as JSON with its keys
+ * sorted, so the order of the keys does not change the id. The content's
+ * values are text, null or lists of text.
+ *
+ * @param {Record<string, string | null | string[]>} content
  */
-export const planIdOf = ({ project, type, summary, description, priority, parent, labels }) => {
-  const content = { project, type, summary, description, priority: priority ?? null, parent: parent ?? null, labels: labels.toSorted() }
-  const canonicalJson = JSON.stringify(content, Object.keys(content).sort())
-  return createHash('sha256').update(canonicalJson).digest('hex')
-}
+export const planIdOf = (content) =>
+  createHash('sha256').update(JSON.stringify(content, Object.keys(content).sort())).digest('hex')
 
 /**
  * Validates a --confirm value: 64 lowercase hex characters, the form of
@@ -57,24 +58,15 @@ export const refuseStalePlan = (confirmedPlanId, planId) => {
   throw new HedyError('USAGE', 'The plan has changed since the dry run. Run the dry run again, then confirm the new plan id.')
 }
 
-const readDescriptionText = async (path) => {
-  try {
-    return await readFile(path, 'utf8')
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      throw new HedyError(
-        'USAGE',
-        `No description file is at ${path}. Write the description into that file, or give the path of the file that holds the description, then run the command again.`,
-        { cause: error }
-      )
-    }
-    throw new HedyError(
-      'UNKNOWN',
-      `The description file at ${path} could not be read. Check that the path is a regular file with read permission, then run the command again.`,
-      { cause: error }
-    )
-  }
+const refuseMissingDescription = (path, error) => {
+  throw new HedyError(
+    'USAGE',
+    `No description file is at ${path}. Write the description into that file, or give the path of the file that holds the description, then run the command again.`,
+    { cause: error }
+  )
 }
+
+const withLfLineEndings = (text) => text.replace(/\r\n?/g, '\n')
 
 const withoutTrailingNewlines = (text) => text.replace(/\n+$/, '')
 
@@ -84,15 +76,17 @@ const refuseBlankDescription = (description, path) => {
 }
 
 /**
- * Resolves to the text of the description file at path without its trailing
- * newlines. Rejects with USAGE naming the path when the file is missing or
- * blank, and with UNKNOWN naming the path for any other read error.
+ * Resolves to the text of the description file at path with LF line endings
+ * and without its trailing newlines. Rejects with USAGE naming the path when
+ * the file is missing or blank, and with UNKNOWN naming the path for any
+ * other read error.
  *
  * @param {string} path
  * @returns {Promise<string>}
  */
 export const readDescription = async (path) => {
-  const description = withoutTrailingNewlines(await readDescriptionText(path))
+  const text = await readTextFile(path, { kind: 'description file', missing: (error) => refuseMissingDescription(path, error) })
+  const description = withoutTrailingNewlines(withLfLineEndings(text))
   refuseBlankDescription(description, path)
   return description
 }
@@ -100,7 +94,8 @@ export const readDescription = async (path) => {
 /**
  * Resolves to the create plan for a validated manifest. The description is
  * read with readDescription from descriptionFile, relative to folder.
- * priority and parent are null when the manifest leaves them out.
+ * priority and parent are null when the manifest leaves them out, and the
+ * plan id does not depend on the order of the labels.
  *
  * @param {{ manifest: z.infer<typeof import('./manifest.js').manifestSchema>, folder: string }} options
  */
@@ -115,7 +110,12 @@ export const buildCreatePlan = async ({ manifest, folder }) => {
     labels: [...manifest.labels],
     description
   }
-  return { planId: planIdOf(content), ...content, warnings: findWarnings(description), fields: buildFields(manifest, description) }
+  return {
+    planId: planIdOf({ ...content, labels: content.labels.toSorted() }),
+    ...content,
+    warnings: findWarnings(description),
+    fields: buildFields(content)
+  }
 }
 
 const valueLines = (value) => {

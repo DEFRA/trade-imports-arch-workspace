@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto'
 import { resolve } from 'node:path'
 import { z } from 'zod'
 import { createJiraClient } from '../../clients/jira.js'
@@ -6,7 +5,7 @@ import { loadCredentials } from '../../credentials.js'
 import { HedyError } from '../../errors.js'
 import { runAction } from '../../run-action.js'
 import { issueKeySchema } from './issue-key.js'
-import { planIdSchema, readDescription, refuseStalePlan, renderPlan, renderWriteOutcome } from './plan.js'
+import { planIdOf, planIdSchema, readDescription, refuseStalePlan, renderPlan, renderWriteOutcome } from './plan.js'
 
 const describeInputSchema = z.object({
   key: issueKeySchema,
@@ -14,16 +13,6 @@ const describeInputSchema = z.object({
     .min(1, '--from is empty. Give --from the path of the description file, then run the command again.'),
   confirm: planIdSchema.optional()
 })
-
-/**
- * Returns the SHA-256 hex digest of JSON.stringify({ currentDescription,
- * description, key }), so the id changes when the issue's description on
- * the server, the description to send or the key changes.
- *
- * @param {{ currentDescription: string | null, description: string, key: string }} content
- */
-export const describePlanIdOf = ({ currentDescription, description, key }) =>
-  createHash('sha256').update(JSON.stringify({ currentDescription, description, key })).digest('hex')
 
 const refuseUnstoredDescription = async (client, key, description) => {
   const readBack = await client.issue(key)
@@ -48,7 +37,7 @@ export const runDescribe = async ({ key, from, confirm, env, workspaceRoot }) =>
   const description = await readDescription(resolve(from))
   const client = createJiraClient(loadCredentials({ env, workspaceRoot }))
   const issue = await client.issue(key)
-  const planId = describePlanIdOf({ currentDescription: issue.description, description, key })
+  const planId = planIdOf({ key, description, currentDescription: issue.description })
   const unchanged = issue.description === description
   if (confirm === undefined) return { mode: 'dry-run', planId, key: issue.key, url: issue.url, description, unchanged }
   if (unchanged) return { mode: 'unchanged', key: issue.key, url: issue.url }

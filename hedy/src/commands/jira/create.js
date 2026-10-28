@@ -1,10 +1,12 @@
-import { readFile, writeFile } from 'node:fs/promises'
+import { writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { z } from 'zod'
 import { createJiraClient } from '../../clients/jira.js'
 import { loadCredentials } from '../../credentials.js'
-import { HedyError } from '../../errors.js'
+import { HedyError, toHedyError } from '../../errors.js'
 import { runAction } from '../../run-action.js'
+import { parseJsonText, readTextFile } from './files.js'
+import { issueKeySchema } from './issue-key.js'
 import { loadManifest } from './manifest.js'
 import { buildCreatePlan, planIdSchema, refuseStalePlan, renderPlan, renderWriteOutcome } from './plan.js'
 
@@ -15,34 +17,25 @@ const createOptionsSchema = z.object({
   confirm: planIdSchema.optional()
 })
 
-const readReceiptText = async (path) => {
-  try {
-    return await readFile(path, 'utf8')
-  } catch (error) {
-    if (error.code === 'ENOENT') return undefined
-    throw new HedyError(
-      'UNKNOWN',
-      `The receipt at ${path} could not be read. Check that the path is a regular file with read permission, then run the command again.`,
-      { cause: error }
-    )
-  }
-}
+const RECEIPT_NEXT_STEP = 'Check in Jira whether the manifest\'s issue exists, then fix or delete the receipt and run the command again.'
 
-const parseReceipt = (text, path) => {
-  try {
-    return JSON.parse(text)
-  } catch (error) {
-    throw new HedyError(
-      'USAGE',
-      `The receipt at ${path} is not JSON. Check in Jira whether the manifest's issue exists, then fix or delete the receipt and run the command again.`,
-      { cause: error }
-    )
-  }
+const receiptSchema = z.object({
+  key: issueKeySchema,
+  url: z.string().min(1),
+  planId: planIdSchema,
+  createdAt: z.string().min(1)
+})
+
+const validateReceipt = (value, path) => {
+  const result = receiptSchema.safeParse(value)
+  if (result.success) return result.data
+  throw new HedyError('USAGE', `The receipt at ${path} does not hold key, url, planId and createdAt. ${RECEIPT_NEXT_STEP}`, { cause: result.error })
 }
 
 const readReceipt = async (path) => {
-  const text = await readReceiptText(path)
-  return text === undefined ? undefined : parseReceipt(text, path)
+  const text = await readTextFile(path, { kind: 'receipt', missing: () => undefined })
+  if (text === undefined) return undefined
+  return validateReceipt(parseJsonText(text, { kind: 'receipt', path, nextStep: RECEIPT_NEXT_STEP }), path)
 }
 
 const writeReceipt = async (path, receipt) => {
@@ -51,14 +44,26 @@ const writeReceipt = async (path, receipt) => {
   } catch (error) {
     throw new HedyError(
       'UNKNOWN',
-      `Jira created ${receipt.key} at ${receipt.url}, but the receipt could not be written at ${path}. Write the receipt by hand before running the command again.`,
+      `Jira created ${receipt.key} at ${receipt.url}, but the receipt could not be written at ${path}. Write this receipt into that file before running the command again: ${JSON.stringify(receipt)}`,
       { cause: error }
     )
   }
 }
 
-const dryRunResult = ({ planId, project, type, summary, priority, parent, labels, description, warnings }) =>
-  ({ mode: 'dry-run', planId, project, type, summary, priority, parent, labels, description, warnings })
+const readBackCreatedIssue = async (client, { key, url, receiptPath }) => {
+  try {
+    await client.issue(key)
+  } catch (error) {
+    const readBackError = toHedyError(error)
+    throw new HedyError(
+      readBackError.code,
+      `Jira created ${key} at ${url} and the receipt is at ${receiptPath}, but reading the issue back failed: ${readBackError.message} Run the same confirm again to read the issue back.`,
+      { cause: readBackError }
+    )
+  }
+}
+
+const dryRunResult = ({ fields, ...plan }) => ({ mode: 'dry-run', ...plan })
 
 const refuseSecondIssue = (receipt, path) => {
   throw new HedyError(
@@ -76,7 +81,7 @@ const createIssue = async (plan, { receiptPath, createClient }) => {
   const client = createClient()
   const { key, url } = await client.createIssue(plan.fields)
   await writeReceipt(receiptPath, { key, url, planId: plan.planId, createdAt: new Date().toISOString() })
-  await client.issue(key)
+  await readBackCreatedIssue(client, { key, url, receiptPath })
   return { mode: 'created', key, url }
 }
 
@@ -84,10 +89,12 @@ const createIssue = async (plan, { receiptPath, createClient }) => {
  * Without confirm, resolves to the dry run of the manifest at from, resolved
  * against the current folder, and reads no credentials. With confirm, a
  * receipt beside the manifest whose planId is confirm resolves to unchanged
- * after reading the issue back; a receipt with another planId, or a confirm
- * that is not the plan's id, rejects with USAGE before any request. Else the
- * issue is created, the receipt written at once, the issue read back, and the
- * result is created.
+ * after reading the issue back; a receipt that is not JSON or does not hold
+ * key, url, planId and createdAt, a receipt with another planId, or a
+ * confirm that is not the plan's id, rejects with USAGE before any request.
+ * Else the issue is created, the receipt written at once, the issue read
+ * back, and the result is created. A failed read back rejects with the read
+ * back's code, naming the key and the receipt path.
  *
  * @param {{ from: string, confirm?: string, env: Record<string, string | undefined>, workspaceRoot: () => string }} options
  */

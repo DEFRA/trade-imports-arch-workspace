@@ -1,3 +1,4 @@
+import { HedyError } from '../errors.js'
 import { createAtlassianHttp } from './atlassian.js'
 
 const ISSUE_FIELDS = ['summary', 'status', 'issuetype', 'priority', 'assignee', 'labels', 'parent', 'created', 'updated']
@@ -33,6 +34,11 @@ const searchPagePath = (jql, { maxResults, nextPageToken }) => {
 
 const nextPageTokenOf = (page) => (page.issues?.length > 0 ? page.nextPageToken : undefined)
 
+const createdKeyOf = (answer) => {
+  if (typeof answer?.key === 'string' && answer.key !== '') return answer.key
+  throw new HedyError('PARSE', 'create: Jira answered without an issue key. Check in Jira whether the issue was created, then run the command again.')
+}
+
 /**
  * Takes the credentials credentialsFromEnv returns and an optional timeoutMs
  * for each request, 30000 when not given. Every method rejects with a
@@ -67,7 +73,7 @@ export const createJiraClient = ({ user, token, baseUrl }, { timeoutMs } = {}) =
       return { issues, truncated: Boolean(nextPageToken) }
     },
     createIssue: async (fields) => {
-      const { key } = await http.post('/rest/api/2/issue', { fields }, 'create')
+      const key = createdKeyOf(await http.post('/rest/api/2/issue', { fields }, 'create'))
       return { key, url: browseUrl(key, http.normalisedBaseUrl) }
     },
     updateDescription: async (key, description) => {

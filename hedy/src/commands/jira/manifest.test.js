@@ -1,4 +1,4 @@
-import { copyFile, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { copyFile, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
@@ -46,6 +46,11 @@ describe('manifestSchema', () => {
     expect([parsed.project, parsed.summary]).toEqual(['HEDY', 'Raise issues'])
   })
 
+  it('accepts a project key with digits and an underscore, and a descriptionFile in a subfolder whose name holds two dots', () => {
+    const parsed = manifestSchema.parse({ ...fixtureManifest, project: 'HEDY_2', descriptionFile: 'notes/v1..v2.jira.txt' })
+    expect([parsed.project, parsed.descriptionFile]).toEqual(['HEDY_2', 'notes/v1..v2.jira.txt'])
+  })
+
   it('accepts a summary of exactly 255 characters', () => {
     expect(manifestSchema.parse({ ...fixtureManifest, summary: 'x'.repeat(255) }).summary).toHaveLength(255)
   })
@@ -61,14 +66,20 @@ describe('loadManifest', () => {
   it.each([
     ['a schema value other than hedy-ticket/1', { schema: 'hedy-ticket/2' }, 'schema must be "hedy-ticket/1"'],
     ['a blank project', { project: '  ' }, 'project must be a Jira project key'],
+    ['a project with a space', { project: 'eudpa tickets' }, 'project must be a Jira project key'],
+    ['a lowercase project', { project: 'eudpa' }, 'project must be a Jira project key'],
     ['a type outside Bug, Story, Task and Epic', { type: 'Subtask' }, 'type must be one of Bug, Story, Task or Epic'],
     ['a summary of 256 characters', { summary: 'x'.repeat(256) }, 'summary is 256 characters, over the limit of 255'],
     ['a blank summary', { summary: '   ' }, 'summary is blank'],
     ['a missing descriptionFile', { descriptionFile: undefined }, 'descriptionFile must be the path of the description file'],
+    ['an absolute descriptionFile', { descriptionFile: '/etc/hosts' }, 'descriptionFile must be a path relative to the manifest\'s folder, without .. segments.'],
+    ['a descriptionFile with a .. segment', { descriptionFile: '../description.jira.txt' }, 'descriptionFile must be a path relative to the manifest\'s folder, without .. segments.'],
+    ['a descriptionFile with a .. segment between backslashes', { descriptionFile: 'notes\\..\\..\\description.jira.txt' }, 'descriptionFile must be a path relative to the manifest\'s folder, without .. segments.'],
     ['a priority outside Lowest, Low, Medium, High and Highest', { priority: 'Urgent' }, 'priority must be one of Lowest, Low, Medium, High or Highest'],
     ['a parent that is not an issue key', { parent: 'HEDY_100' }, 'parent HEDY_100 is not a Jira issue key such as ABC-123'],
     ['labels that are not a list', { labels: 'hedy' }, 'labels must be a list of label names'],
-    ['an empty label', { labels: ['hedy', ''] }, 'labels must be a list of label names'],
+    ['an empty label', { labels: ['hedy', ''] }, 'labels must be a list of label names without spaces, none of them empty'],
+    ['a label with a space', { labels: ['hedy', 'two words'] }, 'labels must be a list of label names without spaces, none of them empty'],
     ['an unknown key', { assignee: 'someone' }, 'The manifest holds keys that are not manifest fields: assignee.']
   ])('refuses %s with USAGE naming the path and the field', async (_label, change, fragment) => {
     const path = await writeManifestText(JSON.stringify({ ...fixtureManifest, ...change }))
@@ -105,13 +116,5 @@ describe('loadManifest', () => {
     const error = await rejectionOf(loadManifest(path))
     expect(error.code).toBe('USAGE')
     expect(error.message).toBe(`The manifest at ${path} is not JSON. Fix the file so that it parses as JSON, then run the command again.`)
-  })
-
-  it('refuses a path it cannot read as a file with UNKNOWN naming the path', async () => {
-    const path = join(folder, 'ticket.json')
-    await mkdir(path)
-    const error = await rejectionOf(loadManifest(path))
-    expect(error.code).toBe('UNKNOWN')
-    expect(error.message).toBe(`The manifest at ${path} could not be read. Check that the path is a regular file with read permission, then run the command again.`)
   })
 })

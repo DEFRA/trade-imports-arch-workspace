@@ -114,7 +114,7 @@ A confirm can also end in one of these outcomes:
 
 - **Changed Plan.** When the manifest or the description has changed since the dry run, `hedy` exits 2 with "The plan has changed since the dry run. Run the dry run again, then confirm the new plan id." Run the dry run again, show the user the new plan and wait for the user's word again. Never reuse a stale plan id.
 - **Existing Receipt.** When the folder already holds a receipt for a different plan, `hedy` exits 2 and names the existing key. Change a raised ticket through Updating a Description, and give a new ticket a new folder.
-- **Repeated Confirm.** The same confirm run again creates nothing and returns `{ mode: 'unchanged', key, url }`. When a confirm's outcome is unclear, repeat that confirm from the same folder. A new folder would raise a second issue.
+- **Repeated Confirm.** The same confirm run again creates nothing and returns `{ mode: 'unchanged', key, url }`. A confirm that fails with `NETWORK` after Jira may have received the request leaves no receipt, so search before confirming again: `hedy jira search 'project = <KEY> AND summary ~ "<summary>" ORDER BY created DESC' --max 5 --json`. When the issue exists, write `ticket.created.json` beside the manifest by hand, holding `{ key, url, planId, createdAt }`; when the issue does not exist, repeat the confirm from the same folder. A new folder would raise a second issue.
 
 ## Updating a Description
 

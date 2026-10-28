@@ -223,6 +223,19 @@ describe('the Jira client createIssue', () => {
       message: 'create: Jira refused the request. Jira said "issuetype: Specify a valid issue type.". Correct the request, then run the command again.'
     })
   })
+
+  it.each([
+    ['a 200 answer without a key', (interceptor) => interceptor.reply(200, {})],
+    ['a 204 answer', (interceptor) => interceptor.reply(204)]
+  ])('rejects %s with PARSE telling the caller to check Jira for the issue', async (_label, reply) => {
+    reply(nock(ATLASSIAN_BASE_URL).post(CREATE, createRequest))
+    const error = await rejectionOf(createJiraClient(TEST_CREDENTIALS).createIssue(createRequest.fields))
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'PARSE',
+      message: 'create: Jira answered without an issue key. Check in Jira whether the issue was created, then run the command again.'
+    })
+  })
 })
 
 describe('the Jira client updateDescription', () => {

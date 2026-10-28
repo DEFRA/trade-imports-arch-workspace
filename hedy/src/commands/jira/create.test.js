@@ -1,4 +1,4 @@
-import { chmod, copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { chmod, copyFile, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { Command } from 'commander'
@@ -107,12 +107,15 @@ describe('runCreate', () => {
     expect(await readFile(receiptPath(), 'utf8')).toBe(`${JSON.stringify(receipt, null, 2)}\n`)
   })
 
-  it('keeps the receipt and rejects with NETWORK when the read back answers 500', async () => {
+  it('keeps the receipt and rejects with NETWORK naming the created key and the receipt path when the read back answers 500', async () => {
     const { planId } = await dryRun()
     stageCreate()
     nock(ATLASSIAN_BASE_URL).get('/rest/api/2/issue/HEDY-201').query(true).reply(500, 'down')
     const error = await rejectionOf(confirmCreate(planId))
     expect(error.code).toBe('NETWORK')
+    expect(error.cause.code).toBe('NETWORK')
+    expect(error.message).toBe(`Jira created HEDY-201 at ${CREATED_URL} and the receipt is at ${receiptPath()}, but reading the issue back failed: ${error.cause.message} Run the same confirm again to read the issue back.`)
+    expect(error.cause.message).toMatch(/^issue HEDY-201: Jira answered 500\./)
     expect(await readReceipt()).toMatchObject({ key: 'HEDY-201', url: CREATED_URL, planId })
   })
 
@@ -131,13 +134,17 @@ describe('runCreate', () => {
     expect(error.message).toBe(`This manifest already created HEDY-201 at ${CREATED_URL}. To raise another issue, delete ${receiptPath()} or start a new folder.`)
   })
 
-  it('rejects with UNKNOWN naming the created key and the receipt path, and does not read back, when the receipt cannot be written', async () => {
+  it('rejects with UNKNOWN naming the created key, the receipt path and the receipt to write, and does not read back, when the receipt cannot be written', async () => {
     const { planId } = await dryRun()
     await chmod(folder, 0o500)
     stageCreate()
     const error = await rejectionOf(confirmCreate(planId))
     expect(error.code).toBe('UNKNOWN')
-    expect(error.message).toBe(`Jira created HEDY-201 at ${CREATED_URL}, but the receipt could not be written at ${receiptPath()}. Write the receipt by hand before running the command again.`)
+    const lead = `Jira created HEDY-201 at ${CREATED_URL}, but the receipt could not be written at ${receiptPath()}. Write this receipt into that file before running the command again: `
+    expect(error.message.startsWith(lead)).toBe(true)
+    expect(error.message).toContain(planId)
+    expect(error.message).toContain('"createdAt"')
+    expect(JSON.parse(error.message.slice(lead.length))).toEqual({ key: 'HEDY-201', url: CREATED_URL, planId, createdAt: expect.any(String) })
     expect(error.cause.code).toBe('EACCES')
   })
 
@@ -149,12 +156,16 @@ describe('runCreate', () => {
     expect(error.message).toBe(`The receipt at ${receiptPath()} is not JSON. Check in Jira whether the manifest's issue exists, then fix or delete the receipt and run the command again.`)
   })
 
-  it('refuses a receipt path it cannot read as a file with UNKNOWN naming the path and sends no request', async () => {
+  it.each([
+    ['null', () => null],
+    ['the confirmed plan id without a key', (planId) => ({ planId })],
+    ['an empty url', (planId) => ({ key: 'HEDY-201', url: '', planId, createdAt: '2026-10-28T10:00:00.000Z' })]
+  ])('refuses a receipt holding %s with USAGE naming the receipt path and sends no request', async (_label, receiptFor) => {
     const { planId } = await dryRun()
-    await mkdir(receiptPath())
+    await writeFile(receiptPath(), JSON.stringify(receiptFor(planId)))
     const error = await rejectionOf(confirmCreate(planId))
-    expect(error.code).toBe('UNKNOWN')
-    expect(error.message).toBe(`The receipt at ${receiptPath()} could not be read. Check that the path is a regular file with read permission, then run the command again.`)
+    expect(error.code).toBe('USAGE')
+    expect(error.message).toBe(`The receipt at ${receiptPath()} does not hold key, url, planId and createdAt. Check in Jira whether the manifest's issue exists, then fix or delete the receipt and run the command again.`)
   })
 })
 

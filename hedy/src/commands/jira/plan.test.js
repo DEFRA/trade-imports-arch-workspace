@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { copyFile, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -42,22 +43,33 @@ describe('buildCreatePlan', () => {
     expect(plan.fields).toEqual(sentFields)
   })
 
-  it('returns the plan content, no warnings, the fields and the plan id of that content', async () => {
+  it('returns the plan content, no warnings, the fields of that content and the plan id of that content with sorted labels', async () => {
     await writeDescription('h3. Why\n\nA reason.\n')
     const plan = await buildCreatePlan({ manifest: fixtureManifest, folder })
-    expect(plan).toEqual({
-      planId: planIdOf(plan),
+    const content = {
       project: 'HEDY',
       type: 'Task',
       summary: 'Raise Jira issues from a manifest with a dry run',
       priority: 'Medium',
       parent: 'HEDY-100',
       labels: ['hedy', 'fixtures'],
-      description: 'h3. Why\n\nA reason.',
+      description: 'h3. Why\n\nA reason.'
+    }
+    expect(plan).toEqual({
+      planId: planIdOf({ ...content, labels: ['fixtures', 'hedy'] }),
+      ...content,
       warnings: [],
-      fields: buildFields(fixtureManifest, 'h3. Why\n\nA reason.')
+      fields: buildFields(content)
     })
-    expect(plan.planId).toMatch(/^[0-9a-f]{64}$/)
+  })
+
+  it('gives the same plan id for two manifests that differ only in the order of their labels, and keeps each manifest\'s order', async () => {
+    await writeDescription('A reason.')
+    const plan = await buildCreatePlan({ manifest: fixtureManifest, folder })
+    const reordered = await buildCreatePlan({ manifest: { ...fixtureManifest, labels: ['fixtures', 'hedy'] }, folder })
+    expect(reordered.planId).toBe(plan.planId)
+    expect([plan.labels, reordered.labels]).toEqual([['hedy', 'fixtures'], ['fixtures', 'hedy']])
+    expect(reordered.fields.labels).toEqual(['fixtures', 'hedy'])
   })
 
   it('gives null priority and parent, and fields without either, when the manifest has neither', async () => {
@@ -66,7 +78,6 @@ describe('buildCreatePlan', () => {
     expect([plan.priority, plan.parent]).toEqual([null, null])
     expect(Object.keys(plan.fields)).toEqual(['project', 'summary', 'description', 'issuetype', 'labels'])
   })
-
   it('strips every trailing newline from the description and keeps the inner blank lines', async () => {
     await writeDescription('line one\n\nline two\n\n\n')
     const plan = await buildCreatePlan({ manifest: fixtureManifest, folder })
@@ -94,6 +105,16 @@ describe('readDescription', () => {
   it('returns the file text without its trailing newlines and keeps the inner blank lines', async () => {
     await writeFile(descriptionPath(), 'line one\n\nline two\n\n\n')
     expect(await readDescription(descriptionPath())).toBe('line one\n\nline two')
+  })
+
+  it('returns the same text for a file saved with CRLF or lone CR line endings as for the LF file', async () => {
+    await writeFile(descriptionPath(), 'line one\r\n\r\nline two\rline three\r\n')
+    expect(await readDescription(descriptionPath())).toBe('line one\n\nline two\nline three')
+  })
+
+  it('strips every trailing CRLF newline from a file ending in two of them', async () => {
+    await writeFile(descriptionPath(), 'line one\r\n\r\n')
+    expect(await readDescription(descriptionPath())).toBe('line one')
   })
 
   it('refuses a missing file with USAGE naming the path', async () => {
@@ -185,8 +206,18 @@ describe('renderWriteOutcome', () => {
 })
 
 describe('buildFields', () => {
-  it('leaves out priority and parent when the manifest has neither', () => {
-    expect(buildFields(manifestWithoutPriorityOrParent, 'A reason.')).toEqual({
+  const content = {
+    project: 'HEDY',
+    type: 'Task',
+    summary: fixtureManifest.summary,
+    description: 'A reason.',
+    priority: null,
+    parent: null,
+    labels: ['hedy', 'fixtures']
+  }
+
+  it('leaves out priority and parent when the content holds null for both', () => {
+    expect(buildFields(content)).toEqual({
       project: { key: 'HEDY' },
       summary: fixtureManifest.summary,
       description: 'A reason.',
@@ -195,10 +226,17 @@ describe('buildFields', () => {
     })
   })
 
-  it('returns a copy of the labels, so changing the fields leaves the manifest unchanged', () => {
-    const fields = buildFields(fixtureManifest, 'A reason.')
+  it('names the priority and the parent issue when the content holds both', () => {
+    expect(buildFields({ ...content, priority: 'Medium', parent: 'HEDY-100' })).toMatchObject({
+      priority: { name: 'Medium' },
+      parent: { key: 'HEDY-100' }
+    })
+  })
+
+  it('returns a copy of the labels, so changing the fields leaves the content unchanged', () => {
+    const fields = buildFields(content)
     fields.labels.push('extra')
-    expect(fixtureManifest.labels).toEqual(['hedy', 'fixtures'])
+    expect(content.labels).toEqual(['hedy', 'fixtures'])
   })
 })
 
@@ -210,7 +248,7 @@ describe('planIdOf', () => {
     description: 'A reason.',
     priority: 'Medium',
     parent: 'HEDY-100',
-    labels: ['hedy', 'fixtures']
+    labels: ['fixtures', 'hedy']
   }
 
   it('gives 64 hex characters, the same for the same content', () => {
@@ -218,17 +256,14 @@ describe('planIdOf', () => {
     expect(planIdOf({ ...content })).toBe(planIdOf(content))
   })
 
-  it('gives the same id when the labels are reordered', () => {
-    expect(planIdOf({ ...content, labels: ['fixtures', 'hedy'] })).toBe(planIdOf(content))
+  it('is the SHA-256 hex digest of the content as JSON with its keys sorted', () => {
+    const digest = createHash('sha256').update('{"currentDescription":"Old text.","description":"New text.","key":"HEDY-101"}').digest('hex')
+    expect(planIdOf({ key: 'HEDY-101', description: 'New text.', currentDescription: 'Old text.' })).toBe(digest)
   })
 
-  it('gives the same id for an absent priority and parent as for null ones', () => {
-    const { priority: _absentPriority, parent: _absentParent, ...withoutPriorityOrParent } = content
-    expect(planIdOf(withoutPriorityOrParent)).toBe(planIdOf({ ...content, priority: null, parent: null }))
-  })
-
-  it('ignores the plan id, warnings and fields a plan also holds', () => {
-    expect(planIdOf({ ...content, planId: 'x', warnings: ['y'], fields: {} })).toBe(planIdOf(content))
+  it('gives the same id whatever the order of the content\'s keys', () => {
+    const reversed = Object.fromEntries(Object.entries(content).reverse())
+    expect(planIdOf(reversed)).toBe(planIdOf(content))
   })
 
   it.each([
@@ -238,6 +273,7 @@ describe('planIdOf', () => {
     ['description', { description: 'Another reason.' }],
     ['priority', { priority: 'High' }],
     ['parent', { parent: 'HEDY-200' }],
+    ['parent, from a key to null', { parent: null }],
     ['labels', { labels: ['hedy'] }]
   ])('gives a different id when the %s changes', (_field, change) => {
     expect(planIdOf({ ...content, ...change })).not.toBe(planIdOf(content))
@@ -258,7 +294,7 @@ describe('findWarnings', () => {
 
   it('returns one warning naming the length and the limit for a description over the limit', () => {
     expect(findWarnings('x'.repeat(32768))).toEqual([
-      'The description is 32,768 characters, over Jira\'s limit of 32,767. Shorten the description file, then run the command again.'
+      'The description is 32,768 characters, over Jira\'s limit of 32,767. Shorten the description file before confirming.'
     ])
   })
 })

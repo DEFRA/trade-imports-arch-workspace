@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto'
 import { copyFile, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -16,7 +15,8 @@ import {
   startAnsweringServer
 } from '../../test-support/http.js'
 import { captureIo } from '../../test-support/io.js'
-import { describePlanIdOf, register, runDescribe } from './describe.js'
+import { register, runDescribe } from './describe.js'
+import { planIdOf } from './plan.js'
 
 interceptNetworkPerTest()
 
@@ -55,25 +55,7 @@ const stageUpdate = (key = 'HEDY-101') => nock(ATLASSIAN_BASE_URL).put(`/rest/ap
 const describeIssue = (confirm) =>
   runDescribe({ key: 'HEDY-101', from: descriptionPath, confirm, env: credentialsEnv(), workspaceRoot: () => root })
 
-const planIdAgainstIssue = describePlanIdOf({ currentDescription: ISSUE_DESCRIPTION, description: revisedDescription, key: 'HEDY-101' })
-
-describe('describePlanIdOf', () => {
-  const content = { currentDescription: 'Old text.', description: 'New text.', key: 'HEDY-101' }
-
-  it('is the SHA-256 hex digest of the JSON of currentDescription, description and key in that order', () => {
-    const digest = createHash('sha256').update('{"currentDescription":"Old text.","description":"New text.","key":"HEDY-101"}').digest('hex')
-    expect(describePlanIdOf(content)).toBe(digest)
-  })
-
-  it.each([
-    ['currentDescription', { currentDescription: 'Edited on the server.' }],
-    ['currentDescription, from text to null', { currentDescription: null }],
-    ['description', { description: 'Newer text.' }],
-    ['key', { key: 'HEDY-102' }]
-  ])('gives a different id when the %s changes', (_field, change) => {
-    expect(describePlanIdOf({ ...content, ...change })).not.toBe(describePlanIdOf(content))
-  })
-})
+const planIdAgainstIssue = planIdOf({ key: 'HEDY-101', description: revisedDescription, currentDescription: ISSUE_DESCRIPTION })
 
 describe('runDescribe', () => {
   it('without confirm reads the issue once and returns the dry run, not unchanged, for the revised description', async () => {
@@ -168,7 +150,7 @@ describe('the jira describe command', () => {
   })
 
   it('in text mode prints the two lines the bash tool printed for a confirmed update', async () => {
-    const planId = describePlanIdOf({ currentDescription: ISSUE_DESCRIPTION, description: revisedDescription, key: 'HEDY-201' })
+    const planId = planIdOf({ key: 'HEDY-201', description: revisedDescription, currentDescription: ISSUE_DESCRIPTION })
     stageIssue(ISSUE_DESCRIPTION, 'HEDY-201')
     stageUpdate('HEDY-201')
     stageIssue(revisedDescription, 'HEDY-201')
