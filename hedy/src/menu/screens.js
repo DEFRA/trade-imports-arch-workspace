@@ -1,0 +1,23 @@
+export const SCREENS = Object.freeze({
+  MAIN: 'main',
+  LOADING: 'loading',
+  ERROR: 'error',
+  AUTH_RESULT: 'auth-result',
+  JIRA_MENU: 'jira-menu',
+  JIRA_TICKET_INPUT: 'jira-ticket-input',
+  JIRA_TICKET_RESULT: 'jira-ticket-result',
+  JIRA_SEARCH_INPUT: 'jira-search-input',
+  JIRA_SEARCH_RESULT: 'jira-search-result',
+  JIRA_CREATE_INPUT: 'jira-create-input',
+  JIRA_CREATE_CONFIRM: 'jira-create-confirm',
+  JIRA_CREATE_RESULT: 'jira-create-result',
+  JIRA_DESCRIBE_KEY_INPUT: 'jira-describe-key-input',
+  JIRA_DESCRIBE_FILE_INPUT: 'jira-describe-file-input',
+  JIRA_DESCRIBE_CONFIRM: 'jira-describe-confirm',
+  JIRA_DESCRIBE_RESULT: 'jira-describe-result',
+  CONFLUENCE_MENU: 'confluence-menu',
+  CONFLUENCE_PAGE_INPUT: 'confluence-page-input',
+  CONFLUENCE_PAGE_RESULT: 'confluence-page-result',
+  CONFLUENCE_PUBLISH_INPUT: 'confluence-publish-input',
+  CONFLUENCE_PUBLISH_CONFIRM: 'confluence-publish-confirm'
+})
