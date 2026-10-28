@@ -22,7 +22,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Menu screens.** One shared result screen and one shared confirm screen serve every command. Each command exports the rows its text mode prints, so the menu and the command line show the same fields from one function. Result text is cut to 20 lines with a note naming the command that prints the whole text, because Ink renders a frame taller than the terminal badly.
 
-**Leaving Ink.** A publish confirmed from the menu unmounts Ink before the publisher runs. The publisher's log then streams to stderr, and the result prints as the command's text with the command's exit code. The menu does not return after a publish. A scrolling screen is left for a later iteration, because neither Ink 8 nor `@inkjs/ui` ships a scrolling component.
+**Leaving Ink.** A publish confirmed from the menu unmounts Ink before the publisher runs. The publisher's log then streams to stderr, and the result prints as the command's text with the command's exit code. The menu does not return after a publish. A scrolling screen is left for a later iteration, because neither Ink 8 nor `@inkjs/ui` ships a scrolling component. Ink's console patch is off, because nothing in the menu writes through `console` and the patch breaks under vitest's console, which has no `Console` constructor; the launcher test therefore runs against the real Ink `render`.
 
 ## Location and Install
 

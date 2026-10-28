@@ -10,13 +10,26 @@ import { EXIT } from './exit-codes.js'
 import { runAction } from './run-action.js'
 import { resolveWorkspaceRoot } from './workspace-root.js'
 
+const launchMenuOnDemand = async (options) => {
+  const { launchMenu } = await import('./menu/launch.js')
+  return launchMenu(options)
+}
+
 const withDefaults = ({
   stdout = process.stdout,
+  stdin = process.stdin,
   stderr = process.stderr,
   setExitCode = (code) => { process.exitCode = code },
   env = process.env,
-  homedir = osHomedir()
-} = {}) => ({ stdout, stderr, setExitCode, env, homedir })
+  homedir = osHomedir(),
+  launchMenu = launchMenuOnDemand
+} = {}) => ({ stdout, stdin, stderr, setExitCode, env, homedir, launchMenu })
+
+const menuOpens = ({ stdout, stdin }, { ui, json }) =>
+  stdout.isTTY === true && stdin.isTTY === true && ui !== false && json !== true
+
+const noCommandGiven = (error, program) =>
+  error instanceof CommanderError && error.code === 'commander.help' && error.exitCode !== EXIT.OK && program.args.length === 0
 
 const requestsJson = (args) => {
   const end = args.indexOf('--')
@@ -53,16 +66,19 @@ const usageMessage = ({ code, message }) => {
 }
 
 /**
- * Builds the hedy commander program. Output, the exit code setter, the
- * environment and the home folder are injectable so the program runs
- * in-process under test. Commander's own errors are thrown, not printed.
+ * Builds the hedy commander program. Output, input, the exit code setter,
+ * the environment, the home folder and the menu launcher are injectable so
+ * the program runs in-process under test; stdin and launchMenu serve
+ * runProgram's menu path. Commander's own errors are thrown, not printed.
  *
  * @param {object} [deps]
- * @param {{ write: (chunk: string) => unknown }} [deps.stdout]
+ * @param {{ write: (chunk: string) => unknown, isTTY?: boolean }} [deps.stdout]
+ * @param {{ isTTY?: boolean }} [deps.stdin]
  * @param {{ write: (chunk: string) => unknown }} [deps.stderr]
  * @param {(code: number) => void} [deps.setExitCode]
  * @param {Record<string, string | undefined>} [deps.env]
  * @param {string} [deps.homedir]
+ * @param {(options: object) => Promise<number>} [deps.launchMenu]
  * @returns {Command}
  */
 export const buildProgram = (deps) => {
@@ -74,6 +90,7 @@ export const buildProgram = (deps) => {
     .version(hedyVersion(), '-V, --version', 'Print the hedy version')
     .option('--json', 'Print one JSON envelope line on stdout instead of text')
     .option('--workspace <path>', 'Use this folder as the workspace root')
+    .option('--no-ui', 'Do not open the menu, so a bare hedy prints the usage error')
     .helpOption('-h, --help', 'Show help for the command')
     .helpCommand('help [command]', 'Show help for a command')
     .exitOverride()
@@ -93,9 +110,21 @@ export const buildProgram = (deps) => {
   return program
 }
 
+const openMenu = async (program, { env, homedir, stdout, stdin, stderr, setExitCode, launchMenu }) => {
+  try {
+    const root = resolveWorkspaceRoot({ workspace: program.opts().workspace, env, homedir })
+    setExitCode(await launchMenu({ env, workspaceRoot: () => root, stdout, stdin, stderr, setExitCode }))
+  } catch (error) {
+    await runAction(() => { throw error }, { stdout, stderr, setExitCode })
+  }
+}
+
 /**
  * Parses the arguments, without the node and script paths, and runs the chosen
- * command. Help and version exit 0. Every other commander error and every
+ * command. Help and version exit 0. With no command at all, when stdout and
+ * stdin are both terminals and neither --no-ui nor --json is given, the menu
+ * opens through launchMenu with the resolved workspace root and the exit code
+ * is the one the launcher resolves to. Every other commander error and every
  * error raised before a command's action becomes a USAGE or UNKNOWN failure
  * written through runAction: one envelope line with --json, else one stderr line.
  *
@@ -105,11 +134,16 @@ export const buildProgram = (deps) => {
  */
 export const runProgram = async (args, deps) => {
   const io = withDefaults(deps)
+  const program = buildProgram(io)
   try {
-    await buildProgram(io).parseAsync(args, { from: 'user' })
+    await program.parseAsync(args, { from: 'user' })
   } catch (error) {
     if (error instanceof CommanderError && isCleanExit(error)) {
       io.setExitCode(EXIT.OK)
+      return
+    }
+    if (noCommandGiven(error, program) && menuOpens(io, program.opts())) {
+      await openMenu(program, io)
       return
     }
     await runAction(() => {

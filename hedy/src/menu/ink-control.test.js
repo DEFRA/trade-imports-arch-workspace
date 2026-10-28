@@ -34,11 +34,11 @@ describe('mount', () => {
     expect(instance.lastFrame()).toContain('hello-one')
   })
 
-  it('passes the injected streams to render with exit on Ctrl+C', () => {
+  it('passes the injected streams to render with exit on Ctrl+C and the console left unpatched', () => {
     const { calls, render } = recordingRender()
     const streams = { stdout: { name: 'out' }, stdin: { name: 'in' }, stderr: { name: 'err' } }
     mount(textOf('streams'), { render, ...streams })
-    expect(calls.map(({ options }) => options)).toEqual([{ ...streams, exitOnCtrlC: true }])
+    expect(calls.map(({ options }) => options)).toEqual([{ ...streams, exitOnCtrlC: true, patchConsole: false }])
   })
 
   it('unmounts the first instance when a second mount runs', () => {

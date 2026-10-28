@@ -1,8 +1,9 @@
 import { readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { afterEach, beforeEach, describe, it, expect } from 'vitest'
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import { runProgram } from './program.js'
 import { createWorkspace, runCli } from './test-support/cli.js'
+import { fakeStderr, fakeStdin, fakeStdout } from './test-support/menu-streams.js'
 
 const { version } = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
 
@@ -141,6 +142,146 @@ describe('runProgram help and version', () => {
   it.each([[['--version']], [['-V']], [['--version', '--json']]])('prints the package version for %j and exits 0', async (args) => {
     const result = await run(args)
     expect(result).toEqual({ stdout: `${version}\n`, stderr: '', codes: [0] })
+  })
+})
+
+describe('runProgram with no command', () => {
+  const NO_COMMAND = 'No command was given. Run hedy --help to list the commands.'
+
+  const terminalMark = (name, terminals) => terminals.includes(name) ? { isTTY: true } : {}
+
+  const runAt = async (args, { terminals = ['stdout', 'stdin'], launchCode = 0 } = {}) => {
+    const out = []
+    const err = []
+    const codes = []
+    const launches = []
+    const deps = {
+      stdout: { write: (chunk) => out.push(chunk), ...terminalMark('stdout', terminals) },
+      stdin: terminalMark('stdin', terminals),
+      stderr: { write: (chunk) => err.push(chunk) },
+      setExitCode: (code) => codes.push(code),
+      env: { HEDY_WORKSPACE: root },
+      homedir: '/nonexistent-home'
+    }
+    await runProgram(args, {
+      ...deps,
+      launchMenu: async (options) => {
+        launches.push(options)
+        deps.stdout.write('menu opened\n')
+        return launchCode
+      }
+    })
+    return { deps, launches, stdout: out.join(''), stderr: err.join(''), codes }
+  }
+
+  it.each([0, 1])('at a terminal opens the menu with the streams, env and resolved workspace root, and sets the exit code %i it resolves to', async (launchCode) => {
+    const { deps, launches, stdout, stderr, codes } = await runAt([], { launchCode })
+    expect(launches).toHaveLength(1)
+    const [options] = launches
+    expect(Object.keys(options).sort()).toEqual(['env', 'setExitCode', 'stderr', 'stdin', 'stdout', 'workspaceRoot'])
+    expect(options.env).toBe(deps.env)
+    expect(options.workspaceRoot()).toBe(root)
+    expect(options.stdout).toBe(deps.stdout)
+    expect(options.stdin).toBe(deps.stdin)
+    expect(options.stderr).toBe(deps.stderr)
+    expect(options.setExitCode).toBe(deps.setExitCode)
+    expect({ stdout, stderr, codes }).toEqual({ stdout: 'menu opened\n', stderr: '', codes: [launchCode] })
+  })
+
+  it.each([
+    ['--no-ui at a terminal', ['--no-ui'], {}],
+    ['stdout a terminal and stdin not', [], { terminals: ['stdout'] }],
+    ['stdin a terminal and stdout not', [], { terminals: ['stdin'] }],
+    ['no terminal at all', [], { terminals: [] }],
+    ['no terminal and a --workspace folder that is not a workspace', ['--workspace', '/nonexistent'], { terminals: [] }]
+  ])('with %s gives the usage error on stderr, exit 2, and never opens the menu', async (_case, args, terminal) => {
+    const { launches, stdout, stderr, codes } = await runAt(args, terminal)
+    expect(launches).toEqual([])
+    expect({ stdout, stderr, codes }).toEqual({ stdout: '', stderr: `${NO_COMMAND}\n`, codes: [2] })
+  })
+
+  it('with --json at a terminal prints one USAGE failure envelope, exit 2, and never opens the menu', async () => {
+    const { launches, stdout, stderr, codes } = await runAt(['--json'])
+    expect(launches).toEqual([])
+    const envelope = envelopeOf(stdout)
+    expect(envelope.ok).toBe(false)
+    expect(envelope.errors).toEqual([{ code: 'USAGE', message: NO_COMMAND }])
+    expect(stderr).toBe('')
+    expect(codes).toEqual([2])
+  })
+
+  it.each([
+    [['nosuch']],
+    [['--workspace', '/nonexistent', 'nosuch']]
+  ])('refuses the unknown command in %j at a terminal and never opens the menu', async (args) => {
+    const { launches, stdout, stderr, codes } = await runAt(args)
+    expect(launches).toEqual([])
+    expect({ stdout, stderr, codes }).toEqual({
+      stdout: '',
+      stderr: 'The command nosuch is not recognised. Run hedy --help to list the commands.\n',
+      codes: [2]
+    })
+  })
+
+  it('at a terminal refuses a --workspace folder that is not a workspace before the menu opens', async () => {
+    const { launches, stdout, stderr, codes } = await runAt(['--workspace', '/nonexistent'])
+    expect(launches).toEqual([])
+    expect(stdout).toBe('')
+    expect(stderr).toMatch(/^The folder \/nonexistent, from --workspace, is not a workspace because [^\n]+\n$/)
+    expect(codes).toEqual([2])
+  })
+
+  it('lists --no-ui in the top-level help', async () => {
+    const { stdout } = await run(['--help'])
+    expect(stdout.replace(/\s+/g, ' ')).toContain(' --no-ui Do not open the menu, so a bare hedy prints the usage error ')
+  })
+
+  it('with no launcher injected opens the real menu on the given terminal streams and exits 0 after Quit', async () => {
+    const stdout = fakeStdout()
+    const stdin = fakeStdin()
+    const codes = []
+    const finished = runProgram([], {
+      stdout,
+      stdin,
+      stderr: fakeStderr(),
+      setExitCode: (code) => codes.push(code),
+      env: { HEDY_WORKSPACE: root },
+      homedir: '/nonexistent-home'
+    })
+    await vi.waitFor(() => expect(stdin.listenerCount('readable')).toBeGreaterThan(0))
+    for (const key of ['\u001B[B', '\u001B[B', '\u001B[B', '\r']) {
+      await new Promise((resolve) => setTimeout(resolve, 30))
+      stdin.write(key)
+    }
+    await finished
+    expect(stdout.text()).toContain('Quit')
+    expect(codes).toEqual([0])
+  })
+})
+
+describe('the hedy entry, spawned with no command', () => {
+  const env = () => ({ HEDY_WORKSPACE: root })
+  const NO_COMMAND = 'No command was given. Run hedy --help to list the commands.'
+
+  it.each([[[]], [['--no-ui']]])('%j prints the usage error as one stderr line and exits 2', async (args) => {
+    const result = await runCli(args, { env: env() })
+    expect(result.exitCode).toBe(2)
+    expect(result.stdout).toBe('')
+    expect(result.stderr).toBe(NO_COMMAND)
+  })
+
+  it('--json prints one USAGE failure envelope and exits 2', async () => {
+    const result = await runCli(['--json'], { env: env() })
+    expect(result.exitCode).toBe(2)
+    expect(result.envelope.ok).toBe(false)
+    expect(result.envelope.errors).toEqual([{ code: 'USAGE', message: NO_COMMAND }])
+    expect(result.stderr).toBe('')
+  })
+
+  it('--help lists --no-ui and exits 0', async () => {
+    const result = await runCli(['--help'], { env: env() })
+    expect(result.exitCode).toBe(0)
+    expect(result.stdout).toMatch(/^ {2}--no-ui\s/m)
   })
 })
 

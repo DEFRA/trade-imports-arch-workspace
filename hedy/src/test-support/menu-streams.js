@@ -2,8 +2,10 @@ import { EventEmitter } from 'node:events'
 
 const collectingStream = (extra) => {
   const stream = Object.assign(new EventEmitter(), { isTTY: true, chunks: [], ...extra })
-  stream.write = (chunk) => {
+  stream.write = (chunk, encodingOrDone, done) => {
     stream.chunks.push(chunk)
+    const finished = typeof encodingOrDone === 'function' ? encodingOrDone : done
+    if (finished !== undefined) finished()
     return true
   }
   stream.text = () => stream.chunks.join('')
