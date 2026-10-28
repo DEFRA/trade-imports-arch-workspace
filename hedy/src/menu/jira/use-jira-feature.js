@@ -107,7 +107,6 @@ export const useJiraFeature = ({
     [screen]: {
       component: InputScreen,
       props: (screenData) => ({
-        key: screen,
         title: 'Jira',
         subtitle,
         label,

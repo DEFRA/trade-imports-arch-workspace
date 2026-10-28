@@ -30,12 +30,12 @@ export const FeatureHarness = ({ useFeature, initialScreen, options = {}, naviga
     onMount?.(feature)
   }, [])
 
-  if (screen === SCREENS.LOADING) return createElement(LoadingScreen, { message: loadingMessage })
+  if (screen === SCREENS.LOADING) return createElement(LoadingScreen, { key: screen, message: loadingMessage })
   if (screen === SCREENS.ERROR) {
-    return createElement(ErrorScreen, { errors: screenData.errors ?? [], onReturn: navigateToMain })
+    return createElement(ErrorScreen, { key: screen, errors: screenData.errors ?? [], onReturn: navigateToMain })
   }
   const route = feature.routes[screen]
   if (route === undefined) return createElement(Text, null, `unknown:${screen}`)
   const props = typeof route.props === 'function' ? route.props(screenData) : route.props
-  return createElement(route.component, props)
+  return createElement(route.component, { key: screen, ...props })
 }
