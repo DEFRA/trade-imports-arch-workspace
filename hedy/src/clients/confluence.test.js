@@ -138,6 +138,87 @@ describe('the Confluence client page', () => {
   })
 })
 
+const titleResponse = await readJsonFixture(new URL('./__fixtures__/confluence-content-by-title-response.json', import.meta.url))
+const titleEmptyResponse = await readJsonFixture(new URL('./__fixtures__/confluence-content-by-title-empty.json', import.meta.url))
+
+const CONTENT = '/wiki/rest/api/content'
+const SPACE_KEY = 'HEDYDOCS'
+const TITLE = 'Publishing guide'
+const TITLE_QUERY = { spaceKey: SPACE_KEY, title: TITLE, expand: 'version,metadata.labels' }
+
+const TITLE_PROJECTION = {
+  id: '201',
+  title: TITLE,
+  status: 'current',
+  version: { number: 3, when: '2026-10-28T09:00:00.000Z', by: 'Hedy Tester' },
+  url: `${ATLASSIAN_BASE_URL}/wiki/spaces/HEDYDOCS/pages/201`,
+  labels: ['generated', 'hedy']
+}
+
+const answerWithOnly = (result) => ({ ...titleResponse, results: [result] })
+
+describe('the Confluence client pageByTitle', () => {
+  it('returns the projection of the first result, asking /wiki/rest/api/content for the space key, title and expansions with the Basic header', async () => {
+    nock(ATLASSIAN_BASE_URL)
+      .matchHeader('authorization', TEST_AUTHORIZATION)
+      .get(CONTENT)
+      .query(TITLE_QUERY)
+      .reply(200, titleResponse)
+    const page = await createConfluenceClient(TEST_CREDENTIALS).pageByTitle(TITLE, SPACE_KEY)
+    expect(page).toEqual(TITLE_PROJECTION)
+    expect(Object.keys(page)).toEqual(['id', 'title', 'status', 'version', 'url', 'labels'])
+  })
+
+  it.each([
+    ['spaces and a colon', '02 INS Auth: Scenario 1'],
+    ['an ampersand, a plus and a hash', 'Q&A + notes #2']
+  ])('sends a title with %s encoded, so Confluence reads the title unchanged', async (_label, title) => {
+    nock(ATLASSIAN_BASE_URL).get(CONTENT).query({ ...TITLE_QUERY, title }).reply(200, titleResponse)
+    expect((await createConfluenceClient(TEST_CREDENTIALS).pageByTitle(title, SPACE_KEY)).id).toBe('201')
+  })
+
+  it.each([
+    ['an empty results list', titleEmptyResponse],
+    ['no results list', {}]
+  ])('resolves to undefined when the answer holds %s', async (_label, answer) => {
+    nock(ATLASSIAN_BASE_URL).get(CONTENT).query(true).reply(200, answer)
+    expect(await createConfluenceClient(TEST_CREDENTIALS).pageByTitle(TITLE, SPACE_KEY)).toBeUndefined()
+  })
+
+  it('gives empty labels when the result has no metadata', async () => {
+    const { metadata: _metadata, ...resultWithoutMetadata } = titleResponse.results[0]
+    nock(ATLASSIAN_BASE_URL).get(CONTENT).query(true).reply(200, answerWithOnly(resultWithoutMetadata))
+    expect(await createConfluenceClient(TEST_CREDENTIALS).pageByTitle(TITLE, SPACE_KEY)).toEqual({ ...TITLE_PROJECTION, labels: [] })
+  })
+
+  it('gives a null version author when the version has no author', async () => {
+    const result = titleResponse.results[0]
+    const { by: _by, ...versionWithoutAuthor } = result.version
+    nock(ATLASSIAN_BASE_URL).get(CONTENT).query(true).reply(200, answerWithOnly({ ...result, version: versionWithoutAuthor }))
+    expect(await createConfluenceClient(TEST_CREDENTIALS).pageByTitle(TITLE, SPACE_KEY)).toEqual({
+      ...TITLE_PROJECTION,
+      version: { ...TITLE_PROJECTION.version, by: null }
+    })
+  })
+
+  it('builds the url without a double slash when the base URL ends in a slash', async () => {
+    nock(ATLASSIAN_BASE_URL).get(CONTENT).query(true).reply(200, titleResponse)
+    const client = createConfluenceClient({ ...TEST_CREDENTIALS, baseUrl: `${ATLASSIAN_BASE_URL}/` })
+    expect((await client.pageByTitle(TITLE, SPACE_KEY)).url).toBe(TITLE_PROJECTION.url)
+  })
+
+  it.each(FAILURE_REPLIES.filter(([label]) => ['401', '404', 'a refused connection'].includes(label)))(
+    'on %s rejects with %s, naming the title, the space and Confluence and holding no token',
+    async (_label, code, reply, fragments) => {
+      reply(nock(ATLASSIAN_BASE_URL).get(CONTENT).query(TITLE_QUERY))
+      const error = await rejectionOf(createConfluenceClient(TEST_CREDENTIALS).pageByTitle(TITLE, SPACE_KEY))
+      expect(error).toMatchObject({ name: 'HedyError', code, message: expect.stringMatching(/^page titled "Publishing guide" in space HEDYDOCS: Confluence /) })
+      for (const fragment of fragments) expect(error.message).toContain(fragment)
+      expect(printedError(error)).not.toContain(TEST_CREDENTIALS.token)
+    }
+  )
+})
+
 const SHARE_PATH = '/wiki/x/AQAB'
 const SHARE_LINK = `${ATLASSIAN_BASE_URL}${SHARE_PATH}`
 

@@ -26,18 +26,38 @@ const pagePath = (id) => {
   return `/wiki/rest/api/content/${encodeURIComponent(id)}?${query}`
 }
 
+const versionProjection = (version) => ({
+  number: version?.number ?? null,
+  when: version?.when ?? null,
+  by: version?.by?.displayName ?? null
+})
+
+const labelNames = (data) => (data.metadata?.labels?.results ?? []).map(({ name }) => name)
+
+const pageUrl = (normalisedBaseUrl, spaceKey, id) => `${normalisedBaseUrl}/wiki/spaces/${spaceKey}/pages/${id}`
+
 const pageProjection = (data, normalisedBaseUrl) => ({
   id: data.id,
   title: data.title ?? null,
   space: data.space?.key ?? null,
-  version: {
-    number: data.version?.number ?? null,
-    when: data.version?.when ?? null,
-    by: data.version?.by?.displayName ?? null
-  },
-  url: `${normalisedBaseUrl}/wiki/spaces/${data.space?.key}/pages/${data.id}`,
-  labels: (data.metadata?.labels?.results ?? []).map(({ name }) => name),
+  version: versionProjection(data.version),
+  url: pageUrl(normalisedBaseUrl, data.space?.key, data.id),
+  labels: labelNames(data),
   body: data.body?.view?.value ?? ''
+})
+
+const pageByTitlePath = (title, spaceKey) => {
+  const query = new URLSearchParams({ spaceKey, title, expand: 'version,metadata.labels' })
+  return `/wiki/rest/api/content?${query}`
+}
+
+const titledPageProjection = (data, normalisedBaseUrl, spaceKey) => ({
+  id: data.id,
+  title: data.title ?? null,
+  status: data.status ?? null,
+  version: versionProjection(data.version),
+  url: pageUrl(normalisedBaseUrl, spaceKey, data.id),
+  labels: labelNames(data)
 })
 
 /**
@@ -71,6 +91,9 @@ const pageIdAtEndOfRedirects = async ({ http, siteOrigin, action }, shareLink) =
  * path. Every method rejects with a HedyError whose message names Confluence.
  * whoami rejects with AUTH when Confluence answers as the anonymous user.
  * page gives an empty body when the answer holds none.
+ * pageByTitle(title, spaceKey) resolves to the first page with that title in
+ * the space, as { id, title, status, version, url, labels }, or to undefined
+ * when Confluence finds no such page.
  * pageIdFromShortLink follows at most 5 redirects, each on the origin of
  * baseUrl, to the first location whose path holds a page id. It sends no
  * request off that origin and rejects with USAGE instead, and rejects with
@@ -91,6 +114,11 @@ export const createConfluenceClient = ({ user, token, baseUrl }, { timeoutMs } =
     page: async (id) => {
       const data = await http.get(pagePath(id), `page ${id}`)
       return pageProjection(data, http.normalisedBaseUrl)
+    },
+    pageByTitle: async (title, spaceKey) => {
+      const data = await http.get(pageByTitlePath(title, spaceKey), `page titled "${title}" in space ${spaceKey}`)
+      const [firstResult] = data.results ?? []
+      return firstResult && titledPageProjection(firstResult, http.normalisedBaseUrl, spaceKey)
     },
     pageIdFromShortLink: async (link) => {
       const action = `page ${link}`

@@ -12,7 +12,7 @@
 ## Integrations
 
 - Remote services are reached through in-process clients. The Jira and Confluence clients use the global `fetch`. `hedy` never shells out to `curl`, `jq` or the bash tools under `.claude/tools/`.
-- Local tools, `git` and `npm`, are reached by shelling out.
+- Local tools, `git` and `npm`, are reached through `local-tool.js`, the one place `hedy` shells out through `node:child_process`.
 - `hedy` has no GitHub commands, client or token. GitHub work uses `gh`, and pull requests go through `.claude/tools/pr/create-pr.sh`, which refuses attribution content.
 
 ## Credentials
@@ -39,6 +39,7 @@ All paths are under `hedy/src/`.
 - `credentials.js` holds `loadCredentials`, which fills the environment from the root `.env` and returns the three Atlassian credentials.
 - `clients/atlassian.js` holds `credentialsFromEnv`, the only reader of the three credential variables, and `createAtlassianHttp`, which sends GET, POST and PUT requests with the Basic header, stops a request after `timeoutMs`, and maps every remote outcome to an error code.
 - `clients/jira.js` and `clients/confluence.js` hold the Jira and Confluence clients. Each client holds only its endpoints and the projections it returns.
+- `local-tool.js` holds `runLocalTool`, which runs a local program with the whole environment the caller gives, collects stdout and stderr, resolves on any exit, and stops the program with SIGTERM, then SIGKILL, after a timeout.
 - `exit-codes.js` is the exit map: 0 for success, 1 for an error, 2 for a usage error.
 - `envelope.js` builds the JSON envelope: `ok`, `schema_version`, `hedy_version`, `result`, `errors`, and `metadata.ranAt` on success only.
 - `run-action.js` writes a command's result: one JSON line on stdout with `--json`, text otherwise, notes on stderr, and the exit code from the map. An `AggregateError` reports several errors at once, one envelope entry or stderr line per error, with the lowest exit code among them.
