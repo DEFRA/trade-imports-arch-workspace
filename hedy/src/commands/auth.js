@@ -25,11 +25,23 @@ export const runAuth = async ({ env, workspaceRoot }) => {
   return { jira: jira.value, confluence: confluence.value }
 }
 
-const serviceLine = (service, { displayName }) =>
-  `${service}: ok as ${displayName ?? 'an account with no display name'}`
+const statusText = ({ displayName }) => `ok as ${displayName ?? 'an account with no display name'}`
 
-const renderAuth = ({ jira, confluence }) =>
-  [serviceLine('jira', jira), serviceLine('confluence', confluence)].join('\n')
+/**
+ * Returns the Jira row, then the Confluence row, each "ok as" the account's
+ * display name, or "ok as an account with no display name" when the name is
+ * null.
+ *
+ * @param {{ jira: { displayName: string | null }, confluence: { displayName: string | null } }} result
+ * @returns {[string, string][]}
+ */
+export const authRows = ({ jira, confluence }) => [
+  ['Jira', statusText(jira)],
+  ['Confluence', statusText(confluence)]
+]
+
+const renderAuth = (result) =>
+  authRows(result).map(([service, status]) => `${service.toLowerCase()}: ${status}`).join('\n')
 
 export const register = (program, { stdout, stderr, setExitCode, env, workspaceRoot }) => {
   program

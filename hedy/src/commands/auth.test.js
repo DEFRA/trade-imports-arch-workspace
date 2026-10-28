@@ -15,7 +15,7 @@ import {
   startAnsweringServer
 } from '../test-support/http.js'
 import { captureIo } from '../test-support/io.js'
-import { register, runAuth } from './auth.js'
+import { authRows, register, runAuth } from './auth.js'
 
 interceptNetworkPerTest()
 
@@ -70,6 +70,22 @@ describe('runAuth', () => {
     expect(isHedyError(error)).toBe(true)
     expect(error.code).toBe('AUTH')
     expect(error.message).toContain('JIRA_TOKEN and JIRA_BASE_URL are not set')
+  })
+})
+
+describe('authRows', () => {
+  it('gives a Jira row and a Confluence row, each ok as the display name', () => {
+    expect(authRows({ jira: { displayName: 'Ada Lovelace' }, confluence: { displayName: 'Ada L.' } })).toEqual([
+      ['Jira', 'ok as Ada Lovelace'],
+      ['Confluence', 'ok as Ada L.']
+    ])
+  })
+
+  it('says in words that an account has no display name when the name is null', () => {
+    expect(authRows({ jira: { displayName: null }, confluence: { displayName: 'Ada L.' } })).toEqual([
+      ['Jira', 'ok as an account with no display name'],
+      ['Confluence', 'ok as Ada L.']
+    ])
   })
 })
 
