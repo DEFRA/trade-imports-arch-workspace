@@ -15,6 +15,6 @@ Placement rules for files under `.claude/`. The human-facing map with fuller des
 - Subagent definitions -> `agents/<name>.md`. Their persistent memory appears under `agent-memory/` automatically; never author it by hand.
 - Saved multi-agent workflow scripts -> `workflows/`.
 - Guard scripts wired from `settings.json` live in `hooks/` - agent edits there are blocked; changes go through the user.
-- The `hedy` CLI sub-project lives at `hedy/` in the workspace root, outside `.claude/`. Its rails are root-scoped: `hedy/CLAUDE.md`, `rules/hedy-code.md` and `rules/hedy-tests.md`, and its guard hooks in `hooks/`.
+- The `hedy` CLI sub-project lives at `hedy/` in the workspace root, outside `.claude/`. Its rails are root-scoped: `hedy/CLAUDE.md`, `rules/hedy-code.md`, `rules/hedy-tests.md`, `rules/hedy-clients.md` and `rules/hedy-menu.md`, and its guard hooks in `hooks/`.
 - Do not create `commands/` - superseded by skills (same `/name` invocation, and skills can bundle supporting files).
 - Do not create `scripts/` - it held vestigial work from the ancestor workspace and was removed; shell work belongs under `tools/<domain>/`.

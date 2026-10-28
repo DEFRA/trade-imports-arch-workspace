@@ -51,6 +51,9 @@ software-development-standards/
 # Installed npm dependencies
 node_modules/
 
+# Coverage reports a scoped vitest run writes under hedy/
+hedy/coverage/
+
 # Root npm manifest and lockfile
 package-lock.json
 !hedy/package-lock.json

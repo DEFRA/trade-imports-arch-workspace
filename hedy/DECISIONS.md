@@ -16,6 +16,14 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Pins and lockfile.** Every dependency is pinned exactly, and `hedy/.npmrc` follows the DEFRA standard with `save-exact`, `ignore-scripts` and `min-release-age`. The lockfile is committed, as the standard requires.
 
+**Menu.** A bare `hedy` opens a menu for people when stdout and stdin are both terminals and neither `--json` nor `--no-ui` is given. Otherwise the bare command keeps the usage error with exit 2, because every agent and test relies on that outcome, and a stdin that is not a terminal cannot carry keys to Ink. The menu reaches `auth`, the three reads and the three writes, and `hello` stays command-line only. The menu's packages load only when the menu opens.
+
+**Menu confirms.** The menu runs each Jira write twice: without `confirm` for the plan screen, then with the plan id when the person presses `y`. The stale-plan refusal and the `unchanged` retry therefore hold as on the command line. `runPublish` takes a `confirm` function that every caller passes explicitly, because the design prefers explicit function passing to a shared exported pre-flight. The command passes `publishAtOnce`, which resolves true, and the menu passes a function that shows the pre-flight facts. Any answer but true resolves `runPublish` to `cancelled` with nothing sent. Every confirm defaults to cancel, so a stray Enter sends nothing.
+
+**Menu screens.** One shared result screen and one shared confirm screen serve every command. Each command exports the rows its text mode prints, so the menu and the command line show the same fields from one function. Result text is cut to 20 lines with a note naming the command that prints the whole text, because Ink renders a frame taller than the terminal badly.
+
+**Leaving Ink.** A publish confirmed from the menu unmounts Ink before the publisher runs. The publisher's log then streams to stderr, and the result prints as the command's text with the command's exit code. The menu does not return after a publish. A scrolling screen is left for a later iteration, because neither Ink 8 nor `@inkjs/ui` ships a scrolling component.
+
 ## Location and Install
 
 **Folder.** The CLI lives at `hedy/` in the workspace root, not under `.claude/`, and has no nested `.claude/` folder. The edit guard blocks agent writes to any `.claude/hooks/` folder and any `.claude/settings.json`, and a session started inside `hedy/` would lose the workspace skills. The rails are therefore root-scoped: `hedy/CLAUDE.md`, the CLI rule files in `.claude/rules/`, and hooks in `.claude/hooks/`.
@@ -72,6 +80,8 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **In-process and spawned tests.** Network behaviour is tested in-process through exported `run*` functions, because nock cannot reach a child process. The envelope and exit codes are tested by spawning the entry.
 
+**Menu tests.** The screens and hooks are tested in-process under ink-testing-library, with injected functions in place of the commands, so no menu test reaches the network. The terminal gate is proven in-process through injected streams that carry `isTTY` and an injected launcher. The launcher is proven through fake streams against the real Ink `render`. Both proofs run in-process because a spawned child never has a terminal and no test allocates a pseudo-terminal.
+
 **Coverage.** `npm test` runs with coverage at 80% on lines, functions, branches and statements, and only the entry file is excluded. Local runs, the pre-commit hook and CI therefore enforce the same gate. `tim` sets the threshold but its CI never runs coverage.
 
 **Hooks.** Hooks scoped to `hedy/` refuse a new source file without a sibling test and a spy assertion without an override comment. Lint and tests run in the pre-commit hook. A guard against unrequested `npm install` is left out until an unattended run adds a package nobody asked for.
@@ -96,7 +106,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Order.** Clients and `auth` come first, then reads, writes and publish, then the estate ports as the editorial skills need them. The roster comes last.
 
-**Not built.** No `--verbose` option and no logging library. No command for a service this workspace does not use. A command is added only with the skill that calls the command. A text user interface for people is wanted and comes as the next increment; the earlier line here that ruled out an interactive menu was the research's inference from `tim`'s files, not a decision. The menu follows `tim`'s Ink model, with React and Ink added to the runtime dependencies when it lands, opens on a bare `hedy` when stdout is a terminal and neither `--json` nor `--no-ui` is set, so an agent never sees it, and covers every command, each write behind a screen that shows the plan or the pre-flight facts and asks for a confirm, with the same plan id check underneath.
+**Not built.** No `--verbose` option and no logging library. No command for a service this workspace does not use. A command is added only with the skill that calls the command.
 
 ## Open Tensions
 

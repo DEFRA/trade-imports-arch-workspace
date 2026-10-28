@@ -30,6 +30,13 @@ These rules apply to every test file under `hedy/`. Hooks under `.claude/hooks/`
 - Test the envelope, the exit codes and argument parsing by spawning the entry through `hedy/src/test-support/cli.js`. A spawned test never reaches the network.
 - A spawned test that needs a server starts a loopback `node:http` server of its own and points the child at the server through `.env` or the environment, and never reaches a real service.
 
+## Menu Tests
+
+- Render a screen or a hook's routes in-process under ink-testing-library, and render a hook's routes through `FeatureHarness`.
+- Send keys through `stdin.write` with a short pause between keys, and read `lastFrame()` under `vi.waitFor` in each assertion.
+- Replace the commands with injected functions that record their arguments in a plain array and return fixture results. No menu test uses nock or reaches the network.
+- Prove the terminal gate and the launcher in-process with the fake streams from `test-support/menu-streams.js`, never with a pseudo-terminal.
+
 ## Sibling Tests
 
 - Every new `hedy/src/**/*.js` file arrives in the same diff as its sibling `<name>.test.js`, and the test is written first.

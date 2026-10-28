@@ -74,6 +74,8 @@ credentials with the auth doctor below rather than inspecting the file.
 - `hedy confluence page <reference>` reads one page by id, URL or share link, as markdown by default.
 - `hedy confluence publish <page>` publishes one docs page to Confluence through the docs repo's publisher, after its pre-flight. The command publishes at once.
 
+A bare `hedy` at a terminal opens a menu for people that reaches every command, and each write waits behind a plan or pre-flight screen and a confirm. Agents call the commands with `--json`. A bare `hedy` without a terminal, or with `--json` or `--no-ui`, is a usage error.
+
 With `--json`, every command prints one envelope line, `{ ok, schema_version, hedy_version, result, errors, metadata }`, where `errors` lists `{ code, message }` entries. A command exits 0 on success, 1 on an error and 2 on a usage error.
 
 Prefer `hedy <command> --json` over ad-hoc `curl` or `jq` against Jira or Confluence.
