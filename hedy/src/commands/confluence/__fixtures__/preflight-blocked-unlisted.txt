@@ -1,0 +1,3 @@
+MODE: BLOCKED
+REASON: page is not listed in publishPaths (/home/hedy/trade-imports-arch-workspace/trade-imports-documentation/scripts/confluence/confluence-config.json)
+REASON: the publisher exits 0 having published nothing for unlisted files - add an entry with path: notes/unlisted.md

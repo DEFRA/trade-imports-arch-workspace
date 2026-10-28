@@ -1,0 +1,127 @@
+{
+  "results": [
+    {
+      "id": "201",
+      "type": "page",
+      "ari": "ari:cloud:confluence:00000000-0000-0000-0000-000000000000:page/201",
+      "base64EncodedAri": "YXJpOmNsb3VkOmNvbmZsdWVuY2U6MDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwOnBhZ2UvMjAx",
+      "status": "current",
+      "title": "Publishing guide",
+      "version": {
+        "by": {
+          "type": "known",
+          "accountId": "000000:00000000-0000-0000-0000-000000000000",
+          "accountType": "atlassian",
+          "email": "hedy.tester@example.com",
+          "publicName": "Hedy Tester",
+          "timeZone": "Europe/London",
+          "profilePicture": {
+            "path": "/wiki/aa-avatar/000000:00000000-0000-0000-0000-000000000000",
+            "width": 48,
+            "height": 48,
+            "isDefault": false
+          },
+          "displayName": "Hedy Tester",
+          "isExternalCollaborator": false,
+          "isGuest": false,
+          "locale": "en_GB",
+          "accountStatus": "active",
+          "_expandable": {
+            "operations": "",
+            "personalSpace": ""
+          },
+          "_links": {
+            "self": "https://example.atlassian.net/wiki/rest/api/user?accountId=000000:00000000-0000-0000-0000-000000000000"
+          }
+        },
+        "when": "2026-10-28T09:00:00.000Z",
+        "friendlyWhen": "today at 9:00 AM",
+        "message": "",
+        "number": 3,
+        "minorEdit": false,
+        "ncsStepVersion": "3",
+        "ncsStepVersionSource": "ncs-ack",
+        "confRev": "confRev:synthetic",
+        "contentTypeModified": false,
+        "_expandable": {
+          "collaborators": "",
+          "content": "/rest/api/content/201"
+        },
+        "_links": {
+          "self": "https://example.atlassian.net/wiki/rest/api/content/201/version/3"
+        }
+      },
+      "macroRenderedOutput": {},
+      "metadata": {
+        "labels": {
+          "results": [
+            {
+              "prefix": "global",
+              "name": "generated",
+              "id": "9001",
+              "label": "generated"
+            },
+            {
+              "prefix": "global",
+              "name": "hedy",
+              "id": "9002",
+              "label": "hedy"
+            }
+          ],
+          "start": 0,
+          "limit": 200,
+          "size": 2,
+          "_links": {
+            "next": "/rest/api/content/201/label?next=true&limit=200&start=200",
+            "self": "https://example.atlassian.net/wiki/rest/api/content/201/label"
+          }
+        },
+        "_expandable": {
+          "lastEditedTime": "",
+          "currentuser": "",
+          "comments": "",
+          "createdBySpaceBlueprint": "",
+          "isActiveLiveEditSession": "",
+          "sourceTemplateEntityId": "",
+          "simple": "",
+          "properties": "",
+          "frontend": "",
+          "likes": ""
+        }
+      },
+      "extensions": {
+        "position": 12
+      },
+      "_expandable": {
+        "container": "/rest/api/space/HEDYDOCS",
+        "restrictions": "/rest/api/content/201/restriction/byOperation",
+        "history": "/rest/api/content/201/history",
+        "body": "",
+        "descendants": "/rest/api/content/201/descendant",
+        "space": "/rest/api/space/HEDYDOCS",
+        "childTypes": "",
+        "schedulePublishInfo": "",
+        "operations": "",
+        "schedulePublishDate": "",
+        "children": "/rest/api/content/201/child",
+        "ancestors": "",
+        "draftVersion": ""
+      },
+      "_links": {
+        "self": "https://example.atlassian.net/wiki/rest/api/content/201",
+        "tinyui": "/x/AQAB",
+        "editui": "/pages/resumedraft.action?draftId=201",
+        "webui": "/spaces/HEDYDOCS/pages/201/Publishing+guide",
+        "edituiv2": "/spaces/HEDYDOCS/pages/edit-v2/201"
+      }
+    }
+  ],
+  "start": 0,
+  "limit": 25,
+  "size": 1,
+  "_links": {
+    "base": "https://example.atlassian.net/wiki",
+    "context": "/wiki",
+    "self": "https://example.atlassian.net/wiki/rest/api/content?spaceKey=HEDYDOCS&title=Publishing+guide&expand=version,metadata.labels"
+  }
+}

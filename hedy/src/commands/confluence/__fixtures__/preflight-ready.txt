@@ -1,0 +1,10 @@
+MODE: READY
+PAGE: docs/systems/HEDY/components.md
+SPACE: HEDYDOCS
+CONFLUENCE_BASE: https://example.atlassian.net/wiki
+LIKEC4_VIEW: hedy-context png=present
+MERMAID_COMPONENT: hedy-flow png=MISSING
+FENCED_MERMAID_BLOCKS: 1
+BUILD_NEEDED: build:mmd
+BUILD_CMD: npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run build:mmd
+PUBLISH_CMD: ~/trade-imports-arch-workspace/.claude/tools/confluence-publish/start-confluence-publish.sh --publish "docs/systems/HEDY/components.md"
