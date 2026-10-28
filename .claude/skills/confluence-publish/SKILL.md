@@ -1,106 +1,88 @@
 ---
 name: confluence-publish
-description: 'Publish a single documentation page from trade-imports-documentation to Confluence by orchestrating the existing delivery-info-arch-tooling scripts: pre-flight prerequisites (credentials, API access, publishPaths entry, diagram exports), validate Mermaid via the mermaid-check skill, build missing diagrams, publish, and report the outcome with a link to the page. Stops with the reason if the publish cannot proceed. Triggers: "publish to confluence", "push to confluence", "publish page". NOT for validating diagrams alone (mermaid-check), content quality (editorial), the full-estate publish (npm run publish:confluence directly), GitHub Pages (deploys itself via CI), or ad-hoc Confluence page reads (use the confluence-read skill) and one-off pages whose source of truth is Confluence itself (use the hand tools in .claude/tools/confluence/). Owns no build or publish logic - the tooling does the work. Requires npm (Node 22+).'
+description: 'Publish a single documentation page from trade-imports-documentation to Confluence through hedy confluence publish, which runs the pre-flight and the docs repo publisher and reports the outcome with a link to the page. The skill runs the diagram builds a failed pre-flight names. The command publishes at once with no dry run, so the skill runs the command only when the user has asked to publish that page. Triggers: "publish to confluence", "push to confluence", "publish page". NOT for validating diagrams without publishing (mermaid-check), content quality (editorial), the full-estate publish (npm run publish:confluence directly), GitHub Pages (a separate workflow), or ad-hoc Confluence page reads (use the confluence-read skill) and one-off pages whose source of truth is Confluence itself (use the hand tools in .claude/tools/confluence/). Requires npm (Node 24).'
 model: sonnet
 effort: low
 metadata:
   workspace-deps: delivery-info-arch-tooling trade-imports-documentation npm
 ---
 
-Publishes one markdown page from the doc repo's `docs/` tree to Confluence (`eaflood.atlassian.net/wiki`), using the `delivery-info-arch-tooling` publisher the doc repo already wraps as npm scripts. The skill's job is orchestration and fail-fast: verify everything the publish needs, run the existing scripts in the right order, and read the publisher's output critically (it has two silent-failure modes, described in Step 4). The outcome is either a page link or a stated reason nothing was published.
-
-## Dependencies
-
-Declared in `metadata.workspace-deps` and pre-flighted by the Step 0 dispatcher (criteria: `patterns.md` §9).
-
-- `trade-imports-documentation` - the doc repo being published from: owns the page tree (`docs/`), the publish config and the npm wrapping (`publish:confluence`, `build:mmd`, `build:diagrams`).
-- `delivery-info-arch-tooling` - the library behind those npm scripts: owns the publish pipeline (ADF conversion, diagram attachment, `generated`-label safety). Reached through the doc repo's `file:../delivery-info-arch-tooling` npm dependency, so the pre-flight also checks the doc repo has been `npm install`ed.
-- `npm` - runs the wrapping scripts (Node 22+ per the doc repo's README).
-
-Why depend rather than port: the publish pipeline is actively maintained in the tooling, so a port would fork it - and this skill's charter is the opposite ("owns no build or publish logic; the tooling does the work").
+Publishes one markdown page from the docs repo's `docs/` tree to Confluence through `hedy confluence publish`. The command checks everything the publish needs, runs the docs repo's publisher, and reports either a page link or the reason nothing was published. The command publishes at once when its pre-flight passes, with no dry run. This skill owns no build or publish logic, only the procedure.
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Usage
 
-| Trigger                 | Steps |
-| ----------------------- | -------------- |
-| "publish to confluence" | Step 0 onward  |
-| "push to confluence"    | Step 0 onward  |
-| "publish page"          | Step 0 onward  |
+| Trigger | Steps |
+| --- | --- |
+| "publish to confluence", "push to confluence", "publish page" | Steps 1 to 4 |
 
-NOT for: validating diagrams without publishing (use `mermaid-check`), reviewing or sharpening the page's content (use `editorial`), publishing the whole configured set or a whole space (run `npm run publish:confluence` / `publish:confluence:space` in the doc repo directly), or the GitHub Pages site (deploys automatically on push to main). Also NOT for ad-hoc Confluence work - reading a page by ID or URL is the `confluence-read` skill; one-off pages whose source of truth is Confluence itself, or mirroring Confluence trees to markdown, are the hand tools in `~/trade-imports-arch-workspace/.claude/tools/confluence/`. Pushing a `docs/` page through those hand tools bypasses the pipeline's ADF conversion, diagram attachment, and `generated`-label safety, and creates drift the next pipeline publish overwrites.
+NOT for validating diagrams without publishing (use `mermaid-check`), reviewing the page's content (use `editorial`), publishing the whole configured set or a whole space (run `npm run publish:confluence` or `publish:confluence:space` in the docs repo directly), or the GitHub Pages site. Reading a page by id or URL is the `confluence-read` skill. One-off pages whose source of truth is Confluence itself are the hand tools in `~/trade-imports-arch-workspace/.claude/tools/confluence/`, never a route for a `docs/` page.
 
-Prerequisites the user's shell must hold: credentials in either convention - `CONFLUENCE_USERNAME`/`CONFLUENCE_API_TOKEN` (preferred; what the node publisher reads) or `JIRA_USER`/`JIRA_TOKEN` (the hand tools' convention; the dispatcher bridges them across, it is the same Atlassian account token). `CONFLUENCE_URL` is optional and defaults to `https://eaflood.atlassian.net`. The pre-flight checks all of this and never prints credential values.
+## Dependencies
 
-## Step 0: Start
+- `trade-imports-documentation` holds the pages, the publish config and the npm scripts for the publish and the diagram builds.
+- `delivery-info-arch-tooling` is the publisher behind those scripts, reached through the docs repo's npm dependency.
+- `npm` runs those scripts, both for `hedy` and for the builds.
+
+A port of the publisher would fork a pipeline the tooling maintains, so the skill depends on the tooling.
+
+## Credentials
+
+`hedy` reads `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL` from the environment, then from the workspace `.env` for any variable the environment lacks. Never read the `.env`. If the publish fails with an auth error, run the pre-flight and report its output:
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/confluence-publish/start-confluence-publish.sh "<page-path>"
+hedy auth
 ```
 
-`<page-path>` may be absolute, repo-relative, or `docs/`-relative. First stdout line is the branch:
+If `hedy` is not found, run `make -C ~/trade-imports-arch-workspace link`.
 
-- `MODE: BLOCKED` - relay every `REASON:` line to the user verbatim and stop. Do not work around a blocker; each reason names its remedy (export the variable, add the `publishPaths` entry, fix the path).
-- `MODE: READY` - continue. The FACT lines carry everything later steps need: `PAGE` (the `docs/...` path), `SPACE` (target space key), `CONFLUENCE_BASE`, one line per embedded diagram with `png=present|MISSING|STALE` (STALE = a model/diagram source changed after the export), `FENCED_MERMAID_BLOCKS`, `BUILD_NEEDED`, zero or more `BUILD_CMD` lines, and `PUBLISH_CMD`. The command lines are emitted with resolved paths in the `~`-spelled canonical form, so they match the permission allowlist verbatim and nothing you type carries a variable - run them verbatim in later steps. Exception, by design: `BUILD_CMD` lines start with bare `npm` and are not allowlist-covered, so they prompt - a deliberate speed bump before the slow, estate-wide diagram rebuild (A11's documented-exception path).
+## Step 1: Confirm the Request
 
-## Step 1: Validate Mermaid sources (conditional)
+The command publishes at once, so run the command only when the user's own message asks to publish this page. The reruns in Step 3 serve the same request and need no new consent.
 
-If `FENCED_MERMAID_BLOCKS` is greater than 0, or any `MERMAID_COMPONENT` line says `png=MISSING` or `png=STALE` (its source is about to be rebuilt), invoke the `mermaid-check` skill on the page before building: it renders each diagram with mermaid-cli and confirms it parses. Fix what it reports before continuing - the Mermaid build exits on the first failing file, so validating first turns a mid-build failure into a named fix.
+## Step 2: Publish
 
-If the page has no Mermaid content, skip to Step 2.
-
-## Step 2: Build missing diagrams (conditional)
-
-Only when `BUILD_NEEDED` is not `none`. Run each `BUILD_CMD` line from Step 0 verbatim, one Bash call per command. What they do: `build:mmd` converts every `.mmd` in the doc repo to SVG (`build/mmd/`) and PNG (`generated/diagrams/`, flat, one file per diagram id); `build:diagrams` exports LikeC4 views to `generated/diagrams/` and is the slow one. Neither has a single-file mode.
-
-Then re-run Step 0. It is idempotent; confirm `BUILD_NEEDED: none` before publishing. A diagram still `MISSING` after its build means the id in the markdown does not match any source file - stop and report which id.
-
-## Step 3: Publish
-
-Run the `PUBLISH_CMD` line from Step 0 verbatim. It routes back through the dispatcher in publish mode:
-
-```
-~/trade-imports-arch-workspace/.claude/tools/confluence-publish/start-confluence-publish.sh --publish "docs/<path>.md"
+```bash
+hedy confluence publish "<page>" --json
 ```
 
-Publish mode re-runs the pre-flight (so a stale READY cannot publish), refuses with `MODE: BLOCKED` if any diagram export is still missing, bridges whichever credential convention the shell holds into the names the node publisher reads, then execs the doc repo's npm publish from the correct working directory. Its output is the publisher's own log, prefixed with `MODE: PUBLISHING` and the `PAGE`/`SPACE`/`CONFLUENCE_BASE` facts Step 4 needs.
+- `<page>` is a `.md` file under `docs/`, given as an absolute path or relative to the current folder, the docs repo or its `docs/` folder.
+- The command prints one envelope line, `{ ok, schema_version, hedy_version, result, errors, metadata }`. The publisher's log streams to stderr as progress.
 
-## Step 4: Interpret the output and report
+## Step 3: Handle a Failure
 
-The publisher's summary counts (`Successful / Failed / Skipped`) are not sufficient evidence on their own. Check the log lines:
+When `ok` is false, relay each message in `errors` verbatim and stop. Each message names its remedy, so never work around a refusal. Three failures are handled here instead:
 
-- `⏭️  Skipping: Page exists but is not safe to update (no 'generated' label)`
-  - the page was NOT published, even though the summary still counts it as successful. Report: not published, because the existing Confluence page lacks the `generated` label; the remedy is adding that label to the page in Confluence (a deliberate safety mechanism - never bypass it silently).
-- `✅ Updated successfully (ID: <n>)` or `✅ Created successfully (ID: <n>)` - the real success signal. Capture the page ID.
-- `⚠️  No Mermaid diagram image found` / `⚠️  Image not found` - the page published but with a missing image; report it as published-degraded and name the asset.
-- `❌ Failed to publish <file>: <N> image upload(s) failed: <names>` after an `Updated successfully` or `Created successfully` line - the page text is live, but the named images show as broken until they upload, and the summary counts the page as failed with a non-zero exit. Report: published with failed images, the page link, and the image names verbatim. The remedy is running the same PUBLISH_CMD again: the cause is usually a network failure (`ETIMEDOUT`, `ENOTFOUND`) or an HTTP error, which the preceding `❌ Failed to upload image` line names.
-- `⚠️  Link not resolved to a Confluence page: <url> (<reason>); linking to GitHub` (or `; left unchanged`) - the page published, but that link points to the GitHub source, or stays as written, instead of a Confluence page. Report it as published-degraded with the URL and reason. A target with no page yet resolves on a later publish once its page exists; `not in publishPaths` needs a config entry.
-- `⚠️  Link not rewritten (unsupported markdown link form): <url>` - the link stays relative and is broken in Confluence; report it as published-degraded. The usual cause is a reference-style link, which the source page can change to an inline link.
-- `⚠️  Anchor not found: <url> (...)` - a link names a heading slug no heading in its target, or on its own page, matches; the link goes to the top of the page or stays as written. Report it as published-degraded; the remedy is correcting the anchor in the source page.
-- The run ends with a link check over every page it published: `🔗 Links checked: <n> on <p> page(s); broken <b>, external unreachable <e>`. Each `❌ Broken link on '<page>': <href> (<reason>)` line is a link that fails on Confluence (a missing page, an anchor no heading matches, or a link to a markdown source on GitHub instead of its Confluence page); the publish exits non-zero and the summary prints `Broken links: <b>`. Report every broken line verbatim as published-broken. A `⚠️  External link not reachable from here` line is a warning, because an external site can refuse an anonymous request a signed-in reader passes; list those lines for the user to check.
-- Any other non-zero exit or `Failed: ≥1` - report the `❌` line verbatim.
+1. **Mermaid exports missing or stale.** When the message names `build:mmd`, invoke the `mermaid-check` skill on the page first, because the Mermaid build stops at the first file that fails to parse. Then run each build command the message names, as given, one per Bash call. Then run the publish command again.
+2. **LikeC4 exports missing or stale.** When the message names `build:diagrams` and not `build:mmd`, run that build command, then run the publish command again.
+3. **Failed image uploads.** The page text is live and the named images show as broken. Run the publish command once more. If the second run fails too, relay the message and stop.
 
-On success, construct the link from Step 0 facts and the captured ID: `<CONFLUENCE_BASE>/spaces/<SPACE>/pages/<ID>`.
+Each build command prompts for permission by design, because both builds cover the whole docs repo. When the publish fails on the same exports after the build, the page names a diagram id that matches no source file. Relay the message and stop.
 
-## Completion output
+## Step 4: Report the Outcome
+
+When `ok` is true, `result` is `{ mode, page, id, title, space, url, version, warnings, links }`, and `mode` is `created` or `updated`. Report the following:
+
+- The outcome, and the page link from `url`.
+- Each line in `warnings`, naming the asset or link the line concerns. A warning marks a missing image, a link left pointing at GitHub or unchanged, an anchor that matches no heading, or an external link the publisher could not reach, which the user checks by hand.
+- The links line from `links`, which is null when the publisher ran no link check.
+
+## Completion Output
 
 ```
-confluence-publish complete for <PAGE>.
+confluence-publish complete for <page>.
 
-Outcome: created | updated | published with failed images (rerun) | NOT published (<reason>)
-Page: <CONFLUENCE_BASE>/spaces/<SPACE>/pages/<ID>
-Degraded: <missing or failed images, unresolved links and anchors, if any - otherwise omit this line>
-Links: <checked> checked; broken <b> (each verbatim), external unreachable <e>
+Outcome: created | updated
+Page: <url>
+Degraded: <each warning, or omit this line>
+Links: <checked> checked; broken <b>, external unreachable <e>
 
 Next: check the page renders as expected in Confluence.
 ```
 
-## Scripts cheat-sheet
+When `links` is null, write `Links: no link check ran`.
 
-All under `~/trade-imports-arch-workspace/.claude/tools/confluence-publish/`:
+## Commands
 
-| Script | Purpose |
-| --- | --- |
-| `start-confluence-publish.sh <page-path>` | Pre-flight: credentials (either convention), API access, publishPaths membership, space resolution, diagram PNG inventory. Emits READY facts plus resolved build/publish commands, or BLOCKED reasons. |
-| `start-confluence-publish.sh --publish <page-path>` | Re-runs the pre-flight, refuses while diagram exports are missing, bridges credentials, then execs the doc repo's npm publish. |
+`hedy confluence publish <page>` publishes one page after its pre-flight, and `hedy auth` checks the credentials.

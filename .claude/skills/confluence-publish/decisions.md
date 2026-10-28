@@ -35,15 +35,7 @@ Publish a single documentation page to Confluence by orchestrating the existing 
 
 ## 7. Helpers introduced
 
-- start-confluence-publish
-- (5 Aug 2026) gained a `--publish` mode: re-runs the pre-flight, refuses
-  while diagram exports are missing, bridges `JIRA_USER`/`JIRA_TOKEN` into
-  the `CONFLUENCE_*` names the node publisher reads, then execs the doc
-  repo's npm publish. Why one script, two modes rather than a second helper:
-  the credential mapping must happen inside a script (never in a typed
-  command), publish must never run against a stale pre-flight, and the
-  emitted `PUBLISH_CMD` stays inside the already-allowlisted tools directory
-  so no npm permission prompt is needed.
+- (28 Oct 2026) No helper remains. `start-confluence-publish`, the pre-flight script that gained a `--publish` mode on 5 Aug 2026, is deleted. `hedy confluence publish` now runs the pre-flight, maps `JIRA_USER` and `JIRA_TOKEN` into the `CONFLUENCE_*` names the node publisher reads, and runs the docs repo's npm publish. Three reasons from the script's two modes still hold. The credential mapping happens inside a program, never in a typed command. The publish never runs against a stale pre-flight, because one command does both. The diagram builds stay outside the command, and each build prompts for permission.
 
 ## 8. Triggers
 
@@ -57,7 +49,7 @@ Publish a single documentation page to Confluence by orchestrating the existing 
 
 **Resolution:** depend
 **Declared:** delivery-info-arch-tooling trade-imports-documentation npm
-**Why:** the publish pipeline (ADF conversion, diagram attachment,
+**Reason:** the publish pipeline (ADF conversion, diagram attachment,
 generated-label safety) is actively maintained in the tooling; a port
 would fork it, and this skill's charter is the opposite - owns no build
 or publish logic.
@@ -70,3 +62,5 @@ uniqueness), a `## Dependencies` body section added, and
 `start-confluence-publish.sh` gained the tooling-presence and
 npm-install pre-flights (previously a missing tooling surfaced as a raw
 npm error mid-publish).
+
+(28 Oct 2026) The declaration stays after the move to `hedy`, because `hedy confluence publish` runs the docs repo's npm script, which runs the tooling.

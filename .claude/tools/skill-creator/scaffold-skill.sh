@@ -413,7 +413,7 @@ while IFS= read -r helper; do
 #   projects: [[ -d \$HOME/trade-imports-arch-workspace/<project> ]]
 #   tools:    command -v <tool>
 # On failure print MODE: BLOCKED plus REASON: <remedy> (model:
-# tools/confluence-publish/start-confluence-publish.sh).
+# the REASON line of tools/skill-creator/list-project-features.sh).
 "
     fi
     cat > "$sh.tmp" <<EOF
