@@ -2,9 +2,11 @@ import { createAtlassianHttp } from './atlassian.js'
 
 const ISSUE_FIELDS = ['summary', 'status', 'issuetype', 'priority', 'assignee', 'labels', 'parent', 'created', 'updated']
 
+const browseUrl = (key, normalisedBaseUrl) => `${normalisedBaseUrl}/browse/${key}`
+
 const issueProjection = ({ key, fields = {} }, normalisedBaseUrl) => ({
   key,
-  url: `${normalisedBaseUrl}/browse/${key}`,
+  url: browseUrl(key, normalisedBaseUrl),
   summary: fields.summary ?? null,
   status: fields.status?.name ?? null,
   type: fields.issuetype?.name ?? null,
@@ -16,9 +18,11 @@ const issueProjection = ({ key, fields = {} }, normalisedBaseUrl) => ({
   updated: fields.updated ?? null
 })
 
+const issueKeyPath = (key) => `/rest/api/2/issue/${encodeURIComponent(key)}`
+
 const issuePath = (key) => {
   const query = new URLSearchParams({ fields: [...ISSUE_FIELDS, 'description'].join(',') })
-  return `/rest/api/2/issue/${encodeURIComponent(key)}?${query}`
+  return `${issueKeyPath(key)}?${query}`
 }
 
 const searchPagePath = (jql, { maxResults, nextPageToken }) => {
@@ -61,6 +65,13 @@ export const createJiraClient = ({ user, token, baseUrl }, { timeoutMs } = {}) =
         nextPageToken = nextPageTokenOf(page)
       } while (nextPageToken && issues.length < max)
       return { issues, truncated: Boolean(nextPageToken) }
+    },
+    createIssue: async (fields) => {
+      const { key } = await http.post('/rest/api/2/issue', { fields }, 'create')
+      return { key, url: browseUrl(key, http.normalisedBaseUrl) }
+    },
+    updateDescription: async (key, description) => {
+      await http.put(issueKeyPath(key), { fields: { description } }, `describe ${key}`)
     }
   }
 }

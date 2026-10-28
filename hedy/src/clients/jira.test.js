@@ -15,6 +15,9 @@ import { createJiraClient } from './jira.js'
 
 interceptNetworkPerTest()
 
+const createRequest = await readJsonFixture(new URL('../commands/jira/__fixtures__/create-request.json', import.meta.url))
+const createResponse = await readJsonFixture(new URL('./__fixtures__/jira-create-response.json', import.meta.url))
+const describeRequest = await readJsonFixture(new URL('../commands/jira/__fixtures__/describe-request.json', import.meta.url))
 const issueResponse = await readJsonFixture(new URL('./__fixtures__/jira-issue-response.json', import.meta.url))
 const searchProjection = await readJsonFixture(new URL('./__fixtures__/jira-search-projection.json', import.meta.url))
 const searchResponse = await readJsonFixture(new URL('./__fixtures__/jira-search-response.json', import.meta.url))
@@ -187,6 +190,64 @@ describe('the Jira client search', () => {
       name: 'HedyError',
       code: 'USAGE',
       message: 'search: Jira refused the request. Jira said "Error in the JQL Query: the field nope does not exist.". Correct the request, then run the command again.'
+    })
+  })
+})
+
+const CREATE = '/rest/api/2/issue'
+
+describe('the Jira client createIssue', () => {
+  it('posts the captured request body to /rest/api/2/issue with the Basic header and returns the key and browse url from the captured answer', async () => {
+    nock(ATLASSIAN_BASE_URL)
+      .matchHeader('authorization', TEST_AUTHORIZATION)
+      .post(CREATE, createRequest)
+      .reply(201, createResponse)
+    expect(await createJiraClient(TEST_CREDENTIALS).createIssue(createRequest.fields)).toEqual({
+      key: 'HEDY-201',
+      url: 'https://example.atlassian.net/browse/HEDY-201'
+    })
+  })
+
+  it('builds the url without a double slash when the base URL ends in a slash', async () => {
+    nock(ATLASSIAN_BASE_URL).post(CREATE, createRequest).reply(201, createResponse)
+    const client = createJiraClient({ ...TEST_CREDENTIALS, baseUrl: `${ATLASSIAN_BASE_URL}/` })
+    expect((await client.createIssue(createRequest.fields)).url).toBe(`${ATLASSIAN_BASE_URL}/browse/HEDY-201`)
+  })
+
+  it('rejects a 400 with USAGE carrying Jira\'s field reason, naming create in the action', async () => {
+    nock(ATLASSIAN_BASE_URL).post(CREATE, createRequest).reply(400, { errorMessages: [], errors: { issuetype: 'Specify a valid issue type.' } })
+    const error = await rejectionOf(createJiraClient(TEST_CREDENTIALS).createIssue(createRequest.fields))
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'USAGE',
+      message: 'create: Jira refused the request. Jira said "issuetype: Specify a valid issue type.". Correct the request, then run the command again.'
+    })
+  })
+})
+
+describe('the Jira client updateDescription', () => {
+  const description = describeRequest.fields.description
+
+  it('puts the captured request body to /rest/api/2/issue/<key> with the Basic header and resolves to undefined on 204', async () => {
+    nock(ATLASSIAN_BASE_URL)
+      .matchHeader('authorization', TEST_AUTHORIZATION)
+      .put('/rest/api/2/issue/HEDY-201', describeRequest)
+      .reply(204)
+    expect(await createJiraClient(TEST_CREDENTIALS).updateDescription('HEDY-201', description)).toBeUndefined()
+  })
+
+  it('encodes the key into the path', async () => {
+    nock(ATLASSIAN_BASE_URL).put('/rest/api/2/issue/HEDY%2F1%3F', describeRequest).reply(204)
+    expect(await createJiraClient(TEST_CREDENTIALS).updateDescription('HEDY/1?', description)).toBeUndefined()
+  })
+
+  it('rejects a 400 with USAGE carrying Jira\'s field reason, naming the key in the action', async () => {
+    nock(ATLASSIAN_BASE_URL).put('/rest/api/2/issue/HEDY-201', describeRequest).reply(400, { errorMessages: [], errors: { description: 'Field cannot be set.' } })
+    const error = await rejectionOf(createJiraClient(TEST_CREDENTIALS).updateDescription('HEDY-201', description))
+    expect(error).toMatchObject({
+      name: 'HedyError',
+      code: 'USAGE',
+      message: 'describe HEDY-201: Jira refused the request. Jira said "description: Field cannot be set.". Correct the request, then run the command again.'
     })
   })
 })

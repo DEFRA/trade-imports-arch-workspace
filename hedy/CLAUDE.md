@@ -37,7 +37,7 @@ All paths are under `hedy/src/`.
 - `errors.js` holds `HedyError` and the error codes: `USAGE`, `UNKNOWN`, `AUTH`, `NOT_FOUND`, `RATE_LIMIT`, `NETWORK` and `PARSE`.
 - `env-file.js` fills the environment from the root `.env`, setting only the variables the environment lacks.
 - `credentials.js` holds `loadCredentials`, which fills the environment from the root `.env` and returns the three Atlassian credentials.
-- `clients/atlassian.js` holds `credentialsFromEnv`, the only reader of the three credential variables, and `createAtlassianHttp`, which sends the Basic header, stops a request after `timeoutMs`, and maps every remote outcome to an error code.
+- `clients/atlassian.js` holds `credentialsFromEnv`, the only reader of the three credential variables, and `createAtlassianHttp`, which sends GET, POST and PUT requests with the Basic header, stops a request after `timeoutMs`, and maps every remote outcome to an error code.
 - `clients/jira.js` and `clients/confluence.js` hold the Jira and Confluence clients. Each client holds only its endpoints and the projections it returns.
 - `exit-codes.js` is the exit map: 0 for success, 1 for an error, 2 for a usage error.
 - `envelope.js` builds the JSON envelope: `ok`, `schema_version`, `hedy_version`, `result`, `errors`, and `metadata.ranAt` on success only.

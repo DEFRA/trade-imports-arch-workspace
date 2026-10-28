@@ -99,8 +99,11 @@ const noRedirectError = ({ service, action }) => new HedyError(
 
 /**
  * Returns the base URL without trailing slashes as normalisedBaseUrl, and
- * two requests on normalisedBaseUrl + path. get(path, action) resolves to
- * the parsed JSON body of a GET. redirectTarget(path, action) sends a GET
+ * four requests on normalisedBaseUrl + path. get(path, action) resolves to
+ * the parsed JSON body of a GET. post(path, body, action) and
+ * put(path, body, action) send body as JSON with the content type
+ * application/json, and resolve to the parsed JSON body of the answer, or
+ * to null when the answer is 204. redirectTarget(path, action) sends a GET
  * that does not follow redirects and resolves to the Location header of a
  * 3xx answer; any other answer below 400 rejects with USAGE. A request with
  * no full answer within timeoutMs fails. Every failure is a HedyError whose
@@ -111,27 +114,38 @@ const noRedirectError = ({ service, action }) => new HedyError(
  * @returns {{
  *   normalisedBaseUrl: string,
  *   get: (path: string, action: string) => Promise<unknown>,
+ *   post: (path: string, body: unknown, action: string) => Promise<unknown>,
+ *   put: (path: string, body: unknown, action: string) => Promise<unknown>,
  *   redirectTarget: (path: string, action: string) => Promise<string>
  * }}
  */
 export const createAtlassianHttp = ({ service, user, token, baseUrl, timeoutMs = 30000 }) => {
   const normalisedBaseUrl = baseUrl.replace(/\/+$/, '')
-  const request = {
-    headers: { Authorization: basicAuthorization(user, token), Accept: 'application/json' },
-    timeoutMs
+  const authorization = basicAuthorization(user, token)
+  const send = async (path, context, { headers, ...init } = {}) => {
+    const request = { ...init, headers: { Authorization: authorization, Accept: 'application/json', ...headers }, timeoutMs }
+    const response = await fetchAnswer(`${normalisedBaseUrl}${path}`, request, context)
+    if (response.status >= 400) throw statusError(context, response)
+    return response
+  }
+  const sendJson = async (method, path, body, action) => {
+    const context = { service, action }
+    const init = { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+    const response = await send(path, context, init)
+    return response.status === 204 ? null : parsedBody(response.text, context)
   }
   return {
     normalisedBaseUrl,
     get: async (path, action) => {
       const context = { service, action }
-      const response = await fetchAnswer(`${normalisedBaseUrl}${path}`, request, context)
-      if (response.status >= 400) throw statusError(context, response)
+      const response = await send(path, context)
       return parsedBody(response.text, context)
     },
+    post: (path, body, action) => sendJson('POST', path, body, action),
+    put: (path, body, action) => sendJson('PUT', path, body, action),
     redirectTarget: async (path, action) => {
       const context = { service, action }
-      const response = await fetchAnswer(`${normalisedBaseUrl}${path}`, { ...request, redirect: 'manual' }, context)
-      if (response.status >= 400) throw statusError(context, response)
+      const response = await send(path, context, { redirect: 'manual' })
       if (response.status < 300 || !response.location) throw noRedirectError(context)
       return response.location
     }

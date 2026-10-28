@@ -2,6 +2,7 @@ import nock from 'nock'
 import { describe, it, expect } from 'vitest'
 import {
   ATLASSIAN_BASE_URL,
+  FAILURE_REPLIES,
   TEST_AUTHORIZATION,
   TEST_CREDENTIALS,
   credentialsEnv,
@@ -244,5 +245,36 @@ describe('createAtlassianHttp get', () => {
       message: 'probe: Jira answered with a body that is not JSON. Check that JIRA_BASE_URL in the workspace .env file is the Atlassian site address.'
     })
     expect(printedError(error)).not.toContain(TEST_CREDENTIALS.token)
+  })
+})
+
+const WRITE_BODY = { fields: { summary: 'Raise an issue', labels: ['hedy'], parent: { key: 'HEDY-100' } } }
+
+const stageWrite = (method) => nock(ATLASSIAN_BASE_URL)[method](PROBE, WRITE_BODY)
+
+const write = (method) => httpFor()[method](PROBE, WRITE_BODY, 'probe')
+
+describe.each(['post', 'put'])('createAtlassianHttp %s', (method) => {
+  it('sends the body as JSON with the JSON content type, the Basic header and a JSON accept, resolving to the parsed answer', async () => {
+    const interceptor = nock(ATLASSIAN_BASE_URL)
+      .matchHeader('authorization', TEST_AUTHORIZATION)
+      .matchHeader('content-type', 'application/json')
+      .matchHeader('accept', 'application/json')
+    interceptor[method](PROBE, WRITE_BODY).reply(201, { id: '10201', key: 'HEDY-201' })
+    expect(await write(method)).toEqual({ id: '10201', key: 'HEDY-201' })
+  })
+
+  it('resolves to null on a 204 answer', async () => {
+    stageWrite(method).reply(204)
+    expect(await write(method)).toBeNull()
+  })
+
+  it.each(FAILURE_REPLIES)('on %s rejects with %s, naming Jira and the action and holding neither the user nor the token', async (_label, code, reply, fragments) => {
+    reply(stageWrite(method))
+    const error = await rejectionOf(write(method))
+    expect(error).toMatchObject({ name: 'HedyError', code, message: expect.stringMatching(/^probe: Jira /) })
+    for (const fragment of fragments) expect(error.message).toContain(fragment)
+    expect(printedError(error)).not.toContain(TEST_CREDENTIALS.token)
+    expect(printedError(error)).not.toContain(TEST_CREDENTIALS.user)
   })
 })
