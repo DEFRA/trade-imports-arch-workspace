@@ -12,7 +12,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Baseline.** `hedy` is plain ESM JavaScript on Node 24, with npm and neostandard, as DEFRA's Node and JavaScript standards require. Node 24 is already needed to publish the docs. Doc comments go only on exported APIs where they state a contract.
 
-**Runtime dependencies.** commander parses the command line and zod validates options, and nothing else ships at runtime. Everything else uses Node built-ins. `execa` is a dev dependency for tests, and runtime code shells out through `node:child_process`.
+**Runtime dependencies.** commander parses the command line and zod validates options, and the commands use nothing else at runtime. The menu for people uses react, ink and `@inkjs/ui`, the Ink author's widget kit, chosen on 28 Oct 2026 over the older add-ons `tim` lists because the menu is written from scratch on the current Ink; these three are imported only when the menu opens, so a command run by an agent never loads them. Everything else uses Node built-ins. `execa` and ink-testing-library are dev dependencies for tests, and runtime code shells out through `node:child_process`. `npm audit` reports one low finding with no fix, prototype poisoning in `deepmerge`, which `@inkjs/ui` uses only to merge its own theme objects, never input from a page or a service.
 
 **Pins and lockfile.** Every dependency is pinned exactly, and `hedy/.npmrc` follows the DEFRA standard with `save-exact`, `ignore-scripts` and `min-release-age`. The lockfile is committed, as the standard requires.
 

@@ -23,6 +23,7 @@ These rules apply to every file under `hedy/src/`, tests included. A breach is a
 - Named exports only.
 - Use Node 24 built-ins before a package: the global `fetch`, `node:child_process`, `node:fs/promises`, `node:crypto`.
 - Runtime code shells out through `node:child_process`. `execa` is a dev dependency for tests only.
+- The commands use commander and zod. The menu under `hedy/src/menu/` uses react, ink and `@inkjs/ui`, and only the menu imports them, so a command never loads them.
 - Add no dependency, runtime or dev, without a line in `hedy/DECISIONS.md` giving the reason.
 
 ## Comments

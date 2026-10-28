@@ -18,13 +18,17 @@
   },
   "license": "OGL-UK-3.0",
   "dependencies": {
+    "@inkjs/ui": "2.0.0",
     "commander": "15.0.0",
+    "ink": "8.0.0",
+    "react": "19.3.1",
     "zod": "4.6.7"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "5.0.5",
     "eslint": "10.13.0",
     "execa": "10.2.0",
+    "ink-testing-library": "4.0.0",
     "neostandard": "0.14.1",
     "nock": "15.0.4",
     "vitest": "5.0.5"
