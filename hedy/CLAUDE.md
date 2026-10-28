@@ -18,7 +18,7 @@
 ## Credentials
 
 - Both Atlassian clients read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL`. Confluence sits at `${JIRA_BASE_URL}/wiki` with the same token.
-- The docs repo's publisher reads `CONFLUENCE_USERNAME` and `CONFLUENCE_API_TOKEN`. `hedy` sets them in the child process environment from `JIRA_USER` and `JIRA_TOKEN`.
+- The docs repo's publisher reads `CONFLUENCE_USERNAME`, `CONFLUENCE_API_TOKEN` and `CONFLUENCE_URL`. `hedy` sets them in the child process environment from `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL`.
 - `credentials.js` is the one place a command gets the three values. A command calls it after validating its options. It loads the root `.env`, then reads the three values.
 - The environment wins. The root `.env` fills only the variables the environment lacks, through Node's `util.parseEnv`, the parser behind `process.loadEnvFile`, and expands `$NAME` and `${NAME}` references, which direnv also expands, from the file's own values only. A reference never reads the process environment. A single-quoted value stays literal, and `\$` is a literal `$`. A variable set to the empty string counts as set.
 - `hedy` never prints a credential value. The `auth` command reports only each account's display name or each service's error.
@@ -32,7 +32,7 @@ All paths are under `hedy/src/`.
 - `commands/<name>.js` holds one command. `commands/<group>/index.js` holds a group, and the group's subcommands sit beside it, one per file.
 - `commands/auth.js` probes Jira and Confluence together with one set of credentials and reports each service's failure.
 - `commands/jira/` holds `ticket`, which prints one issue, `search`, which lists the issues a JQL query matches, `create`, which raises an issue from a manifest after a dry run, and `describe`, which replaces an issue's description from a file after a dry run. `manifest.js` holds the `hedy-ticket/1` schema and loader. `plan.js` holds the create fields, the warnings, the plan id that both writes use, the check of a confirmed plan id, the description reader and the text that a dry run and a confirmed write print. `files.js` holds the text-file and JSON readers the manifest, description and receipt share. `issue-key.js` holds the issue-key rule.
-- `commands/confluence/` holds `page`, which prints one page by id, URL or share link.
+- `commands/confluence/` holds `page`, which prints one page by id, URL or share link, and `publish`, which checks one docs page, runs the docs repo's publisher, reads its log and reads the page back. `docs-repo.js` holds the docs repo and install checks, the page path forms, the publish config reader, the publishPaths membership and the space rule. `page-title.js` holds the title the publisher gives a page. `page-assets.js` holds the inventory of a page's diagram exports and images and the builds they need. `publisher-log.js` holds the reader of the publisher's log.
 - `html-to-markdown.js` holds `markdownFromHtml`, which turns a Confluence page body into markdown.
 - `errors.js` holds `HedyError` and the error codes: `USAGE`, `UNKNOWN`, `AUTH`, `NOT_FOUND`, `RATE_LIMIT`, `NETWORK` and `PARSE`.
 - `env-file.js` fills the environment from the root `.env`, setting only the variables the environment lacks.

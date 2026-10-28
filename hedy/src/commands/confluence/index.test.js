@@ -29,11 +29,13 @@ const harness = () => {
 }
 
 describe('the confluence group', () => {
-  it('lists the page command in its help', async () => {
+  it('lists the page and publish commands under the read and publish description in its help', async () => {
     const h = harness()
     const error = await rejectionOf(h.program.parseAsync(['confluence', '--help'], { from: 'user' }))
     expect(error.code).toBe('commander.helpDisplayed')
+    expect(h.out.join('')).toContain('Read and publish Confluence pages')
     expect(h.out.join('')).toMatch(/^ {2}page \[options\] <reference>\s/m)
+    expect(h.out.join('')).toMatch(/^ {2}publish <page>\s/m)
   })
 
   it('routes confluence page to the page command, which refuses an unknown --format with exit 2', async () => {
@@ -45,9 +47,10 @@ describe('the confluence group', () => {
 })
 
 describe('hedy confluence --help, spawned', () => {
-  it('lists the page command and exits 0', async () => {
-    const result = await runCli(['confluence', '--help'], { env: { HEDY_WORKSPACE: root } })
+  it('lists the page and publish commands and exits 0', async () => {
+    const result = await runCli(['--workspace', root, 'confluence', '--help'])
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toMatch(/^ {2}page \[options\] <reference>\s/m)
+    expect(result.stdout).toMatch(/^ {2}publish <page>\s/m)
   })
 })
