@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { copyFile, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, mkdtemp, realpath, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
@@ -96,6 +96,28 @@ describe('buildCreatePlan', () => {
     const error = await rejectionOf(buildCreatePlan({ manifest: fixtureManifest, folder }))
     expect(error.code).toBe('USAGE')
     expect(error.message).toContain(join(folder, fixtureManifest.descriptionFile))
+  })
+
+  it('refuses a description file that links outside the manifest\'s folder with USAGE naming the link path, the real path and the folder', async () => {
+    const outside = await realpath(await mkdtemp(join(tmpdir(), 'hedy-plan-outside-')))
+    try {
+      const realPath = join(outside, 'elsewhere.txt')
+      await writeFile(realPath, 'A reason.')
+      const linkPath = join(folder, fixtureManifest.descriptionFile)
+      await symlink(realPath, linkPath)
+      const error = await rejectionOf(buildCreatePlan({ manifest: fixtureManifest, folder }))
+      expect(error.code).toBe('USAGE')
+      expect(error.message).toBe(`The description file ${linkPath} is a link to ${realPath}, outside the manifest's folder ${folder}. Put the description file inside that folder, then run the command again.`)
+    } finally {
+      await rm(outside, { recursive: true, force: true })
+    }
+  })
+
+  it('reads a description file that links to a file inside the manifest\'s folder', async () => {
+    await writeFile(join(folder, 'elsewhere.txt'), 'A reason.\n')
+    await symlink(join(folder, 'elsewhere.txt'), join(folder, fixtureManifest.descriptionFile))
+    const plan = await buildCreatePlan({ manifest: fixtureManifest, folder })
+    expect(plan.description).toBe('A reason.')
   })
 })
 

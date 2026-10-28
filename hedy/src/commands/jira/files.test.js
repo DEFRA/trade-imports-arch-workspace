@@ -1,9 +1,9 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, realpath, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import { rejectionOf } from '../../test-support/http.js'
-import { parseJsonText, readTextFile } from './files.js'
+import { isSecretPath, parseJsonText, readTextFile } from './files.js'
 
 let folder
 
@@ -34,6 +34,72 @@ describe('readTextFile', () => {
     expect(error.code).toBe('UNKNOWN')
     expect(error.message).toBe(`The notes file at ${path} could not be read. Check that the path is a regular file with read permission, then run the command again.`)
     expect(error.cause.code).toBe('EISDIR')
+  })
+
+  const writeSecretsFile = async () => {
+    const realFolder = await realpath(folder)
+    const secretsPath = join(realFolder, '.env')
+    await writeFile(secretsPath, 'JIRA_TOKEN=abc\n')
+    return { realFolder, secretsPath }
+  }
+
+  it('refuses a secrets file with USAGE naming the kind and the path once, without the file\'s values', async () => {
+    const { secretsPath } = await writeSecretsFile()
+    const error = await rejectionOf(readTextFile(secretsPath, { kind: 'notes file', missing: () => 'missing' }))
+    expect(error.code).toBe('USAGE')
+    expect(error.message).toBe(`The notes file at ${secretsPath} is a secrets file that hedy never reads. Give the path of a notes file that holds no secrets, then run the command again.`)
+    expect(error.message).not.toContain('abc')
+  })
+
+  it('refuses a link to a secrets file with USAGE naming the link path and the real path, without the file\'s values', async () => {
+    const { realFolder, secretsPath } = await writeSecretsFile()
+    const linkPath = join(realFolder, 'notes.txt')
+    await symlink(secretsPath, linkPath)
+    const error = await rejectionOf(readTextFile(linkPath, { kind: 'notes file', missing: () => 'missing' }))
+    expect(error.code).toBe('USAGE')
+    expect(error.message).toBe(`The notes file at ${linkPath} is ${secretsPath}, a secrets file that hedy never reads. Give the path of a notes file that holds no secrets, then run the command again.`)
+    expect(error.message).not.toContain('abc')
+  })
+
+  it('returns the text of a link to a file that holds no secrets', async () => {
+    const realFolder = await realpath(folder)
+    await writeFile(join(realFolder, 'notes.txt'), 'line one\n')
+    await symlink(join(realFolder, 'notes.txt'), join(realFolder, 'link.txt'))
+    expect(await readTextFile(join(realFolder, 'link.txt'), { kind: 'notes file', missing: () => 'missing' })).toBe('line one\n')
+  })
+})
+
+describe('isSecretPath', () => {
+  it.each([
+    '.env',
+    '.env.local',
+    'sub/.env.production',
+    'production.env',
+    'my.env.txt',
+    '.env.d/one',
+    '.npmrc',
+    '.netrc',
+    'credentials',
+    'credentials.json',
+    'secrets',
+    'secrets.yaml',
+    '.aws/config',
+    '.ssh/id_ed25519',
+    'home/.ssh/keys/one'
+  ])('is true for the real path <tmp>/%s, as the Bash guard\'s patterns are', (relativePath) => {
+    expect(isSecretPath(join(folder, relativePath))).toBe(true)
+  })
+
+  it.each([
+    'notes.txt',
+    'environment.md',
+    'release.environment',
+    'dotenv-guide.md',
+    '.envrc',
+    'credentials-guide.md',
+    'aws/config'
+  ])('is false for the real path <tmp>/%s', (relativePath) => {
+    expect(isSecretPath(join(folder, relativePath))).toBe(false)
   })
 })
 

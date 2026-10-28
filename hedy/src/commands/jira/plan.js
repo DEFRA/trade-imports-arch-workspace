@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
-import { resolve } from 'node:path'
+import { realpath } from 'node:fs/promises'
+import { resolve, sep } from 'node:path'
 import { z } from 'zod'
 import { HedyError } from '../../errors.js'
 import { readTextFile } from './files.js'
@@ -91,16 +92,34 @@ export const readDescription = async (path) => {
   return description
 }
 
+const refuseDescriptionOutsideFolder = async ({ path, folder }) => {
+  const realPath = await realpath(path).catch((error) => {
+    if (error.code === 'ENOENT') return null
+    throw error
+  })
+  if (realPath === null) return
+  const realFolder = await realpath(folder)
+  if (realPath.startsWith(`${realFolder}${sep}`)) return
+  throw new HedyError(
+    'USAGE',
+    `The description file ${path} is a link to ${realPath}, outside the manifest's folder ${folder}. Put the description file inside that folder, then run the command again.`
+  )
+}
+
 /**
  * Resolves to the create plan for a validated manifest. The description is
  * read with readDescription from descriptionFile, relative to folder.
- * priority and parent are null when the manifest leaves them out, and the
- * plan id does not depend on the order of the labels.
+ * Rejects with USAGE naming both paths and the folder when the description
+ * file's real path lies outside the folder's real path. priority and parent
+ * are null when the manifest leaves them out, and the plan id does not
+ * depend on the order of the labels.
  *
  * @param {{ manifest: z.infer<typeof import('./manifest.js').manifestSchema>, folder: string }} options
  */
 export const buildCreatePlan = async ({ manifest, folder }) => {
-  const description = await readDescription(resolve(folder, manifest.descriptionFile))
+  const descriptionPath = resolve(folder, manifest.descriptionFile)
+  await refuseDescriptionOutsideFolder({ path: descriptionPath, folder })
+  const description = await readDescription(descriptionPath)
   const content = {
     project: manifest.project,
     type: manifest.type,
