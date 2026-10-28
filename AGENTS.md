@@ -64,11 +64,13 @@ credentials with the auth doctor below rather than inspecting the file.
 
 ## The `hedy` CLI
 
-`hedy` is the workspace's command-line tool, a Node 24 program in `hedy/`. `make link` puts `hedy` on PATH. The commands read Jira and Confluence:
+`hedy` is the workspace's command-line tool, a Node 24 program in `hedy/`. `make link` puts `hedy` on PATH. The commands read Jira and Confluence and write Jira:
 
 - `hedy auth` checks the Atlassian credentials and reports display names only.
 - `hedy jira ticket <key>` reads one issue, description included.
 - `hedy jira search '<jql>'` reads the issues a JQL query matches, up to `--max` (200 by default).
+- `hedy jira create --from <manifest>` creates one issue from a ticket manifest. The command is a dry run by default, and `--confirm <planId>` runs only the plan the dry run showed.
+- `hedy jira describe <key> --from <file>` replaces one issue's description with the file's Jira wiki markup. The command is a dry run by default, and `--confirm <planId>` runs only the plan the dry run showed.
 - `hedy confluence page <reference>` reads one page by id, URL or share link, as markdown by default.
 
 With `--json`, every command prints one envelope line, `{ ok, schema_version, hedy_version, result, errors, metadata }`, where `errors` lists `{ code, message }` entries. A command exits 0 on success, 1 on an error and 2 on a usage error.
@@ -84,7 +86,6 @@ read its header) for usage.
 
 | Domain | Tools |
 | --- | --- |
-| `jira/` | `create-ticket.sh`, `update-description.sh` |
 | `confluence/` | Hand tools for Confluence page writes and the folder sync. Reads are `hedy confluence page` |
 | `confluence-publish/` | Pre-flight and executor for publishing one docs page to Confluence |
 | `editorial/` | `check-prose.sh` (the style gate), `claim-diff.sh` (the claims a rewrite adds, drops or changes), `check-names.sh` (flag, or with `--fix` rename, the names a document set's editorial profile replaces), `read-profile.sh` (a document set's `editorial-profile.md` as JSON: reader frame, defaults, context pages, run notes, preferred names), `build-review-packet.sh` (one file holding the review brief, its sources and the pages with line numbers, for every reviewer), `start-layered-review.sh` (hash the pages and build the layered review's packet and run folder), `assemble-review.sh` (validate review files written outside the workflow and build the version 3 review result) |

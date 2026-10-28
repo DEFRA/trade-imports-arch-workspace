@@ -30,6 +30,8 @@ analysis/
 .claude/workareas/editorial/
 .claude/workareas/confluence-sync/
 .claude/workareas/design-consistency/
+# Task-local ticket drafts of the jira skill (manifests, descriptions, receipts)
+.claude/workareas/jira/
 
 # Editorial research run state (run records, cold-reader findings, story cards)
 editorial-research/

@@ -22,7 +22,7 @@ The symlink is part of a path contract: everything in the workspace refers to th
 
 ## The `hedy` CLI
 
-`hedy` is the workspace's command-line tool for reading Jira and Confluence, a Node 24 program kept in `hedy/`. `make link` installs `hedy` on your PATH. `hedy auth` checks your Atlassian credentials and shows only display names. `hedy jira ticket <key>` reads one Jira issue, and `hedy jira search '<jql>'` reads the issues a JQL query matches. `hedy confluence page <reference>` reads one Confluence page by id, URL or share link and prints the page as markdown. Add `--json` to any command for one machine-readable line holding the result or the errors. Prefer `hedy <command> --json` over ad-hoc `curl` or `jq` against Jira or Confluence.
+`hedy` is the workspace's command-line tool for Jira and Confluence, a Node 24 program kept in `hedy/`. `make link` installs `hedy` on your PATH. `hedy auth` checks your Atlassian credentials and shows only display names. `hedy jira ticket <key>` reads one Jira issue, and `hedy jira search '<jql>'` reads the issues a JQL query matches. `hedy confluence page <reference>` reads one Confluence page by id, URL or share link and prints the page as markdown. `hedy jira create --from <manifest>` creates a Jira issue and `hedy jira describe <key> --from <file>` replaces an issue's description, and each sends nothing until `--confirm <planId>` names the plan its dry run printed. Add `--json` to any command for one machine-readable line holding the result or the errors. Prefer `hedy <command> --json` over ad-hoc `curl` or `jq` against Jira or Confluence.
 
 ## Inside `.claude/`
 
@@ -38,7 +38,7 @@ The layout follows Claude Code's [project `.claude` directory](https://code.clau
 | `agent-memory/` | Persistent memory for subagents that declare `memory: project` in their frontmatter - each maintains its own `MEMORY.md`, loaded into its system prompt when it runs. Claude Code creates and populates it; nothing to author by hand. |
 | `workflows/` | Saved dynamic-workflow scripts - JavaScript files that orchestrate many subagents, each becoming a `/name` command. Saved from a session via `/workflows` rather than authored from scratch. |
 | `hooks/` *(workspace convention)* | The guard scripts (`guard-bash.sh`, `guard-edits.sh`) that `settings.json` wires to run before tool calls. Claude Code reads the wiring from `settings.json`; keeping the scripts in a dedicated directory, protected from agent edits by `guard-edits.sh` itself, is this workspace's choice. |
-| `tools/` *(workspace convention)* | Per-domain shell scripts that do the deterministic work behind skills - Confluence page writes and publish pre-flight, Jira ticket creation and description update, Mermaid rendering, skill scaffolding, the workspace, auth and dependency doctors. Runnable by hand or from any agent. |
+| `tools/` *(workspace convention)* | Per-domain shell scripts that do the deterministic work behind skills - Confluence page writes and publish pre-flight, Mermaid rendering, skill scaffolding, the workspace, auth and dependency doctors. Runnable by hand or from any agent. |
 | `best-practices/` *(workspace convention)* | Convention docs the skills cite instead of duplicating: skill authoring (`skills/`), git and pull requests (`git/`), editorial writing (`writing/`), and Claude Code enforcement mechanisms (`claude-code/`). |
 | `workareas/` *(workspace convention)* | Persistent working state written by skill runs, such as skill-creator interview decisions and audit plans. |
 
