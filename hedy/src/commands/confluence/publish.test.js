@@ -242,14 +242,12 @@ describe('runPublish asking confirm', () => {
     expect(await publisherRan()).toBe(false)
   })
 
-  it.each([
-    ['missing', undefined],
-    ['not a function', true]
-  ])('refuses a confirm that is %s with USAGE naming the confirm option before the page check', async (_label, confirm) => {
+  it('rejects a missing confirm with a TypeError after the pre-flight and never runs the publisher', async () => {
     await installScenario('updated')
-    const error = await rejectionOf(runPublish({ page: 'docs/notes/unlisted.md', env: {}, workspaceRoot: () => root, cwd: root, stderr: io.stderr, confirm }))
-    expect(error.code).toBe('USAGE')
-    expect(error.message).toBe('runPublish needs the confirm option, an async function that resolves true to publish or false to cancel. Pass confirm, then call runPublish again.')
+    stagePreChecks()
+    const error = await rejectionOf(runPublish({ page: PAGE, env: testEnv(), workspaceRoot: () => root, cwd: root, stderr: io.stderr }))
+    expect(error).toBeInstanceOf(TypeError)
+    expect(nock.pendingMocks()).toEqual([])
     expect(await publisherRan()).toBe(false)
   })
 })

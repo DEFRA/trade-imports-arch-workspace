@@ -16,6 +16,7 @@ import {
   refuseStalePlan,
   renderPlan,
   renderWriteOutcome,
+  rowLines,
   rowValueText,
   writeOutcomeRows
 } from './plan.js'
@@ -241,6 +242,27 @@ describe('renderPlan', () => {
       '',
       'Run it.'
     ].join('\n'))
+  })
+})
+
+describe('rowLines', () => {
+  it('aligns every value two columns after the longest label and its colon', () => {
+    expect(rowLines([['Issue', 'EUDPA-748'], ['Description', 'unchanged']])).toEqual([
+      'Issue:       EUDPA-748',
+      'Description: unchanged'
+    ])
+  })
+
+  it('continues a value that holds newlines on the following lines, under its first line', () => {
+    expect(rowLines([['Key', 'one'], ['Warnings', 'first\nsecond']])).toEqual([
+      'Key:      one',
+      'Warnings: first',
+      '          second'
+    ])
+  })
+
+  it('returns no lines for no rows', () => {
+    expect(rowLines([])).toEqual([])
   })
 })
 

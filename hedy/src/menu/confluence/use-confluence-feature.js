@@ -1,27 +1,19 @@
 import { pageRows, runPage } from '../../commands/confluence/page.js'
 import { renderPublish, runPublish } from '../../commands/confluence/publish.js'
-import { toHedyErrors } from '../../errors.js'
 import { runAction } from '../../run-action.js'
 import { ConfirmScreen } from '../common/confirm-screen.js'
 import { InputScreen } from '../common/input-screen.js'
 import { MenuScreen } from '../common/menu-screen.js'
 import { ResultScreen } from '../common/result-screen.js'
 import { SCREENS } from '../screens.js'
-import { previewOf } from '../text-preview.js'
 
-const hiddenLinesNote = (hiddenLines, reference) =>
-  hiddenLines === 0 ? '' : `${hiddenLines} more lines. Run hedy confluence page ${reference} to read the whole page.`
-
-const pageResultProps = ({ page, reference }, navigateToMain) => {
-  const preview = previewOf(page.body, 20)
-  return {
-    title: page.title,
-    rows: pageRows(page),
-    text: preview.text,
-    note: hiddenLinesNote(preview.hiddenLines, reference),
-    onReturn: navigateToMain
-  }
-}
+const pageResultProps = ({ page, reference }, navigateToMain) => ({
+  title: page.title,
+  rows: pageRows(page),
+  text: page.body,
+  wholeText: { command: `hedy confluence page ${reference}`, whole: 'page' },
+  onReturn: navigateToMain
+})
 
 const confluenceLineOf = (existing) =>
   existing === undefined
@@ -41,19 +33,6 @@ const publishConfirmProps = ({ facts, onConfirm, onCancel }) => ({
   onCancel
 })
 
-const outcomeOf = async (run) => {
-  try {
-    return { result: await run() }
-  } catch (error) {
-    return { error }
-  }
-}
-
-const resultOrThrow = (outcome) => {
-  if ('error' in outcome) throw outcome.error
-  return outcome.result
-}
-
 /**
  * Returns the Confluence group's routes and the main menu's select handler.
  * io is { stdout, stderr, setExitCode }. detach() leaves Ink and returns
@@ -64,7 +43,8 @@ const resultOrThrow = (outcome) => {
 export const useConfluenceFeature = ({
   setScreen,
   setScreenData,
-  setLoadingMessage,
+  showLoading,
+  showErrors,
   navigateToMain,
   env,
   workspaceRoot,
@@ -73,16 +53,6 @@ export const useConfluenceFeature = ({
   readPage = ({ reference }) => runPage({ reference, env, workspaceRoot }),
   publishPage = ({ page, confirm }) => runPublish({ page, env, workspaceRoot, stderr: io.stderr, confirm })
 }) => {
-  const showLoading = (message) => {
-    setLoadingMessage(message)
-    setScreen(SCREENS.LOADING)
-  }
-
-  const showErrors = (error) => {
-    setScreenData({ errors: toHedyErrors(error) })
-    setScreen(SCREENS.ERROR)
-  }
-
   const readAndShowPage = async (reference) => {
     showLoading('Reading the page')
     try {
@@ -106,23 +76,18 @@ export const useConfluenceFeature = ({
     setScreen(SCREENS.CONFLUENCE_PUBLISH_CONFIRM)
   })
 
-  const showUnsentOutcome = (outcome) => {
-    if ('error' in outcome) showErrors(outcome.error)
-    else navigateToMain()
-  }
+  const showUnsentOutcome = (outcome) => outcome.status === 'rejected' ? showErrors(outcome.reason) : navigateToMain()
 
-  const printOutcome = (outcome) => runAction(() => resultOrThrow(outcome), {
-    render: renderPublish,
-    stdout: io.stdout,
-    stderr: io.stderr,
-    setExitCode: io.setExitCode
-  })
+  const printOutcome = (outcome) => runAction(
+    () => outcome.status === 'rejected' ? Promise.reject(outcome.reason) : outcome.value,
+    { render: renderPublish, ...io }
+  )
 
   const publishAndReport = async (page) => {
     showLoading('Checking the page')
     let settle
     const confirm = (facts) => askToPublish(facts, { leaveInk: () => { settle = detach() } })
-    const outcome = await outcomeOf(() => publishPage({ page, confirm }))
+    const [outcome] = await Promise.allSettled([publishPage({ page, confirm })])
     if (settle === undefined) showUnsentOutcome(outcome)
     else settle(await printOutcome(outcome))
   }

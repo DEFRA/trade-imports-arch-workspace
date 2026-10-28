@@ -151,19 +151,28 @@ export const rowValueText = (value, { separator = ', ' } = {}) => {
 }
 
 /**
- * Returns a dry run's text: one line per row, the values aligned two columns
- * after the longest label, then a blank line, the description, a blank line
- * and nextStep. A value holding newlines prints one line per line, each
- * continuation aligned under the first. A list prints one line per item, and
- * a null value, empty text or an empty list prints as none.
+ * Returns one line per row and one per further line of a value that holds
+ * newlines. The label and its colon fill a column two wider than the longest
+ * label, and a further line leaves that column blank.
+ *
+ * @param {[string, string][]} rows
+ * @returns {string[]}
+ */
+export const rowLines = (rows) => {
+  const width = Math.max(...rows.map(([label]) => label.length)) + 2
+  return rows.flatMap(([label, value]) =>
+    value.split('\n').map((line, index) => `${(index === 0 ? `${label}:` : '').padEnd(width)}${line}`))
+}
+
+/**
+ * Returns a dry run's text: the rows through rowLines, then a blank line, the
+ * description, a blank line and nextStep. A list prints one line per item,
+ * and a null value, empty text or an empty list prints as none.
  *
  * @param {{ rows: [string, string | null | string[]][], description: string, nextStep: string }} options
  */
 export const renderPlan = ({ rows, description, nextStep }) => {
-  const width = Math.max(...rows.map(([label]) => label.length)) + 2
-  const fieldLines = rows.flatMap(([label, value]) =>
-    rowValueText(value, { separator: '\n' }).split('\n')
-      .map((line, index) => `${(index === 0 ? `${label}:` : '').padEnd(width)}${line}`))
+  const fieldLines = rowLines(rows.map(([label, value]) => [label, rowValueText(value, { separator: '\n' })]))
   return [...fieldLines, '', description, '', nextStep].join('\n')
 }
 

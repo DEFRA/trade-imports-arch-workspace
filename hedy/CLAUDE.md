@@ -30,7 +30,7 @@
 All paths are under `hedy/src/`.
 
 - `cli.js` is the bin entry. It only parses `process.argv`.
-- `program.js` exports `buildProgram()`, which sets the global options `--json`, `--workspace` and `--no-ui`, sets `exitOverride()`, and routes commander's own errors through the exit map in one catch. The root action opens the menu when stdout and stdin are terminals and neither `--json` nor `--no-ui` is given, and otherwise raises the usage error.
+- `program.js` exports `buildProgram()`, which sets the global options `--json`, `--workspace` and `--no-ui`, sets `exitOverride()`, and routes commander's own errors through the exit map in one catch. `runProgram` opens the menu from the no-command error path when stdout and stdin are terminals and neither `--json` nor `--no-ui` is given, and otherwise reports the usage error.
 - `commands/<name>.js` holds one command. `commands/<group>/index.js` holds a group, and the group's subcommands sit beside it, one per file.
 - `commands/auth.js` probes Jira and Confluence together with one set of credentials and reports each service's failure.
 - `commands/jira/` holds `ticket`, which prints one issue, `search`, which lists the issues a JQL query matches, `create`, which raises an issue from a manifest after a dry run, and `describe`, which replaces an issue's description from a file after a dry run. `manifest.js` holds the `hedy-ticket/1` schema and loader. `plan.js` holds the create fields, the warnings, the plan id that both writes use, the check of a confirmed plan id, the description reader and the text that a dry run and a confirmed write print, with `rowValueText`, which turns a row value into text, and `writeOutcomeRows`, the rows of a confirmed write. `ticket.js`, `create.js` and `describe.js` export `ticketRows`, `createPlanRows` and `describePlanRows`, the rows each text mode prints. `files.js` holds the text-file and JSON readers the manifest, description and receipt share. `issue-key.js` holds the issue-key rule.
@@ -39,7 +39,8 @@ All paths are under `hedy/src/`.
 - `menu/ink-control.js` holds `mount`, `unmount` and `getCurrent` for the one Ink instance.
 - `menu/main-menu.js` is the router over each group's routes.
 - `menu/screens.js` holds the screen ids.
-- `menu/text-preview.js` holds `previewOf`, which cuts a text to a number of lines and counts the lines hidden.
+- `menu/text-preview.js` holds `previewOf`, which cuts a text to the lines that fit a row budget at the terminal's width and counts the lines hidden, and `moreLinesNote`, the note that names the command printing the whole text.
+- `menu/transitions.js` holds `createTransitions`, which gives the hooks `showLoading` and `showErrors` over the router's setters.
 - `menu/common/` holds the six shared screens: menu, input, loading, error, result and confirm.
 - `menu/auth/`, `menu/jira/` and `menu/confluence/` each hold one `use-<group>-feature.js`, which holds the group's side effects and calls the commands' `run*` functions.
 - `html-to-markdown.js` holds `markdownFromHtml`, which turns a Confluence page body into markdown.

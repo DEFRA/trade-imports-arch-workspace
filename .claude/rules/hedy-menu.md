@@ -19,14 +19,14 @@ These rules apply to every file under `hedy/src/menu/`, tests included, on top o
 - One screen per file.
 - The shared screens live under `menu/common/`. A command group reuses them and never forks a copy.
 - Build every element with `createElement` from `react`, over Ink's `Box`, `Text` and `useInput` and the `@inkjs/ui` widgets. `hedy` has no JSX transform.
-- A frame fits a terminal. Long text goes through `previewOf` from `menu/text-preview.js`, and the screen's note names the command that prints the whole text.
+- A frame fits a terminal. The shared result and confirm screens cut long text to the rows that fit at the terminal's width, through `previewOf` from `menu/text-preview.js`, and their note names the command that prints the whole text, which the hook passes as `wholeText`.
 
 ## Hooks
 
 - One `use-<group>-feature.js` per command group holds every side effect of the group.
 - A hook calls a command's exported `run*` function and never a client.
 - A hook takes its boundary functions as parameters with real defaults, so a test passes a fake without `vi.mock`.
-- A hook catches every error, turns the error into the list `toHedyErrors` gives, and shows the error screen with that list.
+- A hook catches every error and passes the error to `showErrors` from `menu/transitions.js`, which turns the error into the list `toHedyErrors` gives and shows the error screen; `showLoading` from the same module shows the loading screen with its message.
 - The confirm for a write defaults to cancel, so a stray Enter sends nothing.
 
 ## Leaving Ink for a Long Run

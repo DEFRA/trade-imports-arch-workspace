@@ -244,10 +244,10 @@ describe('useJiraFeature', () => {
       `Plan id:   ${PLAN_ID}`,
       'Issue:     HEDY-101',
       'Unchanged: no',
-      'Line 20 of the description',
-      '(5 more lines)'
+      'Line 20 of the description'
     ]) expect(frame).toContain(text)
     expect(frame).not.toContain('Line 21 of the description')
+    expect(flat(frame)).toContain(`5 more lines. Run hedy jira describe HEDY-101 --from ${DESCRIPTION_PATH} to read the whole plan.`)
     await press(stdin, 'y')
     await vi.waitFor(() => expect(lastFrame()).toContain(`Updated: ${describePlan.url}`))
     expect(describeCall.calls).toStrictEqual([
@@ -298,6 +298,17 @@ describe('useJiraFeature', () => {
       for (const [label, input] of inputsOf()) await submit({ stdin, lastFrame }, label, input)
       await vi.waitFor(() => expect(lastFrame()).toContain('Something went wrong'))
       expect(flat(lastFrame())).toContain('AUTH JIRA_USER, JIRA_TOKEN and JIRA_BASE_URL are not set')
+    })
+
+    it.each([
+      ['Read an issue', 0, () => [['Issue key', 'eudpa 123']]],
+      ["Replace an issue's description", 3, () => [['Issue key', 'eudpa 123'], ['Description file', join(root, 'description.jira.txt')]]]
+    ])('%s refuses a key that is not an issue key with USAGE and the key rule, before the credentials are read', async (_item, index, inputsOf) => {
+      const { lastFrame, stdin } = renderJira({ env: {}, workspaceRoot: () => root })
+      await chooseItem({ stdin, lastFrame }, index)
+      for (const [label, input] of inputsOf()) await submit({ stdin, lastFrame }, label, input)
+      await vi.waitFor(() => expect(lastFrame()).toContain('Something went wrong'))
+      expect(flat(lastFrame())).toContain('USAGE The key eudpa 123 is not a Jira issue key such as ABC-123. Give the key of one issue, then run the command again.')
     })
 
     it('Create an issue from a manifest runs the create command, which shows the manifest plan without credentials', async () => {

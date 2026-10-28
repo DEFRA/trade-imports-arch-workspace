@@ -57,6 +57,35 @@ describe('ConfirmScreen', () => {
     await vi.waitFor(() => expect(answers).toEqual([answer]))
   })
 
+  it('gives one confirm answer for two y keys that arrive before the screen renders again', async () => {
+    const { stdin, answers } = renderConfirm()
+    await pause()
+    stdin.write('y')
+    stdin.write('y')
+    await vi.waitFor(() => expect(answers).toEqual(['confirm']))
+    await pause()
+    expect(answers).toEqual(['confirm'])
+  })
+
+  it('ignores n after y, so only the first answer counts', async () => {
+    const { stdin, answers } = renderConfirm()
+    await pause()
+    stdin.write('y')
+    await pause()
+    stdin.write('n')
+    await pause()
+    expect(answers).toEqual(['confirm'])
+  })
+
+  it('cuts a long text to 20 rows and names the command that prints the whole plan', () => {
+    const text = Array.from({ length: 25 }, (_, index) => `Line ${String(index + 1).padStart(2, '0')} of the plan`).join('\n')
+    const { lastFrame } = renderConfirm({ text, wholeText: { command: 'hedy jira describe EUDPA-748 --from description.jira.txt', whole: 'plan' } })
+    const frame = lastFrame()
+    expect(frame).toContain('Line 20 of the plan')
+    expect(frame).not.toContain('Line 21 of the plan')
+    expect(frame.replace(/\s+/g, ' ')).toContain('5 more lines. Run hedy jira describe EUDPA-748 --from description.jira.txt to read the whole plan.')
+  })
+
   it('ignores keys other than y, n and Enter', async () => {
     const { stdin, answers } = renderConfirm()
     await pause()

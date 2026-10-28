@@ -68,8 +68,8 @@ const usageMessage = ({ code, message }) => {
 /**
  * Builds the hedy commander program. Output, input, the exit code setter,
  * the environment, the home folder and the menu launcher are injectable so
- * the program runs in-process under test; stdin and launchMenu serve
- * runProgram's menu path. Commander's own errors are thrown, not printed.
+ * the program runs in-process under test. Commander's own errors are thrown,
+ * not printed.
  *
  * @param {object} [deps]
  * @param {{ write: (chunk: string) => unknown, isTTY?: boolean }} [deps.stdout]

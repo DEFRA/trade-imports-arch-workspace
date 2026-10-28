@@ -7,9 +7,7 @@ import { MenuScreen } from './common/menu-screen.js'
 import { useConfluenceFeature } from './confluence/use-confluence-feature.js'
 import { useJiraFeature } from './jira/use-jira-feature.js'
 import { SCREENS } from './screens.js'
-
-const givenOnly = (functions) =>
-  Object.fromEntries(Object.entries(functions).filter(([, given]) => given !== undefined))
+import { createTransitions } from './transitions.js'
 
 const mainRoute = ({ handlers }) => ({
   [SCREENS.MAIN]: {
@@ -31,9 +29,8 @@ const mainRoute = ({ handlers }) => ({
 /**
  * Renders the menu for the current screen. io is { stdout, stderr,
  * setExitCode } and detach() leaves Ink for a long run; both go to the
- * Confluence hook. Each override of a hook's boundary function reaches its
- * hook only when given, so the hook's default applies otherwise. onQuit
- * defaults to Ink's exit.
+ * Confluence hook. A boundary function left out keeps the hook's default.
+ * onQuit defaults to Ink's exit.
  */
 export const MainMenu = ({
   env,
@@ -60,10 +57,11 @@ export const MainMenu = ({
     setScreenData({})
   }
 
-  const shared = { setScreen, setScreenData, setLoadingMessage, navigateToMain, env, workspaceRoot }
-  const auth = useAuthFeature({ ...shared, ...givenOnly({ checkCredentials }) })
-  const jira = useJiraFeature({ ...shared, ...givenOnly({ readIssue, searchIssues, createIssue, describeIssue }) })
-  const confluence = useConfluenceFeature({ ...shared, io, detach, ...givenOnly({ readPage, publishPage }) })
+  const { showLoading, showErrors } = createTransitions({ setScreen, setScreenData, setLoadingMessage })
+  const shared = { setScreen, setScreenData, showLoading, showErrors, navigateToMain, env, workspaceRoot }
+  const auth = useAuthFeature({ ...shared, checkCredentials })
+  const jira = useJiraFeature({ ...shared, readIssue, searchIssues, createIssue, describeIssue })
+  const confluence = useConfluenceFeature({ ...shared, io, detach, readPage, publishPage })
 
   if (screen === SCREENS.LOADING) return createElement(LoadingScreen, { key: screen, message: loadingMessage })
   if (screen === SCREENS.ERROR) {

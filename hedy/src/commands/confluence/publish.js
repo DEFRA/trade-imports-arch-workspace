@@ -75,12 +75,6 @@ const checkConfluence = async ({ env, workspaceRoot, title, space }) => {
   return { credentials, client, existing }
 }
 
-const checkConfirmOption = (confirm) => {
-  if (typeof confirm !== 'function') {
-    throw new HedyError('USAGE', 'runPublish needs the confirm option, an async function that resolves true to publish or false to cancel. Pass confirm, then call runPublish again.')
-  }
-}
-
 const publishFactsOf = ({ absolutePath, pagePath, title, space }, existing) => ({
   absolutePath,
   page: pagePath,
@@ -169,8 +163,8 @@ const publishedOutcome = async ({ result, client, preflight }) => {
  * install, the page path, the publish config, the publishPaths entry, the
  * space, the diagram exports, the image files, the credentials and the
  * Confluence probe, and the generated label on a page Confluence already
- * holds under the title. A confirm that is not a function rejects USAGE
- * before the first check. After the last check, confirm is called once with
+ * holds under the title. After the last check, the required confirm is
+ * called once with
  * { absolutePath, page, title, space, existing }, where page is the docs/
  * path, absolutePath its real path, and existing { id, url } for the page
  * Confluence holds under the title, else undefined. Unless confirm resolves
@@ -194,7 +188,6 @@ const publishedOutcome = async ({ result, client, preflight }) => {
  * }} options
  */
 export const runPublish = async ({ page, env, workspaceRoot, cwd = process.cwd(), timeoutMs = 600000, stderr, confirm }) => {
-  checkConfirmOption(confirm)
   const preflight = await checkLocalFiles({ page, workspaceRoot, cwd })
   const { credentials, client, existing } = await checkConfluence({ env, workspaceRoot, ...preflight })
   if (await confirm(publishFactsOf(preflight, existing)) !== true) {

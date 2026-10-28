@@ -1,27 +1,21 @@
 import { createPlanRows, runCreate } from '../../commands/jira/create.js'
 import { describePlanRows, runDescribe } from '../../commands/jira/describe.js'
+import { issueKeySchema } from '../../commands/jira/issue-key.js'
 import { rowValueText, writeOutcomeRows } from '../../commands/jira/plan.js'
 import { runSearch } from '../../commands/jira/search.js'
 import { runTicket, ticketRows } from '../../commands/jira/ticket.js'
-import { toHedyErrors } from '../../errors.js'
 import { ConfirmScreen } from '../common/confirm-screen.js'
 import { InputScreen } from '../common/input-screen.js'
 import { MenuScreen } from '../common/menu-screen.js'
 import { ResultScreen } from '../common/result-screen.js'
 import { SCREENS } from '../screens.js'
-import { previewOf } from '../text-preview.js'
 
-const PREVIEW_LINES = 20
-
-const ticketResultProps = (issue) => {
-  const { text, hiddenLines } = previewOf(issue.description || '(no description)', PREVIEW_LINES)
-  return {
-    title: `${issue.key}  ${issue.summary}`,
-    rows: ticketRows(issue),
-    text,
-    note: hiddenLines > 0 ? `${hiddenLines} more lines. Run hedy jira ticket ${issue.key} to read the whole description.` : ''
-  }
-}
+const ticketResultProps = (issue) => ({
+  title: `${issue.key}  ${issue.summary}`,
+  rows: ticketRows(issue),
+  text: issue.description || '(no description)',
+  wholeText: { command: `hedy jira ticket ${issue.key}`, whole: 'description' }
+})
 
 const searchResultProps = ({ issues, truncated }) => ({
   title: 'Issues',
@@ -30,32 +24,26 @@ const searchResultProps = ({ issues, truncated }) => ({
   note: truncated ? 'More issues match. Run hedy jira search with a higher --max to read them.' : ''
 })
 
-const planPreviewText = (description) => {
-  const { text, hiddenLines } = previewOf(description, PREVIEW_LINES)
-  return hiddenLines > 0 ? `${text}\n(${hiddenLines} more lines)` : text
-}
-
 export const useJiraFeature = ({
   setScreen,
   setScreenData,
-  setLoadingMessage,
+  showLoading,
+  showErrors,
   navigateToMain,
   env,
   workspaceRoot,
-  readIssue = ({ key }) => runTicket({ key, env, workspaceRoot }),
+  readIssue = ({ key }) => runTicket({ key: issueKeySchema.parse(key), env, workspaceRoot }),
   searchIssues = ({ jql, max }) => runSearch({ jql, max, env, workspaceRoot }),
   createIssue = ({ from, confirm }) => runCreate({ from, confirm, env, workspaceRoot }),
-  describeIssue = ({ key, from, confirm }) => runDescribe({ key, from, confirm, env, workspaceRoot })
+  describeIssue = ({ key, from, confirm }) => runDescribe({ key: issueKeySchema.parse(key), from, confirm, env, workspaceRoot })
 }) => {
   const loadThenShow = async ({ message, load, screen, dataOf }) => {
-    setLoadingMessage(message)
-    setScreen(SCREENS.LOADING)
+    showLoading(message)
     try {
       setScreenData(dataOf(await load()))
       setScreen(screen)
     } catch (error) {
-      setScreenData({ errors: toHedyErrors(error) })
-      setScreen(SCREENS.ERROR)
+      showErrors(error)
     }
   }
 
@@ -117,12 +105,13 @@ export const useJiraFeature = ({
     }
   })
 
-  const confirmRoute = ({ title, planRows, question, message, write, resultScreen }) => ({
+  const confirmRoute = ({ title, planRows, dryRunCommand, question, message, write, resultScreen }) => ({
     component: ConfirmScreen,
     props: ({ plan, request }) => ({
       title,
       rows: planRows(plan),
-      text: planPreviewText(plan.description),
+      text: plan.description,
+      wholeText: { command: dryRunCommand(request), whole: 'plan' },
       question,
       onConfirm: () => confirmWrite({ message, write, request, plan, screen: resultScreen }),
       onCancel: navigateToMain
@@ -184,6 +173,7 @@ export const useJiraFeature = ({
     [SCREENS.JIRA_CREATE_CONFIRM]: confirmRoute({
       title: 'Create an issue',
       planRows: createPlanRows,
+      dryRunCommand: ({ from }) => `hedy jira create --from ${from}`,
       question: 'Create the issue?',
       message: 'Creating the issue',
       write: createIssue,
@@ -210,6 +200,7 @@ export const useJiraFeature = ({
     [SCREENS.JIRA_DESCRIBE_CONFIRM]: confirmRoute({
       title: 'Replace the description',
       planRows: describePlanRows,
+      dryRunCommand: ({ key, from }) => `hedy jira describe ${key} --from ${from}`,
       question: 'Replace the description?',
       message: 'Replacing the description',
       write: describeIssue,
