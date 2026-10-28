@@ -1,20 +1,22 @@
 ---
 name: jira
-description: 'Create, read and update JIRA tickets via the standalone curl+jq scripts in tools/jira/: single-key or JQL batch fetch with a flat JSON projection, ticket creation with type/priority/labels/parent, description replacement in Jira wiki markup, and an auth pre-flight. Triggers: "create jira ticket", "fetch jira ticket", "read jira ticket", "run jql", "update jira description", "rewrite the ticket". NOT for transitioning or commenting on tickets (no tools exist yet - extend tools/jira/ first), and NOT for Confluence pages - reads are the confluence-read skill, publishing is confluence-publish.'
+description: 'Create, read and update JIRA tickets: reads through the hedy CLI (one ticket by key, or a JQL search with a flat JSON projection), ticket creation with type/priority/labels/parent and description replacement in Jira wiki markup through the curl+jq scripts in tools/jira/, and an auth pre-flight. Triggers: "create jira ticket", "fetch jira ticket", "read jira ticket", "run jql", "update jira description", "rewrite the ticket". NOT for transitioning or commenting on tickets (no tools exist yet - extend tools/jira/ first), and NOT for Confluence pages - reads are the confluence-read skill, publishing is confluence-publish.'
 model: sonnet
 ---
 
-Create, read and update JIRA issues from any session in this workspace. Reading returns a flat JSON array the session can reason over directly; creation posts a new issue and returns its key and browse URL; updating replaces an issue's description. All work is done by the self-contained scripts in `~/trade-imports-arch-workspace/.claude/tools/jira/` - this skill owns no logic, only the procedure.
+Create, read and update JIRA issues from any session in this workspace. Reading returns flat JSON the session can reason over directly. Creation posts a new issue and returns its key and browse URL. Updating replaces an issue's description. Reads go through the `hedy` CLI, and creation and update through the scripts in `~/trade-imports-arch-workspace/.claude/tools/jira/`. This skill owns no logic, only the procedure.
 
 **Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Credentials
 
-All three scripts read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL` from the environment (loaded from the workspace `.env` by direnv). Creation additionally needs `JIRA_PROJECT_KEY`. If any call fails with an auth or unset-variable error, run the pre-flight and report its output:
+The read commands and the two scripts read `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL`. The scripts take them from the environment, which direnv loads from the workspace `.env`. `hedy` reads the `.env` itself for any variable the environment lacks. Creation additionally needs `JIRA_PROJECT_KEY`, which the pre-flight below does not check: when that variable is unset, `create-ticket.sh` fails naming the variable, and the fix is a line in the workspace `.env`. If any call fails with an auth or unset-variable error, run the pre-flight and report its output:
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/jira/auth.sh
+hedy auth
 ```
+
+If `hedy` is not found, run `make -C ~/trade-imports-arch-workspace link`.
 
 ## Usage
 
@@ -40,21 +42,22 @@ Before drafting a summary or a new or replacement description, follow the [edito
 
 ## Reading tickets
 
-One call, two modes - keys or JQL:
+Read one ticket by key, or search with JQL:
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/jira/fetch.sh IMTA-13810 IMTA-13811
+hedy jira ticket IMTA-13810 --json
 ```
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/jira/fetch.sh 'project = IMTA AND status = "In Progress" ORDER BY updated DESC'
+hedy jira search 'project = IMTA AND status = "In Progress" ORDER BY updated DESC' --max 50 --json
 ```
 
-- Multiple key arguments become one `key in (...)` search; requested keys the search does not return are listed as missing on stderr.
-- Raw JQL goes as a single quoted argument.
-- Useful flags: `-f fields` (narrow the projection), `-m N` (total cap, default 200), `-r` (raw issue JSON), `-n` (dry run - prints the JQL without calling the API).
-- Output is a JSON array on stdout: `key`, `url`, `summary`, `status`, `type`, `priority`, `assignee`, `labels`, `parent`, `created`, `updated`. Summarise for the user; do not paste large arrays verbatim.
-- A well-formed but nonexistent key in a batch makes JIRA reject the whole query, naming the offending keys - drop them and retry.
+- `--json` prints one envelope line, `{ ok, schema_version, hedy_version, result, errors, metadata }`. When `ok` is false, `errors` lists `{ code, message }` entries.
+- `ticket` gives `result` as `{ key, url, summary, status, type, priority, assignee, labels, parent, created, updated, description }`. The description is Jira wiki markup, or null when empty.
+- `search` gives `result` as `{ issues: [ ... ] }`, each issue with the same fields minus `description`. `--max` caps the total and defaults to 200.
+- Several keys go in one search as `key in (IMTA-13810, IMTA-13811)`.
+- A key Jira does not know makes Jira refuse the whole query. The refusal comes back as a `USAGE` error naming the key: drop the key and retry.
+- Summarise the result for the user. Do not paste large results verbatim.
 
 ## Creating a ticket
 
@@ -89,10 +92,17 @@ Outward-facing like creation: **show the user the new body and get their approva
 ```
 jira <read|create> complete.
 
-- read: N issue(s) fetched (M missing: <keys>)
+- read: N issue(s) fetched
 - create: <KEY> - <browse URL>
 - update: <KEY> - <browse URL>
 ```
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `hedy jira ticket <key>` | Read one issue, description included |
+| `hedy jira search '<jql>'` | Read the issues a JQL query matches, page by page, up to `--max` |
 
 ## Scripts cheat-sheet
 
@@ -100,7 +110,5 @@ All under `~/trade-imports-arch-workspace/.claude/tools/jira/`:
 
 | Script | Purpose |
 | --- | --- |
-| `fetch.sh` | JQL or batch-key fetch, paginated, flat JSON projection |
 | `create-ticket.sh` | Create one issue (type, priority, labels, parent, description file) |
 | `update-description.sh` | Replace one issue's description (Jira wiki markup) |
-| `auth.sh` | Credential pre-flight - verifies the API accepts `JIRA_USER`/`JIRA_TOKEN` |

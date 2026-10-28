@@ -1,0 +1,39 @@
+name: hedy CI
+
+on:
+  push:
+    paths:
+      - 'hedy/**'
+      - '.github/workflows/hedy-ci.yml'
+  pull_request:
+    paths:
+      - 'hedy/**'
+      - '.github/workflows/hedy-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hedy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          # hedy's baseline is Node >= 24 (hedy/package.json engines).
+          node-version: 24
+          cache: npm
+          cache-dependency-path: hedy/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm test
+        env:
+          CI: 'true'

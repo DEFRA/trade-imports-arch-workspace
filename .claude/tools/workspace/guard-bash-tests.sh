@@ -1,0 +1,158 @@
+#!/bin/bash
+# Runs every case against the bash guard and prints ok or FAIL per case.
+# Invoke with bash; $1 names the guard to test, the live hook by default:
+#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-bash-tests.sh
+#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-bash-tests.sh <draft guard>
+# The dirty-tree cases create and remove an untracked probe file under hedy/src
+# and a probe script under /tmp. Exit 1 when any case fails.
+set -u
+WS="$HOME/trade-imports-arch-workspace"
+GUARD=${1:-$WS/.claude/hooks/guard-bash.sh}
+HEDY="$WS/hedy"
+PROBE="$HEDY/src/zz-guard-probe.js"
+OUTSIDE="/tmp/hedy-guard-probe.sh"
+FAILS=0
+
+run() {
+  local expected=$1 cwd=$2 cmd=$3 out actual mark
+  out=$(jq -n --arg c "$cmd" --arg d "$cwd" '{tool_name:"Bash",tool_input:{command:$c},cwd:$d}' | bash "$GUARD")
+  if [ -n "$out" ]; then actual=deny; else actual=allow; fi
+  if [ "$expected" = "$actual" ]; then mark=ok; else mark=FAIL; FAILS=$((FAILS+1)); fi
+  printf '%-4s want %-5s got %-5s %s\n' "$mark" "$expected" "$actual" "$cmd"
+  if [ -n "$out" ]; then
+    printf '       %s\n' "$(printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecisionReason' | cut -c1-110)"
+  fi
+}
+
+echo "== dirty hedy tree =="
+touch "$PROBE"
+run deny  /tmp  'hedy hello'
+run deny  /tmp  'JIRA_TOKEN=x hedy auth --json'
+run deny  /tmp  'echo a; hedy hello'
+run deny  /tmp  'false || hedy hello'
+run deny  /tmp  'echo x | hedy hello'
+run deny  /tmp  'echo $(hedy hello)'
+run deny  /tmp  'timeout 30 hedy auth'
+run deny  /tmp  'npx hedy auth'
+run deny  /tmp  'env hedy auth'
+run deny  /tmp  'xargs -I{} hedy auth'
+run deny  /tmp  'node ~/trade-imports-arch-workspace/hedy/src/cli.js hello'
+run deny  "$HEDY" 'node src/cli.js hello'
+run deny  "$HEDY" './src/cli.js hello'
+run deny  /tmp  '~/trade-imports-arch-workspace/hedy/src/zz-guard-probe.js'
+run deny  /tmp  'bash ~/trade-imports-arch-workspace/hedy/src/zz-guard-probe.js'
+run allow "$HEDY" 'npm test'
+run allow "$HEDY" 'npm run lint'
+run allow "$HEDY" 'npx vitest run src/cli.test.js'
+run allow /tmp  'git -C ~/trade-imports-arch-workspace status -- hedy'
+run allow /tmp  'ls ~/trade-imports-arch-workspace/hedy/src'
+run allow /tmp  'grep -rn whoami ~/trade-imports-arch-workspace/hedy/src'
+rm -f "$PROBE"
+
+echo "== clean hedy tree =="
+run allow /tmp  'hedy hello'
+run allow /tmp  'JIRA_TOKEN=x hedy auth --json'
+run allow /tmp  'npx hedy auth'
+run allow /tmp  'node ~/trade-imports-arch-workspace/hedy/src/cli.js hello'
+run allow "$HEDY" './src/cli.js hello'
+
+echo "== secret reads =="
+run deny  /tmp  'grep foo ~/trade-imports-arch-workspace/.env -n'
+run deny  /tmp  'grep -n foo ~/trade-imports-arch-workspace/.env'
+run deny  /tmp  'jq . ~/trade-imports-arch-workspace/.env'
+run deny  /tmp  'cat x | awk 1 ~/trade-imports-arch-workspace/.env'
+run deny  /tmp  'echo $(grep token ~/trade-imports-arch-workspace/.env)'
+run deny  /tmp  'rg KEY ~/.aws/credentials'
+run allow /tmp  'grep -n foo ~/trade-imports-arch-workspace/README.md'
+run allow /tmp  'grep -rn auth ~/trade-imports-arch-workspace/.claude/tools'
+
+echo "== chmod =="
+run deny  /tmp  'chmod +x x.sh'
+run deny  /tmp  'sudo chmod 755 x.sh'
+run deny  /tmp  'find . -name "*.sh" -exec chmod +x {} \;'
+run deny  /tmp  'ls | xargs chmod +x'
+run allow /tmp  'echo chmod'
+
+echo "== executables by path and by launcher =="
+printf '#!/bin/bash\necho probe\n' > "$OUTSIDE"
+run allow /tmp  '~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh'
+run allow /tmp  'bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh'
+run deny  /tmp  "$OUTSIDE"
+run deny  /tmp  "bash $OUTSIDE"
+run allow /tmp  'bash -c "echo hi"'
+run allow /tmp  'node -e "console.log(1)"'
+run allow /tmp  'python3 -m json.tool'
+run allow /tmp  'bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh ~/trade-imports-arch-workspace/analysis/x.md'
+rm -f "$OUTSIDE"
+
+echo "== commits =="
+run deny  "$WS" 'git commit -m "x" --no-verify'
+run deny  "$WS" 'git commit --no-verify -m "x"'
+run deny  "$WS" 'git -c core.hooksPath=/dev/null commit -m "x"'
+run deny  "$WS" 'git config core.hooksPath /tmp/hooks'
+run deny  "$WS" 'git config --unset core.hooksPath'
+run allow "$WS" 'git config --get core.hooksPath'
+run allow "$WS" 'git commit -m "x"'
+
+echo "== git config, aliases and commit gates =="
+run deny  "$WS" 'git config core.hookspath /dev/null'
+run deny  "$WS" 'git -c core.hookspath=/dev/null commit -m x'
+run deny  "$WS" 'git config unset core.hooksPath'
+run deny  "$WS" 'git config remove-section core'
+run deny  "$WS" 'git config --remove-section core'
+run deny  "$WS" 'git config rename-section core x'
+run deny  "$WS" 'git config --rename-section core x'
+run deny  "$WS" 'git config set core.hooksPath /dev/null'
+run deny  "$WS" 'git config --add CORE.HOOKSPATH /dev/null'
+run deny  "$WS" 'git --config-env=core.hooksPath=HP commit -m x'
+run deny  "$WS" 'git -c $K=/dev/null commit -m x'
+run deny  "$WS" 'git config --edit'
+run deny  "$WS" 'git commit -n -m x'
+run deny  "$WS" 'git commit -nm x'
+run deny  "$WS" 'git commit -m x -an'
+run deny  "$WS" 'git commit --no-veri -m x'
+run deny  "$WS" 'bash -c "git commit -n -m x"'
+run deny  "$WS" 'env git commit -n -m x'
+run deny  "$WS" '(git commit -n -m x)'
+run deny  "$WS" 'GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null git commit -m x'
+run deny  "$WS" "GIT_CONFIG_PARAMETERS=\"'alias.x=push'\" git x origin HEAD:feature"
+run deny  "$WS" 'git config alias.x push'
+run deny  "$WS" 'git config set alias.x push'
+run deny  "$WS" 'git config rename-section foo alias'
+run deny  "$WS" 'git -c alias.x=push x origin HEAD:main'
+run deny  "$WS" 'git -c include.path=/tmp/x status'
+run allow "$WS" 'git config --get core.hookspath'
+run allow "$WS" 'git config core.hooksPath'
+run allow "$WS" 'git config --list'
+run allow "$WS" 'git config --get alias.x'
+run allow "$WS" 'git config --get-regexp alias'
+run allow "$WS" 'git config user.name x'
+run allow "$WS" 'git -c color.ui=never log --oneline'
+run allow "$WS" 'git commit -m x'
+run allow "$WS" 'git commit -am x'
+run allow "$WS" 'git commit -uno -m x'
+run allow "$WS" 'git commit -m "fix the -n check"'
+run allow "$WS" 'git log -n 3'
+
+echo "== direnv exec as a wrapper =="
+run deny  "$WS" 'direnv exec . chmod +x x.sh'
+run deny  "$WS" 'direnv exec . grep token ~/trade-imports-arch-workspace/.env'
+run allow "$WS" 'direnv exec . bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh'
+run allow "$WS" 'direnv exec . env'
+
+echo "== redirects =="
+run deny  /tmp  'ls /Users/benoit/projects'
+run deny  /tmp  'npm --prefix ~/trade-imports-arch-workspace/hedy ci'
+run deny  /tmp  'npm --prefix ~/projects/defra/trade-imports-arch-workspace/hedy install nock'
+run allow /tmp  'npm --prefix ~/projects/defra/trade-imports-arch-workspace/hedy test'
+run deny  /tmp  'cd x && ls'
+run allow /tmp  "awk 'NR>1 && NR<3' f"
+run allow /tmp  'jq "select(.a && .b)" f.json'
+
+echo "== plain commands =="
+run allow /tmp  'git status'
+run allow /tmp  'ls -la'
+run allow /tmp  ''
+
+echo "fails: $FAILS"
+[ "$FAILS" -eq 0 ]

@@ -4,6 +4,8 @@
 #
 # Syncs a Confluence folder tree to local Markdown files.
 # Re-runnable — overwrites existing files on each run.
+# Each page body comes from the page's view format through hedy, so
+# attachment and image links are site-relative.
 #
 # Default root: https://eaflood.atlassian.net/wiki/spaces/EUDP/folder/6447269328
 #
@@ -14,12 +16,14 @@
 #   JIRA_TOKEN     - Atlassian API token
 #   JIRA_BASE_URL  - e.g. https://eaflood.atlassian.net
 #
+# Tools required on PATH:
+#   hedy           - fetches each page as markdown; `make link` installs it
+#
 
 set -euo pipefail
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-SCRIPT_DIR="$HOME/trade-imports-arch-workspace/.claude/tools/confluence"
 ROOT_FOLDER_ID="6447269328"
 OUTPUT_DIR="$HOME/trade-imports-arch-workspace/.claude/workareas/confluence-sync"
 INDEX_FILE="$OUTPUT_DIR/_index.md"
@@ -105,13 +109,6 @@ title_to_slug() {
     | sed 's/^-//; s/-$//'
 }
 
-# ── HTML → Markdown ────────────────────────────────────────────────────────────
-
-html_to_md() {
-  local html="$1"
-  echo "$html" | node "$SCRIPT_DIR/html_to_md.js"
-}
-
 # ── Pagination helper: fetch all results from a paginated /child/* endpoint ────
 # Returns a JSON array.
 
@@ -157,10 +154,17 @@ get_children() {
 
 fetch_page_content() {
   local page_id="$1"
-  local response
-  response=$(confluence_get "rest/api/content/${page_id}?expand=body.export_view,version,space")
-  check_api_error "$response" "fetch page $page_id"
-  echo "$response"
+  local envelope
+  envelope=$(hedy confluence page "$page_id" --json) || true
+  if [[ -z "$envelope" ]]; then
+    echo "Error: hedy printed nothing for page $page_id - is hedy on PATH? Run: make -C ~/trade-imports-arch-workspace link" >&2
+    exit 1
+  fi
+  if [[ "$(echo "$envelope" | jq -r '.ok')" != "true" ]]; then
+    echo "$envelope" | jq -r '.errors[]?.message' >&2
+    exit 1
+  fi
+  echo "$envelope" | jq '.result'
 }
 
 # ── Write a page to disk ───────────────────────────────────────────────────────
@@ -169,15 +173,15 @@ write_page_file() {
   local page_json="$1"
   local output_path="$2"
 
-  local page_id title version space_key updated page_url body_html body_md
+  local page_id title version space_key updated page_url body_md
 
   page_id=$(echo "$page_json"  | jq -r '.id')
   title=$(echo "$page_json"    | jq -r '.title')
   version=$(echo "$page_json"  | jq -r '.version.number')
-  space_key=$(echo "$page_json"| jq -r '.space.key')
+  space_key=$(echo "$page_json"| jq -r '.space')
   updated=$(echo "$page_json"  | jq -r '.version.when')
-  body_html=$(echo "$page_json"| jq -r '.body.export_view.value // ""')
-  page_url="${JIRA_BASE_URL}/wiki/spaces/${space_key}/pages/${page_id}"
+  page_url=$(echo "$page_json" | jq -r '.url')
+  body_md=$(echo "$page_json"  | jq -r '.body // ""')
 
   if [[ "$DRY_RUN" == "true" ]]; then
     echo "  [dry-run] would write: ${output_path#$OUTPUT_DIR/}"
@@ -185,8 +189,6 @@ write_page_file() {
   fi
 
   mkdir -p "$(dirname "$output_path")"
-
-  body_md=$(html_to_md "$body_html")
 
   {
     printf -- '---\n'

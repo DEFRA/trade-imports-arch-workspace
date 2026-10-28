@@ -13,6 +13,20 @@ STAGED=$(git diff --cached --name-only)
 MD_STAGED=$(git diff --cached --name-only --diff-filter=ACMR \
     | grep -E '\.md$' | grep -v '^\.claude/tools/[^/]*/tests/')
 
+# hedy CLI: lint and test in the WORKTREE's hedy/, not the staged copy -
+# the installed packages (hedy/node_modules/, gitignored) exist only in
+# the worktree. Git runs hooks from the repository root.
+if echo "$STAGED" | grep -q '^hedy/'; then
+    (cd hedy && npm run lint) || {
+        echo "pre-commit: hedy CLI lint failed - fix and re-stage" >&2
+        exit 1
+    }
+    (cd hedy && npm test) || {
+        echo "pre-commit: hedy CLI tests failed - fix and re-stage" >&2
+        exit 1
+    }
+fi
+
 NEED_TMP=0
 echo "$STAGED" | grep -Eq '^(\.claude/|Makefile$)' && NEED_TMP=1
 [ -n "$MD_STAGED" ] && NEED_TMP=1

@@ -59,6 +59,12 @@ for TOOL in bash curl jq git; do
     fi
 done
 
+# The hedy CLI reaches PATH through make link (npm link in hedy/).
+if ! command -v hedy >/dev/null 2>&1; then
+    say "WARN hedy CLI not on PATH (run: make link)"
+    WARN=1
+fi
+
 KIND="directory"
 [[ -L "$ROOT" ]] && KIND="symlink -> $(readlink "$ROOT")"
 say "ok root=$ROOT ($KIND)"
