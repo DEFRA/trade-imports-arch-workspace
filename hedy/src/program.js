@@ -41,6 +41,8 @@ const usageMessage = ({ code, message }) => {
       return `The option ${quoted} needs a value. Put the value after the option.`
     case 'commander.missingArgument':
       return `The command needs the argument '${quoted}'. Run it with --help to see its arguments.`
+    case 'commander.missingMandatoryOptionValue':
+      return `The command needs the option '${quoted}'. Run it with --help to see its options.`
     case 'commander.excessArguments':
       return `The command ${quoted} does not take the arguments ${message.match(/got \d+: (.*)\.$/)?.[1]}. Run it with --help to see its arguments.`
     case 'commander.help':

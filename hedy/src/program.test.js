@@ -51,6 +51,7 @@ describe('runProgram in text mode', () => {
     [['hello', 'extra'], 'The command hello does not take the arguments extra. Run it with --help to see its arguments.'],
     [['hello', '--', '--json'], 'The command hello does not take the arguments --json. Run it with --help to see its arguments.'],
     [['jira', 'ticket'], "The command needs the argument 'key'. Run it with --help to see its arguments."],
+    [['jira', 'create'], "The command needs the option '--from <path>'. Run it with --help to see its options."],
     [['--workspace'], 'The option --workspace <path> needs a value. Put the value after the option.'],
     [[], 'No command was given. Run hedy --help to list the commands.']
   ])('turns the parse error for %j into one stderr line, nothing on stdout, exit 2', async (args, message) => {

@@ -4,7 +4,18 @@ import { join } from 'node:path'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import { readJsonFixture, rejectionOf } from '../../test-support/http.js'
 import { manifestSchema } from './manifest.js'
-import { MAX_DESCRIPTION_LENGTH, buildCreatePlan, buildFields, findWarnings, planIdOf } from './plan.js'
+import {
+  MAX_DESCRIPTION_LENGTH,
+  buildCreatePlan,
+  buildFields,
+  findWarnings,
+  planIdOf,
+  planIdSchema,
+  readDescription,
+  refuseStalePlan,
+  renderPlan,
+  renderWriteOutcome
+} from './plan.js'
 
 const fixturesUrl = new URL('./__fixtures__/', import.meta.url)
 const fixtureManifest = manifestSchema.parse(await readJsonFixture(new URL('ticket.json', fixturesUrl)))
@@ -70,31 +81,106 @@ describe('buildCreatePlan', () => {
     expect(plan.warnings).toHaveLength(1)
   })
 
-  it('refuses a missing description file with USAGE naming the path', async () => {
+  it('refuses a manifest whose description file is missing with USAGE naming the path beside the manifest', async () => {
     const error = await rejectionOf(buildCreatePlan({ manifest: fixtureManifest, folder }))
-    const path = join(folder, fixtureManifest.descriptionFile)
     expect(error.code).toBe('USAGE')
-    expect(error.message).toBe(`No description file is at ${path}. Write the description into that file, or set descriptionFile to its path relative to the manifest, then run the command again.`)
+    expect(error.message).toContain(join(folder, fixtureManifest.descriptionFile))
+  })
+})
+
+describe('readDescription', () => {
+  const descriptionPath = () => join(folder, 'description.jira.txt')
+
+  it('returns the file text without its trailing newlines and keeps the inner blank lines', async () => {
+    await writeFile(descriptionPath(), 'line one\n\nline two\n\n\n')
+    expect(await readDescription(descriptionPath())).toBe('line one\n\nline two')
+  })
+
+  it('refuses a missing file with USAGE naming the path', async () => {
+    const error = await rejectionOf(readDescription(descriptionPath()))
+    expect(error.code).toBe('USAGE')
+    expect(error.message).toBe(`No description file is at ${descriptionPath()}. Write the description into that file, or give the path of the file that holds the description, then run the command again.`)
   })
 
   it.each([
     ['empty', ''],
     ['only newlines', '\n\n'],
     ['only spaces and newlines', '  \n \n']
-  ])('refuses a description file that is %s with USAGE naming the path', async (_label, text) => {
-    await writeDescription(text)
-    const error = await rejectionOf(buildCreatePlan({ manifest: fixtureManifest, folder }))
-    const path = join(folder, fixtureManifest.descriptionFile)
+  ])('refuses a file that is %s with USAGE naming the path', async (_label, text) => {
+    await writeFile(descriptionPath(), text)
+    const error = await rejectionOf(readDescription(descriptionPath()))
     expect(error.code).toBe('USAGE')
-    expect(error.message).toBe(`The description file at ${path} is blank. Write the description into the file, then run the command again.`)
+    expect(error.message).toBe(`The description file at ${descriptionPath()} is blank. Write the description into the file, then run the command again.`)
   })
 
-  it('refuses a description path it cannot read as a file with UNKNOWN naming the path', async () => {
-    const path = join(folder, fixtureManifest.descriptionFile)
-    await mkdir(path)
-    const error = await rejectionOf(buildCreatePlan({ manifest: fixtureManifest, folder }))
+  it('refuses a path it cannot read as a file with UNKNOWN naming the path', async () => {
+    await mkdir(descriptionPath())
+    const error = await rejectionOf(readDescription(descriptionPath()))
     expect(error.code).toBe('UNKNOWN')
-    expect(error.message).toBe(`The description file at ${path} could not be read. Check that the path is a regular file with read permission, then run the command again.`)
+    expect(error.message).toBe(`The description file at ${descriptionPath()} could not be read. Check that the path is a regular file with read permission, then run the command again.`)
+  })
+})
+
+describe('planIdSchema', () => {
+  it('accepts 64 lowercase hex characters', () => {
+    expect(planIdSchema.parse('a'.repeat(64))).toBe('a'.repeat(64))
+  })
+
+  it.each([
+    ['too short', 'abc'],
+    ['too long', 'a'.repeat(65)],
+    ['upper case', 'A'.repeat(64)],
+    ['not hex', 'g'.repeat(64)]
+  ])('refuses a plan id that is %s with a message naming the plan id', (_label, planId) => {
+    const result = planIdSchema.safeParse(planId)
+    expect(result.success).toBe(false)
+    expect(result.error.issues.map(({ message }) => message)).toEqual([
+      `The plan id ${planId} is not one a dry run printed. Run the dry run, then confirm the 64-character plan id it prints.`
+    ])
+  })
+})
+
+describe('refuseStalePlan', () => {
+  it('returns when the confirmed plan id is the plan id', () => {
+    expect(refuseStalePlan('a'.repeat(64), 'a'.repeat(64))).toBeUndefined()
+  })
+
+  it('throws USAGE telling the caller to run the dry run again when the plan ids differ', async () => {
+    const error = await rejectionOf((async () => refuseStalePlan('a'.repeat(64), 'b'.repeat(64)))())
+    expect(error.code).toBe('USAGE')
+    expect(error.message).toBe('The plan has changed since the dry run. Run the dry run again, then confirm the new plan id.')
+  })
+})
+
+describe('renderPlan', () => {
+  it('aligns the values two columns after the longest label, writes none for null, empty text and an empty list, and puts each list item on its own line', () => {
+    expect(renderPlan({
+      rows: [['Plan id', 'abc'], ['Parent', null], ['Labels', ''], ['Warnings', []], ['Notes', ['first', 'second']]],
+      description: 'h3. Why',
+      nextStep: 'Run it.'
+    })).toBe([
+      'Plan id:  abc',
+      'Parent:   none',
+      'Labels:   none',
+      'Warnings: none',
+      'Notes:    first',
+      '          second',
+      '',
+      'h3. Why',
+      '',
+      'Run it.'
+    ].join('\n'))
+  })
+})
+
+describe('renderWriteOutcome', () => {
+  it.each([
+    ['created', 'Created'],
+    ['updated', 'Updated'],
+    ['unchanged', 'Unchanged']
+  ])('for mode %s prints the key, then %s: and the URL', (mode, word) => {
+    expect(renderWriteOutcome({ mode, key: 'HEDY-201', url: 'https://example.atlassian.net/browse/HEDY-201' }))
+      .toBe(`HEDY-201\n${word}: https://example.atlassian.net/browse/HEDY-201`)
   })
 })
 
