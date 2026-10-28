@@ -2,12 +2,9 @@ import { z } from 'zod'
 import { createJiraClient } from '../../clients/jira.js'
 import { loadCredentials } from '../../credentials.js'
 import { runAction } from '../../run-action.js'
+import { issueKeySchema } from './issue-key.js'
 
-const ticketArgumentsSchema = z.object({
-  key: z.string().regex(/^[A-Za-z][A-Za-z0-9]*-\d+$/, {
-    error: ({ input }) => `The key ${input} is not a Jira issue key such as ABC-123. Give the key of one issue, then run the command again.`
-  })
-})
+const ticketArgumentsSchema = z.object({ key: issueKeySchema })
 
 /**
  * Returns the Jira client's issue projection for key, description included.
