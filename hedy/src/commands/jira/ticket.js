@@ -3,6 +3,7 @@ import { createJiraClient } from '../../clients/jira.js'
 import { loadCredentials } from '../../credentials.js'
 import { runAction } from '../../run-action.js'
 import { issueKeySchema } from './issue-key.js'
+import { rowValueText } from './plan.js'
 
 const ticketArgumentsSchema = z.object({ key: issueKeySchema })
 
@@ -15,24 +16,27 @@ const ticketArgumentsSchema = z.object({ key: issueKeySchema })
 export const runTicket = async ({ key, env, workspaceRoot }) =>
   createJiraClient(loadCredentials({ env, workspaceRoot })).issue(key)
 
-const fieldText = (value) => {
-  const text = Array.isArray(value) ? value.join(', ') : value
-  return text || 'none'
-}
+/**
+ * Returns the issue's field rows, with the labels joined by commas and none
+ * for each empty value.
+ *
+ * @returns {[string, string][]}
+ */
+export const ticketRows = (ticket) => [
+  ['Status', ticket.status],
+  ['Type', ticket.type],
+  ['Priority', ticket.priority],
+  ['Assignee', ticket.assignee],
+  ['Labels', ticket.labels],
+  ['Parent', ticket.parent],
+  ['Created', ticket.created],
+  ['Updated', ticket.updated],
+  ['URL', ticket.url]
+].map(([label, value]) => [label, rowValueText(value)])
 
 const renderTicket = (ticket) => [
   `${ticket.key}  ${ticket.summary}`,
-  ...[
-    ['Status', ticket.status],
-    ['Type', ticket.type],
-    ['Priority', ticket.priority],
-    ['Assignee', ticket.assignee],
-    ['Labels', ticket.labels],
-    ['Parent', ticket.parent],
-    ['Created', ticket.created],
-    ['Updated', ticket.updated],
-    ['URL', ticket.url]
-  ].map(([label, value]) => `${`${label}:`.padEnd(10)}${fieldText(value)}`),
+  ...ticketRows(ticket).map(([label, value]) => `${`${label}:`.padEnd(10)}${value}`),
   '',
   ticket.description ?? '(no description)'
 ].join('\n')

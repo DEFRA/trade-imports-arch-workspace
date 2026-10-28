@@ -47,13 +47,20 @@ export const runDescribe = async ({ key, from, confirm, env, workspaceRoot }) =>
   return { mode: 'updated', key: issue.key, url: issue.url }
 }
 
+/**
+ * Returns a describe plan's rows, with Unchanged as yes or no.
+ *
+ * @returns {[string, string][]}
+ */
+export const describePlanRows = (plan) => [
+  ['Plan id', plan.planId],
+  ['Issue', plan.key],
+  ['URL', plan.url],
+  ['Unchanged', plan.unchanged ? 'yes' : 'no']
+]
+
 const renderDryRun = (plan) => renderPlan({
-  rows: [
-    ['Plan id', plan.planId],
-    ['Issue', plan.key],
-    ['URL', plan.url],
-    ['Unchanged', plan.unchanged ? 'yes' : 'no']
-  ],
+  rows: describePlanRows(plan),
   description: plan.description,
   nextStep: `This is a dry run. Nothing was sent. Run the command again with --confirm ${plan.planId} to replace the description.`
 })

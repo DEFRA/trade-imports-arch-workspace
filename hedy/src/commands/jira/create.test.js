@@ -13,7 +13,7 @@ import {
   rejectionOf
 } from '../../test-support/http.js'
 import { captureIo } from '../../test-support/io.js'
-import { RECEIPT_FILENAME, register, runCreate } from './create.js'
+import { RECEIPT_FILENAME, createPlanRows, register, runCreate } from './create.js'
 
 interceptNetworkPerTest()
 
@@ -166,6 +166,32 @@ describe('runCreate', () => {
     const error = await rejectionOf(confirmCreate(planId))
     expect(error.code).toBe('USAGE')
     expect(error.message).toBe(`The receipt at ${receiptPath()} does not hold key, url, planId and createdAt. Check in Jira whether the manifest's issue exists, then fix or delete the receipt and run the command again.`)
+  })
+})
+
+describe('createPlanRows', () => {
+  it('gives the eight rows for the fixture plan with the labels joined and none for no warnings', async () => {
+    const plan = await dryRun()
+    expect(createPlanRows(plan)).toEqual([
+      ['Plan id', plan.planId],
+      ['Project', 'HEDY'],
+      ['Type', 'Task'],
+      ['Summary', fixtureManifest.summary],
+      ['Priority', 'Medium'],
+      ['Parent', 'HEDY-100'],
+      ['Labels', 'hedy, fixtures'],
+      ['Warnings', 'none']
+    ])
+  })
+
+  it('gives one warning per line and none for a null priority and parent', async () => {
+    const plan = { ...await dryRun(), priority: null, parent: null, warnings: ['First warning.', 'Second warning.'] }
+    expect(createPlanRows(plan).slice(4)).toEqual([
+      ['Priority', 'none'],
+      ['Parent', 'none'],
+      ['Labels', 'hedy, fixtures'],
+      ['Warnings', 'First warning.\nSecond warning.']
+    ])
   })
 })
 

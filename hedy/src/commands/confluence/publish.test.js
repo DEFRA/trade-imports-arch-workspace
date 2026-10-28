@@ -17,7 +17,7 @@ import {
   startAnsweringServer
 } from '../../test-support/http.js'
 import { captureIo } from '../../test-support/io.js'
-import { register, runPublish } from './publish.js'
+import { register, renderPublish, runPublish } from './publish.js'
 
 interceptNetworkPerTest()
 
@@ -67,8 +67,13 @@ afterEach(async () => {
   await rm(root, { recursive: true, force: true })
 })
 
-const publish = ({ page = PAGE, env = testEnv(), cwd = root, timeoutMs } = {}) =>
-  runPublish({ page, env, workspaceRoot: () => root, cwd, timeoutMs, stderr: io.stderr })
+const publish = ({ page = PAGE, env = testEnv(), cwd = root, timeoutMs, confirm = async () => true } = {}) =>
+  runPublish({ page, env, workspaceRoot: () => root, cwd, timeoutMs, stderr: io.stderr, confirm })
+
+const recordingConfirm = (calls, { answer = true } = {}) => async (facts) => {
+  calls.push(facts)
+  return answer
+}
 
 const installScenario = async (scenario) => installFakePublisher(docsRepo, typeof scenario === 'string' ? await publisherLog(scenario) : scenario)
 
@@ -151,38 +156,107 @@ describe('runPublish pre-flight refusals', () => {
   it.each([
     ['a page no publishPaths entry lists', 'docs/notes/unlisted.md', 'notes/unlisted.md'],
     ['a page a glob entry excludes', 'docs/systems/HEDY/Guide/editorial-profile.md', 'systems/HEDY/Guide/editorial-profile.md']
-  ])('refuses %s with USAGE naming the page and the config, before reading credentials or sending a request', async (_label, page, relativeToDocs) => {
+  ])('refuses %s with USAGE naming the page and the config, before reading credentials, sending a request or asking confirm', async (_label, page, relativeToDocs) => {
     await installScenario('updated')
     const configPath = join(await realpath(docsRepo), 'scripts', 'confluence', 'confluence-config.json')
-    const error = await rejectionOf(publish({ page, env: {} }))
+    const confirmCalls = []
+    const error = await rejectionOf(publish({ page, env: {}, confirm: recordingConfirm(confirmCalls) }))
     expect(error.code).toBe('USAGE')
     expect(error.message).toBe(`The page ${relativeToDocs} is not listed in publishPaths in ${configPath}, or its entry excludes the page, so the publisher would publish nothing. Add an entry with path ${relativeToDocs}, then run the command again.`)
     expect(await publisherRan()).toBe(false)
+    expect(confirmCalls).toEqual([])
   })
 
-  it('refuses a page whose Mermaid export is missing with USAGE naming the diagram, the build and the fenced block, before reading credentials', async () => {
+  it('refuses a page whose Mermaid export is missing with USAGE naming the diagram, the build and the fenced block, before reading credentials or asking confirm', async () => {
     await installScenario('updated')
-    const error = await rejectionOf(publish({ page: 'docs/systems/HEDY/components.md', env: {} }))
+    const confirmCalls = []
+    const error = await rejectionOf(publish({ page: 'docs/systems/HEDY/components.md', env: {}, confirm: recordingConfirm(confirmCalls) }))
     expect(error.code).toBe('USAGE')
     expect(error.message).toBe('The page docs/systems/HEDY/components.md embeds diagrams whose exports are missing or stale: mermaid "hedy-flow" (missing). Run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run build:mmd, then run the command again. The page also holds 1 fenced Mermaid block(s). Check each block renders before the build.')
     expect(await publisherRan()).toBe(false)
+    expect(confirmCalls).toEqual([])
   })
 
-  it('refuses a page embedding an image that is not a file with USAGE naming the image path, before reading credentials', async () => {
+  it('refuses a page embedding an image that is not a file with USAGE naming the image path, before reading credentials or asking confirm', async () => {
     await installScenario('updated')
-    const error = await rejectionOf(publish({ page: 'docs/systems/HEDY/Guide/figures.md', env: {} }))
+    const confirmCalls = []
+    const error = await rejectionOf(publish({ page: 'docs/systems/HEDY/Guide/figures.md', env: {}, confirm: recordingConfirm(confirmCalls) }))
     expect(error.code).toBe('USAGE')
     expect(error.message).toBe('The page docs/systems/HEDY/Guide/figures.md embeds images that are not files: diagrams/nothing.svg. Add each file or correct the path in the page, then run the command again.')
     expect(await publisherRan()).toBe(false)
+    expect(confirmCalls).toEqual([])
   })
 
-  it('refuses with USAGE naming the title, the space, the address and the generated label when Confluence holds the page without that label, and never runs the publisher', async () => {
+  it('refuses with USAGE naming the title, the space, the address and the generated label when Confluence holds the page without that label, and never asks confirm or runs the publisher', async () => {
     await installScenario('updated')
     stagePreChecks(byTitleAnswerWithLabels(['hedy']))
-    const error = await rejectionOf(publish())
+    const confirmCalls = []
+    const error = await rejectionOf(publish({ confirm: recordingConfirm(confirmCalls) }))
     expect(error.code).toBe('USAGE')
     expect(error.message).toBe(`Confluence holds a page titled "Publishing guide" in space HEDYDOCS at ${pageUrlFor('201')} without the label generated, so the publisher would leave the page alone. Add the label generated to the page in Confluence, then run the command again.`)
     expect(await publisherRan()).toBe(false)
+    expect(confirmCalls).toEqual([])
+  })
+
+  it('refuses incomplete credentials with AUTH before asking confirm', async () => {
+    await installScenario('updated')
+    const confirmCalls = []
+    const error = await rejectionOf(publish({ env: { JIRA_USER: TEST_CREDENTIALS.user }, confirm: recordingConfirm(confirmCalls) }))
+    expect(error.code).toBe('AUTH')
+    expect(await publisherRan()).toBe(false)
+    expect(confirmCalls).toEqual([])
+  })
+})
+
+describe('runPublish asking confirm', () => {
+  it('asks confirm once with the real path, the docs page, the title, the space and the id and address of the labelled page Confluence holds', async () => {
+    await installScenario('updated')
+    stagePreChecks()
+    stageReadBack('201')
+    const confirmCalls = []
+    const result = await publish({ confirm: recordingConfirm(confirmCalls) })
+    expect(confirmCalls).toEqual([{
+      absolutePath: join(await realpath(docsRepo), PAGE),
+      page: PAGE,
+      title: 'Publishing guide',
+      space: 'HEDYDOCS',
+      existing: { id: '201', url: pageUrlFor('201') }
+    }])
+    expect(result.mode).toBe('updated')
+  })
+
+  it('asks confirm with existing undefined when Confluence holds no page with the title', async () => {
+    await installScenario('created')
+    stagePreChecks(byTitleEmptyAnswer)
+    stageReadBack('301')
+    const confirmCalls = []
+    await publish({ confirm: recordingConfirm(confirmCalls) })
+    expect(confirmCalls.map(({ existing }) => existing)).toEqual([undefined])
+  })
+
+  it('resolves to cancelled with the page, the title and the space, with no read back staged, and runs no publisher when confirm resolves false', async () => {
+    await installScenario('updated')
+    stagePreChecks()
+    const result = await publish({ confirm: recordingConfirm([], { answer: false }) })
+    expect(result).toEqual({ mode: 'cancelled', page: PAGE, title: 'Publishing guide', space: 'HEDYDOCS' })
+    expect(await publisherRan()).toBe(false)
+  })
+
+  it.each([
+    ['missing', undefined],
+    ['not a function', true]
+  ])('refuses a confirm that is %s with USAGE naming the confirm option before the page check', async (_label, confirm) => {
+    await installScenario('updated')
+    const error = await rejectionOf(runPublish({ page: 'docs/notes/unlisted.md', env: {}, workspaceRoot: () => root, cwd: root, stderr: io.stderr, confirm }))
+    expect(error.code).toBe('USAGE')
+    expect(error.message).toBe('runPublish needs the confirm option, an async function that resolves true to publish or false to cancel. Pass confirm, then call runPublish again.')
+    expect(await publisherRan()).toBe(false)
+  })
+})
+
+describe('renderPublish', () => {
+  it('prints Nothing was sent. for a cancelled result', () => {
+    expect(renderPublish({ mode: 'cancelled', page: PAGE, title: 'Publishing guide', space: 'HEDYDOCS' })).toBe('Nothing was sent.')
   })
 })
 

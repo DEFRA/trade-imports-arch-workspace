@@ -48,13 +48,29 @@ export const runPage = async ({ reference, format = 'markdown', env, workspaceRo
   return format === 'html' ? page : { ...page, body: markdownBodyOf(page.body) }
 }
 
-const renderPage = ({ title, space, version, url, body }) => [
-  `# ${title}`,
-  `Space: ${space} | Version: ${version.number} (${version.when}) | By: ${version.by ?? 'unknown'}`,
-  `Source: ${url}`,
-  '',
-  ...(body === '' ? [] : [body.replace(/\n$/, '')])
-].join('\n')
+/**
+ * Returns the page's header rows: Space, Version as the number and when, By
+ * as the author or unknown, and Source as the page URL.
+ *
+ * @returns {[string, string][]}
+ */
+export const pageRows = ({ space, version, url }) => [
+  ['Space', space],
+  ['Version', `${version.number} (${version.when})`],
+  ['By', version.by ?? 'unknown'],
+  ['Source', url]
+]
+
+const renderPage = (page) => {
+  const [space, version, by, source] = pageRows(page).map(([label, value]) => `${label}: ${value}`)
+  return [
+    `# ${page.title}`,
+    [space, version, by].join(' | '),
+    source,
+    '',
+    ...(page.body === '' ? [] : [page.body.replace(/\n$/, '')])
+  ].join('\n')
+}
 
 export const register = (group, { stdout, stderr, setExitCode, env, workspaceRoot }) => {
   group

@@ -15,12 +15,12 @@ import {
   startAnsweringServer
 } from '../../test-support/http.js'
 import { captureIo } from '../../test-support/io.js'
-import { register, runTicket } from './ticket.js'
+import { register, runTicket, ticketRows } from './ticket.js'
 
 interceptNetworkPerTest()
 
 const issueResponse = await readJsonFixture(new URL('../../clients/__fixtures__/jira-issue-response.json', import.meta.url))
-const [issueProjection] = await readJsonFixture(new URL('../../clients/__fixtures__/jira-search-projection.json', import.meta.url))
+const [issueProjection, bareIssueProjection] = await readJsonFixture(new URL('../../clients/__fixtures__/jira-search-projection.json', import.meta.url))
 
 const stageIssue = (body) => nock(ATLASSIAN_BASE_URL).get('/rest/api/2/issue/HEDY-101').query(true).reply(200, body)
 
@@ -47,6 +47,36 @@ describe('runTicket', () => {
     const error = await rejectionOf(runTicket({ key: 'HEDY-101', env: { JIRA_USER: TEST_CREDENTIALS.user }, workspaceRoot: () => root }))
     expect(error.code).toBe('AUTH')
     expect(error.message).toContain('JIRA_TOKEN and JIRA_BASE_URL are not set')
+  })
+})
+
+describe('ticketRows', () => {
+  it('gives the nine labelled rows for the issue fixture with the labels joined by commas', () => {
+    expect(ticketRows(issueProjection)).toEqual([
+      ['Status', 'In Progress'],
+      ['Type', 'Task'],
+      ['Priority', 'Medium'],
+      ['Assignee', 'Ada Lovelace'],
+      ['Labels', 'fixtures, hedy'],
+      ['Parent', 'HEDY-100'],
+      ['Created', '2026-10-01T09:15:30.000+0000'],
+      ['Updated', '2026-10-05T16:42:08.000+0000'],
+      ['URL', 'https://example.atlassian.net/browse/HEDY-101']
+    ])
+  })
+
+  it('gives none for each null value and the empty label list', () => {
+    expect(ticketRows(bareIssueProjection)).toEqual([
+      ['Status', 'To Do'],
+      ['Type', 'Story'],
+      ['Priority', 'none'],
+      ['Assignee', 'none'],
+      ['Labels', 'none'],
+      ['Parent', 'none'],
+      ['Created', '2026-10-02T11:00:00.000+0000'],
+      ['Updated', '2026-10-02T11:00:00.000+0000'],
+      ['URL', 'https://example.atlassian.net/browse/HEDY-102']
+    ])
   })
 })
 

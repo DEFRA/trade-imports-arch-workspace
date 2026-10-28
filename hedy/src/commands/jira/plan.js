@@ -137,33 +137,55 @@ export const buildCreatePlan = async ({ manifest, folder }) => {
   }
 }
 
-const valueLines = (value) => {
-  const lines = Array.isArray(value) ? value : [value]
-  return lines.length === 0 || !lines[0] ? ['none'] : lines
+/**
+ * Returns a row's value as text: a list joined with separator, and none for
+ * null, undefined, empty text or an empty list.
+ *
+ * @param {string | null | undefined | string[]} value
+ * @param {{ separator?: string }} [options]
+ * @returns {string}
+ */
+export const rowValueText = (value, { separator = ', ' } = {}) => {
+  const text = Array.isArray(value) ? value.join(separator) : value
+  return text || 'none'
 }
 
 /**
  * Returns a dry run's text: one line per row, the values aligned two columns
  * after the longest label, then a blank line, the description, a blank line
- * and nextStep. A row's value is text, null, or a list with one line per
- * item. A null value, empty text or an empty list prints as none.
+ * and nextStep. A value holding newlines prints one line per line, each
+ * continuation aligned under the first. A list prints one line per item, and
+ * a null value, empty text or an empty list prints as none.
  *
  * @param {{ rows: [string, string | null | string[]][], description: string, nextStep: string }} options
  */
 export const renderPlan = ({ rows, description, nextStep }) => {
   const width = Math.max(...rows.map(([label]) => label.length)) + 2
   const fieldLines = rows.flatMap(([label, value]) =>
-    valueLines(value).map((line, index) => `${(index === 0 ? `${label}:` : '').padEnd(width)}${line}`))
+    rowValueText(value, { separator: '\n' }).split('\n')
+      .map((line, index) => `${(index === 0 ? `${label}:` : '').padEnd(width)}${line}`))
   return [...fieldLines, '', description, '', nextStep].join('\n')
 }
 
 /**
- * Returns the two lines a confirmed write prints: the key, then Created,
- * Updated or Unchanged for mode created, updated or unchanged, and the URL.
+ * Returns a confirmed write's rows: Issue with the key, then Created, Updated
+ * or Unchanged for mode created, updated or unchanged, with the URL.
+ *
+ * @param {{ mode: 'created' | 'updated' | 'unchanged', key: string, url: string }} outcome
+ * @returns {[string, string][]}
+ */
+export const writeOutcomeRows = ({ mode, key, url }) => {
+  const outcomeWords = { created: 'Created', updated: 'Updated', unchanged: 'Unchanged' }
+  return [['Issue', key], [outcomeWords[mode], url]]
+}
+
+/**
+ * Returns the two lines a confirmed write prints: the key, then the outcome
+ * word and the URL from writeOutcomeRows.
  *
  * @param {{ mode: 'created' | 'updated' | 'unchanged', key: string, url: string }} outcome
  */
-export const renderWriteOutcome = ({ mode, key, url }) => {
-  const outcomeWords = { created: 'Created', updated: 'Updated', unchanged: 'Unchanged' }
-  return `${key}\n${outcomeWords[mode]}: ${url}`
+export const renderWriteOutcome = (outcome) => {
+  const [[, key], [outcomeWord, url]] = writeOutcomeRows(outcome)
+  return `${key}\n${outcomeWord}: ${url}`
 }

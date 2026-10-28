@@ -15,7 +15,7 @@ import {
   startAnsweringServer
 } from '../../test-support/http.js'
 import { captureIo } from '../../test-support/io.js'
-import { register, runDescribe } from './describe.js'
+import { describePlanRows, register, runDescribe } from './describe.js'
 import { planIdOf } from './plan.js'
 
 interceptNetworkPerTest()
@@ -108,6 +108,21 @@ describe('runDescribe', () => {
   it('on a second matching confirm reads the issue once, sends no update and returns unchanged', async () => {
     stageIssue(revisedDescription)
     expect(await describeIssue(planIdAgainstIssue)).toEqual({ mode: 'unchanged', key: 'HEDY-101', url: ISSUE_URL })
+  })
+})
+
+describe('describePlanRows', () => {
+  it.each([
+    [false, 'no'],
+    [true, 'yes']
+  ])('gives the plan id, issue, URL and unchanged rows, with unchanged %s as %s', (unchanged, word) => {
+    const plan = { mode: 'dry-run', planId: planIdAgainstIssue, key: 'HEDY-101', url: ISSUE_URL, description: revisedDescription, unchanged }
+    expect(describePlanRows(plan)).toEqual([
+      ['Plan id', planIdAgainstIssue],
+      ['Issue', 'HEDY-101'],
+      ['URL', ISSUE_URL],
+      ['Unchanged', word]
+    ])
   })
 })
 

@@ -8,7 +8,7 @@ import { runAction } from '../../run-action.js'
 import { parseJsonText, readTextFile } from './files.js'
 import { issueKeySchema } from './issue-key.js'
 import { loadManifest } from './manifest.js'
-import { buildCreatePlan, planIdSchema, refuseStalePlan, renderPlan, renderWriteOutcome } from './plan.js'
+import { buildCreatePlan, planIdSchema, refuseStalePlan, renderPlan, renderWriteOutcome, rowValueText } from './plan.js'
 
 export const RECEIPT_FILENAME = 'ticket.created.json'
 
@@ -111,17 +111,25 @@ export const runCreate = async ({ from, confirm, env, workspaceRoot }) => {
   return createIssue(plan, { receiptPath, createClient })
 }
 
+/**
+ * Returns a create plan's rows, with the labels joined by commas, one warning
+ * per line, and none for each empty value.
+ *
+ * @returns {[string, string][]}
+ */
+export const createPlanRows = (plan) => [
+  ['Plan id', plan.planId],
+  ['Project', plan.project],
+  ['Type', plan.type],
+  ['Summary', plan.summary],
+  ['Priority', rowValueText(plan.priority)],
+  ['Parent', rowValueText(plan.parent)],
+  ['Labels', rowValueText(plan.labels)],
+  ['Warnings', rowValueText(plan.warnings, { separator: '\n' })]
+]
+
 const renderDryRun = (plan) => renderPlan({
-  rows: [
-    ['Plan id', plan.planId],
-    ['Project', plan.project],
-    ['Type', plan.type],
-    ['Summary', plan.summary],
-    ['Priority', plan.priority],
-    ['Parent', plan.parent],
-    ['Labels', plan.labels.join(', ')],
-    ['Warnings', plan.warnings]
-  ],
+  rows: createPlanRows(plan),
   description: plan.description,
   nextStep: `This is a dry run. Nothing was sent. Run the command again with --confirm ${plan.planId} to create the issue.`
 })

@@ -16,7 +16,7 @@ import {
   startAnsweringServer
 } from '../../test-support/http.js'
 import { captureIo } from '../../test-support/io.js'
-import { pageReferenceOf, register, runPage } from './page.js'
+import { pageReferenceOf, pageRows, register, runPage } from './page.js'
 
 interceptNetworkPerTest()
 
@@ -118,6 +118,28 @@ describe('runPage', () => {
   it('refuses a reference that is not a page with USAGE before reading the credentials', async () => {
     const error = await rejectionOf(runPage({ reference: 'ftp://x', env: {}, workspaceRoot: () => root }))
     expect(error.code).toBe('USAGE')
+  })
+})
+
+describe('pageRows', () => {
+  const page = {
+    title: 'Synthetic Page for the hedy Fixtures',
+    space: 'DOCS',
+    version: { number: 4, when: '2026-10-20T10:30:00.000Z', by: 'Ada Lovelace' },
+    url: `${ATLASSIAN_BASE_URL}/wiki/spaces/DOCS/pages/123456`
+  }
+
+  it('gives the space, version with its time, author and source rows', () => {
+    expect(pageRows(page)).toEqual([
+      ['Space', 'DOCS'],
+      ['Version', '4 (2026-10-20T10:30:00.000Z)'],
+      ['By', 'Ada Lovelace'],
+      ['Source', `${ATLASSIAN_BASE_URL}/wiki/spaces/DOCS/pages/123456`]
+    ])
+  })
+
+  it('gives unknown in the By row for a version with no author', () => {
+    expect(pageRows({ ...page, version: { number: 4, when: '2026-10-20T10:30:00.000Z' } })[2]).toEqual(['By', 'unknown'])
   })
 })
 

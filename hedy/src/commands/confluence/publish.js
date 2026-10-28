@@ -63,16 +63,33 @@ const checkLocalFiles = async ({ page, workspaceRoot, cwd }) => {
   const assets = await inventoryAssets({ docsRepo, pagePath: absolutePath, text })
   checkDiagramExports(assets, pagePath)
   checkImageFiles(assets, pagePath)
-  return { docsRepo, configPath, pagePath, space, title: titleOf(text, absolutePath) }
+  return { docsRepo, configPath, absolutePath, pagePath, space, title: titleOf(text, absolutePath) }
 }
 
 const checkConfluence = async ({ env, workspaceRoot, title, space }) => {
   const credentials = loadCredentials({ env, workspaceRoot })
   const client = createConfluenceClient(credentials)
   await client.whoami()
-  checkGeneratedLabel(await client.pageByTitle(title, space), { title, space })
-  return { credentials, client }
+  const existing = await client.pageByTitle(title, space)
+  checkGeneratedLabel(existing, { title, space })
+  return { credentials, client, existing }
 }
+
+const checkConfirmOption = (confirm) => {
+  if (typeof confirm !== 'function') {
+    throw new HedyError('USAGE', 'runPublish needs the confirm option, an async function that resolves true to publish or false to cancel. Pass confirm, then call runPublish again.')
+  }
+}
+
+const publishFactsOf = ({ absolutePath, pagePath, title, space }, existing) => ({
+  absolutePath,
+  page: pagePath,
+  title,
+  space,
+  existing: existing && { id: existing.id, url: existing.url }
+})
+
+const publishAtOnce = async () => true
 
 const runPublisher = async ({ docsRepo, pagePath, env, credentials, client, timeoutMs, stderr }) => {
   const result = await runLocalTool({
@@ -152,9 +169,15 @@ const publishedOutcome = async ({ result, client, preflight }) => {
  * install, the page path, the publish config, the publishPaths entry, the
  * space, the diagram exports, the image files, the credentials and the
  * Confluence probe, and the generated label on a page Confluence already
- * holds under the title. Then npm run publish:confluence runs in the docs
- * repo with env plus CONFLUENCE_USERNAME, CONFLUENCE_API_TOKEN and
- * CONFLUENCE_URL as its whole environment, and its output is relayed to
+ * holds under the title. A confirm that is not a function rejects USAGE
+ * before the first check. After the last check, confirm is called once with
+ * { absolutePath, page, title, space, existing }, where page is the docs/
+ * path, absolutePath its real path, and existing { id, url } for the page
+ * Confluence holds under the title, else undefined. Unless confirm resolves
+ * true, the result is { mode: 'cancelled', page, title, space } and nothing
+ * is sent. Then npm run publish:confluence runs in the docs repo with env
+ * plus CONFLUENCE_USERNAME, CONFLUENCE_API_TOKEN and CONFLUENCE_URL as its
+ * whole environment, and its output is relayed to
  * stderr as the output arrives. A run past timeoutMs rejects NETWORK. A
  * page id in the log with exit code 0 leads to the read back and the result.
  * A page id with a non-zero exit rejects NETWORK for failed image uploads,
@@ -163,12 +186,20 @@ const publishedOutcome = async ({ result, client, preflight }) => {
  *
  * @param {{
  *   page: string, env: Record<string, string | undefined>, workspaceRoot: () => string,
- *   cwd?: string, timeoutMs?: number, stderr: { write: (chunk: string) => unknown }
+ *   cwd?: string, timeoutMs?: number, stderr: { write: (chunk: string) => unknown },
+ *   confirm: (facts: {
+ *     absolutePath: string, page: string, title: string, space: string,
+ *     existing: { id: string, url: string } | undefined
+ *   }) => Promise<boolean>
  * }} options
  */
-export const runPublish = async ({ page, env, workspaceRoot, cwd = process.cwd(), timeoutMs = 600000, stderr }) => {
+export const runPublish = async ({ page, env, workspaceRoot, cwd = process.cwd(), timeoutMs = 600000, stderr, confirm }) => {
+  checkConfirmOption(confirm)
   const preflight = await checkLocalFiles({ page, workspaceRoot, cwd })
-  const { credentials, client } = await checkConfluence({ env, workspaceRoot, ...preflight })
+  const { credentials, client, existing } = await checkConfluence({ env, workspaceRoot, ...preflight })
+  if (await confirm(publishFactsOf(preflight, existing)) !== true) {
+    return { mode: 'cancelled', page: preflight.pagePath, title: preflight.title, space: preflight.space }
+  }
   const result = await runPublisher({ ...preflight, env, credentials, client, timeoutMs, stderr })
   return publishedOutcome({ result, client, preflight })
 }
@@ -176,12 +207,19 @@ export const runPublish = async ({ page, env, workspaceRoot, cwd = process.cwd()
 const linksLine = ({ checked, pages, broken, unreachable }) =>
   `Links checked: ${checked} on ${pages} page(s); broken ${broken}, external unreachable ${unreachable}`
 
-const renderPublish = ({ mode, title, url, warnings, links }) => [
+const renderPublished = ({ mode, title, url, warnings, links }) => [
   title,
   `${mode === 'created' ? 'Created' : 'Updated'}: ${url}`,
   ...warnings,
   ...(links === null ? [] : [linksLine(links)])
 ].join('\n')
+
+/**
+ * Returns a publish result's text: "Nothing was sent." for mode cancelled,
+ * else the title, the created or updated address, each warning and the link
+ * counts.
+ */
+export const renderPublish = (result) => result.mode === 'cancelled' ? 'Nothing was sent.' : renderPublished(result)
 
 export const register = (group, { stdout, stderr, setExitCode, env, workspaceRoot }) => {
   group
@@ -190,7 +228,7 @@ export const register = (group, { stdout, stderr, setExitCode, env, workspaceRoo
     .argument('<page>', 'The page path, absolute or relative to the current folder, the docs repo or its docs folder')
     .action((page, _options, command) => runAction(() => {
       const validated = publishInputSchema.parse({ page })
-      return runPublish({ ...validated, env, workspaceRoot, stderr })
+      return runPublish({ ...validated, env, workspaceRoot, stderr, confirm: publishAtOnce })
     }, {
       json: command.optsWithGlobals().json === true,
       render: renderPublish,

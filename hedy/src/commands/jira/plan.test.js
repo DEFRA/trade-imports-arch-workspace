@@ -15,7 +15,9 @@ import {
   readDescription,
   refuseStalePlan,
   renderPlan,
-  renderWriteOutcome
+  renderWriteOutcome,
+  rowValueText,
+  writeOutcomeRows
 } from './plan.js'
 
 const fixturesUrl = new URL('./__fixtures__/', import.meta.url)
@@ -222,6 +224,50 @@ describe('renderPlan', () => {
       '',
       'Run it.'
     ].join('\n'))
+  })
+
+  it('prints a value holding newlines one line per line, each continuation aligned under the first', () => {
+    expect(renderPlan({
+      rows: [['Id', 'abc'], ['Warnings', 'first\nsecond\nthird']],
+      description: 'h3. Why',
+      nextStep: 'Run it.'
+    })).toBe([
+      'Id:       abc',
+      'Warnings: first',
+      '          second',
+      '          third',
+      '',
+      'h3. Why',
+      '',
+      'Run it.'
+    ].join('\n'))
+  })
+})
+
+describe('rowValueText', () => {
+  it.each([
+    ['empty text', '', {}, 'none'],
+    ['null', null, {}, 'none'],
+    ['undefined', undefined, {}, 'none'],
+    ['an empty list', [], {}, 'none'],
+    ['text', 'In Progress', {}, 'In Progress'],
+    ['a list', ['hedy', 'fixtures'], {}, 'hedy, fixtures'],
+    ['a list with a newline separator', ['first', 'second'], { separator: '\n' }, 'first\nsecond']
+  ])('gives %s as %j', (_label, value, options, expected) => {
+    expect(rowValueText(value, options)).toBe(expected)
+  })
+})
+
+describe('writeOutcomeRows', () => {
+  it.each([
+    ['created', 'Created'],
+    ['updated', 'Updated'],
+    ['unchanged', 'Unchanged']
+  ])('for mode %s gives the Issue row with the key, then the %s row with the URL', (mode, word) => {
+    expect(writeOutcomeRows({ mode, key: 'HEDY-201', url: 'https://example.atlassian.net/browse/HEDY-201' })).toEqual([
+      ['Issue', 'HEDY-201'],
+      [word, 'https://example.atlassian.net/browse/HEDY-201']
+    ])
   })
 })
 
