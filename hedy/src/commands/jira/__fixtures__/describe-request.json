@@ -1,0 +1,5 @@
+{
+  "fields": {
+    "description": "h3. Why\n\nAgents raise tickets from a draft the user has approved, and the raised issue must match the draft.\n\nh3. What\n\nRaise the issue from a manifest with {{hedy jira create}}: a dry run prints the plan, and {{--confirm}} sends only the plan that was shown.\n\nh3. Acceptance criteria\n\n* A dry run sends no request.\n* A confirm with a stale plan id is refused.\n* A second confirm reports the issue as unchanged."
+  }
+}
