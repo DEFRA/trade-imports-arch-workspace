@@ -8,7 +8,7 @@
 // loopback address replaced by the example site and the temporary workspace by
 // /home/hedy/trade-imports-arch-workspace. Needs openssl on PATH.
 import { spawn, spawnSync } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve as resolvePath } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -84,6 +84,7 @@ const publisherEnv = (origin) => {
 
 const withTestSiteNames = (text, origin) => text
   .replaceAll(origin, 'https://example.atlassian.net')
+  .replaceAll(realpathSync(workspace), '/home/hedy/trade-imports-arch-workspace')
   .replaceAll(workspace, '/home/hedy/trade-imports-arch-workspace')
 
 const run = async () => {
