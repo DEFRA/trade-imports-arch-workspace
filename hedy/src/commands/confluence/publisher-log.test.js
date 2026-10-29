@@ -7,6 +7,7 @@ const fixturesUrl = new URL('./__fixtures__/', import.meta.url)
 const GITHUB_URL_WARNING = '⚠️  No GitHub URL for folder path: docs/systems/HEDY/Guide'
 const IMAGE_WARNING = '⚠️  Image not found: diagrams/nothing.svg (resolved to: /home/hedy/trade-imports-arch-workspace/trade-imports-documentation/docs/systems/HEDY/Guide/diagrams/nothing.svg)'
 const UNRESOLVED_LINK_WARNING = '⚠️  Link not resolved to a Confluence page: ../../../notes/unlisted.md (not in publishPaths); left unchanged'
+const UPLOAD_RETRY_WARNING = '⚠️  Upload of flow.svg answered HTTP 500, retrying once after 2000 ms: Internal server error'
 const IMAGE_UPLOAD_ERROR = '❌ Failed to upload image (HTTP 500): Internal server error'
 const PUBLISH_ERROR = '❌ Failed to publish docs/systems/HEDY/Guide/publishing.md: 1 image upload(s) failed: flow.svg'
 const BROKEN_LINK = '❌ Broken link on \'Links\': https://example.atlassian.net/wiki/spaces/HEDYDOCS/pages/999 (no Confluence page has ID 999)'
@@ -40,10 +41,9 @@ describe('readPublisherLog', () => {
     ['upload-failed', {
       ...emptyReading,
       outcome: 'failed',
-      id: '201',
       failedImages: ['flow.svg'],
       errorLines: [IMAGE_UPLOAD_ERROR, PUBLISH_ERROR],
-      warnings: [GITHUB_URL_WARNING]
+      warnings: [GITHUB_URL_WARNING, UPLOAD_RETRY_WARNING]
     }],
     ['broken-link', {
       ...emptyReading,

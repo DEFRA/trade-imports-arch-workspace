@@ -269,12 +269,12 @@ describe('runPublish reading the publisher\'s log', () => {
     expect(relayedText()).not.toContain(TEST_CREDENTIALS.token)
   })
 
-  it('rejects NETWORK naming the page address and the failed image when an upload failed, and no output holds the token', async () => {
+  it('rejects NETWORK naming the failed image and saying the page is as it was when an upload failed before the write, and no output holds the token', async () => {
     await installScenario('upload-failed')
     stagePreChecks()
     const error = await rejectionOf(publish())
     expect(error.code).toBe('NETWORK')
-    expect(error.message).toBe(`The publisher wrote the page Publishing guide at ${pageUrlFor('201')}, but 1 image upload(s) failed: flow.svg. Run the command again to upload the images.`)
+    expect(error.message).toBe('The publisher could not upload flow.svg for the page Publishing guide, even after its one retry, so the page is as it was. Run the command again.')
     expect(printedError(error)).not.toContain(TEST_CREDENTIALS.token)
     expect(relayedText()).not.toContain(TEST_CREDENTIALS.token)
   })

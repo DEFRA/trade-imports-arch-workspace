@@ -118,6 +118,9 @@ const writtenThenFailedError = (reading, { title, pagePath, pageUrl }) => {
 }
 
 const notWrittenError = (reading, { title, space, pagePath, configPath }) => {
+  if (reading.failedImages.length > 0) {
+    return new HedyError('NETWORK', `The publisher could not upload ${reading.failedImages.join(', ')} for the page ${title}, even after its one retry, so the page is as it was. Run the command again.`)
+  }
   switch (reading.outcome) {
     case 'skipped-no-label':
       return new HedyError('USAGE', `Confluence holds a page titled "${title}" in space ${space} without the label generated, so the publisher left the page alone. Add the label generated to the page in Confluence, then run the command again.`)
@@ -175,8 +178,9 @@ const publishedOutcome = async ({ result, client, preflight }) => {
  * stderr as the output arrives. A run past timeoutMs rejects NETWORK. A
  * page id in the log with exit code 0 leads to the read back and the result.
  * A page id with a non-zero exit rejects NETWORK for failed image uploads,
- * USAGE for broken links, else UNKNOWN. No page id rejects USAGE for the
- * generated-label skip, else UNKNOWN.
+ * USAGE for broken links, else UNKNOWN. No page id rejects NETWORK for
+ * failed image uploads, which the publisher attempts before its one page
+ * write, USAGE for the generated-label skip, else UNKNOWN.
  *
  * @param {{
  *   page: string, env: Record<string, string | undefined>, workspaceRoot: () => string,

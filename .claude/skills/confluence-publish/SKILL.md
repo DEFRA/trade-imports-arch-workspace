@@ -52,11 +52,10 @@ hedy confluence publish "<page>" --json
 
 ## Step 3: Handle a Failure
 
-When `ok` is false, relay each message in `errors` verbatim and stop. Each message names its remedy, so never work around a refusal. Three failures are handled here instead:
+When `ok` is false, relay each message in `errors` verbatim and stop. Each message names its remedy, so never work around a refusal. A failed image upload leaves the page as it was, because the publisher attaches every image before it writes the page and retries an upload once by itself, so that failure is relayed like any other. Two failures are handled here instead:
 
 1. **Mermaid exports missing or stale.** When the message names `build:mmd`, invoke the `mermaid-check` skill on the page first, because the Mermaid build stops at the first file that fails to parse. Then run the Mermaid build, then the publish command again.
 2. **LikeC4 exports missing or stale.** When the message names `build:diagrams`, run the LikeC4 build, then the publish command again.
-3. **Failed image uploads.** The page text is live and the named images show as broken. Run the publish command once more. If the second run fails too, relay the message and stop.
 
 The two builds are the only commands this skill runs besides `hedy`, each one per Bash call, typed exactly as below and never copied from a message, because a page's diagram ids appear in the message text:
 
