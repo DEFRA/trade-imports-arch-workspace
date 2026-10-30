@@ -1,6 +1,6 @@
 ---
 name: editorial-help
-description: 'On demand, help a user choose, run and customise the editorial tools (editorial, editorial-triage, design-consistency, the names and prose checks, /decide): look at the pages, ask what the user wants, print the exact command with its measured cost and next step, start the chosen tool on the user''s go, and say which file customises what at the three levels (workspace rules, document-set profile, one run). Invoked only as "/editorial-help". NOT for doing an editorial pass (editorial), closing findings (editorial-triage), finding contradictions (design-consistency) or asking open questions (/decide): this skill picks among them and starts the one chosen. Distinct from /init, which scaffolds CLAUDE.md.'
+description: 'On demand, help a user choose, run and customise the editorial tools (the authoring voice, editorial, editorial-triage, design-consistency, the names and prose checks, the tiering tool, /decide): look at the pages, ask what the user wants, print the exact command with its measured cost and next step, start the chosen tool on the user''s go, and say which file customises what at the three levels (workspace rules, document-set profile, one run). Invoked only as "/editorial-help". NOT for doing an editorial pass (editorial), closing findings (editorial-triage), finding contradictions (design-consistency) or asking open questions (/decide): this skill picks among them and starts the one chosen. Distinct from /init, which scaffolds CLAUDE.md.'
 disable-model-invocation: true
 ---
 
@@ -56,7 +56,7 @@ For an editorial pass or a review, draft the run's brief so the user never write
 | Input | Source |
 | --- | --- |
 | Reader frame | who the document serves and what that reader must know or do after reading; the profile's Reader when one applies; otherwise inferred from the document's kind and audience (a PR body serves its reviewer) |
-| Tone | the house voice in `best-practices/writing/language.md`, "Voice and tone": a knowledgeable colleague speaking directly to another colleague, matched to the document form; a different register only when the reader needs one |
+| Tone | the house voice in `best-practices/writing/language.md`, "Voice and tone": formal, explanatory and deliberate, matched to the document form; a plain register only when the reader needs one |
 | Mode | `revise` when the user wants the text changed; `review` when the user wants findings only |
 | Intent | `clarify` when the complaint is clarity, structure, tone or sentences, because clarify may restructure and keeps every claim; `distil` when the complaint is length or noise |
 | Document form | the dominant mode or fixed format from `skills/editorial/references/document-types.md` (a PR body keeps Change, Reason and Verification) |
@@ -66,13 +66,15 @@ For an editorial pass or a review, draft the run's brief so the user never write
 Then ask, in one call to the question tool, four questions. Each leads with the sensible default, labelled "(Recommended)", so the user confirms with one choice and describes only what differs through Other:
 
 1. **Audience** (header "Audience"): the inferred reader frame first; one or two other readers the document could serve, drawn from its kind and the session's context.
-2. **Tone** (header "Tone"): the house voice first; then a formal register for governance, assessment or external readers, and a plain register for readers outside the specialism.
+2. **Tone** (header "Tone"): the house voice first, formal, explanatory and deliberate; then a plain register for readers outside the specialism.
 3. **Edit** (header "Edit"): the inferred intent and restructuring first, among `clarify` with restructuring, `clarify` keeping the structure, and `distil`.
 4. **Start** (header "Start"): "Start the pass with this brief (Recommended)", whose preview shows the whole brief with the answers above and the inferred form and keep list, against "Show me the brief first".
 
 Say in the question text which inputs were inferred rather than stated by the user. The answers are the brief Step 3 passes on, and choosing Start is the user's go.
 
-For customising, answer with the level the change belongs at (workspace, document set or one run), the file and the section from "Customising the Tools", and a one-line example of the edit. A rule that holds only for this document set goes in its profile, never in `language.md`. Offer to make the edit; a workspace file changes only through a commit, which the user asks for.
+For customising, answer with the level the change belongs at (workspace, document set or one run), the file and the section from "Customising the Tools", and a one-line example of the edit. A word to ban or flag in every document is dry-run first with `tier-candidates.sh` over the tracked pages and enters the table at the tier the count gives. The folders the voice loads into are the `paths` list of `rules/authoring-voice.md`. A rule that holds only for this document set goes in its profile, never in `language.md`. Offer to make the edit; a workspace file changes only through a commit, which the user asks for.
+
+For writing a new document, say that drafting needs no tool: the authoring-voice rule is in context from the first file read or written, `language.md` is read in full before a whole document, and the write-time check reports the FAIL lines each write introduces. Offer the editorial writing path only when the user wants a guided pass, and the review path once a draft exists.
 
 ## Step 3: Start on the User's Go
 

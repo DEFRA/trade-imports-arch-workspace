@@ -134,8 +134,9 @@ run anywhere. Conventions shared by all skills:
 
 The authoring voice is `.claude/rules/authoring-voice.md`, a drafting
 procedure digested from `.claude/best-practices/writing/language.md`.
-Claude Code loads it when a file in its `paths` list is read or written;
-any other agent, and any subagent, reads it before drafting prose.
+Claude Code loads it when a file in its `paths` list is read or written.
+Any other agent reads it before drafting prose, and a subagent brief
+names it, so the voice is in context before the first draft.
 
 Invoke the editorial skill, `.claude/skills/editorial/SKILL.md`, only
 when the user asks for an editorial pass, by name or with `/editorial`.
