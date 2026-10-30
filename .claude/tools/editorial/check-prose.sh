@@ -233,17 +233,22 @@ read_terms_table() {  # $1 file, $2 its display path
 }
 
 report_terms() {  # $1 file on disk, $2 display label, $3 masked text, $4 gate; returns 2 on a FAIL hit
-  local gate pat first repair src _scope hits rc=0
+  local gate pat first repair src _scope hits matched rc=0
   while IFS=$'\t' read -r gate pat first repair src _scope; do
     [ "$gate" = "$4" ] || continue
     hits=$(printf '%s\n' "$3" | grep -inE "$pat" || true)
     [ -n "$hits" ] || continue
     report_hits "$1" "$2" "$gate" "$hits"
+    # A row can group many forms, so name the text that matched: every
+    # distinct match, lowercased, in order of appearance.
+    matched=$(printf '%s\n' "$hits" | cut -d: -f2- | grep -oiE "$pat" | tr '[:upper:]' '[:lower:]' \
+      | awk '!seen[$0]++ { printf "%s\"%s\"", (n++ ? ", " : ""), $0 }')
+    [ -n "$matched" ] || matched="\"$first\""
     if [ "$gate" = FAIL ]; then
-      printf 'check-prose: banned term "%s" - %s - rule: %s ("Words to avoid or examine").\n' "$first" "$repair" "$src" >&2
+      printf 'check-prose: banned term %s - %s - rule: %s ("Words to avoid or examine").\n' "$matched" "$repair" "$src" >&2
       rc=2
     else
-      printf 'check-prose: WARN hits are "%s" - %s (%s, "Words to avoid or examine").\n' "$first" "$repair" "$src" >&2
+      printf 'check-prose: WARN hits are %s - %s (%s, "Words to avoid or examine").\n' "$matched" "$repair" "$src" >&2
     fi
   done <<< "$TERMS"
   return $rc
