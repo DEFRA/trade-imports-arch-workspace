@@ -1,0 +1,37 @@
+--- the fixture page ---
+{
+  "file": "WORK/page.md",
+  "words": 42,
+  "fail": {
+    "frobnicates": 1,
+    "zorbles": 1
+  },
+  "warn": {
+    "blarg": 1,
+    "semicolon": 1,
+    "spaced-hyphen": 1
+  },
+  "failPer1000": 47.6,
+  "warnPer1000": 71.4
+}
+exit 0
+--- several terms on one line ---
+{
+  "file": "WORK/page-multi.md",
+  "words": 17,
+  "fail": {
+    "frobnicates": 1,
+    "zorble": 1,
+    "zorbles": 1
+  },
+  "warn": {},
+  "failPer1000": 176.5,
+  "warnPer1000": 0
+}
+exit 0
+--- a missing file ---
+draft-density: file not found: WORK/nope.md
+exit 1
+--- no arguments ---
+draft-density: no file (see --help)
+exit 1
