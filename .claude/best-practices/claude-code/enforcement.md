@@ -19,13 +19,13 @@ SKILL.md frontmatter accepts a `hooks:` key with the same shape as `settings.jso
 
 ## Rules and Their Scope
 
-A file in `.claude/rules/` with `paths:` frontmatter is advisory context Claude Code loads when a matching file is read, written or edited. The authoring-voice rule's `paths` list is also the deterministic scope of the write-time check: `rule-scope.sh` parses the same list, subtracts `gate-exclude`, and skips files gitignored in their own repository. One list configures where the voice loads and where the gate runs, and `lint-skills.sh` refuses a list whose shape the parser and Claude Code could read differently. A subagent does not receive path-scoped rules, so a subagent that drafts prose is told to read the rule.
+A file in `.claude/rules/` with `paths:` frontmatter is advisory context Claude Code loads when a matching file is read, written or edited. The authoring-voice rule's `paths` list is also the deterministic scope of the write-time check: `rule-scope.sh` parses the same list, subtracts `gate-exclude`, and skips files gitignored in their own repository. One list configures where the voice loads and where the gate runs, and `lint-skills.sh` refuses a list whose shape the parser and Claude Code could read differently. Claude Code matches rules and nested CLAUDE.md files against the path as the tool call typed it, so a file reached through the `~/trade-imports-arch-workspace` symlink matched nothing until `.claude/hooks/realpath-file-tools.sh`, a `PreToolUse` hook on the four file tools, rewrote `file_path` to the real checkout path through `updatedInput`. Subagents receive path-scoped rules the same way; a subagent that drafts prose is still told to read the rule, so the voice is in context before its first write.
 
 ## Enforcement Code Locations
 
 | Location | Wiring | Editor |
 | --- | --- | --- |
-| `.claude/hooks/` | `settings.json` (global, every session) | the owner only - `guard-edits.sh` blocks agent edits to both |
+| `.claude/hooks/` | `settings.json` (global, every session): the guards, and `realpath-file-tools.sh`, which resolves a symlinked `file_path` before a file tool runs | the owner only, since `guard-edits.sh` blocks agent edits to both |
 | `.claude/tools/<domain>/` | skill frontmatter hooks, skill steps, other scripts | agents; covered by the blanket `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` allowlist |
 | `.githooks/` | `core.hooksPath` (set by `make link`) | agents; runs for every git user regardless of AI tooling |
 
