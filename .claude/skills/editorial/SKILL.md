@@ -1,12 +1,12 @@
 ---
 name: editorial
-description: Editorial pass on human-facing technical documentation in the workspace editorial voice - architecture documents, solution overviews, design docs, explanations, how-to guides, reference pages, READMEs, ADRs, Confluence pages, PR descriptions, commit bodies and Jira tickets. Invoke only when the user asks for an editorial pass, by name or with /editorial; drafting and revising before that point follow language.md without this skill, its cold reader or its hooks. Establishes the reader brief and structure, drills from surface text to meaning, and applies a cold-reader review and mechanical style gate. Not for code comments or ordinary conversational replies.
+description: Editorial pass on human-facing technical documentation in the workspace editorial voice - architecture documents, solution overviews, design docs, explanations, how-to guides, reference pages, READMEs, ADRs, Confluence pages, PR descriptions, commit bodies and Jira tickets. Invoke only when the user asks for an editorial pass, by name or with /editorial; drafting and revising before that point follow the authoring-voice rule and language.md without this skill, its cold reader or its hooks. Establishes the reader brief and structure, drills from surface text to meaning, and applies a cold-reader review and mechanical style gate. Not for code comments or ordinary conversational replies.
 hooks:
   PostToolUse:
     - matcher: Write|Edit|MultiEdit
       hooks:
         - type: command
-          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh" --record
+          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh" --scope "$CLAUDE_PROJECT_DIR/.claude/rules/authoring-voice.md" --outside-scope --record
           timeout: 10
   Stop:
     - hooks:
