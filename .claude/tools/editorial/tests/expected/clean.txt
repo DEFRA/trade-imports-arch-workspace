@@ -1,3 +1,2 @@
-check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/clean.md:3: Plain prose with a proper hyphen break - like this one. Straight "double" and 'single' quotes only.
-check-prose: WARN hits are a spaced hyphen as a sentence break: use a full stop, comma or colon, or recast the two parts as two sentences (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Punctuation and formatting").
+
 exit-code: 0

@@ -287,7 +287,7 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
   hits=$(printf '%s\n' "$masked" | grep -nE "$PUNCT_PATTERN" || true)
   if [ -n "$hits" ]; then
     report_hits "$1" "$2" FAIL "$hits"
-    printf 'check-prose: banned punctuation (em-dash / spaced en-dash / curly quote) - rule: %s. Replace with a plain hyphen " - " or straight quotes and re-run.\n' "$LANGUAGE_DOC" >&2
+    printf 'check-prose: banned punctuation (em-dash / spaced en-dash / curly quote) - rule: %s. Replace with a full stop, comma or colon, or recast as two sentences. Use straight quotes, and re-run.\n' "$LANGUAGE_DOC" >&2
     rc=2
   fi
 
@@ -385,7 +385,7 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
   }')
   if [ -n "$hits" ]; then
     report_hits "$1" "$2" WARN "$hits"
-    printf 'check-prose: WARN hits are aside stacking - 3 or more " - " separators in one sentence. At most one dash-aside per sentence; split the rest into their own sentences (%s, "Reader-pays compression").\n' "$LANGUAGE_DOC" >&2
+    printf 'check-prose: WARN hits are aside stacking - 3 or more " - " separators in one sentence. Recast the asides as sentences or a list (%s, "Reader-pays compression").\n' "$LANGUAGE_DOC" >&2
   fi
 
   # The punctuation shape rules read body text only: front matter blanked,
