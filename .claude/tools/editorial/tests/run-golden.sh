@@ -133,6 +133,12 @@ out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DI
 rm -rf "$WORK"
 record "read-profile" "$out" "$rc"
 
+# The candidate-row tiering tool, the same way.
+WORK=$(mktemp -d)
+out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DIR/fixtures/tier-candidates/case.sh" 2>&1); rc=$?
+rm -rf "$WORK"
+record "tier-candidates" "$out" "$rc"
+
 if [[ "$COUNT" -eq 0 ]]; then
     say "FAIL - no fixtures found under $TESTS_DIR/fixtures/"
     exit 1
