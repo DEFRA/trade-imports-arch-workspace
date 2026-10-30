@@ -240,9 +240,10 @@ report_terms() {  # $1 file on disk, $2 display label, $3 masked text, $4 gate; 
     [ -n "$hits" ] || continue
     report_hits "$1" "$2" "$gate" "$hits"
     # A row can group many forms, so name the text that matched: every
-    # distinct match, lowercased, in order of appearance.
+    # distinct match, lowercased, its runs of whitespace collapsed to one
+    # space, in order of appearance.
     matched=$(printf '%s\n' "$hits" | cut -d: -f2- | grep -oiE "$pat" | tr '[:upper:]' '[:lower:]' \
-      | awk '!seen[$0]++ { printf "%s\"%s\"", (n++ ? ", " : ""), $0 }')
+      | sed -E 's/[[:space:]]+/ /g' | awk '!seen[$0]++ { printf "%s\"%s\"", (n++ ? ", " : ""), $0 }')
     [ -n "$matched" ] || matched="\"$first\""
     if [ "$gate" = FAIL ]; then
       printf 'check-prose: banned term %s - %s - rule: %s ("Words to avoid or examine").\n' "$matched" "$repair" "$src" >&2

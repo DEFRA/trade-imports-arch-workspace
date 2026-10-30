@@ -1,5 +1,5 @@
 check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/terms-table/page.md:3: The service frobnicates each record, and frobnication runs nightly.
 check-prose: banned term "frobnicates", "frobnication" - name the operation - rule: ~/trade-imports-arch-workspace/.claude/tools/editorial/tests/fixtures/terms-table/terms.md ("Words to avoid or examine").
 check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/terms-table/page.md:5: The job will make   use of the cache, and the widget stays unchecked.
-check-prose: WARN hits are "make   use of" - use (~/trade-imports-arch-workspace/.claude/tools/editorial/tests/fixtures/terms-table/terms.md, "Words to avoid or examine").
+check-prose: WARN hits are "make use of" - use (~/trade-imports-arch-workspace/.claude/tools/editorial/tests/fixtures/terms-table/terms.md, "Words to avoid or examine").
 exit-code: 2
