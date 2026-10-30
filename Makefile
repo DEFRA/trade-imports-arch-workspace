@@ -9,10 +9,10 @@
 #                   and point core.hooksPath at .githooks (pre-commit lint)
 #   make check      run the doctors, the skills lint and the golden tests
 #
-# Clones over HTTPS by default; override for SSH:
-#   make GIT_BASE=git@github.com:DEFRA
+# Clones over SSH by default; override for HTTPS:
+#   make GIT_BASE=https://github.com/DEFRA
 
-GIT_BASE ?= https://github.com/DEFRA
+GIT_BASE ?= git@github.com:DEFRA
 CHILDREN := trade-imports-documentation delivery-info-arch-tooling trade-imports-schemas
 CANONICAL := $(HOME)/trade-imports-arch-workspace
 

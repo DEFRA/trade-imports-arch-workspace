@@ -53,7 +53,8 @@ bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-workspace.sh
 The root `Makefile` bootstraps a fresh machine: `make` clones any missing
 child repo, creates the canonical symlink, and runs the check above
 (`make clone` / `make pull` / `make link` / `make check` individually;
-`GIT_BASE=git@github.com:DEFRA` for SSH clones).
+children clone over SSH; `GIT_BASE=https://github.com/DEFRA` for HTTPS
+clones).
 
 ## Credentials
 
