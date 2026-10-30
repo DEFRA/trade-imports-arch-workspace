@@ -85,6 +85,26 @@ record "terms-bad-form" "$out" "$rc"
 out=$(bash "$GATE" --terms "$TERMS_DIR/no-table.md" "$TERMS_DIR/page.md" 2>&1); rc=$?
 record "terms-no-table" "$out" "$rc"
 
+# A docs-scoped row applies to human-facing documents only and is skipped
+# for an agent-instruction path. The cases run inside the fixture folder,
+# so the page path is relative and the labels name no real file: a page
+# under .claude/ would itself count as an agent-instruction file.
+SCOPE_DIR="$TESTS_DIR/fixtures/scope-docs"
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --terms terms.md page.md 2>&1); rc=$?
+record "scope-docs-file" "$out" "$rc"
+
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --stdin --label .claude/skills/x/SKILL.md --terms terms.md < page.md 2>&1); rc=$?
+record "scope-docs-agent-skill" "$out" "$rc"
+
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --stdin --label hedy/CLAUDE.md --terms terms.md < page.md 2>&1); rc=$?
+record "scope-docs-agent-claude-md" "$out" "$rc"
+
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --stdin --label docs/page.md --terms terms.md < page.md 2>&1); rc=$?
+record "scope-docs-page" "$out" "$rc"
+
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --terms bad-scope.md page.md 2>&1); rc=$?
+record "scope-bad-token" "$out" "$rc"
+
 # The nearest editorial-profile.md above a page adds its table with no
 # flag, for a file and for --stdin whose label names the file.
 DISC="$TESTS_DIR/fixtures/profile-discovery/pages/page.md"

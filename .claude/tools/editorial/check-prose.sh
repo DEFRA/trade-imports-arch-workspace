@@ -13,6 +13,11 @@
 # page's nearest editorial-profile.md (beside it or in a folder above, up
 # to the repository root) adds its own table's rows for that page; with
 # --stdin, a --label that names a file finds the profile the same way.
+# A row whose Gate cell reads "FAIL docs" or "WARN docs" applies to
+# human-facing documents only: it is skipped for an agent-instruction
+# file, a path (the file argument, or the --label value) that holds a
+# /.claude/ segment or begins .claude/, or whose name is CLAUDE.md or
+# AGENTS.md.
 #
 # Hard failures (exit 2): em-dash; spaced en-dash (sentence-break usage);
 # curly quotes; the table's FAIL rows;
@@ -29,7 +34,10 @@
 # metaphor candidates, ledger phrases), and the reader-pays
 # compression family (language.md, "Reader-pays compression"): the
 # contact-clause pattern ("only the front door reaches"), aside
-# stacking (3 or more " - " separators in one sentence), a sentence, list item or cell that
+# stacking (3 or more " - " separators in one sentence), a spaced hyphen
+# between two words used as a sentence break (table rows and front
+# matter pass), a semicolon in body text (table rows, list items, front
+# matter and HTML entities pass), a sentence, list item or cell that
 # opens in FAQ voice (What, How, Which, Why, Whether, Who), a table
 # header that trails off on a preposition ("Set by"), an inventory
 # opener ("This page covers A, B, C and D": a page's parts listed as
@@ -98,6 +106,13 @@ HEADER_CELL_DANGLING_PATTERN='[[:space:]](by|as|for|to|of|from|with|in|on|at)[[:
 # repair; whether the opener is one is a judgment, so WARN not FAIL.
 INVENTORY_OPENER_PATTERN='(^|[.!?][[:space:]]+)(This|The) (page|document|section|chapter|guide|note|record|proposal|plan|table) (covers|defines|describes|explains|sets out|lists|answers|gives|details|holds|records|states|presents|summari[sz]es|carries|contains|includes|comprises)\b[^.]*(,[^.]*){2,}'
 CONTACT_PATTERN='\bonly (the |that |its )?([a-zA-Z'\''-]+ ){1,3}(reaches|sees|touches)\b'
+# A spaced hyphen between two words is a sentence break; a list marker
+# has no word before it and a "---" rule no word beside it, so neither
+# matches. Table rows and front matter are skipped where the rule runs.
+HYPHEN_BREAK_PATTERN="[[:alnum:]\"')] - [[:alnum:]\"'(]"
+# Body-text lines only: a table row or a list item may hold a semicolon,
+# and an HTML entity ("&amp;") is removed before the test.
+LIST_ITEM_PATTERN='^[[:space:]]*([-*+]|[0-9]+[.])[[:space:]]'
 
 usage() { awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "$0"; }
 
@@ -121,10 +136,14 @@ strip_masked() {
 }
 
 # Read the "Words to avoid or examine" table into one line per FAIL or
-# WARN row: gate, grep pattern, first term, repair, tab-separated. Each
+# WARN row: gate, grep pattern, first term, repair, source, scope,
+# tab-separated. Each
 # backticked form in the Term cell is one alternative; a trailing * matches
 # any ending and a space matches any run of spaces. A form with any other
-# character is refused, so the table never carries regex.
+# character is refused, so the table never carries regex. The Gate cell is
+# the tier, FAIL or WARN, optionally followed by the scope token docs,
+# which limits the row to human-facing documents; any other second word
+# is refused.
 load_terms() {
   local doc
   BASE_TERMS=""
@@ -139,7 +158,9 @@ terms_from() {  # $1 table file, $2 "required" when the file must yield rows
   shown="${1/#$HOME/~}"
   [ -f "$1" ] || fail "terms table not found: $shown"
   out=$(read_terms_table "$1" "$shown")
-  bad=$(printf '%s\n' "$out" | grep '^BAD' | cut -f2 | head -1)
+  bad=$(printf '%s\n' "$out" | awk -F'\t' '$1 == "BADSCOPE" { print $2; exit }')
+  [ -z "$bad" ] || fail "terms table: gate \"$bad\" may read only FAIL, WARN, FAIL docs or WARN docs ($shown, \"Words to avoid or examine\")"
+  bad=$(printf '%s\n' "$out" | awk -F'\t' '$1 == "BAD" { print $2; exit }')
   [ -z "$bad" ] || fail "terms table: form \"$bad\" may hold only letters, digits, spaces, hyphens, apostrophes and a trailing * ($shown, \"Words to avoid or examine\")"
   [ -n "$out" ] || [ "${2:-}" != required ] || fail "terms table: no FAIL or WARN rows read from $shown, \"Words to avoid or examine\""
   printf '%s' "$out"
@@ -163,10 +184,28 @@ terms_for() {  # $1 page path; sets TERMS for that page
   local prof extra
   TERMS=$BASE_TERMS
   prof=$(profile_for "$1")
-  [ -n "$prof" ] || return 0
-  extra=$(terms_from "$prof") || exit 1
-  [ -z "$extra" ] || TERMS="$TERMS
+  if [ -n "$prof" ]; then
+    extra=$(terms_from "$prof") || exit 1
+    [ -z "$extra" ] || TERMS="$TERMS
 $extra"
+  fi
+  # A docs-scoped row applies to human-facing documents only.
+  if is_agent_file "$1"; then
+    TERMS=$(printf '%s\n' "$TERMS" | awk -F'\t' '$6 != "docs"')
+  fi
+}
+
+# An agent-instruction file: a path holding a /.claude/ segment or
+# beginning .claude/, or a file named CLAUDE.md or AGENTS.md. The path is
+# matched as given, relative or absolute.
+is_agent_file() {  # $1 page path
+  case "$1" in
+    .claude/*|*/.claude/*) return 0 ;;
+  esac
+  case "${1##*/}" in
+    CLAUDE.md|AGENTS.md) return 0 ;;
+  esac
+  return 1
 }
 
 read_terms_table() {  # $1 file, $2 its display path
@@ -175,7 +214,10 @@ read_terms_table() {  # $1 file, $2 its display path
     !insec || !/^\|/ { next }
     {
       gate = $4; gsub(/^[ \t]+|[ \t]+$/, "", gate)
-      if (gate != "FAIL" && gate != "WARN") next
+      ng = split(gate, g, /[ \t]+/)
+      if (g[1] != "FAIL" && g[1] != "WARN") next
+      if (ng > 2 || (ng == 2 && g[2] != "docs")) { print "BADSCOPE\t" gate; next }
+      scope = (ng == 2 ? "docs" : "all"); gate = g[1]
       repair = $3; gsub(/^[ \t]+|[ \t]+$/, "", repair)
       cell = $2; alt = ""; first = ""
       while (match(cell, /`[^`]+`/)) {
@@ -186,13 +228,13 @@ read_terms_table() {  # $1 file, $2 its display path
         gsub(/ /, "[[:space:]]+", t)
         alt = alt (alt == "" ? "" : "|") t
       }
-      if (alt != "") print gate "\t\\b(" alt ")\\b\t" first "\t" repair "\t" src
+      if (alt != "") print gate "\t\\b(" alt ")\\b\t" first "\t" repair "\t" src "\t" scope
     }' "$1"
 }
 
 report_terms() {  # $1 file on disk, $2 display label, $3 masked text, $4 gate; returns 2 on a FAIL hit
-  local gate pat first repair src hits rc=0
-  while IFS=$'\t' read -r gate pat first repair src; do
+  local gate pat first repair src _scope hits rc=0
+  while IFS=$'\t' read -r gate pat first repair src _scope; do
     [ "$gate" = "$4" ] || continue
     hits=$(printf '%s\n' "$3" | grep -inE "$pat" || true)
     [ -n "$hits" ] || continue
@@ -344,6 +386,30 @@ check_file() {  # $1 file on disk, $2 display label; returns 2 on violation
   if [ -n "$hits" ]; then
     report_hits "$1" "$2" WARN "$hits"
     printf 'check-prose: WARN hits are aside stacking - 3 or more " - " separators in one sentence. At most one dash-aside per sentence; split the rest into their own sentences (%s, "Reader-pays compression").\n' "$LANGUAGE_DOC" >&2
+  fi
+
+  # The punctuation shape rules read body text only: front matter blanked,
+  # line numbers kept, on top of the masking above.
+  local masked_prose
+  masked_prose=$(printf '%s\n' "$masked" | awk '
+    NR == 1 && /^---[[:space:]]*$/ { fm = 1; print ""; next }
+    fm { if (/^---[[:space:]]*$/) fm = 0; print ""; next }
+    { print }')
+
+  hits=$(printf '%s\n' "$masked_prose" | awk -v pat="$HYPHEN_BREAK_PATTERN" '
+    /^[[:space:]]*\|/ { next }
+    $0 ~ pat { print NR ":" $0 }')
+  if [ -n "$hits" ]; then
+    report_hits "$1" "$2" WARN "$hits"
+    printf 'check-prose: WARN hits are a spaced hyphen as a sentence break: use a full stop, comma or colon, or recast the two parts as two sentences (%s, "Punctuation and formatting").\n' "$LANGUAGE_DOC" >&2
+  fi
+
+  hits=$(printf '%s\n' "$masked_prose" | awk -v list="$LIST_ITEM_PATTERN" '
+    /^[[:space:]]*\|/ || $0 ~ list { next }
+    { l = $0; gsub(/&[a-zA-Z#0-9]+;/, "", l); if (l ~ /;/) print NR ":" $0 }')
+  if [ -n "$hits" ]; then
+    report_hits "$1" "$2" WARN "$hits"
+    printf 'check-prose: WARN hits are a semicolon in body text: split the sentence, or use a colon before a list (%s, "Punctuation and formatting").\n' "$LANGUAGE_DOC" >&2
   fi
 
   return $rc

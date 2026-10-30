@@ -1,0 +1,7 @@
+check-prose: FAIL page.md:3: You decide, and your team agrees.
+check-prose: banned term "you" - name the actor or the reader's role - rule: terms.md ("Words to avoid or examine").
+check-prose: WARN page.md:5: Please read the page.
+check-prose: WARN hits are "please" - state the instruction (terms.md, "Words to avoid or examine").
+check-prose: WARN page.md:7: The step simply runs.
+check-prose: WARN hits are "simply" - delete the word (terms.md, "Words to avoid or examine").
+exit-code: 2
