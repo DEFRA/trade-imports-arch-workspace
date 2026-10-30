@@ -1,5 +1,3 @@
 check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/metaphor-warn.md:3: The fix lands next week and the cost bites in the second quarter.
-check-prose: WARN hits are "bites" - metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
-check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/metaphor-warn.md:3: The fix lands next week and the cost bites in the second quarter.
-check-prose: WARN hits are "lands" - metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
+check-prose: WARN hits are "lands", "bites" - metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
 exit-code: 0
