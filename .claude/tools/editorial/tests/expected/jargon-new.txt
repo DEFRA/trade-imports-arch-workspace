@@ -4,7 +4,7 @@ check-prose: banned term "seamless" - state which step the user no longer takes 
 check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon-new.md:3: The rollout was seamless and the tool is user-friendly.
 check-prose: banned term "user-friendly" - state what the user can do - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine").
 check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon-new.md:5: We streamlined the process so onboarding feels seamless.
-check-prose: banned term "streamline" - state what was removed or shortened - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine").
+check-prose: banned term "streamlined" - state what was removed or shortened - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine").
 check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/jargon-new.md:7: That sentence is load-bearing for the argument.
 check-prose: banned term "load-bearing" - state what depends on the thing - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine").
 exit-code: 2

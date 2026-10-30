@@ -56,6 +56,21 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-git-push.sh\"",
             "timeout": 10
           }
+
+
+
+
+
+        ]
+      },
+      {
+        "matcher": "Read|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/realpath-file-tools.sh\"",
+            "timeout": 5
+          }
         ]
       },
       {
@@ -84,6 +99,18 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/hedy-forbid-spy-assertions.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh\" --scope \"$CLAUDE_PROJECT_DIR/.claude/rules/authoring-voice.md\" --record",
             "timeout": 10
           }
         ]

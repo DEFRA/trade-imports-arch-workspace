@@ -10,7 +10,9 @@ live there - this file carries only what applies to Claude Code alone.
 
 `.claude/rules/` is auto-loaded: `workspace-paths.md` every session (the
 canonical-root contract), `dot-claude-layout.md` when working under
-`.claude/` (where new files go).
+`.claude/` (where new files go), `authoring-voice.md` when a markdown
+file in its `paths` list is read or written (the drafting procedure for
+prose, whose list is also the write-time check's scope).
 
 ## Guard hooks
 

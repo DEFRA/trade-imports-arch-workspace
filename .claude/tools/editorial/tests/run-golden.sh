@@ -85,6 +85,26 @@ record "terms-bad-form" "$out" "$rc"
 out=$(bash "$GATE" --terms "$TERMS_DIR/no-table.md" "$TERMS_DIR/page.md" 2>&1); rc=$?
 record "terms-no-table" "$out" "$rc"
 
+# A docs-scoped row applies to human-facing documents only and is skipped
+# for an agent-instruction path. The cases run inside the fixture folder,
+# so the page path is relative and the labels name no real file: a page
+# under .claude/ would itself count as an agent-instruction file.
+SCOPE_DIR="$TESTS_DIR/fixtures/scope-docs"
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --terms terms.md page.md 2>&1); rc=$?
+record "scope-docs-file" "$out" "$rc"
+
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --stdin --label .claude/skills/x/SKILL.md --terms terms.md < page.md 2>&1); rc=$?
+record "scope-docs-agent-skill" "$out" "$rc"
+
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --stdin --label hedy/CLAUDE.md --terms terms.md < page.md 2>&1); rc=$?
+record "scope-docs-agent-claude-md" "$out" "$rc"
+
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --stdin --label docs/page.md --terms terms.md < page.md 2>&1); rc=$?
+record "scope-docs-page" "$out" "$rc"
+
+out=$(cd "$SCOPE_DIR" && bash "$GATE" --terms bad-scope.md page.md 2>&1); rc=$?
+record "scope-bad-token" "$out" "$rc"
+
 # The nearest editorial-profile.md above a page adds its table with no
 # flag, for a file and for --stdin whose label names the file.
 DISC="$TESTS_DIR/fixtures/profile-discovery/pages/page.md"
@@ -112,6 +132,19 @@ WORK=$(mktemp -d)
 out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DIR/fixtures/read-profile/case.sh" 2>&1); rc=$?
 rm -rf "$WORK"
 record "read-profile" "$out" "$rc"
+
+# The candidate-row tiering tool, the same way.
+WORK=$(mktemp -d)
+out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DIR/fixtures/tier-candidates/case.sh" 2>&1); rc=$?
+rm -rf "$WORK"
+record "tier-candidates" "$out" "$rc"
+
+# The scope library, the write-time hook and the lint's rule checks on a
+# fake workspace, the same way.
+WORK=$(mktemp -d)
+out=$(HELPER_DIR="$REAL_WS/.claude/tools/editorial" WORK="$WORK" bash "$TESTS_DIR/fixtures/rule-scope/case.sh" 2>&1); rc=$?
+rm -rf "$WORK"
+record "rule-scope" "$out" "$rc"
 
 if [[ "$COUNT" -eq 0 ]]; then
     say "FAIL - no fixtures found under $TESTS_DIR/fixtures/"

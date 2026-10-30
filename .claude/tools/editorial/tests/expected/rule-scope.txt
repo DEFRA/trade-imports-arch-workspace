@@ -1,0 +1,182 @@
+--- rule-scope: list all ---
+paths	README.md
+paths	AGENTS.md
+paths	CLAUDE.md
+paths	.claude/**/*.md
+paths	hedy/*.md
+paths	analysis/**/*.md
+paths	trade-imports-documentation*/docs/**/*.md
+gate-exclude	analysis/**
+exit 0
+--- rule-scope: list gate-exclude ---
+analysis/**
+exit 0
+--- rule-scope: ere README.md ---
+^README\.md$
+exit 0
+--- rule-scope: ere .claude/**/*.md ---
+^\.claude/(.*/)?[^/]*\.md$
+exit 0
+--- rule-scope: ere analysis/** ---
+^analysis/.*$
+exit 0
+--- rule-scope: ere trade-imports-documentation*/docs/**/*.md ---
+^trade-imports-documentation[^/]*/docs/(.*/)?[^/]*\.md$
+exit 0
+--- rule-scope: ere hedy/?.md ---
+^hedy/[^/]\.md$
+exit 0
+--- rule-scope: path in the nested clone ---
+rule-scope: gate trade-imports-documentation-events/docs/systems/EUDP/probe.md
+exit 0
+--- rule-scope: path of the root README ---
+rule-scope: gate README.md
+exit 0
+--- rule-scope: path of the root README through the real checkout ---
+rule-scope: gate README.md
+exit 0
+--- rule-scope: path of a README below the root ---
+rule-scope: skip WORK/trade-imports-arch-workspace/sub/README.md: not in paths
+exit 1
+--- rule-scope: path in a skill folder ---
+rule-scope: gate .claude/skills/x/SKILL.md
+exit 0
+--- rule-scope: path under hedy ---
+rule-scope: gate hedy/notes.md
+exit 0
+--- rule-scope: path in a gitignored workarea ---
+rule-scope: skip WORK/trade-imports-arch-workspace/.claude/workareas/editorial/draft.md: ignored by git
+exit 1
+--- rule-scope: path in a workarea folder not yet created ---
+rule-scope: skip WORK/trade-imports-arch-workspace/.claude/workareas/new/draft.md: ignored by git
+exit 1
+--- rule-scope: path under analysis ---
+rule-scope: skip WORK/trade-imports-arch-workspace/analysis/scratch.md: in gate-exclude
+exit 1
+--- rule-scope: path in the astro folder ---
+rule-scope: skip WORK/trade-imports-arch-workspace/trade-imports-documentation/astro/README.md: not in paths
+exit 1
+--- rule-scope: path outside the workspace ---
+rule-scope: skip WORK/outside/probe.md: outside the workspace
+exit 1
+--- rule-scope: a missing rule ---
+rule-scope: scope rule missing: WORK/nope.md
+exit 2
+--- rule-scope: no arguments ---
+rule-scope: no arguments (see --help)
+exit 2
+--- hook: nested clone page ---
+hook-check-written: WORK/trade-imports-arch-workspace/trade-imports-documentation-events/docs/systems/EUDP/probe.md - FAIL line(s) introduced by this write (pre-existing violations are excused):
+  We leverage the cache.
+  The portal opens.
+  The flow is seamless.
+hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at commit and PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.
+exit 2
+--- hook: nested clone page, outside-scope ---
+exit 0
+--- hook: gitignored workarea ---
+exit 0
+--- hook: analysis draft ---
+exit 0
+--- hook: analysis draft, outside-scope ---
+hook-check-written: WORK/trade-imports-arch-workspace/analysis/scratch.md - FAIL line(s) introduced by this write (pre-existing violations are excused):
+  We leverage the cache.
+  The portal opens.
+  The flow is seamless.
+hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at commit and PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.
+exit 2
+--- hook: astro page ---
+exit 0
+--- hook: outside file ---
+exit 0
+--- hook: outside file, outside-scope ---
+hook-check-written: WORK/outside/probe.md - FAIL line(s) introduced by this write (pre-existing violations are excused):
+  We leverage the cache.
+  The portal opens.
+  The flow is seamless.
+hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at commit and PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.
+exit 2
+--- hook: outside file, no scope ---
+hook-check-written: WORK/outside/probe.md - FAIL line(s) introduced by this write (pre-existing violations are excused):
+  We leverage the cache.
+  The portal opens.
+  The flow is seamless.
+hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at commit and PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.
+exit 2
+--- hook: text file under hedy ---
+exit 0
+--- hook: text file under hedy, outside-scope ---
+hook-check-written: WORK/trade-imports-arch-workspace/hedy/notes.txt - FAIL line(s) introduced by this write (pre-existing violations are excused):
+  We leverage the cache.
+  The portal opens.
+  The flow is seamless.
+hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at commit and PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.
+exit 2
+--- hook: root README, nothing excused ---
+hook-check-written: WORK/trade-imports-arch-workspace/README.md - FAIL line(s) introduced by this write (pre-existing violations are excused):
+  We leverage the cache.
+  The portal opens.
+  The flow is seamless.
+hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at commit and PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.
+exit 2
+--- hook: root AGENTS.md, the HEAD line excused ---
+hook-check-written: WORK/trade-imports-arch-workspace/AGENTS.md - FAIL line(s) introduced by this write (pre-existing violations are excused):
+  The portal opens.
+  The flow is seamless.
+hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at commit and PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.
+exit 2
+--- hook: MultiEdit on the nested clone page ---
+hook-check-written: WORK/trade-imports-arch-workspace/trade-imports-documentation-events/docs/systems/EUDP/probe.md - FAIL line(s) introduced by this write (pre-existing violations are excused):
+  We leverage the cache.
+  The portal opens.
+hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at commit and PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.
+exit 2
+--- hook: a missing rule ---
+hook-check-written: scope rule missing: WORK/nope.md
+exit 1
+--- hook: a rule with no paths ---
+hook-check-written: scope rule has no paths: WORK/no-paths.md
+exit 1
+--- hook: outside-scope without scope ---
+hook-check-written: --outside-scope needs --scope
+exit 1
+--- hook: record a gated page ---
+hook-check-written: WORK/trade-imports-arch-workspace/trade-imports-documentation-events/docs/systems/EUDP/probe.md - FAIL line(s) introduced by this write (pre-existing violations are excused):
+  We leverage the cache.
+  The portal opens.
+  The flow is seamless.
+hook-check-written: fix these lines now (run check-prose.sh on the file for the governing rule per line) - the same gate runs at commit and PR creation and, in editorial sessions, blocks the turn from ending. Rules: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md.
+exit 2
+--- hook: record a skipped analysis draft ---
+exit 0
+--- hook: record a skipped outside file ---
+exit 0
+--- state file ---
+WORK/trade-imports-arch-workspace/trade-imports-documentation-events/docs/systems/EUDP/probe.md
+--- lint: the clean fake ---
+skills-lint: ok — estate lint clean (0 warn(s))
+exit 0
+--- lint: a rule in flow style ---
+skills-lint: FAIL .claude/rules/flow.md:2 — not a bare key line (a key, a colon, and its list on the lines below) (Claude Code loads a rule whose frontmatter it cannot read in every session)
+skills-lint: FAIL .claude/rules/flow.md:1 — no paths or gate-paths list (Claude Code loads a rule whose frontmatter it cannot read in every session)
+exit 1
+--- lint: a badly shaped rule ---
+skills-lint: FAIL .claude/rules/shape.md:3 — glob "*.md" has a wildcard but no /, so it may match at any depth (Claude Code loads a rule whose frontmatter it cannot read in every session)
+skills-lint: FAIL .claude/rules/shape.md:4 — glob "docs/**.md" uses ** inside a segment (Claude Code loads a rule whose frontmatter it cannot read in every session)
+skills-lint: FAIL .claude/rules/shape.md:5 — glob "a{b,c}/*.md" holds a character outside letters, digits, space, _ . / * ? - (Claude Code loads a rule whose frontmatter it cannot read in every session)
+skills-lint: FAIL .claude/rules/shape.md:6 — not a bare key line (a key, a colon, and its list on the lines below) (Claude Code loads a rule whose frontmatter it cannot read in every session)
+skills-lint: FAIL .claude/rules/shape.md:7 — key gate-exclude lists no glob (Claude Code loads a rule whose frontmatter it cannot read in every session)
+exit 1
+--- lint: a citation that is no heading ---
+skills-lint: FAIL .claude/rules/authoring-voice.md:19 — "Just Enuf" is no heading in language.md, document-types.md or voice-examples.md
+exit 1
+--- lint: settings wire the hook without scope ---
+skills-lint: FAIL .claude/settings.json — a PostToolUse command runs hook-check-written.sh without --scope: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh" --record
+exit 1
+--- lint: settings name a missing scope rule ---
+skills-lint: FAIL .claude/settings.json — hook-check-written.sh --scope names a missing rule: $CLAUDE_PROJECT_DIR/.claude/rules/missing.md
+exit 1
+--- lint: settings name the scope rule ---
+skills-lint: ok — estate lint clean (0 warn(s))
+exit 0
+exit-code: 0

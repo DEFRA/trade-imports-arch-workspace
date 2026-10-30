@@ -8,7 +8,7 @@ hooks:
     - matcher: Write|Edit|MultiEdit
       hooks:
         - type: command
-          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh"
+          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh" --scope "$CLAUDE_PROJECT_DIR/.claude/rules/authoring-voice.md" --outside-scope
           timeout: 10
 ---
 

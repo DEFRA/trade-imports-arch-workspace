@@ -1,0 +1,3 @@
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/semicolon-body.md:7: The client sends the request; the server answers.
+check-prose: WARN hits are a semicolon in body text: split the sentence, or use a colon before a list (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Punctuation and formatting").
+exit-code: 0

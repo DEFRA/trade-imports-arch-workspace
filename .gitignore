@@ -39,8 +39,10 @@ editorial-research/
 # Child repo: shared docs-generation tooling library (its own git repository)
 delivery-info-arch-tooling/
 
-# Child repo: trade imports documentation monorepo (its own git repository)
+# Child repo: trade imports documentation monorepo (its own git repository),
+# and any second checkout or worktree of it that carries the same prefix
 trade-imports-documentation/
+trade-imports-documentation-*/
 
 # Child repo: shared trade imports schemas (its own git repository)
 trade-imports-schemas/

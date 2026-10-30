@@ -15,13 +15,17 @@ All hooks receive JSON on stdin (`session_id`, `hook_event_name`, and for tool e
 
 ## Scoping hooks to a skill
 
-SKILL.md frontmatter accepts a `hooks:` key with the same shape as `settings.json` hooks. These register when the skill is invoked and last for the skill's lifetime - the sanctioned way to enforce a skill's own contract without a global hook. Both this estate's uses live in the pr and editorial skills (write-time prose gate, editorial Stop gate), calling scripts in `.claude/tools/editorial/`.
+SKILL.md frontmatter accepts a `hooks:` key with the same shape as `settings.json` hooks. These register when the skill is invoked and last for the skill's lifetime, the sanctioned way to enforce a skill's own contract without a global hook. The editorial Stop gate is this estate's skill-scoped use. The write-time prose check is global: `settings.json` runs `hook-check-written.sh --scope` on every Write or Edit, and the pr and editorial skills run the same script with `--outside-scope` for the drafts the global scope skips, so each write is checked once. Both call scripts in `.claude/tools/editorial/`, which agents may edit; that wiring is acceptable because a PostToolUse hook gives feedback and blocks nothing, and the pre-commit gate is the backstop.
+
+## Rules and Their Scope
+
+A file in `.claude/rules/` with `paths:` frontmatter is advisory context Claude Code loads when a matching file is read, written or edited. The authoring-voice rule's `paths` list is also the deterministic scope of the write-time check: `rule-scope.sh` parses the same list, subtracts `gate-exclude`, and skips files gitignored in their own repository. One list configures where the voice loads and where the gate runs, and `lint-skills.sh` refuses a list whose shape the parser and Claude Code could read differently. Claude Code matches rules and nested CLAUDE.md files against the path as the tool call typed it, so a file reached through the `~/trade-imports-arch-workspace` symlink matched nothing until `.claude/hooks/realpath-file-tools.sh`, a `PreToolUse` hook on the four file tools, rewrote `file_path` to the real checkout path through `updatedInput`. Subagents receive path-scoped rules the same way; a subagent that drafts prose is still told to read the rule, so the voice is in context before its first write.
 
 ## Enforcement Code Locations
 
 | Location | Wiring | Editor |
 | --- | --- | --- |
-| `.claude/hooks/` | `settings.json` (global, every session) | the owner only - `guard-edits.sh` blocks agent edits to both |
+| `.claude/hooks/` | `settings.json` (global, every session): the guards, and `realpath-file-tools.sh`, which resolves a symlinked `file_path` before a file tool runs | the owner only, since `guard-edits.sh` blocks agent edits to both |
 | `.claude/tools/<domain>/` | skill frontmatter hooks, skill steps, other scripts | agents; covered by the blanket `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` allowlist |
 | `.githooks/` | `core.hooksPath` (set by `make link`) | agents; runs for every git user regardless of AI tooling |
 

@@ -1,3 +1,5 @@
 check-prose: FAIL WS/.claude/tools/editorial/tests/fixtures/profile-discovery/pages/page.md:3: The service frobnicates each record; the profile one folder up bans the word.
-check-prose: banned term "frobnicat*" - name the operation - rule: ~/trade-imports-arch-workspace/.claude/tools/editorial/tests/fixtures/profile-discovery/editorial-profile.md ("Words to avoid or examine").
+check-prose: banned term "frobnicates" - name the operation - rule: ~/trade-imports-arch-workspace/.claude/tools/editorial/tests/fixtures/profile-discovery/editorial-profile.md ("Words to avoid or examine").
+check-prose: WARN WS/.claude/tools/editorial/tests/fixtures/profile-discovery/pages/page.md:3: The service frobnicates each record; the profile one folder up bans the word.
+check-prose: WARN hits are a semicolon in body text: split the sentence, or use a colon before a list (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Punctuation and formatting").
 exit-code: 2

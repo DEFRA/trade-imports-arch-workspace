@@ -1,0 +1,33 @@
+--- tiered, threshold 2 ---
+## Tiered Candidates
+
+| Term | Repair | Count | Tier |
+| --- | --- | --- | --- |
+| `synergy`, `synergies` | state the effect | 0 | FAIL |
+| `in order to` | to | 1 | WARN |
+| `ensure*` | make sure, or name the check | 3 | Guidance |
+| `spin up`, `spins up` (literal: a test harness spins up a container) | start, or name the process | 0 | WARN |
+| `e.g.` | for example | - | Script or guidance |
+
+## Script or Guidance
+
+| Term | Refused form |
+| --- | --- |
+| `e.g.` | `e.g.` |
+
+tier-candidates: 5 rows, 2 files, threshold 2
+exit 0
+--- execution failures ---
+--- no arguments ---
+tier-candidates: no candidates file (see --help)
+exit 1
+--- missing candidates file ---
+tier-candidates: candidates file not found: WORK/nope.md
+exit 1
+--- a table with no rows ---
+tier-candidates: no candidate rows read from WS/.claude/tools/editorial/tests/fixtures/tier-candidates/no-table.md, "Words to avoid or examine"
+exit 1
+--- a root outside any repository ---
+tier-candidates: root is not inside a git repository: WORK/plain
+exit 1
+exit-code: 0

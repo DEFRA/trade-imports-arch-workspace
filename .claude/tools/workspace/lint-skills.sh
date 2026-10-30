@@ -13,6 +13,19 @@
 #   3. Fenced code blocks invoking child projects or beyond-baseline
 #      tools (node, npm, npx, mmdc) in a skill that declares no matching
 #      token. Judgment stays human; the warn surfaces candidates.
+# Rule checks (FAIL -> exit 1; silent when clean or when the input is absent):
+#   4. Every .claude/rules/*.md with frontmatter has the one shape Claude
+#      Code and rule-scope.sh both read: keys paths, gate-paths or
+#      gate-exclude, each followed by one or more `  - "glob"` lines;
+#      globs of letters, digits, space, _ . / * ? and -, ** only as a whole
+#      segment, and no wildcard without a / (it may match at any depth).
+#      A frontmatter Claude Code cannot read loads the rule everywhere.
+#   4b. The lint's own reading of each rule's globs equals
+#      rule-scope.sh --list all, and every glob's ERE compiles.
+#   5. Every double-quoted string in the body of rules/authoring-voice.md
+#      is a heading in language.md, document-types.md or voice-examples.md.
+#   5b. A PostToolUse command in settings.json that runs
+#      hook-check-written.sh carries --scope naming an existing rule.
 #
 # Triggers: make check, the scaffold tail, and the pre-commit hook.
 
@@ -143,6 +156,122 @@ for doc in "$ROOT"/.claude/best-practices/skills/*.md; do
     [[ -e "$doc" ]] || continue
     check_links "$doc"
 done
+
+# 4. Rule frontmatter shape, and 4b. agreement with rule-scope.sh.
+SCOPE_LIB="$ROOT/.claude/tools/editorial/rule-scope.sh"
+PARSE_NOTE="Claude Code loads a rule whose frontmatter it cannot read in every session"
+for rule in "$ROOT"/.claude/rules/*.md; do
+    [[ -e "$rule" ]] || continue
+    [[ "$(head -n 1 "$rule")" == "---" ]] || continue
+    rel="${rule#"$ROOT"/}"
+    problems=$(awk '
+        function endkey() { if (key != "" && items == 0) print keyline "\tkey " key " lists no glob" }
+        NR == 1 { next }
+        /^---$/ { endkey(); closed = 1; exit }
+        /^$/ { print NR "\tblank line inside the frontmatter"; next }
+        /^[^ ]/ {
+            endkey(); key = ""
+            k = $0
+            if (k !~ /^[a-z-]+:$/) { print NR "\tnot a bare key line (a key, a colon, and its list on the lines below)"; next }
+            sub(/:$/, "", k)
+            if (k != "paths" && k != "gate-paths" && k != "gate-exclude") { print NR "\tunknown key " k " (paths, gate-paths or gate-exclude)"; next }
+            if (k in seen) print NR "\tkey " k " repeated"
+            seen[k] = 1; key = k; keyline = NR; items = 0; next
+        }
+        {
+            if (key == "") { print NR "\tlist entry outside a key"; next }
+            if ($0 !~ /^  - "[^"]*"$/) { print NR "\tnot one double-quoted glob on a \"  - \" line"; next }
+            g = $0; sub(/^  - "/, "", g); sub(/"$/, "", g); items++
+            if (g == "") { print NR "\tempty glob"; next }
+            if (g ~ /[^A-Za-z0-9 _.\/*?-]/) { print NR "\tglob \"" g "\" holds a character outside letters, digits, space, _ . / * ? -"; next }
+            n = split(g, seg, "/")
+            for (i = 1; i <= n; i++) if (seg[i] ~ /\*\*/ && seg[i] != "**") { print NR "\tglob \"" g "\" uses ** inside a segment"; break }
+            if (g ~ /[*?]/ && g !~ /\//) print NR "\tglob \"" g "\" has a wildcard but no /, so it may match at any depth"
+        }
+        END {
+            if (!closed) print NR "\tfrontmatter never closed with ---"
+            else if (!("paths" in seen) && !("gate-paths" in seen)) print "1\tno paths or gate-paths list"
+        }' "$rule")
+    if [[ -n "$problems" ]]; then
+        while IFS=$'\t' read -r line reason; do
+            say "FAIL $rel:$line — $reason ($PARSE_NOTE)"
+        done <<< "$problems"
+        FAIL=1
+        continue
+    fi
+    [[ -f "$SCOPE_LIB" ]] || continue
+    mine=$(awk '
+        NR == 1 { next }
+        /^---$/ { exit }
+        /^[a-z-]+:$/ { k = $0; sub(/:$/, "", k); next }
+        { g = $0; sub(/^  - "/, "", g); sub(/"$/, "", g); print k "\t" g }' "$rule" | sort)
+    theirs=$(bash "$SCOPE_LIB" --rule "$rule" --list all 2>&1 | sort)
+    if [[ "$mine" != "$theirs" ]]; then
+        say "FAIL $rel — the lint and rule-scope.sh read different globs (lint: $(printf '%s' "$mine" | tr '\t\n' ': '); rule-scope.sh: $(printf '%s' "$theirs" | tr '\t\n' ': '))"
+        FAIL=1
+        continue
+    fi
+    while IFS=$'\t' read -r _ g; do
+        [[ -n "$g" ]] || continue
+        ere=$(bash "$SCOPE_LIB" --ere "$g")
+        printf '' | grep -E "$ere" > /dev/null 2>&1
+        if [[ $? -eq 2 ]]; then
+            say "FAIL $rel — glob \"$g\" becomes an expression grep cannot compile: $ere"
+            FAIL=1
+        fi
+    done <<< "$mine"
+done
+
+# 5. The authoring-voice rule cites sections by their headings in double
+# quotes; each quoted string must be a heading in one of the three
+# documents the rule draws on. Fenced blocks and backtick spans are
+# masked first, so examples may hold quotes.
+VOICE_RULE="$ROOT/.claude/rules/authoring-voice.md"
+if [[ -f "$VOICE_RULE" ]]; then
+    headings=$(for doc in "$ROOT/.claude/best-practices/writing/language.md" \
+                          "$ROOT/.claude/skills/editorial/references/document-types.md" \
+                          "$ROOT/.claude/skills/editorial/references/voice-examples.md"; do
+                   [[ -f "$doc" ]] || continue
+                   awk '/^[[:space:]]*(```|~~~)/ { f = !f; next } !f && /^(#|##|###) / { sub(/^#+ /, ""); print }' "$doc"
+               done)
+    while IFS=$'\t' read -r line cited; do
+        [[ -n "$cited" ]] || continue
+        if ! printf '%s\n' "$headings" | grep -qxF -- "$cited"; then
+            say "FAIL ${VOICE_RULE#"$ROOT"/}:$line — \"$cited\" is no heading in language.md, document-types.md or voice-examples.md"
+            FAIL=1
+        fi
+    done < <(awk '
+        NR == 1 && /^---$/ { fm = 1; next }
+        fm { if (/^---$/) fm = 0; next }
+        /^[[:space:]]*(```|~~~)/ { f = !f; next }
+        f { next }
+        {
+            s = $0
+            gsub(/``([^`]|`[^`])*``/, "", s); gsub(/`[^`]*`/, "", s)
+            while (match(s, /"[^"]+"/)) { print NR "\t" substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH) }
+        }' "$VOICE_RULE")
+fi
+
+# 5b. The write-time hook wired in settings.json names its scope rule.
+SETTINGS="$ROOT/.claude/settings.json"
+if [[ -f "$SETTINGS" ]] && command -v jq > /dev/null 2>&1; then
+    while IFS= read -r cmd; do
+        [[ -n "$cmd" ]] || continue
+        scope=$(printf '%s\n' "$cmd" | sed -nE 's/.*--scope[[:space:]]+"?([^"[:space:]]+)"?.*/\1/p')
+        if [[ -z "$scope" ]]; then
+            say "FAIL .claude/settings.json — a PostToolUse command runs hook-check-written.sh without --scope: $cmd"
+            FAIL=1
+            continue
+        fi
+        resolved=${scope//\$\{CLAUDE_PROJECT_DIR\}/$ROOT}
+        resolved=${resolved//\$CLAUDE_PROJECT_DIR/$ROOT}
+        resolved=${resolved/#\~/$HOME}
+        if [[ ! -f "$resolved" ]]; then
+            say "FAIL .claude/settings.json — hook-check-written.sh --scope names a missing rule: $scope"
+            FAIL=1
+        fi
+    done < <(jq -r '.hooks.PostToolUse[]?.hooks[]?.command? // empty' "$SETTINGS" 2>/dev/null | grep 'hook-check-written\.sh')
+fi
 
 if [[ "$FAIL" -eq 1 ]]; then
     exit 1

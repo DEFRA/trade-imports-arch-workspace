@@ -1,12 +1,12 @@
 ---
 name: editorial
-description: Editorial pass on human-facing technical documentation in the workspace editorial voice - architecture documents, solution overviews, design docs, explanations, how-to guides, reference pages, READMEs, ADRs, Confluence pages, PR descriptions, commit bodies and Jira tickets. Invoke only when the user asks for an editorial pass, by name or with /editorial; drafting and revising before that point follow language.md without this skill, its cold reader or its hooks. Establishes the reader brief and structure, drills from surface text to meaning, and applies a cold-reader review and mechanical style gate. Not for code comments or ordinary conversational replies.
+description: Editorial pass on human-facing technical documentation in the workspace editorial voice - architecture documents, solution overviews, design docs, explanations, how-to guides, reference pages, READMEs, ADRs, Confluence pages, PR descriptions, commit bodies and Jira tickets. Invoke only when the user asks for an editorial pass, by name or with /editorial; drafting and revising before that point follow the authoring-voice rule and language.md without this skill, its cold reader or its hooks. Establishes the reader brief and structure, drills from surface text to meaning, and applies a cold-reader review and mechanical style gate. Not for code comments or ordinary conversational replies.
 hooks:
   PostToolUse:
     - matcher: Write|Edit|MultiEdit
       hooks:
         - type: command
-          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh" --record
+          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh" --scope "$CLAUDE_PROJECT_DIR/.claude/rules/authoring-voice.md" --outside-scope --record
           timeout: 10
   Stop:
     - hooks:
@@ -56,9 +56,9 @@ Every run names an output mode and an intent. The modes: `review` returns findin
 
 ## House voice
 
-Write as a knowledgeable colleague speaking directly and precisely to another colleague. The tone is conversational, brisk but not terse, serious without becoming pompous, and confident only where the evidence supports confidence.
+The register is the one [language.md](../../best-practices/writing/language.md) sets under "Voice and tone": formal, explanatory and deliberate. A document states facts, mechanisms and consequences and lets the comparison carry the judgement, confident only where the evidence supports confidence.
 
-Lead with the point. Name actors and mechanisms. Prefer concrete facts to judgments about those facts. Let the reader see what happens, why it happens and what follows from that behaviour. Preserve natural cadence rather than forcing every sentence into the same short pattern.
+Lead with the point. Name actors and mechanisms. Prefer concrete facts to judgements about those facts. Let the reader see what happens, why it happens and what follows from that behaviour. Preserve natural cadence rather than forcing every sentence into the same short pattern. Drafting before any pass follows the authoring-voice rule, which digests the same document.
 
 Do not invent missing meaning, rationale or evidence. A named gap is better than a fluent guess.
 
