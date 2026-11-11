@@ -46,7 +46,8 @@ Each of these has a literal sense that stays. Replace every other use with the r
 | `appropriate`, `appropriately` | state the criterion |
 | `overarching` | name what the thing spans |
 | `foster`, `fosters`, `fostered`, `fostering` | state the action taken |
-| `alone` after a noun | where it restricts the subject ("the front door alone holds"), put only before the noun: "only the front door holds"; keep it for the by-itself sense ("expiry alone ends no provider session") or write "by itself" |
+| `alone` after a noun | where it restricts the subject ("the front door alone holds"), lead with what is restricted: "access to the store is restricted to the front door"; keep it for the by-itself sense ("expiry alone ends no provider session") or write "by itself" |
+| `only` | ask if a rewrite can express the meaning without using only: lead with what is restricted, "access to the store is restricted to the front door", or drop a restriction that adds nothing, "receives the plan and `writing.md`" |
 | `price`, `prices`, `priced`, `ride`, `rides`, `bite`, `bites`, `spend`, `spends`, `spent`, `buy`, `buys`, `kill`, `kills`, `hang on`, `hangs on`, `collapse`, `collapses`, `leak`, `leaks`, `land`, `lands`, `landed`, `foreclose`, `forecloses`, `soften`, `softens`, `softened`, `softening`, `bootstrap`, `bootstraps`, `bootstrapped`, `bootstrapping`, `axis`, `axes`, `posture`, `postures` | metaphor candidate: keep a literal use; rewrite a figurative use around the mechanism, not another metaphor |
 | `held open under`, `argued under`, `its case is made`, `stated below the table`, `collected under`, `point back to`, `points back to` | ledger voice: state the status or pointer in plain words, "that is still an open question (see X)" |
 | `frictionless`, `intuitive`, `mission-critical`, `enterprise-grade`, `future-proof`, `unlock*`, `harness*`, `elevate*`, `introducing`, `say hello to`, `meet the`, `comprehensive`, `best practice*`, `landscape`, `pivotal`, `crucial`, `vital` | hype: keep a literal use (a test harness, a raised privilege, a locked record); otherwise state the measured fact, list what is covered, or name the practice |
@@ -83,7 +84,7 @@ Each pattern is recognised by reading, and the repair is the whole fix.
 | A heading not in title case | capitalise every word except articles, short conjunctions and short prepositions after the first word: "Activity and the Idle Point" |
 | An opening sentence that lists the page's parts as noun phrases: "This page covers the assertion, the operations and the rules" | write one sentence per job of the page, each with an actor and a verb |
 | A sentence or line that ends on the pronoun `it` | name the noun the pronoun stands for. The subject the pronoun hides usually belongs at the front of the sentence |
-| A contact clause, a dropped relative pronoun that gives agency to a thing: "a store only the front door reaches" | restore the relative pronoun and the capability verb: "a store that only the front door can access" |
+| A contact clause, a dropped relative pronoun that gives agency to a thing: "a store only the front door reaches" | lead with what is restricted: "Access to the store is restricted to the front door" |
 | Aside stacking, three or more spaced hyphens in one sentence | recast the asides as sentences or a list |
 | An em dash, a spaced en dash or a spaced hyphen used as a sentence break | a full stop, a comma or a colon, or two sentences |
 | A curly quote | a straight quote |

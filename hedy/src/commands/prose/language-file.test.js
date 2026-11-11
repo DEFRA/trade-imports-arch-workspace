@@ -110,7 +110,7 @@ describe('readLanguageRows', () => {
 
   it('reads every row of the workspace language file, with only the you row scoped to documents and only the portal row case sensitive', async () => {
     const { banned, examine, patterns } = await readLanguageRows(WORKSPACE_ROOT)
-    expect([banned.length, examine.length, patterns.length]).toEqual([20, 22, 13])
+    expect([banned.length, examine.length, patterns.length]).toEqual([20, 23, 13])
     const rowHolding = (form) => banned.find(({ forms }) => forms.includes(form))
     expect(rowHolding('you')).toMatchObject({ scope: 'documents', caseSensitive: false })
     expect(rowHolding('portal')).toMatchObject({ scope: 'all', caseSensitive: true })
