@@ -1,4 +1,4 @@
-import { checkRows, runWorkspaceCheck } from '../../commands/workspace/check.js'
+import { checkRows, checkSummary, runWorkspaceCheck } from '../../commands/workspace/check.js'
 import { ResultScreen } from '../common/result-screen.js'
 import { SCREENS } from '../screens.js'
 
@@ -15,7 +15,8 @@ export const useWorkspaceFeature = ({
   const handleMainMenuSelect = async () => {
     showLoading('Checking the workspace setup')
     try {
-      setScreenData({ rows: checkRows(await checkWorkspace()) })
+      const result = await checkWorkspace()
+      setScreenData({ title: checkSummary(result), rows: checkRows(result) })
       setScreen(SCREENS.WORKSPACE_RESULT)
     } catch (error) {
       showErrors(error)
@@ -25,7 +26,7 @@ export const useWorkspaceFeature = ({
   const routes = {
     [SCREENS.WORKSPACE_RESULT]: {
       component: ResultScreen,
-      props: ({ rows }) => ({ title: 'Workspace setup', rows, onReturn: navigateToMain })
+      props: ({ title, rows }) => ({ title, rows, onReturn: navigateToMain })
     }
   }
 

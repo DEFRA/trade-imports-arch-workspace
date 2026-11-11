@@ -25,7 +25,7 @@ const renderWorkspaceFeature = (options) => {
 }
 
 describe('useWorkspaceFeature', () => {
-  it('shows the loading message, then one row per check, and Enter on the result returns to the main menu', async () => {
+  it('shows the loading message, then the pass summary as the title and one pass row per check, and Enter on the result returns to the main menu', async () => {
     const checks = []
     const answer = Promise.withResolvers()
     const { lastFrame, stdin, returns } = renderWorkspaceFeature({
@@ -36,10 +36,10 @@ describe('useWorkspaceFeature', () => {
     })
     await vi.waitFor(() => expect(lastFrame()).toContain('Checking the workspace setup'))
     answer.resolve({ root: '/ws', checks: [{ name: 'Node', detail: 'Node 24.15.0' }, { name: 'Git hooks', detail: 'core.hooksPath is .githooks' }] })
-    await vi.waitFor(() => expect(lastFrame()).toContain('Workspace setup'))
+    await vi.waitFor(() => expect(lastFrame()).toContain('All 2 workspace setup checks pass.'))
     const frame = lastFrame()
-    expect(frame).toContain('Node:      Node 24.15.0')
-    expect(frame).toContain('Git hooks: core.hooksPath is .githooks')
+    expect(frame).toContain('Node:      pass, Node 24.15.0')
+    expect(frame).toContain('Git hooks: pass, core.hooksPath is .githooks')
     expect(checks).toEqual(['check'])
     await pause()
     stdin.write('\r')

@@ -186,12 +186,12 @@ describe('MainMenu', () => {
     expect(renderMenu({ initialScreen: 'no-such-screen' }).lastFrame()).toBe('')
   })
 
-  it('runs the injected workspace check from Check the workspace setup, shows one row per check, and Enter returns to the main menu', async () => {
+  it('runs the injected workspace check from Check the workspace setup, shows the pass summary and one pass row per check, and Enter returns to the main menu', async () => {
     const check = recorder(() => ({ root: '/ws', checks: [{ name: 'Git hooks', detail: 'core.hooksPath is .githooks' }] }))
     const menu = renderMenu({ checkWorkspace: check.fake })
     await chooseItem(menu, { on: 'Quit', index: 3 })
-    await shown(menu.lastFrame, 'Workspace setup')
-    expect(menu.lastFrame()).toContain('Git hooks: core.hooksPath is .githooks')
+    await shown(menu.lastFrame, 'The 1 workspace setup check passes.')
+    expect(menu.lastFrame()).toContain('Git hooks: pass, core.hooksPath is .githooks')
     expect(check.calls).toEqual([undefined])
     await press(menu.stdin, '\r')
     await shown(menu.lastFrame, 'Check the workspace setup')

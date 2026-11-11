@@ -8,13 +8,13 @@ import { SETUP_CHECKS } from './setup-checks.js'
 
 const checkOptionsSchema = z.object({}).strict()
 
-const failedCheckError = (name, reason) => new HedyError('SETUP', `${name}: ${toHedyError(reason).message}`, { cause: reason })
+const failedCheckError = (name, reason) => new HedyError('SETUP', `${name} failed: ${toHedyError(reason).message}`, { cause: reason })
 
 /**
  * Runs every setup check against the workspace's real root and resolves to
  * { root, checks }, one { name, detail } per check in order, when every check
  * passes. Otherwise rejects with an AggregateError holding one SETUP error per
- * failed check, in check order, its message led by the check's name.
+ * failed check, in check order, its message led by the check's name and "failed".
  *
  * @param {{
  *   workspaceRoot: () => string, env: Record<string, string | undefined>,
@@ -41,14 +41,30 @@ export const runWorkspaceCheck = async ({
 }
 
 /**
- * Returns one [name, detail] row per check, in order.
+ * Returns one row per check, in order: the check's name and its detail marked
+ * as a pass.
  *
  * @param {{ checks: { name: string, detail: string }[] }} result
  * @returns {[string, string][]}
  */
-export const checkRows = ({ checks }) => checks.map(({ name, detail }) => [name, detail])
+export const checkRows = ({ checks }) => checks.map(({ name, detail }) => [name, `pass, ${detail}`])
 
-const renderCheck = (result) => checkRows(result).map(([name, detail]) => `ok ${name}: ${detail}`).join('\n')
+/**
+ * Returns the sentence that states every check passed, with the count.
+ *
+ * @param {{ checks: unknown[] }} result
+ */
+export const checkSummary = ({ checks }) =>
+  checks.length === 1 ? 'The 1 workspace setup check passes.' : `All ${checks.length} workspace setup checks pass.`
+
+/**
+ * Returns the text output of a passing run: one "pass <name>: <detail>" line
+ * per check, a blank line, then the summary.
+ *
+ * @param {{ checks: { name: string, detail: string }[] }} result
+ */
+export const renderCheck = (result) =>
+  [...result.checks.map(({ name, detail }) => `pass ${name}: ${detail}`), '', checkSummary(result)].join('\n')
 
 export const register = (group, { stdout, stderr, setExitCode, env, workspaceRoot }) => {
   group

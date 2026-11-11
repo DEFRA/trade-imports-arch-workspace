@@ -6,7 +6,7 @@ import { HedyError } from '../../errors.js'
 import { createWorkspace, runCli } from '../../test-support/cli.js'
 import { rejectionOf } from '../../test-support/http.js'
 import { captureIo } from '../../test-support/io.js'
-import { checkRows, register, runWorkspaceCheck } from './check.js'
+import { checkRows, checkSummary, register, renderCheck, runWorkspaceCheck } from './check.js'
 
 let root
 
@@ -52,7 +52,7 @@ describe('runWorkspaceCheck', () => {
     expect(seen).toEqual([{ root, env: { PATH: '/bin' }, cwd: '/somewhere', homedir: '/home/someone', nodeVersion: '24.1.0', runTool }])
   })
 
-  it('throws an AggregateError holding one SETUP error per failed check, in check order, each named after its check', async () => {
+  it('throws an AggregateError holding one SETUP error per failed check, in check order, each led by its check\'s name and "failed"', async () => {
     const error = await rejectionOf(runWorkspaceCheck({
       workspaceRoot: () => root,
       env: {},
@@ -65,16 +65,34 @@ describe('runWorkspaceCheck', () => {
     }))
     expect(error).toBeInstanceOf(AggregateError)
     expect(error.errors.map(({ code, message }) => ({ code, message }))).toEqual([
-      { code: 'SETUP', message: 'First: First is wrong. Fix it.' },
-      { code: 'SETUP', message: 'Third: Third needs a value. Give one.' },
-      { code: 'SETUP', message: 'Fourth: Fourth broke.' }
+      { code: 'SETUP', message: 'First failed: First is wrong. Fix it.' },
+      { code: 'SETUP', message: 'Third failed: Third needs a value. Give one.' },
+      { code: 'SETUP', message: 'Fourth failed: Fourth broke.' }
     ])
   })
 })
 
 describe('checkRows', () => {
-  it('gives one row per check, its name and its detail', () => {
-    expect(checkRows({ root, checks: [{ name: 'Node', detail: 'Node 24.15.0' }] })).toEqual([['Node', 'Node 24.15.0']])
+  it('gives one row per check, its name and its detail marked as a pass', () => {
+    expect(checkRows({ root, checks: [{ name: 'Node', detail: 'Node 24.15.0' }] })).toEqual([['Node', 'pass, Node 24.15.0']])
+  })
+})
+
+describe('checkSummary', () => {
+  it.each([
+    [1, 'The 1 workspace setup check passes.'],
+    [11, 'All 11 workspace setup checks pass.']
+  ])('states that every one of %i checks passes', (count, summary) => {
+    const checks = Array.from({ length: count }, (_, index) => ({ name: `Check ${index}`, detail: 'fine' }))
+    expect(checkSummary({ root, checks })).toBe(summary)
+  })
+})
+
+describe('renderCheck', () => {
+  it('prints a pass line per check, then the summary', () => {
+    expect(renderCheck({ root, checks: [{ name: 'Node', detail: 'Node 24.15.0' }, { name: 'Git hooks', detail: 'core.hooksPath is .githooks' }] })).toBe(
+      'pass Node: Node 24.15.0\npass Git hooks: core.hooksPath is .githooks\n\nAll 2 workspace setup checks pass.'
+    )
   })
 })
 
@@ -97,8 +115,8 @@ describe('the check command', () => {
     expect(envelope.ok).toBe(false)
     expect(new Set(envelope.errors.map(({ code }) => code))).toEqual(new Set(['SETUP']))
     const messages = envelope.errors.map(({ message }) => message)
-    expect(messages).toContain(`Child repos: The Makefile at ${join(root, 'Makefile')} has no CHILDREN line. Restore the line, then run the check again.`)
-    expect(messages).toContain(`Git hooks: core.hooksPath is not set, so the pre-commit gates do not run. Set it with make -C ${root} install.`)
+    expect(messages).toContain(`Child repos failed: The Makefile at ${join(root, 'Makefile')} has no CHILDREN line. Restore the line, then run the check again.`)
+    expect(messages).toContain(`Git hooks failed: core.hooksPath is not set, so the pre-commit gates do not run. Set it with make -C ${root} install.`)
     expect(h.codes).toEqual([1])
   })
 
@@ -107,7 +125,7 @@ describe('the check command', () => {
     await h.program.parseAsync(['workspace', 'check'], { from: 'user' })
     const lines = h.err.join('').trim().split('\n')
     expect(lines.length).toBeGreaterThanOrEqual(2)
-    expect(lines).toContain(`Git hooks: core.hooksPath is not set, so the pre-commit gates do not run. Set it with make -C ${root} install.`)
+    expect(lines).toContain(`Git hooks failed: core.hooksPath is not set, so the pre-commit gates do not run. Set it with make -C ${root} install.`)
     expect(h.out).toEqual([])
   })
 
