@@ -3,9 +3,10 @@
 # adds each failed check, with its next step, to the session's context, so the
 # agent tells the user before other work. Never blocks the session.
 #
-# A session started in a subfolder loads no workspace hooks, so this hook
-# cannot see that case. It runs hedy from the session's folder as Claude Code
-# typed it, so a folder reached through a symlink is reported.
+# Claude Code resolves a session's folder to its real path at start-up, so a
+# session started through a symlink reaches this hook as its real path, and the
+# current folder check passes here. A session started in a subfolder loads no
+# workspace hooks, so this hook cannot see that case either.
 #
 # stdin: the SessionStart JSON. Prints hookSpecificOutput JSON only when a check
 # fails or hedy cannot run. Exit 0 always.
