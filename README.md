@@ -10,15 +10,44 @@ AI skills and tooling shared across DEFRA trade-imports architecture work. The v
 
 ## Getting started
 
-```bash
-git clone https://github.com/DEFRA/trade-imports-arch-workspace.git
-cd trade-imports-arch-workspace
-make
-```
+Prerequisites:
 
-`make` clones the child repos, installs the pre-commit gates and `hedy`, and verifies the result. The steps run individually as `make clone`, `make pull`, `make install` and `make check`. Clones use SSH; add `GIT_BASE=https://github.com/DEFRA` to clone over HTTPS.
+- Node 24 or later. `make install` stops and names the fix when Node is older.
+- `git`, `jq` and `curl` on PATH.
+- SSH access to the DEFRA GitHub organisation, including the private `trade-imports-documentation` repository. Without SSH, add `GIT_BASE=https://github.com/DEFRA` to each `make` command to clone the child repos over HTTPS.
+- An Atlassian API token, for the Jira and Confluence commands.
+- Optional: `gh`, which the `pr` skill uses.
 
-The checkout can live in any folder. Everything in the workspace refers to paths relative to the workspace root, so the same commands work in every checkout, and agent sessions start at the root. The contract is documented in `.claude/rules/workspace-paths.md`.
+1. Clone the workspace into any folder, and run `make` there:
+
+   ```bash
+   git clone git@github.com:DEFRA/trade-imports-arch-workspace.git
+   cd trade-imports-arch-workspace
+   make
+   ```
+
+   `make` clones the three child repos, then runs `make install` and `make check`. `make install` points `core.hooksPath` at `.githooks`, installs `hedy` and puts it on PATH, and installs the docs repo's packages. `make check` runs `hedy workspace check`, the skills lint, the golden tests and the hedy tests. Each step also runs on its own as `make clone`, `make pull`, `make install` or `make check`.
+
+2. Create `.env` at the workspace root with the Atlassian credentials. git ignores the file, and `hedy` reads it directly:
+
+   ```
+   JIRA_USER=<email address of the Atlassian account>
+   JIRA_TOKEN=<Atlassian API token>
+   JIRA_BASE_URL=https://<site>.atlassian.net
+   ```
+
+3. Check the setup:
+
+   ```bash
+   hedy workspace check
+   hedy auth
+   ```
+
+   `hedy workspace check` names the next step for each failed check. `hedy auth` shows the Jira and Confluence display names when the credentials work.
+
+4. Start Claude Code sessions from the workspace root with `claude`. Every path in the workspace is relative to the root, so a checkout works wherever it is cloned. The path contract is in `.claude/rules/workspace-paths.md`.
+
+A machine set up before the workspace dropped its fixed location may still have a `~/trade-imports-arch-workspace` symlink. `hedy workspace check` reports the symlink, and `unlink ~/trade-imports-arch-workspace` followed by `make install` repairs the machine.
 
 ## The `hedy` CLI
 
@@ -56,8 +85,8 @@ The workspace wraps two repos that together provide documentation-as-code for th
 Directional setup only - each repo's README holds the authoritative steps:
 
 1. `make clone` puts both repos in place as siblings.
-2. `npm install` inside `trade-imports-documentation` (and again in its `astro/` subdirectory) resolves the tooling by relative path and installs everything else.
-3. Node.js 22+ is required; publishing to Confluence needs Atlassian credentials in environment variables (`CONFLUENCE_USERNAME`, `CONFLUENCE_API_TOKEN`).
+2. `make install` runs `npm install` inside `trade-imports-documentation`, which resolves the tooling by relative path and installs everything else. The GitHub Pages site needs a second `npm install` in its `astro/` subdirectory.
+3. Node 24 or later is required. `hedy confluence publish` sets the publisher's `CONFLUENCE_USERNAME`, `CONFLUENCE_API_TOKEN` and `CONFLUENCE_URL` from the `JIRA_*` variables in `.env`. Running the docs repo's publish script directly needs the `CONFLUENCE_*` variables in the environment.
 
 `make` also clones [trade-imports-schemas](https://github.com/DEFRA/trade-imports-schemas), the JSON Schema and JSON-LD artefacts for trade-import payloads - a self-contained sibling with its own README.
 
