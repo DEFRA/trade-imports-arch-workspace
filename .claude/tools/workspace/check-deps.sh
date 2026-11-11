@@ -24,8 +24,8 @@ say() { echo "deps-check: $1"; }
 
 # Child projects come from the Makefile's CHILDREN line - the single
 # source of truth (a second hardcoded list is how earlier drift
-# happened). Parse + fallback pinned to check-workspace.sh and
-# lint-skills.sh - change all three together.
+# happened). Parse + fallback pinned to lint-skills.sh, and hedy
+# workspace check reads the same line - change all three together.
 CHILDREN=$(awk -F':=' '/^CHILDREN[[:space:]]*:?=/{print $2}' "$ROOT/Makefile" 2>/dev/null)
 if [[ -z "${CHILDREN// /}" ]]; then
     say "WARN could not parse CHILDREN from $ROOT/Makefile - using fallback list"
