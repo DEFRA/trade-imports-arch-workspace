@@ -42,7 +42,7 @@ Fetch a Confluence page by URL or page id as clean markdown through the hedy CLI
 
 ## 8. Helpers introduced
 
-None. The skill calls `hedy confluence page`, and the `tools/confluence/` hand tools no longer hold a read path. The scaffold's helper stubs were deliberately skipped so the existing hand tools would not be overwritten. The domain name differs from the skill name by design.
+None. The skill calls `hedy confluence page` and owns no script under `.claude/tools/`, because `hedy` is the one route to Confluence. The scaffold's helper stubs were skipped for the same reason.
 
 ## 9. Triggers
 
