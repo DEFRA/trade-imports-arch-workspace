@@ -99,6 +99,8 @@ run when one fails:
 | `check-auth.sh` | the Atlassian credentials through `hedy auth`, plus any domain `auth.sh` | on demand | fix the named env var in `.env`; run `make install` when `hedy` is missing |
 | `check-deps.sh` | declared `workspace-deps` resolve on this machine | `make check` | clone the project / install the tool it names |
 | `lint-skills.sh` | declaration format, dangling links, undeclared-invocation sweep | pre-commit (staged index), scaffold tail, `make check` | fix and re-stage; acknowledge soft probes in `workspace-soft-deps` |
+| `.githooks/commit-msg` | the commit message, through `hedy prose check` | every commit, once `make install` has set `core.hooksPath` | reword each banned and pattern finding the hook names, then commit again |
+| `create-pr.sh` | the pull request title and body, for AI attribution and through `hedy prose check` | every pull request created or edited through the `pr` skill or the script | reword the title or body and run the script again |
 | Golden tests (2 suites) | scaffold and doctor behaviour vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
 | Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
 | Guard hooks (`.claude/hooks/`) | agent Bash and file-edit calls in Claude Code sessions | every matched tool call | follow the sanctioned alternative the denial names |
