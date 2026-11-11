@@ -1,6 +1,6 @@
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execa } from 'execa'
 
@@ -43,14 +43,19 @@ export const runCli = async (args, { workspace, env = {}, cwd, input } = {}) => 
  * Creates a workspace folder, by default a new temporary one holding a .claude
  * folder and a Makefile, which passes the workspace check. The caller removes it.
  *
- * @param {{ at?: string, claudeFolder?: boolean, makefile?: boolean }} [options]
+ * @param {{ at?: string, claudeFolder?: boolean, makefile?: boolean, files?: Record<string, string> }} [options]
  *   at creates the folder at that path instead of a new temporary one
+ *   files maps a path relative to the folder to the text written there
  * @returns {Promise<string>} the folder's absolute path
  */
-export const createWorkspace = async ({ at, claudeFolder = true, makefile = true } = {}) => {
+export const createWorkspace = async ({ at, claudeFolder = true, makefile = true, files = {} } = {}) => {
   const root = at ?? await mkdtemp(join(tmpdir(), 'hedy-workspace-'))
   await mkdir(root, { recursive: true })
   if (claudeFolder) await mkdir(join(root, '.claude'))
   if (makefile) await writeFile(join(root, 'Makefile'), 'all:\n')
+  for (const [path, text] of Object.entries(files)) {
+    await mkdir(dirname(join(root, path)), { recursive: true })
+    await writeFile(join(root, path), text)
+  }
   return root
 }

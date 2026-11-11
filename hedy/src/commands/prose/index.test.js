@@ -1,13 +1,17 @@
+import { readFile, rm } from 'node:fs/promises'
 import { Readable } from 'node:stream'
 import { fileURLToPath } from 'node:url'
 import { Command } from 'commander'
-import { describe, it, expect } from 'vitest'
-import { runCli } from '../../test-support/cli.js'
+import { afterAll, describe, it, expect } from 'vitest'
+import { createWorkspace, runCli } from '../../test-support/cli.js'
 import { rejectionOf } from '../../test-support/http.js'
 import { captureIo } from '../../test-support/io.js'
 import { register } from './index.js'
+import { LANGUAGE_FILE } from './language-file.js'
 
-const WORKSPACE_ROOT = fileURLToPath(new URL('../../../../', import.meta.url))
+const languageFixture = await readFile(new URL('./__fixtures__/tables/language.md', import.meta.url), 'utf8')
+const FIXTURE_WORKSPACE = await createWorkspace({ files: { [LANGUAGE_FILE]: languageFixture } })
+afterAll(() => rm(FIXTURE_WORKSPACE, { recursive: true, force: true }))
 
 const harness = () => {
   const io = captureIo()
@@ -15,7 +19,7 @@ const harness = () => {
     .option('--json')
     .exitOverride()
     .configureOutput({ writeOut: (chunk) => io.stdout.write(chunk), writeErr: () => {} })
-  register(program, { ...io, stdin: Readable.from(['']), workspaceRoot: () => WORKSPACE_ROOT })
+  register(program, { ...io, stdin: Readable.from(['']), workspaceRoot: () => FIXTURE_WORKSPACE })
   return { program, ...io }
 }
 
@@ -46,7 +50,7 @@ describe('the prose group', () => {
 
 describe('hedy prose --help, spawned', () => {
   it('lists the check command and exits 0', async () => {
-    const result = await runCli(['prose', '--help'], { workspace: WORKSPACE_ROOT })
+    const result = await runCli(['prose', '--help'], { workspace: FIXTURE_WORKSPACE })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toMatch(/^ {2}check \[options\] \[files\.\.\.\]\s/m)
   })

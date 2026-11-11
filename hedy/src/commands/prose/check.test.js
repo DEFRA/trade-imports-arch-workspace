@@ -4,14 +4,13 @@ import { join } from 'node:path'
 import { Readable } from 'node:stream'
 import { fileURLToPath } from 'node:url'
 import { Command } from 'commander'
-import { afterEach, beforeEach, describe, it, expect } from 'vitest'
-import { runCli } from '../../test-support/cli.js'
+import { afterAll, afterEach, beforeEach, describe, it, expect } from 'vitest'
+import { createWorkspace, runCli } from '../../test-support/cli.js'
 import { rejectionOf } from '../../test-support/http.js'
 import { captureIo } from '../../test-support/io.js'
 import { readFileText, readStdinText, register, renderProseCheck, runProseCheck } from './check.js'
 import { LANGUAGE_FILE, readLanguageRows } from './language-file.js'
 
-const WORKSPACE_ROOT = fileURLToPath(new URL('../../../../', import.meta.url))
 const fixturePath = (name) => fileURLToPath(new URL(`./__fixtures__/${name}`, import.meta.url))
 const readFixture = (name) => readFile(fixturePath(name), 'utf8')
 
@@ -19,7 +18,10 @@ const EM_DASH = String.fromCodePoint(0x2014)
 const EN_DASH = String.fromCodePoint(0x2013)
 const RIGHT_SINGLE_QUOTE = String.fromCodePoint(0x2019)
 
-const rows = await readLanguageRows(WORKSPACE_ROOT)
+const FIXTURE_WORKSPACE = await createWorkspace({ files: { [LANGUAGE_FILE]: await readFixture('tables/language.md') } })
+afterAll(() => rm(FIXTURE_WORKSPACE, { recursive: true, force: true }))
+
+const rows = await readLanguageRows(FIXTURE_WORKSPACE)
 const { cases } = JSON.parse(await readFixture('expected-findings.json'))
 
 const check = (text, { label = 'docs/page.md' } = {}) => runProseCheck({ texts: [{ label, text }], rows })
@@ -260,7 +262,7 @@ describe('the check command, in-process', () => {
       .option('--json')
       .exitOverride()
       .configureOutput({ writeOut: (chunk) => io.stdout.write(chunk), writeErr: () => {} })
-    register(program, { ...io, stdin: Readable.from([stdinText]), workspaceRoot: () => WORKSPACE_ROOT })
+    register(program, { ...io, stdin: Readable.from([stdinText]), workspaceRoot: () => FIXTURE_WORKSPACE })
     return { program, ...io }
   }
 
@@ -330,7 +332,7 @@ describe('hedy prose check, spawned', () => {
   const failingPage = fixturePath('pages/jargon.md')
 
   it('--json on a page with banned findings exits 1 with one PROSE error and the failing result', async () => {
-    const result = await runCli(['prose', 'check', '--json', failingPage], { workspace: WORKSPACE_ROOT })
+    const result = await runCli(['prose', 'check', '--json', failingPage], { workspace: FIXTURE_WORKSPACE })
     expect(result.exitCode).toBe(1)
     expect(result.envelope.ok).toBe(false)
     expect(result.envelope.errors.map(({ code }) => code)).toEqual(['PROSE'])
@@ -339,14 +341,14 @@ describe('hedy prose check, spawned', () => {
   })
 
   it('--json on a clean page exits 0 with a passing result', async () => {
-    const result = await runCli(['prose', 'check', '--json', fixturePath('pages/clean.md')], { workspace: WORKSPACE_ROOT })
+    const result = await runCli(['prose', 'check', '--json', fixturePath('pages/clean.md')], { workspace: FIXTURE_WORKSPACE })
     expect(result.exitCode).toBe(0)
     expect(result.envelope.ok).toBe(true)
     expect(result.envelope.result.passed).toBe(true)
   })
 
   it('--json on a missing path exits 2 with USAGE and a null result', async () => {
-    const result = await runCli(['prose', 'check', '--json', fixturePath('pages/no-such-page.md')], { workspace: WORKSPACE_ROOT })
+    const result = await runCli(['prose', 'check', '--json', fixturePath('pages/no-such-page.md')], { workspace: FIXTURE_WORKSPACE })
     expect(result.exitCode).toBe(2)
     expect(result.envelope.errors.map(({ code }) => code)).toEqual(['USAGE'])
     expect(result.envelope.result).toBeNull()
@@ -354,7 +356,7 @@ describe('hedy prose check, spawned', () => {
 
   it('--json --stdin --label title exits 1 with the em dash finding at line 1 under the label title', async () => {
     const input = await readFixture('stdin/stdin-title-viol.txt')
-    const result = await runCli(['prose', 'check', '--json', '--stdin', '--label', 'title'], { workspace: WORKSPACE_ROOT, input })
+    const result = await runCli(['prose', 'check', '--json', '--stdin', '--label', 'title'], { workspace: FIXTURE_WORKSPACE, input })
     expect(result.exitCode).toBe(1)
     expect(result.envelope.result.findings).toEqual([
       expect.objectContaining({ label: 'title', line: 1, kind: 'pattern', term: 'em dash' })
@@ -362,7 +364,7 @@ describe('hedy prose check, spawned', () => {
   })
 
   it('in text mode on a failing page exits 1, prints the findings on stdout and the PROSE message on stderr', async () => {
-    const result = await runCli(['prose', 'check', failingPage], { workspace: WORKSPACE_ROOT })
+    const result = await runCli(['prose', 'check', failingPage], { workspace: FIXTURE_WORKSPACE })
     expect(result.exitCode).toBe(1)
     expect(result.stdout).toContain(`${failingPage}:3: banned "leverage": ${bannedRepairOf('leverage')}`)
     expect(result.stdout.split('\n').at(-1)).toBe('4 banned, 1 examine, 0 pattern')
@@ -370,7 +372,7 @@ describe('hedy prose check, spawned', () => {
   })
 
   it('--stdin without --label exits 2', async () => {
-    const result = await runCli(['prose', 'check', '--stdin'], { workspace: WORKSPACE_ROOT, input: 'Text.' })
+    const result = await runCli(['prose', 'check', '--stdin'], { workspace: FIXTURE_WORKSPACE, input: 'Text.' })
     expect(result.exitCode).toBe(2)
     expect(result.stderr).toContain('--label')
   })

@@ -1,4 +1,4 @@
-import { rm, stat } from 'node:fs/promises'
+import { readFile, rm, stat } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import { afterEach, describe, it, expect } from 'vitest'
 import { createWorkspace, runCli } from './cli.js'
@@ -80,5 +80,11 @@ describe('createWorkspace', () => {
     expect(root).toBe(join(parent, 'nested', 'ws'))
     expect((await stat(join(root, '.claude'))).isDirectory()).toBe(true)
     await expect(stat(join(root, 'Makefile'))).rejects.toMatchObject({ code: 'ENOENT' })
+  })
+
+  it('writes each given file at its relative path, creating the folders it needs', async () => {
+    const root = await workspace({ files: { 'a/b/page.md': 'Text.\n', 'top.md': 'Top.\n' } })
+    expect(await readFile(join(root, 'a/b/page.md'), 'utf8')).toBe('Text.\n')
+    expect(await readFile(join(root, 'top.md'), 'utf8')).toBe('Top.\n')
   })
 })
