@@ -22,7 +22,7 @@
         "push to confluence",
         "publish page"
       ],
-      "disambiguation": "Distinct from Claude Code built-in /init (CLAUDE.md scaffolding, no publishing). Distinct from mermaid-check (validates diagram syntax and rendering, never publishes): this skill invokes mermaid-check as its diagram-validation step rather than duplicating it. Distinct from editorial (content quality, not delivery). Orchestrates the existing delivery-info-arch-tooling build and publish scripts for one page; owns no build or publish logic of its own. The bare phrase publish page defaults here because Confluence is the only push target needing a skill; GitHub Pages deploys automatically via CI."
+      "disambiguation": "Distinct from Claude Code built-in /init (CLAUDE.md scaffolding, no publishing). Distinct from mermaid-check (validates diagram syntax and rendering, never publishes): this skill invokes mermaid-check as its diagram-validation step rather than duplicating it. Distinct from authoring (content quality, not delivery). Orchestrates the existing delivery-info-arch-tooling build and publish scripts for one page; owns no build or publish logic of its own. The bare phrase publish page defaults here because Confluence is the only push target needing a skill; GitHub Pages deploys automatically via CI."
     }
   }
 }

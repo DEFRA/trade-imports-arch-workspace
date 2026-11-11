@@ -1,6 +1,6 @@
 ---
 name: decide
-description: 'Put every open decision of the current work to the user as question prompts: each prompt frames the problem, the evidence and the consequence of the choice, offers 2 to 4 options and leads with the recommendation; then record the answers where the work keeps its state and act only on answers that are explicit instructions. Triggers: "/decide", "present the decisions", "give me the decisions as prompts", "ask me the open questions", "what do I need to decide". NOT for a single clarifying question in the middle of a task (ask it directly), for closing editorial review findings (editorial-triage, whose Decide section and spot check own those inside a triage run), or for Jira tickets (jira). Distinct from /init, which scaffolds CLAUDE.md. Decides nothing itself and owns no domain state.'
+description: 'Put every open decision of the current work to the user as question prompts: each prompt frames the problem, the evidence and the consequence of the choice, offers 2 to 4 options and leads with the recommendation; then record the answers where the work keeps its state and act only on answers that are explicit instructions. Triggers: "/decide", "present the decisions", "give me the decisions as prompts", "ask me the open questions", "what do I need to decide". NOT for a single clarifying question in the middle of a task (ask it directly), or for Jira tickets (jira). Distinct from /init, which scaffolds CLAUDE.md. Decides nothing itself and owns no domain state.'
 ---
 
 Collects the decisions waiting on the user in the current work, from any domain, and puts each one to the user as a question prompt with enough context to decide without scrolling back: what is being decided, the evidence, what each choice leads to, and a recommendation. The answers are recorded in the work's own records, and only answers that instruct an action are acted on.
@@ -17,7 +17,7 @@ Collects the decisions waiting on the user in the current work, from any domain,
 | "ask me the open questions" | Steps 1 to 4 |
 | "what do I need to decide" | Steps 1 to 4 |
 
-NOT for a single clarifying question in the middle of a task: ask it directly with the question tool. NOT for closing editorial review findings: `editorial-triage` owns those. NOT for Jira tickets: `jira`.
+NOT for a single clarifying question in the middle of a task: ask it directly with the question tool. NOT for Jira tickets: `jira`.
 
 ## Step 1: Gather the Open Decisions
 

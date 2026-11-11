@@ -1,0 +1,11 @@
+check-prose: FAIL docs/page.md:3: You decide, and your team agrees.
+check-prose: banned term "you", "your" - name the actor or the reader's role, or write the step in the imperative - rule: ~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md ("Words to avoid or examine").
+check-prose: FAIL docs/page.md:3: You decide, and your team agrees.
+check-prose: banned term "you", "your" - name the actor or the reader's role - rule: terms.md ("Words to avoid or examine").
+check-prose: WARN docs/page.md:7: The step simply runs.
+check-prose: WARN hits are "simply" - filler: delete and keep the point (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
+check-prose: WARN docs/page.md:5: Please read the page.
+check-prose: WARN hits are "please" - state the instruction (terms.md, "Words to avoid or examine").
+check-prose: WARN docs/page.md:7: The step simply runs.
+check-prose: WARN hits are "simply" - delete the word (terms.md, "Words to avoid or examine").
+exit-code: 2

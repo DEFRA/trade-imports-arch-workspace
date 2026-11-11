@@ -1,0 +1,5 @@
+check-prose: WARN hedy/CLAUDE.md:7: The step simply runs.
+check-prose: WARN hits are "simply" - filler: delete and keep the point (~/trade-imports-arch-workspace/.claude/best-practices/writing/language.md, "Words to avoid or examine").
+check-prose: WARN hedy/CLAUDE.md:7: The step simply runs.
+check-prose: WARN hits are "simply" - delete the word (terms.md, "Words to avoid or examine").
+exit-code: 0

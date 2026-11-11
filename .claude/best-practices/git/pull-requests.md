@@ -21,13 +21,13 @@ Conventional-commit style, same mechanics as a commit subject ([commits.md](comm
 
 ## Bodies
 
-Clarity is the governing requirement: write for a cold reader who has not seen the branch or the conversation that produced the change. Establish the brief and house voice before drafting - the [editorial skill](../../skills/editorial/SKILL.md) Writing path - rather than fixing the prose afterwards.
+Clarity is the governing requirement: write for a cold reader who has not seen the branch or the conversation that produced the change. The body is written through the [authoring skill](../../skills/authoring/SKILL.md), short-artefact path, to [writing.md](../writing/writing.md).
 
-Shape:
+The body has three sections under these headings. The section names are nouns, never `What` or `Why`, under the heading rule in `writing.md`.
 
-- **What** - the change, led by its outcome.
-- **Why** - the problem or need; link the ticket if one exists.
-- **Verification** - what was run and the results, stated plainly. If something failed or was skipped, say so.
+- **Change** - the change made, led by its outcome.
+- **Reason** - the problem or need; link the ticket if one exists.
+- **Verification** - the commands run and their results, stated plainly. If something failed or was skipped, say so.
 
 ## Tooling
 

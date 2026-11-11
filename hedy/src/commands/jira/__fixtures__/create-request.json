@@ -1,0 +1,22 @@
+{
+  "fields": {
+    "project": {
+      "key": "HEDY"
+    },
+    "summary": "Raise Jira issues from a manifest with a dry run",
+    "description": "h3. Why\n\nAgents raise tickets from a draft the user has approved, and the raised issue must match the draft.\n\nh3. What\n\nRaise the issue from a manifest with {{hedy jira create}}: a dry run prints the plan, and {{--confirm}} sends only the plan that was shown.\n\n||Step||Outcome||\n|Dry run|The plan and its id|\n|Confirm|The issue and its receipt|\n\n# Show the plan to the user.\n# Confirm with the exact plan id.",
+    "issuetype": {
+      "name": "Task"
+    },
+    "priority": {
+      "name": "Medium"
+    },
+    "labels": [
+      "hedy",
+      "fixtures"
+    ],
+    "parent": {
+      "key": "HEDY-100"
+    }
+  }
+}

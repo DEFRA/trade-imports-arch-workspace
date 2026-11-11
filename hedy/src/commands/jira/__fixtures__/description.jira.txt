@@ -1,0 +1,14 @@
+h3. Why
+
+Agents raise tickets from a draft the user has approved, and the raised issue must match the draft.
+
+h3. What
+
+Raise the issue from a manifest with {{hedy jira create}}: a dry run prints the plan, and {{--confirm}} sends only the plan that was shown.
+
+||Step||Outcome||
+|Dry run|The plan and its id|
+|Confirm|The issue and its receipt|
+
+# Show the plan to the user.
+# Confirm with the exact plan id.

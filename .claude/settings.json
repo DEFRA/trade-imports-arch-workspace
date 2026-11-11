@@ -4,6 +4,7 @@
       "Read",
       "Grep",
       "Glob",
+      "Bash(hedy:*)",
       "Bash(git log:*)",
       "Bash(git show:*)",
       "Bash(git blame:*)",
@@ -26,10 +27,16 @@
       "Bash(tail:*)",
       "Bash(wc:*)",
       "Bash(~/trade-imports-arch-workspace/.claude/tools/:*)",
-      "Skill(editorial)",
-      "Skill(editorial-triage)",
       "Skill(skill-creator)",
       "WebFetch(domain:agents.md)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(~/.npmrc)",
+      "Read(~/.netrc)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)"
     ]
   },
   "hooks": {
@@ -41,6 +48,26 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-bash.sh\"",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-git-push.sh\"",
+            "timeout": 10
+          }
+
+
+
+
+
+        ]
+      },
+      {
+        "matcher": "Read|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/realpath-file-tools.sh\"",
+            "timeout": 5
           }
         ]
       },
@@ -50,6 +77,26 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-edits.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/hedy-require-sibling-test.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/hedy-forbid-spy-assertions.sh\"",
             "timeout": 10
           }
         ]

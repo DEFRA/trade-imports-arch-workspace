@@ -1,0 +1,189 @@
+{
+  "id": "123456",
+  "type": "page",
+  "status": "current",
+  "title": "Synthetic Page for the hedy Fixtures",
+  "space": {
+    "id": 100,
+    "key": "DOCS",
+    "name": "Documentation",
+    "type": "global",
+    "status": "current",
+    "_expandable": {
+      "settings": "/rest/api/space/DOCS/settings",
+      "metadata": "",
+      "operations": "",
+      "lookAndFeel": "/rest/api/settings/lookandfeel?spaceKey=DOCS",
+      "identifiers": "",
+      "permissions": "",
+      "icon": "",
+      "description": "",
+      "theme": "/rest/api/space/DOCS/theme",
+      "history": "",
+      "homepage": "/rest/api/content/100001"
+    },
+    "_links": {
+      "webui": "/spaces/DOCS",
+      "self": "https://example.atlassian.net/wiki/rest/api/space/DOCS"
+    }
+  },
+  "history": {
+    "latest": true,
+    "createdBy": {
+      "type": "known",
+      "accountId": "000000:00000000-0000-4000-8000-000000000001",
+      "accountType": "atlassian",
+      "publicName": "Ada Lovelace",
+      "displayName": "Ada Lovelace",
+      "isExternalCollaborator": false,
+      "isGuest": false,
+      "locale": "en_GB",
+      "accountStatus": "active",
+      "profilePicture": {
+        "path": "/wiki/aa-avatar/000000:00000000-0000-4000-8000-000000000001",
+        "width": 48,
+        "height": 48,
+        "isDefault": false
+      },
+      "_expandable": {
+        "operations": "",
+        "personalSpace": ""
+      },
+      "_links": {
+        "self": "https://example.atlassian.net/wiki/rest/api/user?accountId=000000:00000000-0000-4000-8000-000000000001"
+      }
+    },
+    "createdDate": "2026-09-30T14:00:00.000Z",
+    "_expandable": {
+      "lastUpdated": "",
+      "previousVersion": "",
+      "contributors": "",
+      "nextVersion": ""
+    },
+    "_links": {
+      "self": "https://example.atlassian.net/wiki/rest/api/content/123456/history"
+    }
+  },
+  "version": {
+    "by": {
+      "type": "known",
+      "accountId": "000000:00000000-0000-4000-8000-000000000001",
+      "accountType": "atlassian",
+      "publicName": "Ada Lovelace",
+      "displayName": "Ada Lovelace",
+      "isExternalCollaborator": false,
+      "isGuest": false,
+      "locale": "en_GB",
+      "accountStatus": "active",
+      "profilePicture": {
+        "path": "/wiki/aa-avatar/000000:00000000-0000-4000-8000-000000000001",
+        "width": 48,
+        "height": 48,
+        "isDefault": false
+      },
+      "_expandable": {
+        "operations": "",
+        "personalSpace": ""
+      },
+      "_links": {
+        "self": "https://example.atlassian.net/wiki/rest/api/user?accountId=000000:00000000-0000-4000-8000-000000000001"
+      }
+    },
+    "when": "2026-10-20T10:30:00.000Z",
+    "friendlyWhen": "Oct 20, 2026",
+    "message": "",
+    "number": 4,
+    "minorEdit": false,
+    "ncsStepVersion": "40",
+    "ncsStepVersionSource": "ncs-ack",
+    "confRev": "confluence$content$123456.40",
+    "contentTypeModified": false,
+    "_expandable": {
+      "collaborators": "",
+      "content": "/rest/api/content/123456"
+    },
+    "_links": {
+      "self": "https://example.atlassian.net/wiki/rest/api/content/123456/version/4"
+    }
+  },
+  "macroRenderedOutput": {},
+  "body": {
+    "view": {
+      "value": "<h1 id=\"SyntheticPage-Purpose\">Purpose</h1><p local-id=\"a1b2c3d4e5f6\">This page exists so that <strong>hedy</strong> can prove its <em>markdown</em> conversion against <code>page.sh</code>. It holds entities such as &amp;, &lt;tag&gt;, &quot;quotes&quot;, it&#39;s and a&nbsp;non-breaking space.</p><p local-id=\"b2c3d4e5f6a1\">Legacy <b>bold</b> with <i>italic</i> and <s>struck</s> text, then a line<br />break and a <a href=\"https://example.atlassian.net/wiki/spaces/DOCS/pages/987654/Other+Page\" class=\"confluence-link\">link to another page</a>, plus a <span class=\"status-macro aui-lozenge aui-lozenge-success\">DONE</span> status.</p><h2 id=\"SyntheticPage-Lists\">Lists</h2><ul local-id=\"c3d4e5f6a1b2\"><li local-id=\"d4e5f6a1b2c3\"><p local-id=\"e5f6a1b2c3d4\">Endpoint <code>gateway.example.test/mdm</code></p><ul local-id=\"f6a1b2c3d4e5\"><li local-id=\"a1b2c3d4e5f7\"><p local-id=\"b2c3d4e5f6a2\">Tenant: <code>example.onmicrosoft.com</code></p></li><li local-id=\"c3d4e5f6a1b3\"><p local-id=\"d4e5f6a1b2c4\">Scope: <code>api://example.test/.default</code></p></li></ul></li><li local-id=\"e5f6a1b2c3d5\"><p local-id=\"f6a1b2c3d4e6\">Second top-level item</p></li></ul><ol local-id=\"a1b2c3d4e5f8\"><li local-id=\"b2c3d4e5f6a3\"><p local-id=\"c3d4e5f6a1b4\">First step</p></li><li local-id=\"d4e5f6a1b2c5\"><p local-id=\"e5f6a1b2c3d6\">Second step</p></li><li local-id=\"f6a1b2c3d4e7\"><p local-id=\"a1b2c3d4e5f9\">Third step</p></li></ol><h2 id=\"SyntheticPage-Table\">Table</h2><div class=\"table-wrap\"><table class=\"confluenceTable\"><tbody><tr><th class=\"confluenceTh\"><p local-id=\"b2c3d4e5f6a4\">Name</p></th><th class=\"confluenceTh\"><p local-id=\"c3d4e5f6a1b5\">Value</p></th></tr><tr><td class=\"confluenceTd\"><p local-id=\"d4e5f6a1b2c6\">timeout</p></td><td class=\"confluenceTd\"><p local-id=\"e5f6a1b2c3d7\">30 s | the default</p></td></tr><tr><td class=\"confluenceTd\"><p local-id=\"f6a1b2c3d4e8\">retries</p></td><td class=\"confluenceTd\"><p local-id=\"a1b2c3d4e5fa\"><code>0</code></p></td></tr></tbody></table></div><h3 id=\"SyntheticPage-Code\">Code</h3><pre><code class=\"language-json\">{\n  &quot;ok&quot;: true,\n  &quot;result&quot;: null\n}</code></pre><div class=\"code panel pdl\"><div class=\"codeContent panelContent pdl\"><pre class=\"syntaxhighlighter-pre\" data-syntaxhighlighter-params=\"brush: bash; gutter: false; theme: Confluence\" data-theme=\"Confluence\">hedy confluence page 123456 --json</pre></div></div><blockquote><p local-id=\"b2c3d4e5f6a5\">A quoted paragraph with <em>emphasis</em>.</p></blockquote><hr /><p local-id=\"c3d4e5f6a1b6\"><span class=\"confluence-embedded-file-wrapper\"><img class=\"confluence-embedded-image\" alt=\"diagram\" src=\"/wiki/download/attachments/123456/diagram.png\" /></span></p><p local-id=\"d4e5f6a1b2c7\">Closing paragraph.</p><p local-id=\"e5f6a1b2c3d8\" /><p local-id=\"f6a1b2c3d4e9\" />\n",
+      "representation": "view",
+      "_expandable": {
+        "webresource": "",
+        "embeddedContent": "",
+        "mediaToken": "",
+        "content": "/rest/api/content/123456"
+      }
+    },
+    "_expandable": {
+      "editor": "",
+      "atlas_doc_format": "",
+      "export_view": "",
+      "styled_view": "",
+      "dynamic": "",
+      "storage": "",
+      "editor2": "",
+      "anonymous_export_view": ""
+    }
+  },
+  "metadata": {
+    "labels": {
+      "results": [
+        {
+          "prefix": "global",
+          "name": "architecture",
+          "id": "200001",
+          "label": "architecture"
+        },
+        {
+          "prefix": "global",
+          "name": "hedy",
+          "id": "200002",
+          "label": "hedy"
+        }
+      ],
+      "start": 0,
+      "limit": 200,
+      "size": 2,
+      "_links": {
+        "self": "https://example.atlassian.net/wiki/rest/api/content/123456/label"
+      }
+    },
+    "_expandable": {
+      "currentuser": "",
+      "comments": "",
+      "sourceTemplateEntityId": "",
+      "simple": "",
+      "properties": "",
+      "frontend": "",
+      "likes": ""
+    }
+  },
+  "extensions": {
+    "position": 12
+  },
+  "_expandable": {
+    "childTypes": "",
+    "schedulePublishInfo": "",
+    "container": "/rest/api/space/DOCS",
+    "operations": "",
+    "schedulePublishDate": "",
+    "children": "/rest/api/content/123456/child",
+    "restrictions": "/rest/api/content/123456/restriction/byOperation",
+    "ancestors": "",
+    "descendants": "/rest/api/content/123456/descendant"
+  },
+  "_links": {
+    "editui": "/pages/resumedraft.action?draftId=123456",
+    "webui": "/spaces/DOCS/pages/123456/Synthetic+Page+for+the+hedy+Fixtures",
+    "edituiv2": "/spaces/DOCS/pages/edit-v2/123456",
+    "context": "/wiki",
+    "self": "https://example.atlassian.net/wiki/rest/api/content/123456",
+    "tinyui": "/x/AQAB",
+    "collection": "/rest/api/content",
+    "base": "https://example.atlassian.net/wiki"
+  }
+}

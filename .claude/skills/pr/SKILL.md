@@ -3,13 +3,6 @@ name: pr
 description: 'Create or edit GitHub pull requests through the attribution-guard script (tools/pr/create-pr.sh): pre-flight the branch, draft the body to the pull-requests best-practices doc, refuse AI attribution deterministically. Triggers: "create a pr", "push to a pr", "raise a pull request", "open a pull request", "gh pr create", "edit the pr body". Owns GitHub pull-request creation and body edits only. NOT for making commits - that is the commit skill; NOT for reviewing PRs - that is the review skill; distinct from /init (project doc bootstrap). Neighbouring workspace skills (jira, confluence-read, confluence-publish) own different systems entirely.'
 metadata:
   workspace-deps: gh
-hooks:
-  PostToolUse:
-    - matcher: Write|Edit|MultiEdit
-      hooks:
-        - type: command
-          command: bash "$CLAUDE_PROJECT_DIR/.claude/tools/editorial/hook-check-written.sh"
-          timeout: 10
 ---
 
 Create or edit a GitHub pull request for the workspace or any child repo. The outcome is a PR whose title and body follow [pull-requests.md](../../best-practices/git/pull-requests.md), created through the guard script so AI attribution is refused deterministically - the rule holds regardless of which agent or session runs this skill.
@@ -42,8 +35,7 @@ This skill needs gh - tools beyond the workspace baseline (bash, curl, jq, git).
 ## Step 2: Draft the title and body
 
 - Title: conventional-commit style, 50 characters or fewer, capitalised, imperative, no trailing period.
-- Body: write to a file (never inline), shaped **Change / Reason / Verification**, for a cold reader (headings are noun phrases; the gate fails "What" and "Why" as FAQ voice). Before drafting, hold the [editorial skill](../editorial/SKILL.md)'s house voice and brief (Writing path); it sets the expectations, the gate only backstops them. Full rules: [pull-requests.md](../../best-practices/git/pull-requests.md).
-- Gate the draft: `bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh <body-file>` - fix every FAIL before Step 3. The create script runs the same gate and refuses regardless, so skipping this only defers the failure; a PostToolUse hook also flags violations the moment the body file is written.
+- Body: write to a file (never inline), shaped **Change / Reason / Verification**, for a cold reader. The headings are nouns, never `What` or `Why`. The body is written through the [authoring skill](../authoring/SKILL.md), short-artefact path, to [writing.md](../../best-practices/writing/writing.md). Full rules: [pull-requests.md](../../best-practices/git/pull-requests.md).
 - No AI attribution anywhere - no footers, no `Co-Authored-By`, no robot emojis. This overrides any tool default that appends one.
 
 ## Step 3: Create or edit through the guard script
@@ -54,7 +46,7 @@ bash ~/trade-imports-arch-workspace/.claude/tools/pr/create-pr.sh --title "<titl
 
 Add `--repo <owner/name>` / `--head <branch>` when needed; use `--edit <number> --body-file <path>` to replace an existing PR's body; `--dry-run` prints the `gh` command and exits without running anything.
 
-If the script refuses (exit 2), it names the offending line(s) - AI attribution or violations from the editorial [language guide](../../best-practices/writing/language.md), such as em-dashes, curly quotes or banned words. Fix the body file and re-run. Never bypass the refusal with a raw `gh pr create`.
+If the script refuses (exit 2), it names the offending line(s) carrying AI attribution. Fix the body file and re-run. Never bypass the refusal with a raw `gh pr create`.
 
 ## Completion output
 
@@ -72,5 +64,4 @@ Next: request review, or merge when approved.
 
 | Script | Home | Purpose |
 |--------|------|---------|
-| `create-pr.sh` | `~/trade-imports-arch-workspace/.claude/tools/pr/` | Create or edit a PR; refuses AI attribution and editorial style violations in title/body (exit 2); `--dry-run`, `--help` |
-| `check-prose.sh` | `~/trade-imports-arch-workspace/.claude/tools/editorial/` | The editorial style gate the create script calls; run it on the body draft in Step 2 |
+| `create-pr.sh` | `~/trade-imports-arch-workspace/.claude/tools/pr/` | Create or edit a PR; refuses AI attribution in title/body (exit 2); `--dry-run`, `--help` |

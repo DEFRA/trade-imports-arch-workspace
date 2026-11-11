@@ -98,7 +98,7 @@ Each entry: the anti-pattern, the symptom that catches it, and the correction.
 
 **Why it's wrong:** skill prose is advisory context the model may skip or compress; the script is the deterministic layer. A gate on the advisory side of that line guards nothing on the run where it matters most, which is the run where the agent is in a hurry.
 
-**Correction:** give the approving step an artifact keyed to the thing being approved, and have the mutating step refuse unless that artifact is present and current. Document the override flag. Documented instance: editorial-triage's `apply` refuses until `plan --sample` has written a spot check no older than the plan.
+**Correction:** give the approving step an artifact keyed to the thing being approved, and have the mutating step refuse unless that artifact is present and current. Document the override flag.
 
 ## A13. Worker output citing a vocabulary nothing validates
 
@@ -106,7 +106,7 @@ Each entry: the anti-pattern, the symptom that catches it, and the correction.
 
 **Why it's wrong:** the citation is the evidence that the worker followed the shared definition rather than its own judgment. Unvalidated, the citation decays into decoration, and drift between the asset and the workers goes unnoticed until someone greps for the id.
 
-**Correction:** validate the citation where the helper already validates the enums, and report an unknown id the way an out-of-range value is reported. Documented instance: editorial-triage warns when a grade cites a heuristic the rubric does not define or has retired.
+**Correction:** validate the citation where the helper already validates the enums, and report an unknown id the way an out-of-range value is reported.
 
 ## A14. Superseded path kept alive by its own test coverage
 

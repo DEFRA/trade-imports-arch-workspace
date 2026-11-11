@@ -1,0 +1,10 @@
+{
+  "schema": "hedy-ticket/1",
+  "project": "HEDY",
+  "type": "Task",
+  "summary": "Raise Jira issues from a manifest with a dry run",
+  "descriptionFile": "description.jira.txt",
+  "priority": "Medium",
+  "parent": "HEDY-100",
+  "labels": ["hedy", "fixtures"]
+}

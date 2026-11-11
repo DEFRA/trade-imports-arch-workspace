@@ -1,0 +1,5 @@
+{
+  "exitCode": 0,
+  "stdout": "\n> hedy-docs-fixture@1.0.0 publish:confluence\n> publish-to-confluence --config scripts/confluence/confluence-config.json --file docs/notes/unlisted.md\n\n📝 Publishing to Confluence via REST API...\n\n   Content root: docs\n   Confluence URL: https://example.atlassian.net\n   Space filter: ALL\n   Dry run: OFF\n   File filter: docs/notes/unlisted.md\n\n📝 Publishing configured paths from confluence-config.json...\nFound 3 path(s) to process\n\n\n================================================\nPublishing Summary:\n  ✅ Successful: 0\n  ❌ Failed: 0\n  ⏭️  Skipped: 7\n  🔗 Broken links: 0\n  ⚠️  External links not reachable: 0\n================================================\n",
+  "stderr": "  📄 File filter active: /home/hedy/trade-imports-arch-workspace/trade-imports-documentation/docs/notes/unlisted.md\n"
+}

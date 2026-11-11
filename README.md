@@ -1,12 +1,12 @@
 # Trade Imports Architecture Workspace
 
-AI skills and tooling shared across DEFRA trade-imports architecture work. The versioned content is the `.claude/` directory - agent skills, per-domain shell tools, guard hooks and best-practices notes. Everything else in a working checkout (the documentation repos below, local analysis material) is cloned in beside it and excluded from version control.
+AI skills and tooling shared across DEFRA trade-imports architecture work. The versioned content is the `.claude/` directory - agent skills, per-domain shell tools, guard hooks and best-practices notes - and the `hedy/` CLI. Everything else in a working checkout (the documentation repos below, local analysis material) is cloned in beside it and excluded from version control.
 
 ## Two ways to use this workspace
 
 **As a parent workspace for Claude Code - the sweet spot.** Clone this repo and open it as the root of a Claude Code session. The arrangement is deliberate context engineering: the tooling sits at the root, the repos it operates on sit inside it as children, and Claude Code loads the conventions automatically (`CLAUDE.md`, rules, skills). Guard hooks enforce the working agreements - one command per Bash call, no reads of credential files, no agent edits to its own permission config - and the skills orchestrate the documentation tooling end to end.
 
-**As a library of capabilities for other setups.** Colleagues work in other AI tools and other workflows, and the workspace is built with that in mind. Agent instructions follow the [agents.md](https://agents.md/) standard: `AGENTS.md` at the root is the shared instruction file, read natively by Cursor, Codex and others, while `CLAUDE.md` imports it and adds only the Claude Code layer (hooks, rules, native skill invocation). Skills follow the [agentskills.io](https://agentskills.io/specification) format - a `SKILL.md` entry point plus supporting references - and do their real work through plain shell scripts under `.claude/tools/`, so they can be read by other agents, wired into other workspaces, or run by hand. The guard hooks and permission config are Claude Code concepts and do not transfer; whether and how to enforce equivalents is a choice for your own tooling.
+**As a library of capabilities for other setups.** Colleagues work in other AI tools and other workflows, and the workspace is built with that in mind. Agent instructions follow the [agents.md](https://agents.md/) standard: `AGENTS.md` at the root is the shared instruction file, read natively by Cursor, Codex and others, while `CLAUDE.md` imports it and adds only the Claude Code layer (hooks, rules, native skill invocation). Skills follow the [agentskills.io](https://agentskills.io/specification) format, a `SKILL.md` entry point plus supporting references, and do their real work through plain shell scripts under `.claude/tools/`, so they can be read by other agents, wired into other workspaces, or run by hand. The guard hooks and permission config are Claude Code concepts and do not transfer. Whether and how to enforce equivalents is a choice for each team's own tooling.
 
 ## Getting started
 
@@ -19,6 +19,10 @@ make
 `make` clones the child repos, creates the canonical symlink and verifies the result. The steps run individually as `make clone`, `make pull`, `make link` and `make check`. Clones use SSH; add `GIT_BASE=https://github.com/DEFRA` to clone over HTTPS.
 
 The symlink is part of a path contract: everything in the workspace refers to the root as `~/trade-imports-arch-workspace`, so the same commands work on every machine regardless of where the checkout lives. The contract is documented in `.claude/rules/workspace-paths.md`.
+
+## The `hedy` CLI
+
+`hedy` is the workspace's command-line tool for Jira and Confluence, a Node 24 program kept in `hedy/`. `make link` installs `hedy` on the PATH. `hedy auth` checks the Atlassian credentials and shows only display names. `hedy jira ticket <key>` reads one Jira issue, and `hedy jira search '<jql>'` reads the issues a JQL query matches. `hedy confluence page <reference>` reads one Confluence page by id, URL or share link and prints the page as markdown. `hedy jira create --from <manifest>` creates a Jira issue and `hedy jira describe <key> --from <file>` replaces an issue's description, and each sends nothing until `--confirm <planId>` names the plan its dry run printed. `hedy confluence publish <page>` publishes one docs page to Confluence after its pre-flight, at once. Run `hedy` on its own in a terminal to open a menu that reaches every command and asks for a confirmation of each write after showing its plan or pre-flight. Agents call the commands with `--json`. Add `--json` to any command for one machine-readable line holding the result or the errors. Prefer `hedy <command> --json` over ad-hoc `curl` or `jq` against Jira or Confluence.
 
 ## Inside `.claude/`
 
@@ -34,8 +38,8 @@ The layout follows Claude Code's [project `.claude` directory](https://code.clau
 | `agent-memory/` | Persistent memory for subagents that declare `memory: project` in their frontmatter - each maintains its own `MEMORY.md`, loaded into its system prompt when it runs. Claude Code creates and populates it; nothing to author by hand. |
 | `workflows/` | Saved dynamic-workflow scripts - JavaScript files that orchestrate many subagents, each becoming a `/name` command. Saved from a session via `/workflows` rather than authored from scratch. |
 | `hooks/` *(workspace convention)* | The guard scripts (`guard-bash.sh`, `guard-edits.sh`) that `settings.json` wires to run before tool calls. Claude Code reads the wiring from `settings.json`; keeping the scripts in a dedicated directory, protected from agent edits by `guard-edits.sh` itself, is this workspace's choice. |
-| `tools/` *(workspace convention)* | Per-domain shell scripts that do the deterministic work behind skills - Confluence page operations and publish pre-flight, Jira ticket creation, description update and JQL fetch, Mermaid rendering, skill scaffolding, the workspace, auth and dependency doctors. Runnable by hand or from any agent. |
-| `best-practices/` *(workspace convention)* | Convention docs the skills cite instead of duplicating: skill authoring (`skills/`), git and pull requests (`git/`), editorial writing (`writing/`), and Claude Code enforcement mechanisms (`claude-code/`). |
+| `tools/` *(workspace convention)* | Per-domain shell scripts that do the deterministic work behind skills - Confluence page writes, Mermaid rendering, skill scaffolding, the workspace, auth and dependency doctors. Runnable by hand or from any agent. |
+| `best-practices/` *(workspace convention)* | Convention docs the skills cite instead of duplicating: skill authoring (`skills/`), git and pull requests (`git/`), the house writing standard (`writing/`), and Claude Code enforcement mechanisms (`claude-code/`). |
 | `workareas/` *(workspace convention)* | Persistent working state written by skill runs, such as skill-creator interview decisions and audit plans. |
 
 There is deliberately no `commands/` directory. Claude Code has folded commands and skills into one mechanism - same `/name` invocation - and skills are the recommended form because they can bundle supporting files, so this workspace defines everything as skills.
