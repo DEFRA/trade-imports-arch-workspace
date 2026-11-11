@@ -34,7 +34,7 @@ This skill writes into, validates with and publishes from the `trade-imports-doc
 | The DR markdown template | `assets/template.md` |
 | Style / voice rules to write in (very important) | `assets/style-guide.md` |
 
-Read `assets/style-guide.md` on every invocation. The rules are opinionated and easy to breach if you're writing on autopilot.
+Read `assets/style-guide.md` on every invocation. The rules are opinionated, and a draft written on autopilot breaks several of them.
 
 ---
 
@@ -94,7 +94,7 @@ Follow `assets/style-guide.md` throughout. In particular: no em dashes, no emoji
 
 ### 4. Diagrams (only if the decision needs one, always ad-hoc)
 
-Not every DR needs a diagram. Use one only when the decision is fundamentally about a format, a structure, or a flow that is easier to see than describe. Free-text decisions (a choice of vendor, a governance approach, a policy) rarely need diagrams and forcing one in adds noise.
+Not every DR needs a diagram. Use one only when the decision is fundamentally about a format, a structure, or a flow that a diagram shows more clearly than prose. Free-text decisions (a choice of vendor, a governance approach, a policy) rarely need diagrams and forcing one in adds noise.
 
 Diagrams here are always ad-hoc, drawn for the specific DR. There is no reusable template. Look at the SVGs produced for DR-EUDP-001 (`docs/systems/EUDP/Architecture and Development/DR/diagrams/numbering-scheme-diagram-*.svg`) as a colour-and-typography reference if one is already there, but design the shape and content from scratch to fit the decision at hand.
 

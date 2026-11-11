@@ -35,7 +35,7 @@ The two skills split on a clean line: **`mermaid-check` owns whether the diagram
 | Right diagram type for what is being shown | `mermaid-check` |
 | Exact identifiers, no em-dashes in labels | `mermaid-check` (the punctuation and heading rules in [writing.md](../../best-practices/writing/writing.md)) |
 | Label wording, jargon, acronym on first use | `authoring` |
-| Whether the diagram earns its place in the document | `authoring` |
+| Whether the document needs the diagram | `authoring` |
 
 In practice: when the authoring skill's drafting agent draws a diagram, the agent checks the diagram here through the single-block entry point below. When this skill authors a diagram whose labels introduce a term the document has not used before, say so and hand that to `authoring` rather than settling the wording here.
 

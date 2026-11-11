@@ -87,7 +87,7 @@ A missing explanation is first a suspect claim. Before you ask for the explanati
 
 ## Threshold and Stop
 
-Change a passage only when the change makes the text easier for the plan's reader to understand or verify. Never change wording for preference or for a synonym. A paragraph with no defect stays as written. Leaving a passage unchanged is a real outcome, and the existence of a better version is no reason to change acceptable text. A synonym, a reordering the reader does not need and a second split of a paragraph already on one job are churn. The edit stops when a pass over the page finds nothing new.
+Change a passage only when the change helps the plan's reader understand or verify the text. Never change wording for preference or for a synonym. A paragraph with no defect stays as written. Leaving a passage unchanged is a real outcome, and the existence of a better version is no reason to change acceptable text. A synonym, a reordering the reader does not need and a second split of a paragraph already on one job are churn. The edit stops when a pass over the page finds nothing new.
 
 ## Exemptions
 

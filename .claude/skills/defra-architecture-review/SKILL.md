@@ -51,7 +51,7 @@ Guardrail ids are stable, but wording, level and status change (version 0.3.0 ad
 
 Use the snapshot to scope (step 3). Fetch the full text (statement, why, how to meet it, evidence by phase) for the areas the document touches plus the areas holding the always-check guardrails below; that text decides a rating. Expect to read about half the area pages for a decision document and most of them for a solution document.
 
-Things in the repository that are easy to miss:
+Things in the repository that a reviewer often misses:
 
 - The seven decision-check questions are not in `docs/governance/decision-check.md` (a shell) but in the `QUESTIONS` array in `docs/javascripts/site.js`; `docs/governance/triage.md` has a five-question variant of the same tree.
 - The patterns live in `docs/patterns/` (solution patterns such as `async-submission.md`, `acting-on-behalf.md`, `authoritative-source.md`, `file-upload.md`, `open-data-publishing.md`, and service patterns under `service/`), each with a `guardrails:` list in its front matter and a sentence on threats to put in the threat model.
