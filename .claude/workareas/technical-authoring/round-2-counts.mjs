@@ -2,6 +2,7 @@
 // counts per row and per pattern as markdown. Run from the workspace root:
 //   node .claude/workareas/technical-authoring/round-2-counts.mjs <docs repo> > <report part>
 // The docs repo argument is the folder that holds the docs repo's docs/ folder.
+// The third-party folders under docs/ are left out.
 import { spawnSync } from 'node:child_process'
 import { readdirSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
@@ -27,9 +28,11 @@ const checkFindings = (args, input) => {
 const EXCLUDED = /__fixtures__\/|prose-gate-cases\/|\/tests\/expected\//
 const repoFiles = run('git', ['ls-files', '*.md']).split('\n').filter((path) => path !== '' && !EXCLUDED.test(path))
 
+const THIRD_PARTY = [join(DOCS_REPO, 'docs/systems/EUDP/TNT-WebServices'), join(DOCS_REPO, 'docs/guidelines')]
+
 const markdownUnder = (folder) => readdirSync(folder, { withFileTypes: true }).flatMap((entry) => {
   const path = join(folder, entry.name)
-  if (entry.isDirectory()) return entry.name === 'node_modules' ? [] : markdownUnder(path)
+  if (entry.isDirectory()) return entry.name === 'node_modules' || THIRD_PARTY.includes(path) ? [] : markdownUnder(path)
   return entry.name.endsWith('.md') ? [path] : []
 })
 const docsFiles = markdownUnder(join(DOCS_REPO, 'docs'))
