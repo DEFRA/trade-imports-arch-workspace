@@ -4,7 +4,7 @@ import { ERROR_CODES, HedyError, isHedyError, toHedyError, toHedyErrors } from '
 
 describe('ERROR_CODES', () => {
   it('holds exactly the seven codes and cannot be changed', () => {
-    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE'])
+    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE', 'SETUP'])
     expect(Object.isFrozen(ERROR_CODES)).toBe(true)
   })
 })

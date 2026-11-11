@@ -5,10 +5,11 @@
 #   make clone      clone the child repos; wires origin on any that
 #                   exist without one (idempotent)
 #   make pull       fast-forward the children
-#   make install    point core.hooksPath at .githooks (pre-commit lint),
-#                   install hedy/ and npm-link hedy onto PATH
-#   make check      run the doctors, the skills lint, the golden tests
-#                   and the hedy CLI lint and tests
+#   make install    check for Node 24, point core.hooksPath at .githooks
+#                   (pre-commit lint), install hedy/ and npm-link hedy
+#                   onto PATH
+#   make check      run hedy workspace check, the deps doctor, the skills
+#                   lint, the golden tests and the hedy CLI lint and tests
 #
 # Clones over SSH by default; override for HTTPS:
 #   make GIT_BASE=https://github.com/DEFRA
@@ -42,7 +43,13 @@ pull:
 
 # hedy: a bare `npm link` from inside hedy/, never `npm --prefix`: asdf's
 # npm wrapper reshims only after the bare form, which puts hedy on PATH.
+# hedy needs Node 24, and hedy workspace check cannot report a missing Node,
+# so install checks the version before anything else.
 install:
+	@node -e 'process.exit(Number(process.versions.node.split(".")[0]) >= 24 ? 0 : 1)' 2>/dev/null || { \
+		echo "install: FAIL Node 24 or later is required, found $$(node --version 2>/dev/null || echo no node). Install Node 24, then run make install again."; \
+		exit 1; \
+	}
 	@git config core.hooksPath .githooks
 	@echo "install: core.hooksPath -> .githooks (pre-commit skills lint)"
 	@echo "install: npm ci in hedy/"
@@ -51,7 +58,7 @@ install:
 	@cd hedy && npm link
 
 check:
-	@bash .claude/tools/workspace/check-workspace.sh
+	@hedy workspace check
 	@bash .claude/tools/workspace/check-deps.sh
 	@bash .claude/tools/workspace/lint-skills.sh
 	@bash .claude/tools/skill-creator/tests/run-golden.sh
