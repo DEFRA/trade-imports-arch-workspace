@@ -1,21 +1,18 @@
 #!/usr/bin/env bash
-# Workspace doctor - verifies the canonical-root contract on this machine.
-# Invoke with bash (no execute bit required):
-#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-workspace.sh
+# Workspace doctor - verifies that this checkout is ready to use.
+# The root is the checkout this script sits in, wherever it was cloned.
+# Invoke with bash from the workspace root (no execute bit required):
+#   bash .claude/tools/workspace/check-workspace.sh
 # Exit 1 only when the root itself is unusable; child gaps are warnings.
 
 set -u
 
-ROOT="$HOME/trade-imports-arch-workspace"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 
 say() { echo "workspace-check: $1"; }
 
-if [[ ! -e "$ROOT" ]]; then
-    say "FAIL canonical root missing - set it up once: ln -s <your-checkout> ~/trade-imports-arch-workspace"
-    exit 1
-fi
-if [[ ! -d "$ROOT/.claude" ]]; then
-    say "FAIL $ROOT exists but has no .claude/ - is the symlink pointing at the right checkout?"
+if [[ ! -f "$ROOT/Makefile" ]]; then
+    say "FAIL $ROOT has no Makefile - this script must run from inside a workspace checkout"
     exit 1
 fi
 
@@ -36,16 +33,16 @@ COUNT=0
 for CHILD in $CHILDREN; do
     COUNT=$((COUNT+1))
     if [[ ! -d "$ROOT/$CHILD" ]]; then
-        say "WARN child missing: $ROOT/$CHILD (the harness assumes it as a child of the root)"
+        say "WARN child missing: $ROOT/$CHILD (run: make -C $ROOT clone)"
         WARN=1
     fi
 done
 
 # Pre-commit enforcement only exists once core.hooksPath points at
-# .githooks - a bare clone that never ran `make link` has none.
+# .githooks - a bare clone that never ran `make install` has none.
 HOOKSPATH=$(git -C "$ROOT" config core.hooksPath 2>/dev/null)
 if [[ "$HOOKSPATH" != ".githooks" ]]; then
-    say "WARN core.hooksPath not set to .githooks - the pre-commit skills lint is not active (run: make link)"
+    say "WARN core.hooksPath not set to .githooks - the pre-commit skills lint is not active (run: make -C $ROOT install)"
     WARN=1
 fi
 
@@ -59,14 +56,12 @@ for TOOL in bash curl jq git; do
     fi
 done
 
-# The hedy CLI reaches PATH through make link (npm link in hedy/).
+# The hedy CLI reaches PATH through make install (npm link in hedy/).
 if ! command -v hedy >/dev/null 2>&1; then
-    say "WARN hedy CLI not on PATH (run: make link)"
+    say "WARN hedy CLI not on PATH (run: make -C $ROOT install)"
     WARN=1
 fi
 
-KIND="directory"
-[[ -L "$ROOT" ]] && KIND="symlink -> $(readlink "$ROOT")"
-say "ok root=$ROOT ($KIND)"
+say "ok root=$ROOT"
 [[ "$WARN" -eq 0 ]] && say "ok all child repos present ($COUNT) and baseline tools available"
 exit 0

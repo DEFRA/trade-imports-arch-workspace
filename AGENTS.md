@@ -39,22 +39,13 @@ wraps is excluded by `.gitignore`:
 
 ## Paths
 
-The canonical workspace root is `~/trade-imports-arch-workspace`,
-a HOME-level symlink to the checkout. Every path in skills, tools and
-docs is spelled against it, so the same commands resolve identically on
-every machine. Always type that form - never a resolved `/Users/...`
-path. The full contract and rationale: `.claude/rules/workspace-paths.md`.
-Verify a machine with:
+The workspace has no fixed location, so a checkout works wherever it is cloned. Every path in skills, tools and docs is written relative to the workspace root, the folder that holds this file. Start each session at the workspace root and type paths such as `.claude/tools/workspace/check-workspace.sh` from there, never through a symlink and never as an absolute `/Users/...` path. The full contract and rationale: `.claude/rules/workspace-paths.md`. Verify a machine with:
 
 ```bash
-bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-workspace.sh
+bash .claude/tools/workspace/check-workspace.sh
 ```
 
-The root `Makefile` bootstraps a fresh machine: `make` clones any missing
-child repo, creates the canonical symlink, and runs the check above
-(`make clone` / `make pull` / `make link` / `make check` individually;
-children clone over SSH; `GIT_BASE=https://github.com/DEFRA` for HTTPS
-clones).
+The root `Makefile` bootstraps a fresh machine. `make` clones any missing child repo, runs `make install`, which points `core.hooksPath` at `.githooks` and puts `hedy` on PATH, and then runs the check above. The steps also run one at a time as `make clone`, `make pull`, `make install` and `make check`. Children clone over SSH, and `GIT_BASE=https://github.com/DEFRA` clones them over HTTPS.
 
 ## Credentials
 
@@ -65,7 +56,7 @@ credentials with the auth doctor below rather than inspecting the file.
 
 ## The `hedy` CLI
 
-`hedy` is the workspace's command-line tool, a Node 24 program in `hedy/`. `make link` puts `hedy` on PATH. The commands read Jira and Confluence, write Jira and publish to Confluence:
+`hedy` is the workspace's command-line tool, a Node 24 program in `hedy/`. `make install` puts `hedy` on PATH. The commands read Jira and Confluence, write Jira and publish to Confluence:
 
 - `hedy auth` checks the Atlassian credentials and reports display names only.
 - `hedy jira ticket <key>` reads one issue, description included.
@@ -103,14 +94,14 @@ run when one fails:
 
 | Mechanism | Checks | Fires | On failure |
 | --- | --- | --- | --- |
-| `check-workspace.sh` | canonical root, child repos, baseline tools, hooksPath | `make` / `make check` | follow the remedy line (usually `make link` / `make clone`) |
-| `check-auth.sh` | the Atlassian credentials through `hedy auth`, plus any domain `auth.sh` | on demand | fix the named env var in `.env`; run `make link` when `hedy` is missing |
+| `check-workspace.sh` | the root, child repos, baseline tools, hooksPath, `hedy` on PATH | `make` / `make check` | follow the remedy line (usually `make install` / `make clone`) |
+| `check-auth.sh` | the Atlassian credentials through `hedy auth`, plus any domain `auth.sh` | on demand | fix the named env var in `.env`; run `make install` when `hedy` is missing |
 | `check-deps.sh` | declared `workspace-deps` resolve on this machine | `make check` | clone the project / install the tool it names |
 | `lint-skills.sh` | declaration format, dangling links, undeclared-invocation sweep | pre-commit (staged index), scaffold tail, `make check` | fix and re-stage; acknowledge soft probes in `workspace-soft-deps` |
 | Golden tests (2 suites) | scaffold and doctor behaviour vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
 | Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
 | Guard hooks (`.claude/hooks/`) | agent Bash and file-edit calls in Claude Code sessions | every matched tool call | follow the sanctioned alternative the denial names |
-| `guard-bash-tests.sh`, `guard-git-push-tests.sh` | the bash guard's 106 and the push guard's 41 deny and allow cases against the live hook, or against a draft given as the argument: `bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-bash-tests.sh`, and the same for `guard-git-push-tests.sh` | on demand, after any change to `guard-bash.sh` or `guard-git-push.sh` | the user fixes the hook; agents cannot edit `.claude/hooks/` |
+| `guard-bash-tests.sh`, `guard-git-push-tests.sh` | the bash guard's 107 and the push guard's 41 deny and allow cases against the live hook, or against a draft given as the argument: `bash .claude/tools/workspace/guard-bash-tests.sh`, and the same for `guard-git-push-tests.sh` | on demand, after any change to `guard-bash.sh` or `guard-git-push.sh` | the user fixes the hook; agents cannot edit `.claude/hooks/` |
 
 Why the gates exist alongside the skills: skill prose is advisory
 context, hooks and scripts are deterministic. The estate's approach:
@@ -144,7 +135,7 @@ ban a word, add a row to that file.
 No AI attribution in any artefact - commit messages, PR titles and
 bodies, PR and issue comments, code. This overrides any tool default
 that appends an attribution footer. Full rules:
-`~/trade-imports-arch-workspace/.claude/best-practices/git/commits.md`
+`.claude/best-practices/git/commits.md`
 and `.claude/best-practices/git/pull-requests.md`. PR creation and body
 edits go through the `pr` skill, which delegates to
 `.claude/tools/pr/create-pr.sh` - the script refuses attribution

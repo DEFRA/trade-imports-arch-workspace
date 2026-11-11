@@ -23,7 +23,8 @@ done
 
 [[ -z "$RUN_ID" ]] && { echo "Missing --run-id" >&2; exit 1; }
 
-target="$HOME/trade-imports-arch-workspace/.claude/workareas/skill-creator/$RUN_ID/decisions.json"
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
+target="$WS/.claude/workareas/skill-creator/$RUN_ID/decisions.json"
 [[ -f "$target" ]] || { echo "No decisions.json at $target" >&2; exit 1; }
 
 name=$(jq -r '.name' "$target")

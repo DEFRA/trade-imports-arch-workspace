@@ -7,22 +7,22 @@ allowed-tools: [Bash, Read, Glob, Grep, Task, Edit, Write]
 argument-hint: "<trigger phrase including skill name>"
 ---
 
-The meta-skill. Captures the 9-pattern checklist for workspace skills under `~/trade-imports-arch-workspace/.claude/skills/` and applies it two ways:
+The meta-skill. Captures the 9-pattern checklist for workspace skills under `.claude/skills/` and applies it two ways:
 
 - **CREATE** - interview the user, produce a full scaffold with TODO placeholders.
 - **AUDIT** - walk the checklist against existing skill(s), write plan documents under `workareas/skills-audit/`.
 
 Stops at audit. Improvement work is judgment-heavy; the user resolves Open Questions on the plan and hand-writes the implementer prompt.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Session start - Read these references
 
 Before either mode, Read these into context (the checklist must be live; anti-patterns drift over time):
 
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md` - the 9-pattern checklist (canonical reference).
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md` - known mis-applications. Grows over time.
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/scaffold-template.md` - only Read in CREATE mode (the SKILL.md skeleton + decisions.md sidecar).
+- `.claude/best-practices/skills/patterns.md` - the 9-pattern checklist (canonical reference).
+- `.claude/best-practices/skills/anti-patterns.md` - known mis-applications. Grows over time.
+- `.claude/best-practices/skills/scaffold-template.md` - only Read in CREATE mode (the SKILL.md skeleton + decisions.md sidecar).
 
 ## Usage
 
@@ -46,11 +46,11 @@ NOT for hand-editing a skill you already understand - open `SKILL.md` and edit. 
 Spawn idiom for AUDITOR - prompt begins:
 
 ```
-Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/skill-creator/references/AUDITOR.md.
+Follow the instructions in .claude/skills/skill-creator/references/AUDITOR.md.
 
 **Target skill:** <name>
-**SKILL.md path:** ~/trade-imports-arch-workspace/.claude/skills/<name>/SKILL.md
-**Output path:** ~/trade-imports-arch-workspace/.claude/workareas/skills-audit/<name>.md
+**SKILL.md path:** .claude/skills/<name>/SKILL.md
+**Output path:** .claude/workareas/skills-audit/<name>.md
 ```
 
 `general-purpose` carries `Tools: *` so the worker can Read / Write / Bash freely - required because the AUDITOR doesn't see this SKILL.md (it has its own hygiene block at the top of `AUDITOR.md`).
@@ -58,7 +58,7 @@ Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/skill-c
 ## Step 0: Dispatch
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/skill-creator/start-skill-creator.sh "<trigger phrase>"
+.claude/tools/skill-creator/start-skill-creator.sh "<trigger phrase>"
 ```
 
 The dispatcher writes `MODE: CREATE`, `MODE: AUDIT_ONE`, or `MODE: AUDIT_ALL` as the first stdout line, then prints a JSON payload with mode-specific parameters (`skill_name`, `targets[]`, `decisions_path`).
@@ -119,11 +119,11 @@ Spawn `general-purpose` Task subagents in parallel (up to one per target), each 
 Emit ALL Task calls in a single assistant response - do NOT spawn one, await the result, then spawn the next. Parallelism only works when calls are batched in one turn.
 
 ```
-Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/skill-creator/references/AUDITOR.md.
+Follow the instructions in .claude/skills/skill-creator/references/AUDITOR.md.
 
 **Target skill:** <name>
-**SKILL.md path:** ~/trade-imports-arch-workspace/.claude/skills/<name>/SKILL.md
-**Output path:** ~/trade-imports-arch-workspace/.claude/workareas/skills-audit/<name>.md
+**SKILL.md path:** .claude/skills/<name>/SKILL.md
+**Output path:** .claude/workareas/skills-audit/<name>.md
 ```
 
 Wait for all workers to finish (the harness emits `task-notification` per worker - wait for the `completed` set, do not poll).
@@ -163,7 +163,7 @@ implementer prompt (no auto-chaining audit → implement).
 
 ## Scripts cheat-sheet
 
-All under `~/trade-imports-arch-workspace/.claude/tools/skill-creator/`:
+All under `.claude/tools/skill-creator/`:
 
 | Script | Purpose |
 | --- | --- |

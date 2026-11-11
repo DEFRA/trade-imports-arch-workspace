@@ -54,7 +54,7 @@ fi
 [[ -f "$FILE" ]] || { echo "No such file: $FILE" >&2; exit 1; }
 [[ -z "$LABEL" ]] && LABEL="$FILE"
 
-WS="$HOME/trade-imports-arch-workspace"
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 
 # Resolve mmdc. Mirrors findMmdc() in
 # delivery-info-arch-tooling/lib/diagrams/convert-mmd.js so both

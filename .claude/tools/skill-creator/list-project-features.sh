@@ -39,11 +39,12 @@ case "$PROJECT" in
         exit 1 ;;
 esac
 
-PROJECT_DIR="$HOME/trade-imports-arch-workspace/$PROJECT"
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
+PROJECT_DIR="$WS/$PROJECT"
 
 if [[ ! -d "$PROJECT_DIR" ]]; then
     echo "STATUS: ABSENT"
-    echo "REASON: project not found at ~/trade-imports-arch-workspace/$PROJECT — clone it (make -C ~/trade-imports-arch-workspace clone) or assess overlap from knowledge"
+    echo "REASON: project not found at $PROJECT_DIR — clone it (make -C $WS clone) or assess overlap from knowledge"
     exit 0
 fi
 

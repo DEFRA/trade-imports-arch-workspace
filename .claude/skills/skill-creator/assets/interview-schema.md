@@ -3,7 +3,7 @@
 CREATE mode records interview answers into:
 
 ```
-~/trade-imports-arch-workspace/.claude/workareas/skill-creator/<name>/decisions.json
+.claude/workareas/skill-creator/<name>/decisions.json
 ```
 
 The file is mutated atomically by `tools/skill-creator/interview-add-answer.sh` (one shape question per call). The final entry is consumed by `tools/skill-creator/scaffold-skill.sh` which materialises the skill directories under `.claude/skills/<name>/` and `tools/<name>/`.

@@ -19,11 +19,11 @@ The skill covers:
 
 Bundled resources live under `assets/`. Read them when you need the detail; SKILL.md itself is the workflow.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Dependencies
 
-This skill writes into, validates with and publishes from the `trade-imports-documentation` child project, so it needs that repository cloned at `~/trade-imports-arch-workspace/trade-imports-documentation/` (run `make` at the workspace root) with `npm install` done there, and `npm` on the path. Publishing also needs Atlassian credentials in the environment (`CONFLUENCE_USERNAME`, `CONFLUENCE_API_TOKEN`); see that repository's README.
+This skill writes into, validates with and publishes from the `trade-imports-documentation` child project, so it needs that repository cloned at `trade-imports-documentation/` under the workspace root (run `make` at the workspace root) with `npm install` done there, and `npm` on the path. Publishing also needs Atlassian credentials in the environment (`CONFLUENCE_USERNAME`, `CONFLUENCE_API_TOKEN`); see that repository's README.
 
 ---
 
@@ -58,7 +58,7 @@ If the user is turning an existing conversation, email thread, Slack thread or C
 
 ### 2. Number the DR
 
-DRs in this repo are numbered `DR-EUDP-001`, `DR-EUDP-002`, and so on. To pick the next number, list the existing DRs in the target folder and increment the highest. Use Glob with the pattern `~/trade-imports-arch-workspace/trade-imports-documentation/docs/systems/EUDP/Architecture and Development/DR/DR-EUDP-*.md`, or one plain `ls` of that folder with no pipes.
+DRs in this repo are numbered `DR-EUDP-001`, `DR-EUDP-002`, and so on. To pick the next number, list the existing DRs in the target folder and increment the highest. Use Glob with the pattern `trade-imports-documentation/docs/systems/EUDP/Architecture and Development/DR/DR-EUDP-*.md`, or one plain `ls` of that folder with no pipes.
 
 Confirm the number with the user before writing the file. If two DRs are being drafted in parallel, coordinate rather than clashing.
 
@@ -110,12 +110,12 @@ Practical conventions when you do add a diagram:
 
 Once the DR is drafted and the user has reviewed the file locally:
 
-1. Validate frontmatter: run `node scripts/validate-docs-frontmatter.mjs` with `~/trade-imports-arch-workspace/trade-imports-documentation` as the working directory (do not chain a `cd` with the command; set the working directory on the call). This confirms the DR has a `title:` in its frontmatter and won't break the Astro build.
-2. Commit the file and any diagrams with `git -C ~/trade-imports-arch-workspace/trade-imports-documentation add ...` and then `git -C ~/trade-imports-arch-workspace/trade-imports-documentation commit ...`, one command per Bash call.
+1. Validate frontmatter: run `(cd trade-imports-documentation; node scripts/validate-docs-frontmatter.mjs)` as one Bash call. The subshell keeps the `cd` inside that call, so later calls still start at the workspace root. This confirms the DR has a `title:` in its frontmatter and won't break the Astro build.
+2. Commit the file and any diagrams with `git -C trade-imports-documentation add ...` and then `git -C trade-imports-documentation commit ...`, one command per Bash call.
 3. Publish to Confluence:
 
    ```bash
-   npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run publish:confluence -- --file "docs/systems/EUDP/Architecture and Development/DR/DR-EUDP-<NNN>-<slug>.md"
+   npm --prefix trade-imports-documentation run publish:confluence -- --file "docs/systems/EUDP/Architecture and Development/DR/DR-EUDP-<NNN>-<slug>.md"
    ```
 
    The publisher walks the markdown, base64-encodes any referenced SVGs, and creates or updates a Confluence page. It only updates existing Confluence pages that carry the `generated` label. If this DR was drafted in Confluence first and needs its first source-controlled publish, add the `generated` label to the existing Confluence page once so the publisher can take it over.
@@ -141,7 +141,7 @@ If the user is updating an existing DR rather than creating a new one:
 Target repo (canonical workspace path):
 
 ```
-~/trade-imports-arch-workspace/trade-imports-documentation/
+trade-imports-documentation/
 ```
 
 DR folder within the repo:

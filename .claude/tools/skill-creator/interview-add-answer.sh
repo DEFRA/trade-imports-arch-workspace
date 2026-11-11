@@ -43,7 +43,8 @@ case "$RUN_ID" in
         exit 1 ;;
 esac
 
-target="$HOME/trade-imports-arch-workspace/.claude/workareas/skill-creator/$RUN_ID/decisions.json"
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
+target="$WS/.claude/workareas/skill-creator/$RUN_ID/decisions.json"
 [[ -f "$target" ]] || { echo "No decisions.json at $target — run start-skill-creator.sh first" >&2; exit 1; }
 
 # Canonicalise the value first (also fails fast on invalid JSON) so

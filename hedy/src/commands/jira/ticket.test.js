@@ -140,13 +140,13 @@ describe('the jira ticket command', () => {
 })
 
 describe('hedy jira ticket, spawned', () => {
-  const childEnv = () => ({ HEDY_WORKSPACE: root, JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined })
+  const childEnv = () => ({ JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined })
 
   it.each([
     ['with no key', ['jira', 'ticket', '--json'], "The command needs the argument 'key'."],
     ['with a key of the wrong shape', ['jira', 'ticket', 'not-a-key', '--json'], 'The key not-a-key is not a Jira issue key such as ABC-123.']
   ])('%s gives one USAGE entry and no AUTH entry, so no .env was read, and exits 2', async (_label, args, message) => {
-    const result = await runCli(args, { env: childEnv() })
+    const result = await runCli(args, { workspace: root, env: childEnv() })
     expect(result.exitCode).toBe(2)
     expect(result.envelope.ok).toBe(false)
     expect(result.envelope.errors.map(({ code }) => code)).toEqual(['USAGE'])
@@ -157,7 +157,7 @@ describe('hedy jira ticket, spawned', () => {
     const server = await startAnsweringServer(() => ({ status: 200, body: issueResponse }))
     try {
       await writeFile(join(root, '.env'), `JIRA_USER=file-user\nJIRA_TOKEN=file-token\nJIRA_BASE_URL=${server.baseUrl}\n`)
-      const result = await runCli(['jira', 'ticket', 'HEDY-101', '--json'], { env: childEnv() })
+      const result = await runCli(['jira', 'ticket', 'HEDY-101', '--json'], { workspace: root, env: childEnv() })
       expect(result.exitCode).toBe(0)
       expect(result.envelope.ok).toBe(true)
       expect(result.envelope.result).toEqual({

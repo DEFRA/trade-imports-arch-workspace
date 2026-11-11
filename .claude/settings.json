@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1"
+  },
   "permissions": {
     "allow": [
       "Read",
@@ -26,7 +29,8 @@
       "Bash(head:*)",
       "Bash(tail:*)",
       "Bash(wc:*)",
-      "Bash(~/trade-imports-arch-workspace/.claude/tools/:*)",
+      "Bash(.claude/tools/*)",
+      "Bash(bash .claude/tools/*)",
       "Skill(skill-creator)",
       "WebFetch(domain:agents.md)"
     ],
@@ -53,21 +57,6 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-git-push.sh\"",
             "timeout": 10
-          }
-
-
-
-
-
-        ]
-      },
-      {
-        "matcher": "Read|Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/realpath-file-tools.sh\"",
-            "timeout": 5
           }
         ]
       },

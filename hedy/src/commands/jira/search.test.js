@@ -141,7 +141,8 @@ describe('the jira search command', () => {
 describe('hedy jira search, spawned', () => {
   it('with --max 0 gives one USAGE entry naming --max and no AUTH entry, so no .env was read, and exits 2', async () => {
     const result = await runCli(['jira', 'search', 'project = X', '--max', '0', '--json'], {
-      env: { HEDY_WORKSPACE: root, JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined }
+      workspace: root,
+      env: { JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined }
     })
     expect(result.exitCode).toBe(2)
     expect(result.envelope.ok).toBe(false)

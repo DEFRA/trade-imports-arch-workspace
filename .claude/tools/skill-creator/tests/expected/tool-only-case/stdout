@@ -1,7 +1,7 @@
 WARN: dependencies declared without a dispatcher - no home for the pre-flight; audit pattern 9 will flag this until one exists
 Scaffolded skill: test-toolonly
-  SKILL.md:    HOME/trade-imports-arch-workspace/.claude/skills/test-toolonly/SKILL.md
-  decisions:   HOME/trade-imports-arch-workspace/.claude/skills/test-toolonly/decisions.md
+  SKILL.md:    ROOT/.claude/skills/test-toolonly/SKILL.md
+  decisions:   ROOT/.claude/skills/test-toolonly/decisions.md
   allowlist:   not applicable (no owned scripts; the reused domain's coverage is its own concern)
 
 Open the SKILL.md and replace the TODO markers.

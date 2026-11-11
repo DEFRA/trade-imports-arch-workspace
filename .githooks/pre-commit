@@ -3,13 +3,14 @@
 # lint the skills estate when staged changes touch .claude/ or the
 # Makefile, and run the scaffold and workspace golden suites when staged
 # changes touch a gated tools domain.
-# Wired via `git config core.hooksPath .githooks` (make link does this).
+# Wired via `git config core.hooksPath .githooks` (make install does this).
 # Tool-agnostic by design: runs for any editor or agent. Bypassing
 # with --no-verify is denied by the workspace's own bash guard.
 #
 # Lints the STAGED INDEX, not the worktree: the content being committed
-# is checked out into a temp HOME (the same seam the golden tests use),
-# so an unstaged fix cannot mask a staged break and vice versa.
+# is checked out into a temp folder, and each script there takes its
+# root from its own location, so it checks the staged copy. An unstaged
+# fix cannot mask a staged break, and vice versa.
 
 STAGED=$(git diff --cached --name-only)
 
@@ -33,9 +34,10 @@ echo "$STAGED" | grep -Eq '^(\.claude/|Makefile$)' || exit 0
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
-git checkout-index --prefix="$TMP/trade-imports-arch-workspace/" -a
+STAGED_COPY="$TMP/workspace"
+git checkout-index --prefix="$STAGED_COPY/" -a
 
-if ! HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh"; then
+if ! bash "$STAGED_COPY/.claude/tools/workspace/lint-skills.sh"; then
     echo "pre-commit: skills lint failed on the staged content - fix and re-stage" >&2
     exit 1
 fi
@@ -46,11 +48,11 @@ fi
 # blessed stdout embeds lint-skills.sh output, so a workspace-side
 # lint change can break scaffold goldens too.
 if echo "$STAGED" | grep -Eq '^\.claude/tools/(skill-creator|workspace|pr)/'; then
-    HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/run-golden.sh" || {
+    bash "$STAGED_COPY/.claude/tools/skill-creator/tests/run-golden.sh" || {
         echo "pre-commit: scaffold goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
         exit 1
     }
-    HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/workspace/tests/run-golden.sh" || {
+    bash "$STAGED_COPY/.claude/tools/workspace/tests/run-golden.sh" || {
         echo "pre-commit: deps-doctor goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
         exit 1
     }

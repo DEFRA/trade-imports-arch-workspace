@@ -19,15 +19,15 @@ SKILL.md frontmatter accepts a `hooks:` key with the same shape as `settings.jso
 
 ## Rules and Their Scope
 
-A file in `.claude/rules/` with `paths:` frontmatter is advisory context Claude Code loads when a matching file is read, written or edited. `lint-skills.sh` checks the frontmatter shape of every rule, because a frontmatter Claude Code cannot read loads the rule everywhere. Claude Code matches rules and nested CLAUDE.md files against the path as the tool call typed it, so a file reached through the `~/trade-imports-arch-workspace` symlink matched nothing until `.claude/hooks/realpath-file-tools.sh`, a `PreToolUse` hook on the four file tools, rewrote `file_path` to the real checkout path through `updatedInput`. Subagents receive path-scoped rules the same way; a subagent that drafts prose is still told to read `writing.md`, so the standard is in context before its first write.
+A file in `.claude/rules/` with `paths:` frontmatter is advisory context Claude Code loads when a matching file is read, written or edited. `lint-skills.sh` checks the frontmatter shape of every rule, because a frontmatter Claude Code cannot read loads the rule everywhere. Claude Code matches rules and nested CLAUDE.md files against the path as the tool call typed it, without resolving symlinks, so a rule loads only for a path inside the folder the session started in. The workspace types every path relative to the workspace root, where sessions start, so rules load for every file in the checkout. A `PreToolUse` hook that rewrites `file_path` through `updatedInput` cannot stand in for this, because Claude Code checks that a file was read before an edit before any hook runs, and the rewritten read and the typed edit then name different paths. Subagents receive path-scoped rules the same way; a subagent that drafts prose is still told to read `writing.md`, so the standard is in context before its first write.
 
 ## Enforcement Code Locations
 
 | Location | Wiring | Editor |
 | --- | --- | --- |
-| `.claude/hooks/` | `settings.json` (global, every session): the guards, and `realpath-file-tools.sh`, which resolves a symlinked `file_path` before a file tool runs | the owner only, since `guard-edits.sh` blocks agent edits to both |
-| `.claude/tools/<domain>/` | skill frontmatter hooks, skill steps, other scripts | agents; covered by the blanket `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` allowlist |
-| `.githooks/` | `core.hooksPath` (set by `make link`) | agents; runs for every git user regardless of AI tooling |
+| `.claude/hooks/` | `settings.json` (global, every session): the guards | the owner only, since `guard-edits.sh` blocks agent edits to both |
+| `.claude/tools/<domain>/` | skill frontmatter hooks, skill steps, other scripts | agents; covered by the blanket `Bash(.claude/tools/*)` and `Bash(bash .claude/tools/*)` allowlist entries |
+| `.githooks/` | `core.hooksPath` (set by `make install`) | agents; runs for every git user regardless of AI tooling |
 
 Scripts under `tools/` are the agent-agnostic layer: colleagues on other AI tools get the same refusals (`create-pr.sh` exit 2) even though frontmatter hooks are Claude Code specific.
 

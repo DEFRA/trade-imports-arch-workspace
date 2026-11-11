@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
 # Golden-file tests for check-deps.sh.
-# Invoke with bash (no execute bit required):
-#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/tests/run-golden.sh [--bless]
+# Invoke with bash from the workspace root (no execute bit required):
+#   bash .claude/tools/workspace/tests/run-golden.sh [--bless]
 #
 # Each fixtures/<case>/ directory IS a fake workspace fragment
 # (.claude/skills/*/SKILL.md, Makefile, child dirs holding a .keep).
-# The runner copies it to a temp HOME as trade-imports-arch-workspace —
-# HOME redirection is the test seam, since the doctor hardcodes
-# $HOME/trade-imports-arch-workspace by the path contract — runs the
-# REAL check-deps.sh against it, and diffs normalized stdout + exit
-# code against expected/<case>.txt. --bless rewrites expected files.
+# The runner copies it to a temp folder, copies the REAL check-deps.sh
+# into the copy's .claude/tools/workspace/, and runs it there. The doctor
+# takes its root from its own location, so it checks the copy. stdout,
+# with the copy's path written as ROOT, and the exit code are diffed
+# against expected/<case>.txt. --bless rewrites expected files.
 
 set -u
 
-REAL_WS="$HOME/trade-imports-arch-workspace"
-TESTS_DIR="$REAL_WS/.claude/tools/workspace/tests"
-DOCTOR="$REAL_WS/.claude/tools/workspace/check-deps.sh"
+TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+DOCTOR="$TESTS_DIR/../check-deps.sh"
 BLESS=false
 [[ "${1:-}" == "--bless" ]] && BLESS=true
 
@@ -28,17 +27,18 @@ for fixture in "$TESTS_DIR"/fixtures/*/; do
     case=$(basename "$fixture")
     COUNT=$((COUNT+1))
 
-    TMP=$(mktemp -d)
-    FAKE="$TMP/trade-imports-arch-workspace"
-    mkdir -p "$FAKE"
+    TMP=$(cd "$(mktemp -d)" && pwd -P)
+    FAKE="$TMP/workspace"
+    mkdir -p "$FAKE/.claude/tools/workspace"
     cp -R "$fixture/." "$FAKE/"
+    cp "$DOCTOR" "$FAKE/.claude/tools/workspace/"
 
-    out=$(HOME="$TMP" bash "$DOCTOR" 2>&1)
+    out=$(bash "$FAKE/.claude/tools/workspace/check-deps.sh" 2>&1)
     rc=$?
 
     actual="$TMP/actual.txt"
     {
-        printf '%s\n' "$out" | sed "s|$TMP|HOME|g"
+        printf '%s\n' "$out" | sed "s|$FAKE|ROOT|g"
         printf 'exit-code: %s\n' "$rc"
     } > "$actual"
 

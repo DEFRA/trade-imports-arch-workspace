@@ -6,28 +6,30 @@ This document is the canonical reference for the workspace-level conventions tha
 
 ## Workspace root resolution
 
-The canonical workspace root is `~/trade-imports-arch-workspace`. On a machine where the checkout lives elsewhere, the contributor creates one HOME-level symlink: `ln -s <checkout> ~/trade-imports-arch-workspace`. Every path in the workspace is spelled against this constant, so it resolves identically on every machine. The trade-off is deliberate: the spelling is baked into many files, so renaming the root later is a mass find-and-replace. `trade-imports-documentation/`, `delivery-info-arch-tooling/` and `trade-imports-schemas/` are children of the root; the workspace references them downward by canonical path, and they never reference the workspace upward (which keeps them self-contained and CI-safe).
+The workspace has no fixed location. Every path in the workspace is written relative to the workspace root, the folder that holds `.claude/` and the `Makefile`, so a checkout works wherever it is cloned. `trade-imports-documentation/`, `delivery-info-arch-tooling/` and `trade-imports-schemas/` are children of the root. The workspace references them downward by relative path, and they never reference the workspace upward, which keeps them self-contained and CI-safe.
 
-Skills must NOT assume the agent's current working directory. Claude Code can invoke a skill from anywhere, and the child repos are themselves git repositories, so `git rev-parse --show-toplevel` returns the child root when called from inside one - silently breaking any path that should be workspace-relative.
+A relative path depends on the working directory, and Claude Code holds that at the root. A session starts in the folder Claude Code was launched from, so sessions start at the workspace root. `.claude/settings.json` sets `CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR`, which returns the main session's Bash tool to the root after every command, so a `cd` moves neither later Bash calls nor the file tools, which resolve relative paths against the same folder. A subagent's Bash calls also start at the root, and a subagent keeps no `cd` between calls. If a session starts in a subfolder, relative paths resolve against that subfolder, and Claude Code loads no workspace skills there either.
 
-Two layers:
+Never reach the checkout through a symlink. Claude Code compares file paths as typed, without resolving symlinks. A file read through a symlink loads no path-scoped rule and no nested CLAUDE.md, and Edit refuses a file that was read under another spelling of its path.
 
-- **In LLM-typed commands** (SKILL.md, references/*.md, spawn prompts): use the literal home-relative path `~/trade-imports-arch-workspace/...`. Bash expands `~` to `$HOME` automatically.
-- **Inside `.claude/tools/<domain>/<script>.sh`**: scripts hardcode the path literally as `$HOME/trade-imports-arch-workspace/...`. No env var, no runtime root-discovery. `$HOME` expands inside the shell at script-run time; it never reaches the permission system or an LLM. Emitted commands (a dispatcher printing a `PUBLISH_CMD` for the agent to run) use the `~` form so they match the allowlist verbatim.
+Three layers:
 
-The split exists because Claude Code's permission system flags parameter expansion (`$VAR`) in LLM-typed Bash commands as "Contains simple_expansion" - even when the variable is explicitly allowlisted ([GH#51001](https://github.com/anthropics/claude-code/issues/51001)). Literal `~` paths in agent-typed commands don't trip the check, and `$HOME` inside script bodies never crosses the boundary.
+- **In LLM-typed commands and file tool paths** (SKILL.md, references/*.md, spawn prompts): paths relative to the root, such as `.claude/tools/workspace/check-workspace.sh`.
+- **Inside `.claude/tools/<domain>/<script>.sh`**: the script takes the root from its own location, three folders up: `ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"`. A script under `tests/` counts four. The count is fixed, so a script that moves to another depth must change its count, and a wrong count fails the script's first check of the root. The script counts folders instead of walking up to the first `.claude/`, because a walk-up matches a stray `.claude/` in a parent folder. `pwd -P` gives the real path, so a call through a symlink still finds the real root.
+- **Commands a script prints**: a command a dispatcher prints for the agent to run verbatim stays root-relative, so it matches the allowlist. A remedy that a script or `hedy` names in an error message uses the resolved absolute root, because the reader of a message may be in any folder.
 
-Earlier iterations used a walk-up helper that derived the root from `${BASH_SOURCE[0]}` or `$PWD`. That had two failure modes: off-by-one when scripts moved between directory depths, and false matches when a parent of the workspace happened to contain a stray `.claude/` directory.
+`$VAR` stays out of LLM-typed commands, because Claude Code's permission system flags parameter expansion as "Contains simple_expansion" even when the variable is allowlisted ([GH#51001](https://github.com/anthropics/claude-code/issues/51001)). A root-relative path holds no expansion.
 
 ## Path conventions
 
-Cross-workspace references in `SKILL.md` use absolute paths anchored on `~/trade-imports-arch-workspace`:
+Cross-workspace references in `SKILL.md` use paths relative to the workspace root:
 
 ```
-Scripts:        ~/trade-imports-arch-workspace/.claude/tools/<domain>/<script>
-Best-practices: ~/trade-imports-arch-workspace/.claude/best-practices/<topic>/<file>
-Workareas:      ~/trade-imports-arch-workspace/.claude/workareas/...
-Other skills:   ~/trade-imports-arch-workspace/.claude/skills/<name>/...
+Scripts:        .claude/tools/<domain>/<script>
+Best-practices: .claude/best-practices/<topic>/<file>
+Workareas:      .claude/workareas/...
+Other skills:   .claude/skills/<name>/...
+Child repos:    trade-imports-documentation/...
 ```
 
 Skill-internal references stay relative from `SKILL.md`:
@@ -37,17 +39,17 @@ references/<NAME>.md
 assets/<NAME>.md
 ```
 
-**Markdown links are the one exception to the `~` rule:** a link like `[agent-skills.md](../../best-practices/skills/agent-skills.md)` uses the relative form, because relative links are the only form `lint-skills.sh` can resolve and renderers can follow. The `~` form is for _commands and prose paths_, not link targets.
+**Markdown links are the one exception to the root-relative rule:** a link like `[agent-skills.md](../../best-practices/skills/agent-skills.md)` is relative to the linking file, because that is the only form `lint-skills.sh` can resolve and renderers can follow. The root-relative form is for _commands and prose paths_, not link targets.
 
 ## Bash call hygiene (avoiding permission prompts)
 
 **The core principle: one command per Bash call.** The allowlist matches against the whole command string - anything that makes the call a _compound_ shape (a chain, a pipe, an embedded sub-command, or a variable expansion) doesn't match the prefix rule even when each piece would individually. Symptoms:
 
 - `&&` / `;` / `|` - turns N commands into one string the matcher doesn't recognise. Run them as separate Bash calls instead.
-- `cd <dir> && cmd ...` - special case of `&&`. Use `cmd -C <dir>` / full paths instead.
+- `cd <dir> && cmd ...` - special case of `&&`. Use `cmd -C <dir>` / `npm --prefix <dir>`, or `(cd <dir>; cmd)` in one call where the command has no such option.
 - `find ... -exec cmd {} \;` - `-exec` runs an arbitrary embedded command. Claude Code refuses to prefix-allowlist any command containing `-exec`. Use Glob + Read for "find then read" workflows.
-- `$VAR` in the command - Claude Code's "Contains simple_expansion" check ([GH#51001](https://github.com/anthropics/claude-code/issues/51001)) trips before the allowlist matcher sees the command. Use literal `~/trade-imports-arch-workspace/...` paths.
-- `/Users/<you>/...` resolved-tilde form - the matcher compares literal strings, so `~/trade-imports-arch-workspace/...` and its resolved `/Users/<you>/...` form are _different_ prefixes. Always type the `~/` form, never resolve it to your home path.
+- `$VAR` in the command - Claude Code's "Contains simple_expansion" check ([GH#51001](https://github.com/anthropics/claude-code/issues/51001)) trips before the allowlist matcher sees the command. Use root-relative paths.
+- An absolute path to a workspace script - the matcher compares literal strings, and the allowlist rules are written in the root-relative form, so `/Users/<you>/.../.claude/tools/x.sh` does not match `Bash(.claude/tools/*)` and prompts. Type `.claude/tools/x.sh`.
 - Ad-hoc text utilities (`awk`, `sed`, `find`) on files outside the workspace - scoped to workspace paths in the allowlist; system paths still prompt.
 
 **Don't reach for Bash combos when an LLM-native tool does the job:**
@@ -61,11 +63,10 @@ assets/<NAME>.md
 
 | Anti-pattern | Use instead |
 | --- | --- |
-| `cd ~/trade-imports-arch-workspace && .claude/tools/x.sh` | `~/trade-imports-arch-workspace/.claude/tools/x.sh` (no `cd`) |
-| `.claude/tools/x.sh` (relative) | full `~/trade-imports-arch-workspace/...` form |
+| `cd <dir> && .claude/tools/x.sh` | `.claude/tools/x.sh` from the root (no `cd`) |
+| `/Users/<you>/.../.claude/tools/x.sh` (absolute) | `.claude/tools/x.sh` |
 | `tools/x.sh && tools/y.sh` | two separate Bash calls |
-| `$WORKSPACE/.claude/tools/x.sh` | literal `~/trade-imports-arch-workspace/...` form |
-| `/Users/<you>/trade-imports-arch-workspace/...` (resolved tilde) | literal `~/trade-imports-arch-workspace/...` form |
+| `$WORKSPACE/.claude/tools/x.sh` | `.claude/tools/x.sh` |
 | `cd <dir> && git ...` | `git -C <dir> ...` |
 | `awk '...' file` (workspace inspection) | Read tool with offset+limit |
 | `find <dir> -name X -exec cat {} \;` | Glob + Read |
@@ -74,7 +75,7 @@ assets/<NAME>.md
 
 The skill prose models this in every example - follow the model.
 
-Worker personas are addressed by an absolute `references/<NAME>.md` path inside the spawn prompt - see "Worker references" below.
+Worker personas are addressed by a root-relative `references/<NAME>.md` path inside the spawn prompt - see "Worker references" below.
 
 ## Skill folder shape
 
@@ -90,18 +91,18 @@ metadata: # OPTIONAL; only for skills with unbundled needs
 - `SKILL.md` body should stay under 500 lines / ~5000 tokens.
 - `references/<NAME>.md` - additional docs loaded on demand.
 - `assets/<NAME>.md` - templates, schemas, static resources.
-- Skills do NOT carry private `scripts/` folders in this workspace: shared shell scripts live at `~/trade-imports-arch-workspace/.claude/tools/`.
+- Skills do NOT carry private `scripts/` folders in this workspace: shared shell scripts live at `.claude/tools/`.
 
 ### Dependencies frontmatter
 
 A skill that cannot function from its bundled tools alone declares what it needs in `metadata.workspace-deps` - a single space-separated string. The agentskills.io spec routes custom properties through `metadata` (string keys → string values), so this stays valid under `skills-ref validate`; the key carries a workspace prefix rather than a bare `dependencies` because the metadata map is a namespace shared with other consumers. Each token is either:
 
-- a **workspace child project** - a directory name under `~/trade-imports-arch-workspace/` (e.g. `delivery-info-arch-tooling`), or
+- a **workspace child project** - a directory name under the workspace root (e.g. `delivery-info-arch-tooling`), or
 - a **non-baseline tool** - a command the skill's scripts invoke (e.g. `npm`, `mmdc`).
 
 Format: two-space indent under `metadata:`, no quotes, no inline comments. Rules:
 
-- **Baseline is assumed, never declared**: `bash`, `curl`, `jq`, `git`, and `hedy`, which `make link` puts on PATH. `check-workspace.sh` verifies the baseline once per machine; declaring it per skill would reduce declarations to boilerplate.
+- **Baseline is assumed, never declared**: `bash`, `curl`, `jq`, `git`, and `hedy`, which `make install` puts on PATH. `check-workspace.sh` verifies the baseline once per machine; declaring it per skill would reduce declarations to boilerplate.
 - **Credentials are not dependencies** - env-var and auth needs belong to `hedy auth`, which `check-auth.sh` runs with any per-domain `auth.sh` the sweep still finds.
 - **Declare hard dependencies only** - things the skill cannot work without. A soft probe with graceful fallback (e.g. mermaid-check trying the tooling's mmdc, then npx) is not declared - and a fallback chain is soft only if its LAST rung degrades gracefully; a chain that ends in a raw failure is a hard dependency wearing a costume.
 
@@ -119,7 +120,7 @@ Spawn idiom inside `SKILL.md`:
 Long-running fan-out workers (per-file reviewers, per-package planners, per-version planners, per-item fixers) live as `references/<NAME>.md` prose inside the owning skill. They are spawned via the Task tool with `subagent_type: general-purpose` and a prompt that begins:
 
 ```
-Follow the instructions in ~/trade-imports-arch-workspace/.claude/skills/<owner>/references/<NAME>.md.
+Follow the instructions in .claude/skills/<owner>/references/<NAME>.md.
 
 <per-spawn context: file/path/commit/output-path>
 ```
@@ -128,7 +129,7 @@ Rationale:
 
 - The agentskills.io specification defines `references/` for "additional documentation that agents can read when needed" and is silent on subagents - this is the spec-blessed home for worker prose.
 - `general-purpose` carries `Tools: *` (Write, Edit, Bash, WebFetch all available) and is not subject to the no-write guardrail injected into custom-named restricted subagents - workers can therefore reliably write the per-file artifacts that downstream `tools/` scripts consume.
-- The path is absolute so the spawned subagent doesn't need to inherit the parent's working directory.
+- The path is relative to the workspace root, and a subagent's Bash calls and file tools start at the root, so the subagent finds the file without the parent's working directory.
 
 ## Cross-host discovery
 
@@ -139,4 +140,4 @@ Rationale:
 
 ## Runtime workareas
 
-`~/trade-imports-arch-workspace/.claude/workareas/` holds working state written by skill runs - interview decisions, audit plans, review artifacts. It is tracked, not gitignored: checked-in files (`skill-creator/<name>/decisions.json`, `skills-audit/<name>.md`) form the durable audit trail alongside each skill's `decisions.md` sidecar.
+`.claude/workareas/` holds working state written by skill runs - interview decisions, audit plans, review artifacts. It is tracked, not gitignored: checked-in files (`skill-creator/<name>/decisions.json`, `skills-audit/<name>.md`) form the durable audit trail alongside each skill's `decisions.md` sidecar.

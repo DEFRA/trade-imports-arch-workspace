@@ -1,4 +1,3 @@
-import { homedir as osHomedir } from 'node:os'
 import { Command, CommanderError } from 'commander'
 import { register as registerAuth } from './commands/auth.js'
 import { register as registerConfluence } from './commands/confluence/index.js'
@@ -21,9 +20,9 @@ const withDefaults = ({
   stderr = process.stderr,
   setExitCode = (code) => { process.exitCode = code },
   env = process.env,
-  homedir = osHomedir(),
+  checkoutRoot,
   launchMenu = launchMenuOnDemand
-} = {}) => ({ stdout, stdin, stderr, setExitCode, env, homedir, launchMenu })
+} = {}) => ({ stdout, stdin, stderr, setExitCode, env, checkoutRoot, launchMenu })
 
 const menuOpens = ({ stdout, stdin }, { ui, json }) =>
   stdout.isTTY === true && stdin.isTTY === true && ui !== false && json !== true
@@ -67,9 +66,9 @@ const usageMessage = ({ code, message }) => {
 
 /**
  * Builds the hedy commander program. Output, input, the exit code setter,
- * the environment, the home folder and the menu launcher are injectable so
- * the program runs in-process under test. Commander's own errors are thrown,
- * not printed.
+ * the environment, the checkout hedy runs from and the menu launcher are
+ * injectable so the program runs in-process under test. Commander's own
+ * errors are thrown, not printed.
  *
  * @param {object} [deps]
  * @param {{ write: (chunk: string) => unknown, isTTY?: boolean }} [deps.stdout]
@@ -77,12 +76,12 @@ const usageMessage = ({ code, message }) => {
  * @param {{ write: (chunk: string) => unknown }} [deps.stderr]
  * @param {(code: number) => void} [deps.setExitCode]
  * @param {Record<string, string | undefined>} [deps.env]
- * @param {string} [deps.homedir]
+ * @param {string} [deps.checkoutRoot] the workspace root used without --workspace, by default the checkout that holds the hedy source
  * @param {(options: object) => Promise<number>} [deps.launchMenu]
  * @returns {Command}
  */
 export const buildProgram = (deps) => {
-  const { stdout, stderr, setExitCode, env, homedir } = withDefaults(deps)
+  const { stdout, stderr, setExitCode, env, checkoutRoot } = withDefaults(deps)
   let root
   const program = new Command()
     .name('hedy')
@@ -100,7 +99,7 @@ export const buildProgram = (deps) => {
       outputError: () => {}
     })
     .hook('preAction', (_program, actionCommand) => {
-      root = resolveWorkspaceRoot({ workspace: actionCommand.optsWithGlobals().workspace, env, homedir })
+      root = resolveWorkspaceRoot({ workspace: actionCommand.optsWithGlobals().workspace, checkoutRoot })
     })
   const commandDeps = { stdout, stderr, setExitCode, env, workspaceRoot: () => root }
   registerHello(program, commandDeps)
@@ -110,9 +109,9 @@ export const buildProgram = (deps) => {
   return program
 }
 
-const openMenu = async (program, { env, homedir, stdout, stdin, stderr, setExitCode, launchMenu }) => {
+const openMenu = async (program, { env, checkoutRoot, stdout, stdin, stderr, setExitCode, launchMenu }) => {
   try {
-    const root = resolveWorkspaceRoot({ workspace: program.opts().workspace, env, homedir })
+    const root = resolveWorkspaceRoot({ workspace: program.opts().workspace, checkoutRoot })
     setExitCode(await launchMenu({ env, workspaceRoot: () => root, stdout, stdin, stderr, setExitCode }))
   } catch (error) {
     await runAction(() => { throw error }, { stdout, stderr, setExitCode })

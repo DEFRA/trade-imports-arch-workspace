@@ -10,7 +10,8 @@
 # remedy in the error message, never a raw failure.
 
 # TODO pattern 9 - pre-flight each declared dependency before real work:
-#   projects: [[ -d $HOME/trade-imports-arch-workspace/<project> ]]
+#   projects: [[ -d "$WS/<project>" ]], with WS taken from this
+#             script's location, as check-deps.sh takes ROOT
 #   tools:    command -v <tool>
 # On failure print MODE: BLOCKED plus REASON: <remedy> (model:
 # the REASON line of tools/skill-creator/list-project-features.sh).

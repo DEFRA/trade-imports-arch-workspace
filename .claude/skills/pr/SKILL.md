@@ -7,7 +7,7 @@ metadata:
 
 Create or edit a GitHub pull request for the workspace or any child repo. The outcome is a PR whose title and body follow [pull-requests.md](../../best-practices/git/pull-requests.md), created through the guard script so AI attribution is refused deterministically - the rule holds regardless of which agent or session runs this skill.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Usage
 
@@ -41,7 +41,7 @@ This skill needs gh - tools beyond the workspace baseline (bash, curl, jq, git).
 ## Step 3: Create or edit through the guard script
 
 ```
-bash ~/trade-imports-arch-workspace/.claude/tools/pr/create-pr.sh --title "<title>" --body-file <path> --base main
+bash .claude/tools/pr/create-pr.sh --title "<title>" --body-file <path> --base main
 ```
 
 Add `--repo <owner/name>` / `--head <branch>` when needed; use `--edit <number> --body-file <path>` to replace an existing PR's body; `--dry-run` prints the `gh` command and exits without running anything.
@@ -64,4 +64,4 @@ Next: request review, or merge when approved.
 
 | Script | Home | Purpose |
 |--------|------|---------|
-| `create-pr.sh` | `~/trade-imports-arch-workspace/.claude/tools/pr/` | Create or edit a PR; refuses AI attribution in title/body (exit 2); `--dry-run`, `--help` |
+| `create-pr.sh` | `.claude/tools/pr/` | Create or edit a PR; refuses AI attribution in title/body (exit 2); `--dry-run`, `--help` |

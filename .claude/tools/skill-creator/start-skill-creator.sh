@@ -23,7 +23,7 @@ set -e
 TRIGGER="${1:-}"
 [[ -z "$TRIGGER" ]] && { echo "Usage: $0 \"<trigger phrase>\"" >&2; exit 1; }
 
-WS="$HOME/trade-imports-arch-workspace"
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 SKILLS_DIR="$WS/.claude/skills"
 AUDITS_DIR="$WS/.claude/workareas/skills-audit"
 INTERVIEWS_DIR="$WS/.claude/workareas/skill-creator"

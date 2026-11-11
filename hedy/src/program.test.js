@@ -17,7 +17,7 @@ afterEach(async () => {
   await rm(root, { recursive: true, force: true })
 })
 
-const run = async (args, env = { HEDY_WORKSPACE: root }) => {
+const run = async (args, { checkoutRoot = root } = {}) => {
   const out = []
   const err = []
   const codes = []
@@ -25,8 +25,8 @@ const run = async (args, env = { HEDY_WORKSPACE: root }) => {
     stdout: { write: (chunk) => out.push(chunk) },
     stderr: { write: (chunk) => err.push(chunk) },
     setExitCode: (code) => codes.push(code),
-    env,
-    homedir: '/nonexistent-home'
+    env: {},
+    checkoutRoot
   })
   return { stdout: out.join(''), stderr: err.join(''), codes }
 }
@@ -67,9 +67,9 @@ describe('runProgram in text mode', () => {
     expect(result.codes).toEqual([2])
   })
 
-  it('refuses when no override is given and the default location under the home folder is missing', async () => {
-    const result = await run(['hello'], {})
-    expect(result.stderr).toContain('/nonexistent-home/trade-imports-arch-workspace, from the default location,')
+  it('refuses when no --workspace is given and the checkout hedy runs from is not a workspace', async () => {
+    const result = await run(['hello'], { checkoutRoot: '/nonexistent-checkout' })
+    expect(result.stderr).toContain('/nonexistent-checkout, from the checkout hedy runs from,')
     expect(result.codes).toEqual([2])
   })
 })
@@ -160,8 +160,8 @@ describe('runProgram with no command', () => {
       stdin: terminalMark('stdin', terminals),
       stderr: { write: (chunk) => err.push(chunk) },
       setExitCode: (code) => codes.push(code),
-      env: { HEDY_WORKSPACE: root },
-      homedir: '/nonexistent-home'
+      env: {},
+      checkoutRoot: root
     }
     await runProgram(args, {
       ...deps,
@@ -245,8 +245,8 @@ describe('runProgram with no command', () => {
       stdin,
       stderr: fakeStderr(),
       setExitCode: (code) => codes.push(code),
-      env: { HEDY_WORKSPACE: root },
-      homedir: '/nonexistent-home'
+      env: {},
+      checkoutRoot: root
     })
     await vi.waitFor(() => expect(stdin.listenerCount('readable')).toBeGreaterThan(0))
     for (const key of ['\u001B[B', '\u001B[B', '\u001B[B', '\r']) {
@@ -260,18 +260,17 @@ describe('runProgram with no command', () => {
 })
 
 describe('the hedy entry, spawned with no command', () => {
-  const env = () => ({ HEDY_WORKSPACE: root })
   const NO_COMMAND = 'No command was given. Run hedy --help to list the commands.'
 
   it.each([[[]], [['--no-ui']]])('%j prints the usage error as one stderr line and exits 2', async (args) => {
-    const result = await runCli(args, { env: env() })
+    const result = await runCli(args, { workspace: root })
     expect(result.exitCode).toBe(2)
     expect(result.stdout).toBe('')
     expect(result.stderr).toBe(NO_COMMAND)
   })
 
   it('--json prints one USAGE failure envelope and exits 2', async () => {
-    const result = await runCli(['--json'], { env: env() })
+    const result = await runCli(['--json'], { workspace: root })
     expect(result.exitCode).toBe(2)
     expect(result.envelope.ok).toBe(false)
     expect(result.envelope.errors).toEqual([{ code: 'USAGE', message: NO_COMMAND }])
@@ -279,30 +278,28 @@ describe('the hedy entry, spawned with no command', () => {
   })
 
   it('--help lists --no-ui and exits 0', async () => {
-    const result = await runCli(['--help'], { env: env() })
+    const result = await runCli(['--help'], { workspace: root })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toMatch(/^ {2}--no-ui\s/m)
   })
 })
 
 describe('the hedy entry, spawned', () => {
-  const env = () => ({ HEDY_WORKSPACE: root })
-
   it('hello --json prints one success envelope line and exits 0', async () => {
-    const result = await runCli(['hello', '--json'], { env: env() })
+    const result = await runCli(['hello', '--json'], { workspace: root })
     expect(result.exitCode).toBe(0)
     expect(result.envelope.ok).toBe(true)
     expect(result.envelope.result.message).toBe('Hello from hedy')
   })
 
   it('hello prints the message as text and exits 0', async () => {
-    const result = await runCli(['hello'], { env: env() })
+    const result = await runCli(['hello'], { workspace: root })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toBe('Hello from hedy')
   })
 
   it('hello --bogus exits 2 with one stderr line naming --bogus, no stack trace and nothing on stdout', async () => {
-    const result = await runCli(['hello', '--bogus'], { env: env() })
+    const result = await runCli(['hello', '--bogus'], { workspace: root })
     expect(result.exitCode).toBe(2)
     expect(result.stdout).toBe('')
     expect(result.stderr.split('\n')).toHaveLength(1)
@@ -311,7 +308,7 @@ describe('the hedy entry, spawned', () => {
   })
 
   it('hello --bogus --json prints one USAGE failure envelope and exits 2', async () => {
-    const result = await runCli(['hello', '--bogus', '--json'], { env: env() })
+    const result = await runCli(['hello', '--bogus', '--json'], { workspace: root })
     expect(result.exitCode).toBe(2)
     expect(result.envelope.ok).toBe(false)
     expect(result.envelope.errors[0].code).toBe('USAGE')
@@ -319,7 +316,7 @@ describe('the hedy entry, spawned', () => {
   })
 
   it('--help lists the jira and confluence commands and exits 0', async () => {
-    const result = await runCli(['--help'], { env: env() })
+    const result = await runCli(['--help'], { workspace: root })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toMatch(/^Usage: hedy/)
     expect(result.stdout).toMatch(/^ {2}jira\s/m)
@@ -327,20 +324,20 @@ describe('the hedy entry, spawned', () => {
   })
 
   it('--version prints the version from package.json and exits 0', async () => {
-    const result = await runCli(['--version'], { env: env() })
+    const result = await runCli(['--version'], { workspace: root })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toBe(version)
   })
 
   it('--workspace /nonexistent hello --json prints one USAGE failure envelope and exits 2', async () => {
-    const result = await runCli(['--workspace', '/nonexistent', 'hello', '--json'], { env: env() })
+    const result = await runCli(['--workspace', '/nonexistent', 'hello', '--json'])
     expect(result.exitCode).toBe(2)
     expect(result.envelope.ok).toBe(false)
     expect(result.envelope.errors[0].code).toBe('USAGE')
   })
 
   it('an unknown command exits 2', async () => {
-    const result = await runCli(['nosuch'], { env: env() })
+    const result = await runCli(['nosuch'], { workspace: root })
     expect(result.exitCode).toBe(2)
   })
 })

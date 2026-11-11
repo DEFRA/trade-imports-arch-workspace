@@ -78,15 +78,15 @@ Each entry: the anti-pattern, the symptom that catches it, and the correction.
 
 ## A10. Env vars in LLM-typed Bash
 
-**Symptom:** SKILL.md or persona prose typed `$WORKSPACE/.claude/tools/...` or `$HOME/trade-imports-arch-workspace/...` in an LLM-typed command.
+**Symptom:** SKILL.md or persona prose typed `$WORKSPACE/.claude/tools/...` or `$HOME/...` in an LLM-typed command.
 
 **Why it's wrong:** Claude Code's "Contains simple_expansion" check trips on `$VAR` in LLM-typed commands even when the var is allowlisted ([GH#51001](https://github.com/anthropics/claude-code/issues/51001)).
 
-**Correction:** literal `~/trade-imports-arch-workspace/...` paths. `~` expands transparently and doesn't trip the check.
+**Correction:** paths relative to the workspace root, such as `.claude/tools/...`. A relative path holds no expansion, so it does not trip the check.
 
 ## A11. Dispatcher-emitted commands outside the allowlist
 
-**Symptom:** a dispatcher carefully emits ~-spelled FACT commands so they match the allowlist verbatim, but some emitted lines (e.g. bare `npm --prefix ... run ...`) start with a prefix no allowlist entry covers - so the "run verbatim, no prompt" contract silently holds for some emitted commands and not others.
+**Symptom:** a dispatcher carefully emits root-relative FACT commands so they match the allowlist verbatim, but some emitted lines (e.g. bare `npm --prefix ... run ...`) start with a prefix no allowlist entry covers - so the "run verbatim, no prompt" contract silently holds for some emitted commands and not others.
 
 **Why it's wrong:** the whole point of emitting resolved commands is a prompt-free verbatim run; a partially-covered emission set trains the agent to expect no prompt and the user to rubber-stamp the ones that appear.
 

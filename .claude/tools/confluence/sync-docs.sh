@@ -17,7 +17,7 @@
 #   JIRA_BASE_URL  - e.g. https://eaflood.atlassian.net
 #
 # Tools required on PATH:
-#   hedy           - fetches each page as markdown; `make link` installs it
+#   hedy           - fetches each page as markdown; `make install` installs it
 #
 
 set -euo pipefail
@@ -25,7 +25,8 @@ set -euo pipefail
 # ── Constants ──────────────────────────────────────────────────────────────────
 
 ROOT_FOLDER_ID="6447269328"
-OUTPUT_DIR="$HOME/trade-imports-arch-workspace/.claude/workareas/confluence-sync"
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
+OUTPUT_DIR="$WS/.claude/workareas/confluence-sync"
 INDEX_FILE="$OUTPUT_DIR/_index.md"
 BASE_URL="${JIRA_BASE_URL:?JIRA_BASE_URL is not set}/wiki"
 DRY_RUN=false
@@ -157,7 +158,7 @@ fetch_page_content() {
   local envelope
   envelope=$(hedy confluence page "$page_id" --json) || true
   if [[ -z "$envelope" ]]; then
-    echo "Error: hedy printed nothing for page $page_id - is hedy on PATH? Run: make -C ~/trade-imports-arch-workspace link" >&2
+    echo "Error: hedy printed nothing for page $page_id - is hedy on PATH? Run: make -C $WS install" >&2
     exit 1
   fi
   if [[ "$(echo "$envelope" | jq -r '.ok')" != "true" ]]; then

@@ -1,7 +1,7 @@
 #!/bin/bash
 # PreToolUse guard for Edit/Write/MultiEdit/NotebookEdit — protects the security
 # config from being modified by the agent itself. Without this, the deny list and
-# the guard hooks live under ~/trade-imports-arch-workspace (which the agent can Write/Edit), so a
+# the guard hooks live in the workspace checkout (which the agent can Write/Edit), so a
 # determined agent could neuter its own guardrails. This blocks edits to:
 #   - .claude/settings.json / .claude/settings.local.json (the permission rules)
 #   - .claude/hooks/**                                     (the guard scripts)

@@ -26,15 +26,15 @@ A skill that declares `metadata.workspace-deps` (pattern 9) pre-flights each dec
 `.claude/settings.json` allowlist entries (pattern 8):
 
 ```
-Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*)
-Bash(~/trade-imports-arch-workspace/.claude/tools/{{NAME}}/*:*)
+Bash(.claude/tools/{{NAME}}/*)
+Bash(bash .claude/tools/{{NAME}}/*)
 ```
 
 ## SKILL.md skeleton - the blessed golden output is the exemplar
 
 There is deliberately NO hand-written copy of the emitted SKILL.md here: a second copy of the generator's heredoc drifts (it did, twice, in one branch). The living, review-gated exemplars are the golden expected trees - they cannot diverge from `scaffold-skill.sh` because `make check` and the pre-commit hook diff them against its real output:
 
-- `~/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/expected/plain-case/skill/SKILL.md` - dispatcher + JSON state + fan-out worker.
+- `.claude/tools/skill-creator/tests/expected/plain-case/skill/SKILL.md` - dispatcher + JSON state + fan-out worker.
 - `.../expected/depend-case/skill/SKILL.md` - a declaring skill (`metadata.workspace-deps` frontmatter + `## Dependencies` section).
 - `.../expected/tool-only-case/skill/SKILL.md` - zero-helper skill reusing another tools domain.
 

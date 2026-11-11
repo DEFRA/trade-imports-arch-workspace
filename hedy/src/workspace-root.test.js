@@ -1,6 +1,6 @@
-import { mkdtemp, rm, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { realpath, rm, writeFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { afterEach, describe, it, expect } from 'vitest'
 import { isHedyError } from './errors.js'
 import { createWorkspace } from './test-support/cli.js'
@@ -12,18 +12,6 @@ const workspace = async (options) => {
   const root = await createWorkspace(options)
   created.push(root)
   return root
-}
-
-const emptyHome = async () => {
-  const home = await mkdtemp(join(tmpdir(), 'hedy-home-'))
-  created.push(home)
-  return home
-}
-
-const homeWithCanonical = async (options) => {
-  const home = await emptyHome()
-  const canonical = await createWorkspace({ ...options, at: join(home, 'trade-imports-arch-workspace') })
-  return { home, canonical }
 }
 
 const refusalOf = (resolveOptions) => {
@@ -40,32 +28,25 @@ afterEach(async () => {
 })
 
 describe('resolveWorkspaceRoot order', () => {
-  it('prefers the --workspace value over HEDY_WORKSPACE and the default location', async () => {
+  it('prefers the --workspace value over the checkout hedy runs from', async () => {
     const flag = await workspace()
-    const fromEnv = await workspace()
-    const { home } = await homeWithCanonical()
-    expect(resolveWorkspaceRoot({ workspace: flag, env: { HEDY_WORKSPACE: fromEnv }, homedir: home })).toBe(flag)
+    const checkout = await workspace()
+    expect(resolveWorkspaceRoot({ workspace: flag, checkoutRoot: checkout })).toBe(flag)
   })
 
-  it('uses HEDY_WORKSPACE over the default location when no --workspace value is given', async () => {
-    const fromEnv = await workspace()
-    const { home } = await homeWithCanonical()
-    expect(resolveWorkspaceRoot({ env: { HEDY_WORKSPACE: fromEnv }, homedir: home })).toBe(fromEnv)
+  it('uses the checkout hedy runs from when no --workspace value is given', async () => {
+    const checkout = await workspace()
+    expect(resolveWorkspaceRoot({ checkoutRoot: checkout })).toBe(checkout)
   })
 
-  it('falls back to trade-imports-arch-workspace under the home folder', async () => {
-    const { home, canonical } = await homeWithCanonical()
-    expect(resolveWorkspaceRoot({ env: {}, homedir: home })).toBe(canonical)
-  })
-
-  it('treats an empty HEDY_WORKSPACE as unset', async () => {
-    const { home, canonical } = await homeWithCanonical()
-    expect(resolveWorkspaceRoot({ env: { HEDY_WORKSPACE: '' }, homedir: home })).toBe(canonical)
+  it('defaults to the real path of the checkout that holds the hedy source', async () => {
+    const checkout = await realpath(fileURLToPath(new URL('../..', import.meta.url)))
+    expect(resolveWorkspaceRoot()).toBe(checkout)
   })
 
   it('returns an absolute path for a --workspace value relative to the current folder', async () => {
     const root = await workspace()
-    expect(resolveWorkspaceRoot({ workspace: relative(process.cwd(), root), env: {} })).toBe(root)
+    expect(resolveWorkspaceRoot({ workspace: relative(process.cwd(), root) })).toBe(root)
   })
 })
 
@@ -76,43 +57,34 @@ describe('resolveWorkspaceRoot refusal', () => {
     ['both', { claudeFolder: false, makefile: false }, 'it has no .claude folder and no Makefile.']
   ])('refuses a --workspace folder lacking %s with a USAGE error naming the path and what is missing', async (_label, parts, lacks) => {
     const root = await workspace(parts)
-    const error = refusalOf({ workspace: root, env: {} })
+    const error = refusalOf({ workspace: root })
     expect(isHedyError(error)).toBe(true)
     expect(error.code).toBe('USAGE')
     expect(error.message).toBe(`The folder ${root}, from --workspace, is not a workspace because ${lacks} Pass --workspace the path of a workspace checkout.`)
   })
 
   it('refuses a --workspace path that does not exist with a USAGE error naming it', () => {
-    const error = refusalOf({ workspace: '/nonexistent', env: {} })
+    const error = refusalOf({ workspace: '/nonexistent' })
     expect(error.code).toBe('USAGE')
     expect(error.message).toContain('The folder /nonexistent, from --workspace,')
   })
 
-  it('refuses a HEDY_WORKSPACE folder lacking a Makefile and says how to fix the variable', async () => {
-    const root = await workspace({ makefile: false })
-    const error = refusalOf({ env: { HEDY_WORKSPACE: root } })
+  it('refuses a checkout lacking a Makefile, naming it and giving make install or --workspace as the next step', async () => {
+    const checkout = await workspace({ makefile: false })
+    const error = refusalOf({ checkoutRoot: checkout })
     expect(error.code).toBe('USAGE')
-    expect(error.message).toContain(`The folder ${root}, from HEDY_WORKSPACE,`)
-    expect(error.message).toContain('Set HEDY_WORKSPACE to the path of a workspace checkout, or unset it.')
+    expect(error.message).toBe(`The folder ${checkout}, from the checkout hedy runs from, is not a workspace because it has no Makefile. Install hedy from a workspace checkout with make install, or pass --workspace.`)
   })
 
-  it('refuses a missing default location, naming it and giving the ln -s line', async () => {
-    const home = await emptyHome()
-    const error = refusalOf({ env: {}, homedir: home })
-    expect(error.code).toBe('USAGE')
-    expect(error.message).toContain(`The folder ${join(home, 'trade-imports-arch-workspace')}, from the default location,`)
-    expect(error.message).toContain('ln -s <your-checkout> ~/trade-imports-arch-workspace')
+  it('refuses a checkout whose .claude is a file, not a folder', async () => {
+    const checkout = await workspace({ claudeFolder: false })
+    await writeFile(join(checkout, '.claude'), '')
+    expect(refusalOf({ checkoutRoot: checkout }).message).toContain('it has no .claude folder.')
   })
 
-  it('refuses a default location whose .claude is a file, not a folder', async () => {
-    const { home, canonical } = await homeWithCanonical({ claudeFolder: false })
-    await writeFile(join(canonical, '.claude'), '')
-    expect(refusalOf({ env: {}, homedir: home }).message).toContain('it has no .claude folder.')
-  })
-
-  it('refuses a default location whose Makefile is a folder, not a file', async () => {
-    const { home, canonical } = await homeWithCanonical({ makefile: false })
-    await createWorkspace({ at: join(canonical, 'Makefile'), claudeFolder: false, makefile: false })
-    expect(refusalOf({ env: {}, homedir: home }).message).toContain('it has no Makefile.')
+  it('refuses a checkout whose Makefile is a folder, not a file', async () => {
+    const checkout = await workspace({ makefile: false })
+    await createWorkspace({ at: join(checkout, 'Makefile'), claudeFolder: false, makefile: false })
+    expect(refusalOf({ checkoutRoot: checkout }).message).toContain('it has no Makefile.')
   })
 })

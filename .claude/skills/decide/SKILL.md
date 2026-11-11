@@ -5,7 +5,7 @@ description: 'Put every open decision of the current work to the user as questio
 
 Collects the decisions waiting on the user in the current work, from any domain, and puts each one to the user as a question prompt with enough context to decide without scrolling back: what is being decided, the evidence, what each choice leads to, and a recommendation. The answers are recorded in the work's own records, and only answers that instruct an action are acted on.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Usage
 

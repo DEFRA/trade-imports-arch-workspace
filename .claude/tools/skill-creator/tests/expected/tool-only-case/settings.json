@@ -1,1 +1,1 @@
-{"permissions":{"allow":["Bash(~/trade-imports-arch-workspace/.claude/tools/:*)"]}}
+{"permissions":{"allow":["Bash(.claude/tools/*)"]}}

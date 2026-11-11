@@ -16,16 +16,16 @@ Your job: fill in `answers.*` via `interview-add-answer.sh`, one question at a t
 
 If not already in context:
 
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md` - the 9-pattern checklist (used to phrase each question).
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md` - to call out mismatches as the user answers.
-- `~/trade-imports-arch-workspace/.claude/skills/skill-creator/assets/interview-schema.md` - the JSON shape `interview-add-answer.sh` writes into.
+- `.claude/best-practices/skills/patterns.md` - the 9-pattern checklist (used to phrase each question).
+- `.claude/best-practices/skills/anti-patterns.md` - to call out mismatches as the user answers.
+- `.claude/skills/skill-creator/assets/interview-schema.md` - the JSON shape `interview-add-answer.sh` writes into.
 
 ## Workflow
 
 Ask each question on its own turn. Each answer informs the next. After every answer, call:
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/skill-creator/interview-add-answer.sh \
+.claude/tools/skill-creator/interview-add-answer.sh \
     --run-id <name> --field <field> --value '<value-json>'
 ```
 
@@ -44,7 +44,7 @@ Before shaping the skill, check whether its purpose overlaps functionality that 
 Probe EVERY Makefile child project (one Bash call each - sub-second, ABSENT-safe; "plausibly relevant" judgment is the failure mode the probe exists to remove):
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/skill-creator/list-project-features.sh \
+.claude/tools/skill-creator/list-project-features.sh \
     --project delivery-info-arch-tooling
 ```
 
@@ -59,7 +59,7 @@ Push back on `depend` once, concretely: name what a port would cost versus what 
 Save as `answers.dependencies` (full object in one call - shape in `assets/interview-schema.md`):
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/skill-creator/interview-add-answer.sh \
+.claude/tools/skill-creator/interview-add-answer.sh \
     --run-id <name> --field dependencies \
     --value '{"resolution":"depend","declared":["delivery-info-arch-tooling","npm"],"justification":"<why>"}'
 ```
@@ -145,7 +145,7 @@ Also sweep the other direction: grep existing skills' NOT-for clauses for territ
 Show the user a recap:
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/skill-creator/render-interview.sh \
+.claude/tools/skill-creator/render-interview.sh \
     --run-id <name>
 ```
 
@@ -158,7 +158,7 @@ If yes, re-run `interview-add-answer.sh` for the changed field(s).
 If no, scaffold:
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/skill-creator/scaffold-skill.sh \
+.claude/tools/skill-creator/scaffold-skill.sh \
     --run-id <name>
 ```
 

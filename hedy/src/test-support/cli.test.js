@@ -18,7 +18,7 @@ afterEach(async () => {
 describe('runCli', () => {
   it('returns stdout, stderr, the exit code and the parsed envelope for one JSON line', async () => {
     const root = await workspace()
-    const run = await runCli(['hello', '--json'], { env: { HEDY_WORKSPACE: root } })
+    const run = await runCli(['hello', '--json'], { workspace: root })
     expect(run.exitCode).toBe(0)
     expect(run.stderr).toBe('')
     expect(run.envelope.ok).toBe(true)
@@ -27,7 +27,7 @@ describe('runCli', () => {
 
   it('leaves the envelope undefined when stdout is text', async () => {
     const root = await workspace()
-    const run = await runCli(['hello'], { env: { HEDY_WORKSPACE: root } })
+    const run = await runCli(['hello'], { workspace: root })
     expect(run.stdout).toBe('Hello from hedy')
     expect(run.envelope).toBeUndefined()
   })
@@ -44,10 +44,20 @@ describe('runCli', () => {
     expect(run.stdout).toBe('')
   })
 
-  it('passes the given env to the child, so HEDY_WORKSPACE chooses the workspace', async () => {
-    const run = await runCli(['hello', '--json'], { env: { HEDY_WORKSPACE: '/nonexistent' } })
+  it('passes the workspace to the child as --workspace before the arguments', async () => {
+    const run = await runCli(['hello', '--json'], { workspace: '/nonexistent' })
     expect(run.exitCode).toBe(2)
-    expect(run.envelope.errors[0].message).toContain('/nonexistent, from HEDY_WORKSPACE,')
+    expect(run.envelope.errors[0].message).toContain('/nonexistent, from --workspace,')
+  })
+
+  it('passes the given env to the child, leaving out a name set to undefined', async () => {
+    const root = await workspace()
+    const run = await runCli(['auth', '--json'], {
+      workspace: root,
+      env: { JIRA_USER: 'env-user', JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined }
+    })
+    expect(run.exitCode).toBe(1)
+    expect(run.envelope.errors[0].message).toMatch(/^JIRA_TOKEN and JIRA_BASE_URL are not set\./)
   })
 
   it('runs the child in the given cwd, so a relative --workspace resolves there', async () => {

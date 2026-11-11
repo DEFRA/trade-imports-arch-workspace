@@ -6,8 +6,6 @@ import { copyFixtureDocsRepo } from '../../test-support/docs-repo.js'
 import { rejectionOf } from '../../test-support/http.js'
 import { inventoryAssets } from './page-assets.js'
 
-const BUILD_COMMAND = 'npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run'
-
 let workspace
 let docsRepo
 
@@ -36,15 +34,14 @@ const setTimeAfterPng = async (path, id) => {
 
 const preflightFactsOf = async (fixtureName) => {
   const text = await readFile(new URL(`./__fixtures__/${fixtureName}`, import.meta.url), 'utf8')
-  const factKeys = ['LIKEC4_VIEW', 'MERMAID_COMPONENT', 'FENCED_MERMAID_BLOCKS', 'BUILD_NEEDED', 'BUILD_CMD']
+  const factKeys = ['LIKEC4_VIEW', 'MERMAID_COMPONENT', 'FENCED_MERMAID_BLOCKS', 'BUILD_NEEDED']
   return text.trim().split('\n').filter((line) => factKeys.some((key) => line.startsWith(`${key}: `)))
 }
 
-const preflightFactsFor = ({ diagrams, fencedMermaidBlocks, buildNeeded, buildCommands }) => [
+const preflightFactsFor = ({ diagrams, fencedMermaidBlocks, buildNeeded }) => [
   ...diagrams.map(({ kind, id, status }) => `${kind === 'likec4' ? 'LIKEC4_VIEW' : 'MERMAID_COMPONENT'}: ${id} png=${status === 'present' ? status : status.toUpperCase()}`),
   `FENCED_MERMAID_BLOCKS: ${fencedMermaidBlocks}`,
-  `BUILD_NEEDED: ${buildNeeded.length > 0 ? buildNeeded.join(' ') : 'none'}`,
-  ...buildCommands.map((command) => `BUILD_CMD: ${command}`)
+  `BUILD_NEEDED: ${buildNeeded.length > 0 ? buildNeeded.join(' ') : 'none'}`
 ]
 
 describe('inventoryAssets', () => {
@@ -57,7 +54,7 @@ describe('inventoryAssets', () => {
       images: [],
       fencedMermaidBlocks: 1,
       buildNeeded: ['build:mmd'],
-      buildCommands: [`${BUILD_COMMAND} build:mmd`]
+      buildCommands: [`npm --prefix ${docsRepo} run build:mmd`]
     })
   })
 
@@ -70,7 +67,7 @@ describe('inventoryAssets', () => {
     const { diagrams, buildNeeded, buildCommands } = await inventoryOfPage('systems/HEDY/components.md')
     expect(diagrams.map(({ status }) => status)).toEqual(['stale', 'missing'])
     expect(buildNeeded).toEqual(['build:mmd', 'build:diagrams'])
-    expect(buildCommands).toEqual([`${BUILD_COMMAND} build:mmd`, `${BUILD_COMMAND} build:diagrams`])
+    expect(buildCommands).toEqual([`npm --prefix ${docsRepo} run build:mmd`, `npm --prefix ${docsRepo} run build:diagrams`])
   })
 
   it.each([

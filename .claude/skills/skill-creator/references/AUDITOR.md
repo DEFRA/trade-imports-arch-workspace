@@ -2,32 +2,32 @@ Audit **one** workspace skill against the 9-pattern checklist and write a plan d
 
 Your spawn prompt names a target skill, its `SKILL.md` path, and the output plan path. Walk the checklist; produce the plan. Do not make in-place edits to the target skill.
 
-**Bash call hygiene** - one command per Bash call. Full rule table: `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md` → "Bash call hygiene".
+**Bash call hygiene** - one command per Bash call. Full rule table: `.claude/best-practices/skills/agent-skills.md` → "Bash call hygiene".
 
 ## Inputs
 
 Your spawn prompt gives you:
 
 - `Target skill: <name>`
-- `SKILL.md path: ~/trade-imports-arch-workspace/.claude/skills/<name>/SKILL.md`
-- `Output path: ~/trade-imports-arch-workspace/.claude/workareas/skills-audit/<name>.md`
+- `SKILL.md path: .claude/skills/<name>/SKILL.md`
+- `Output path: .claude/workareas/skills-audit/<name>.md`
 
 ## Read first
 
 Read these into context before walking the checklist (these are the canonical references the audit cites):
 
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/patterns.md` - the 9-pattern checklist.
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/anti-patterns.md` - known mis-applications. Cite the matching entry (`A1`–`AN`) whenever you flag one.
-- `~/trade-imports-arch-workspace/.claude/best-practices/skills/agent-skills.md` - workspace-wide hygiene rules.
+- `.claude/best-practices/skills/patterns.md` - the 9-pattern checklist.
+- `.claude/best-practices/skills/anti-patterns.md` - known mis-applications. Cite the matching entry (`A1`–`AN`) whenever you flag one.
+- `.claude/best-practices/skills/agent-skills.md` - workspace-wide hygiene rules.
 
 Then Read the target skill exhaustively:
 
 - The `SKILL.md` (offset 0, full length).
-- Every file under `~/trade-imports-arch-workspace/.claude/skills/<name>/references/`.
-- Every file under `~/trade-imports-arch-workspace/.claude/skills/<name>/assets/` (if present).
+- Every file under `.claude/skills/<name>/references/`.
+- Every file under `.claude/skills/<name>/assets/` (if present).
 - The owning `tools/<name>/` directory (use Glob to list, Read each helper).
 
-Inspect `~/trade-imports-arch-workspace/.claude/settings.json` for matching allowlist entries.
+Inspect `.claude/settings.json` for matching allowlist entries.
 
 ## The 9-pattern walkthrough
 
@@ -63,7 +63,7 @@ Walk the SKILL.md and each `references/*.md` for hygiene violations:
 - `cd <dir> && cmd` shapes.
 - `find ... -exec`.
 - `$VAR` (any) in LLM-typed paths.
-- `/Users/<you>/...` resolved-tilde paths.
+- Absolute `/Users/<you>/...` or `~/...` paths to the workspace, where a root-relative path belongs.
 - `python3 -c` for JSON.
 
 Each violation: cite `file:line` and the corrected form.
@@ -92,16 +92,16 @@ For each helper in `tools/<name>/`:
 
 ### 8. Allowlist coverage
 
-- Does `.claude/settings.json` cover the skill's `tools/<name>/` scripts - via **either** the blanket `Bash(~/trade-imports-arch-workspace/.claude/tools/:*)` entry (the live settings.json shape) **or** the per-skill `Bash(.../tools/<name>/*)` + `:*` pair?
+- Does `.claude/settings.json` cover the skill's `tools/<name>/` scripts - via **either** the blanket `Bash(.claude/tools/*)` entry (the live settings.json shape) **or** the per-skill pair `Bash(.claude/tools/<name>/*)` and `Bash(bash .claude/tools/<name>/*)`?
 - Flag a hard gap only when **neither** form is present (skill is unusable without coverage).
 
 ### 9. Dependencies
 
-- Grep the SKILL.md, `references/*.md`, and `tools/<name>/` scripts for unbundled invocations: child-project paths (`~/trade-imports-arch-workspace/<child>/`, `npm --prefix`, `node_modules/@defra/`, tooling bin names) and beyond-baseline tools (anything past bash, curl, jq, git).
+- Grep the SKILL.md, `references/*.md`, and `tools/<name>/` scripts for unbundled invocations: child-project paths (`<child>/`, `npm --prefix`, `node_modules/@defra/`, tooling bin names) and beyond-baseline tools (anything past bash, curl, jq, git).
 - Hard invocation with no `metadata.workspace-deps` frontmatter → flag as a hard gap (undeclared dependency).
 - Soft probe with graceful fallback (probe, then fall back, never block) → fine undeclared; do not flag.
 - If `metadata.workspace-deps` is declared, verify all of:
-  - each token resolves - run `bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-deps.sh` and read this skill's lines;
+  - each token resolves - run `bash .claude/tools/workspace/check-deps.sh` and read this skill's lines;
   - a `## Dependencies` body section states the rationale;
   - the `description` names the requirement;
   - the dispatcher pre-flights each declared token (`MODE: BLOCKED` + REASON naming the remedy) - a declared dependency without a pre-flight is a gap.
@@ -184,7 +184,7 @@ Map each finding to its `A1`-`AN` entry in `best-practices/skills/anti-patterns.
 When done, return one short line:
 
 ```
-Plan: ~/trade-imports-arch-workspace/.claude/workareas/skills-audit/<name>.md
+Plan: .claude/workareas/skills-audit/<name>.md
 Pattern gaps: <N>
 Open questions: <K>
 Headline gap: <one-line summary>

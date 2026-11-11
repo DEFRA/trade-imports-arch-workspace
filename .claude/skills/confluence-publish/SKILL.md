@@ -9,7 +9,7 @@ metadata:
 
 Publishes one markdown page from the docs repo's `docs/` tree to Confluence through `hedy confluence publish`. The command checks everything the publish needs, runs the docs repo's publisher, and reports either a page link or the reason nothing was published. The command publishes at once when its pre-flight passes, with no dry run. This skill owns no build or publish logic, only the procedure.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Usage
 
@@ -17,7 +17,7 @@ Publishes one markdown page from the docs repo's `docs/` tree to Confluence thro
 | --- | --- |
 | "publish to confluence", "push to confluence", "publish page" | Steps 1 to 4 |
 
-NOT for validating diagrams without publishing (use `mermaid-check`), improving the page's wording (use `authoring`), publishing the whole configured set or a whole space (run `npm run publish:confluence` or `publish:confluence:space` in the docs repo directly), or the GitHub Pages site. Reading a page by id or URL is the `confluence-read` skill. One-off pages whose source of truth is Confluence itself are the hand tools in `~/trade-imports-arch-workspace/.claude/tools/confluence/`, never a route for a `docs/` page.
+NOT for validating diagrams without publishing (use `mermaid-check`), improving the page's wording (use `authoring`), publishing the whole configured set or a whole space (run `npm run publish:confluence` or `publish:confluence:space` in the docs repo directly), or the GitHub Pages site. Reading a page by id or URL is the `confluence-read` skill. One-off pages whose source of truth is Confluence itself are the hand tools in `.claude/tools/confluence/`, never a route for a `docs/` page.
 
 ## Dependencies
 
@@ -35,7 +35,7 @@ A port of the publisher would fork a pipeline the tooling maintains, so the skil
 hedy auth
 ```
 
-If `hedy` is not found, run `make -C ~/trade-imports-arch-workspace link`.
+If `hedy` is not found, run `make install`.
 
 ## Step 1: Confirm the Request
 
@@ -60,8 +60,8 @@ When `ok` is false, relay each message in `errors` verbatim and stop. Each messa
 The two builds are the only commands this skill runs besides `hedy`, each one per Bash call, typed exactly as below and never copied from a message, because a page's diagram ids appear in the message text:
 
 ```bash
-npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run build:mmd
-npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run build:diagrams
+npm --prefix trade-imports-documentation run build:mmd
+npm --prefix trade-imports-documentation run build:diagrams
 ```
 
 Each build prompts for permission by design, because both builds cover the whole docs repo. When the publish fails on the same exports after the build, the page names a diagram id that matches no source file. Relay the message and stop.

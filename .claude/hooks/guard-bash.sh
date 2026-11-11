@@ -44,11 +44,8 @@
 #      GIT_CONFIG_KEY_<n>, GIT_CONFIG_VALUE_<n>, GIT_CONFIG_GLOBAL, ...) set in a
 #      command that runs git overrides any key, core.hooksPath and aliases
 #      included, where neither -c nor git config shows it.
-# Redirects, with no security weight, each naming the sanctioned form:
-#   7. A literal /Users/<user>/ path: use ~/.
-#   8. An install-like npm command with --prefix on a workspace path: install from
-#      inside the package folder on the real path.
-#   9. && chaining outside quotes: one command per Bash call.
+# Redirect, with no security weight, naming the sanctioned form:
+#   7. && chaining outside quotes: one command per Bash call.
 #
 # Pushes belong to guard-git-push.sh and file edits to guard-edits.sh.
 #
@@ -62,7 +59,9 @@ CWD=$(printf '%s' "$INPUT" | jq -r '.cwd // empty')
 [ -z "$CMD" ] && exit 0
 [ -z "$CWD" ] && CWD=$PWD
 
-WORKSPACE="$HOME/trade-imports-arch-workspace"
+# Claude Code gives every hook the project root as CLAUDE_PROJECT_DIR. Run by
+# hand, the guard takes the root from its own place in .claude/hooks/.
+WORKSPACE=${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)}
 HEDY_DIR=$(realpath "$WORKSPACE/hedy" 2>/dev/null || true)
 
 deny() {
@@ -196,7 +195,7 @@ deny_no_verify() {
 }
 
 deny_hooks_path() {
-  deny "Changing core.hooksPath detaches the pre-commit gates. Leave the hooks path as make link set it, and read it with git config --get core.hooksPath. If a hook is wrong, the user runs the command: ! git ..."
+  deny "Changing core.hooksPath detaches the pre-commit gates. Leave the hooks path as make install set it, and read it with git config --get core.hooksPath. If a hook is wrong, the user runs the command: ! git ..."
 }
 
 deny_alias() {
@@ -272,7 +271,7 @@ check_reader() {
     arg=$(unquoted "$arg")
     case "$arg" in -*) continue ;; esac
     if is_secret_path "$arg"; then
-      deny "Blocked: '$reader' would read the secret path $arg. Secrets are consumed from the environment, never read through Bash. The auth doctor verifies them without printing a value: bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh"
+      deny "Blocked: '$reader' would read the secret path $arg. Secrets are consumed from the environment, never read through Bash. The auth doctor verifies them without printing a value: bash .claude/tools/workspace/check-auth.sh"
     fi
   done
 }
@@ -499,15 +498,7 @@ if printf '%s' "$CMD" | grep -Eq 'git[[:space:]]+commit[^|;&]*--amend'; then
   fi
 fi
 
-# --- 7 to 9. redirects -------------------------------------------------------
-
-if printf '%s' "$CMD" | grep -Eq '/Users/[A-Za-z0-9._-]+/'; then
-  deny "Use ~/ in place of a literal /Users/<user>/ path. The permission matcher treats the two as different prefixes, so a literal path prompts where ~/ is already allowed."
-fi
-
-if printf '%s' "$CMD" | grep -Eq 'npm[[:space:]].*--prefix[[:space:]]+[^[:space:]]*trade-imports-arch-workspace[^[:space:]]*[[:space:]]+(install|i|ci|add|update|dedupe|prune|uninstall)([[:space:]]|$)'; then
-  deny "An install-like npm command does not take --prefix on a workspace path: across the symlink the lockfile can be corrupted. Run it from inside the package folder on the real path, as hedy/CLAUDE.md shows: (cd <real checkout path>/hedy; npm ci)"
-fi
+# --- 7. redirect -------------------------------------------------------------
 
 # A quoted && is data (awk 'a && b', jq 'select(.a && .b)'), so quoted spans
 # are removed first, in one pass so that whichever quote opens first consumes
