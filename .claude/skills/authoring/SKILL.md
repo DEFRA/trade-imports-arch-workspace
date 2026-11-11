@@ -70,7 +70,7 @@ You draft one document from its plan. Read the plan, `writing.md` and `language.
 
 1. **Start.** Settle the artefact's purpose and points in the short-artefact form. When the purpose or a point is missing, ask the author. No file check runs.
 2. **Draft.** Write the content of the artefact's type, as "Artefact Content" sets out below.
-3. **Check.** The artefact meets the same standard as a page: read the artefact against `writing.md` and `language.md` and reword each sentence that breaks a rule or holds a listed word. Then run the check that "Checks" names on the text. `create-pr.sh` refuses only AI attribution.
+3. **Check.** The artefact meets the same standard as a page: read the artefact against `writing.md` and `language.md` and reword each sentence that breaks a rule or holds a listed word. Then run the check that "Checks" names on the text. `create-pr.sh` refuses a pull request title or body that holds AI attribution or fails the check, and the `commit-msg` hook refuses such a commit message.
 
 ## The Reverse Outline
 

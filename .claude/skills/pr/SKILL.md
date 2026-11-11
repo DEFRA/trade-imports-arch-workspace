@@ -64,4 +64,4 @@ Next: request review, or merge when approved.
 
 | Script | Home | Purpose |
 |--------|------|---------|
-| `create-pr.sh` | `.claude/tools/pr/` | Create or edit a PR; refuses AI attribution in title/body (exit 2); `--dry-run`, `--help` |
+| `create-pr.sh` | `.claude/tools/pr/` | Create or edit a PR; refuses AI attribution and any hedy prose check finding that fails the run in title/body (exit 2); `--dry-run`, `--help` |

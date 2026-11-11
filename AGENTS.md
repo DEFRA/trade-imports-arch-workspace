@@ -84,7 +84,7 @@ read its header) for usage.
 | --- | --- |
 | `confluence/` | Hand tools for Confluence page writes and the folder sync. Reads are `hedy confluence page` |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
-| `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard |
+| `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard and the prose check |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
 | `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs `hedy auth` and every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine), `lint-skills.sh` (repo-only estate lint), `guard-bash-tests.sh` (the bash guard's deny and allow cases) and `guard-git-push-tests.sh` (the push guard's deny and allow cases) |
 
@@ -142,5 +142,5 @@ that appends an attribution footer. Full rules:
 and `.claude/best-practices/git/pull-requests.md`. PR creation and body
 edits go through the `pr` skill, which delegates to
 `.claude/tools/pr/create-pr.sh` - the script refuses attribution
-content deterministically. Prefer SSH remotes and the `gh` CLI when
+content and a title or body that fails `hedy prose check`. Prefer SSH remotes and the `gh` CLI when
 available; fall back to plain `git` when not.

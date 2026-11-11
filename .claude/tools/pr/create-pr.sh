@@ -7,16 +7,17 @@
 #   bash create-pr.sh --help
 #
 # Refuses (exit 2) any title or body containing AI attribution (the rule in
-# best-practices/git/pull-requests.md), naming the offending line. --dry-run
+# best-practices/git/pull-requests.md), naming the offending line, and any
+# title or body that fails hedy prose check, printing the findings. --dry-run
 # prints the gh command it would run instead of running it. Requires gh
-# (authenticated). The body must be passed as a file, never inline.
+# (authenticated) and hedy. The body must be passed as a file, never inline.
 
 set -euo pipefail
 
 ATTRIBUTION_PATTERN='Generated with|Co-Authored-By|Claude Code|Signed-off-by|🤖'
 
 usage() {
-  sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 fail() {
@@ -53,6 +54,19 @@ OFFENDING=$(grep -En "$ATTRIBUTION_PATTERN" "$BODY_FILE" || true)
 if [ -n "$OFFENDING" ]; then
   fail "body contains AI attribution — forbidden by best-practices/git/pull-requests.md; remove these line(s) from $BODY_FILE and re-run:
 $OFFENDING" 2
+fi
+
+# The prose check: the title and body hold no banned word and no pattern
+# from language.md. Each is read on stdin under a label, so a body file
+# kept under .claude/ is still checked as a document for people.
+command -v hedy >/dev/null 2>&1 || fail "hedy not found — run make install from the workspace root, then re-run"
+if [ -n "$TITLE" ] && ! FINDINGS=$(printf '%s\n' "$TITLE" | hedy prose check --stdin --label "pull request title" 2>&1); then
+  fail "title fails hedy prose check — reword each banned and pattern finding, then re-run:
+$FINDINGS" 2
+fi
+if ! FINDINGS=$(hedy prose check --stdin --label "pull request body" < "$BODY_FILE" 2>&1); then
+  fail "body fails hedy prose check — reword each banned and pattern finding in $BODY_FILE, then re-run:
+$FINDINGS" 2
 fi
 
 if [ -n "$EDIT" ]; then
