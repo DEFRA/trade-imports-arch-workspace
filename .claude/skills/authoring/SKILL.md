@@ -22,18 +22,19 @@ An existing page that needs sections added, removed or reordered needs a structu
 ## Read List
 
 - Always read [writing.md](../../best-practices/writing/writing.md) in full before writing a word.
+- Always read [language.md](references/language.md) with `writing.md`: the words, phrases and sentence shapes ruled out, each with its repair.
 - Read [planning.md](references/planning.md) when planning a page or deck, before reading the material.
 - Always read the plan before drafting or editing: its form, reader, purpose, document type, opening, governing thought, detail rule, exclusions, questions, sections with their delivery lines, and open items.
 - Read [line-editing.md](references/line-editing.md) only when line editing, after reading the page and its plan.
 - Read [plan-template.md](assets/plan-template.md) when a plan is written or proposed, and when checking a plan.
 
-The material stays with the planning conversation. The drafting agent reads the plan, `writing.md` and the drafting sections of this file, and holds no analysis corpus, no neighbouring page and no summary of the conversation.
+The material stays with the planning conversation. The drafting agent reads the plan, `writing.md`, `language.md` and the drafting sections of this file, and holds no analysis corpus, no neighbouring page and no summary of the conversation.
 
 ## Checks
 
 - The plan is checked by reading the plan against [plan-template.md](assets/plan-template.md) before drafting or editing. Drafting or editing stops on any missing part, which goes to the author.
-- No mechanical prose check exists. The old prose gate was removed on 10 November 2026 with no replacement, and whether hedy gains a prose check is a later decision.
-- The closing pass is the check. Every rule in `writing.md` that a script would have tested, such as the words the standard rules out, headings in title case and FAQ voice, is applied by reading.
+- No script checks a draft. The prose gate was removed on 10 November 2026, its word table and sentence shapes live in `language.md`, and whether hedy gains a prose check that reads that file is a later decision.
+- The closing pass is the check. Every rule in `writing.md` and every row in `language.md`, such as the banned words, headings in title case and FAQ voice, is applied by reading.
 
 ## Planning a Document
 
@@ -42,34 +43,34 @@ Follow [planning.md](references/planning.md). The planning conversation reads th
 ## Writing a Document
 
 1. **Start.** Read the plan against `plan-template.md`, and draft only from a complete plan, as the template's completeness rules define. On any missing part, stop.
-2. **Hand the drafting to a fresh agent.** Start the drafting agent with the Agent tool and give the agent a name with the tool's `name` parameter, so that stage 3 can send the author's answers to that agent. The brief gives four paths: the plan, `writing.md`, this `SKILL.md` and the path for the draft. The brief tells the agent to read the plan and `writing.md` in full, to read only "The Drafting Brief" and the sections that brief names from `SKILL.md`, and to read no other file except through the mermaid-check skill. The brief carries no material, no summary of the planning conversation and no fact of your own, because drafting writes only from the plan.
+2. **Hand the drafting to a fresh agent.** Start the drafting agent with the Agent tool and give the agent a name with the tool's `name` parameter, so that stage 3 can send the author's answers to that agent. The brief gives five paths: the plan, `writing.md`, `language.md`, this `SKILL.md` and the path for the draft. The brief tells the agent to read the plan, `writing.md` and `language.md` in full, to read only "The Drafting Brief" and the sections that brief names from `SKILL.md`, and to read no other file except through the mermaid-check skill. The brief carries no material, no summary of the planning conversation and no fact of your own, because drafting writes only from the plan.
 3. **Questions.** The agent returns the draft with its open points. Put every open point to the author in one batch, in the question form, and record each answer in the plan's Open Items. Send the answers to the named agent with SendMessage, so the agent replaces each placeholder from the plan and runs the closing pass again. An answer that changes a section's point reopens the plan: return to Planning a Document, then start a fresh drafting agent from the changed plan.
 4. **Hand over.** Write the hand-over report from the word count and open points the agent returns.
 
 ## The Drafting Brief
 
-You draft one document from its plan. Read the plan and `writing.md` in full. From `SKILL.md`, read only this section and the sections listed here: "Checks", "The Reverse Outline", "Explain and Rewrite", "The Question Form", "The Closing Pass" and "Resolving a Standard Breach". Read no other file except through the mermaid-check skill. Write the draft to the path the brief gives.
+You draft one document from its plan. Read the plan, `writing.md` and `language.md` in full. From `SKILL.md`, read only this section and the sections listed here: "Checks", "The Reverse Outline", "Explain and Rewrite", "The Question Form", "The Closing Pass" and "Resolving a Standard Breach". Read no other file except through the mermaid-check skill. Write the draft to the path the brief gives.
 
 1. **Draft each section.** Write the introduction from the plan's `Opening` and `Governing thought`: the situation, then the complication, then the governing thought. Each section makes its point from its own items and nothing else, in the form the plan chose, at the plan's detail rule, and leaving out what `Excludes` names. Write each section to its delivery lines, roughly one paragraph for each line. Each paragraph opens on the claim the rest of the paragraph supports. Write to the tone of voice, the plan's document type and the plan's forms in `writing.md`. Where the items do not support a point, put a bracketed placeholder in the draft and add the point to the questions. Never invent a fact.
 2. **Draw each image.** Draw each image the plan describes as a Mermaid diagram, from the section's items and the image's stated purpose, and check each diagram with the mermaid-check skill. That skill is the one procedure you load beyond the files this brief names.
 3. **Check each paragraph.** Run the reverse outline on every paragraph, and explain and rewrite on every sentence a reader would have to reconstruct.
 4. **Closing pass.** Run the closing-pass checklist on the whole document.
-5. **Read against the standard.** Read the whole draft once against the word, heading and punctuation rules in `writing.md`, and reword each sentence that breaks one.
+5. **Read against the standard.** Read the whole draft once against the word, heading and punctuation rules in `writing.md` and every row in `language.md`, and reword each sentence that breaks one.
 6. **Return.** Return the draft's path, its word count and every open point in the question form. Ask the author nothing, because the session that started you puts the questions.
 
 ## Line Editing a Document
 
-1. **Read.** Read the page, then propose a line-edit plan in the line-edit form from the page itself, adding no point the page lacks. Edit only after the author agrees the plan and the plan reads complete against `plan-template.md`. Read `writing.md`, then `line-editing.md`.
+1. **Read.** Read the page, then propose a line-edit plan in the line-edit form from the page itself, adding no point the page lacks. Edit only after the author agrees the plan and the plan reads complete against `plan-template.md`. Read `writing.md` and `language.md`, then `line-editing.md`.
 2. **Find defects.** Run the tests in `line-editing.md` and the reverse outline on every paragraph and sentence. List each defect before you change anything.
 3. **Edit.** Change only paragraphs with a found defect, using the repair rules in `line-editing.md` and explain and rewrite. Improve how each point is said and change no claim. A sentence with no job that carries a claim goes to the author as a question. Stop when a pass finds nothing new. Edit the file in place and commit nothing, so the author reads the line edit as a diff.
 4. **Questions.** Put every question to the author in one batch, in the question form. Record each answer in the plan's Open Items, then replace the placeholder with the answer.
-5. **Closing pass and hand over.** Run the closing pass on the whole page, then read the whole page once against the word, heading and punctuation rules in `writing.md`, and reword each sentence that breaks one. Write the hand-over report, which lists each addition and each removal with its reason.
+5. **Closing pass and hand over.** Run the closing pass on the whole page, then read the whole page once against the word, heading and punctuation rules in `writing.md` and every row in `language.md`, and reword each sentence that breaks one. Write the hand-over report, which lists each addition and each removal with its reason.
 
 ## Writing a Short Artefact
 
 1. **Start.** Settle the artefact's purpose and points in the short-artefact form. When the purpose or a point is missing, ask the author. No file check runs.
 2. **Draft.** Write the content of the artefact's type, as "Artefact Content" sets out below.
-3. **Check.** The artefact meets the same standard as a page: read the artefact against `writing.md` and reword each sentence that breaks a rule. `create-pr.sh` refuses only AI attribution.
+3. **Check.** The artefact meets the same standard as a page: read the artefact against `writing.md` and `language.md` and reword each sentence that breaks a rule or holds a listed word. `create-pr.sh` refuses only AI attribution.
 
 ## The Reverse Outline
 
@@ -112,7 +113,7 @@ Repair each failure as one local edit, then run the reverse outline on the chang
 
 ## Resolving a Standard Breach
 
-When reading finds a word, heading, punctuation mark or pattern the standard rules out, reword the sentence that holds the breach with the repair the standard gives. Never delete a fragment to clear a breach. Read again until a pass finds nothing new. A breach in an author's heading is reworded too, and every renamed heading goes in the hand-over report.
+When reading finds a word, heading, punctuation mark or pattern that `writing.md` or `language.md` rules out, reword the sentence that holds the breach with the repair the rule or the row gives. Never delete a fragment to clear a breach. Read again until a pass finds nothing new. A breach in an author's heading is reworded too, and every renamed heading goes in the hand-over report.
 
 ## The Hand-Over Report
 
@@ -125,7 +126,7 @@ Files: <path>: <words before> to <words after> words
 Renamed headings: <old> to <new>, or none
 Additions and removals: <each added or removed unit with its reason>, on a line edit
 Open questions: <each question still open>, or none
-Checks: plan read against the template <pass>, closing pass <pass>
+Checks: plan read against the template <pass>, closing pass against writing.md and language.md <pass>
 Nothing committed.
 ```
 

@@ -1,6 +1,6 @@
 # Prose Gate Golden Cases
 
-These are the 41 cases of the deleted `check-prose.sh` golden suite, blessed on 10 November 2026. The gate reads the word table in `../word-table.md`. In an expected file, `WS` stands for the workspace root. Each case's expected file holds the gate's normalised stdout plus stderr, followed by an `exit-code:` line. The scope-docs cases run inside `fixtures/scope-docs/`, so their paths and labels are relative to that folder.
+These are the 41 cases of the deleted `check-prose.sh` golden suite, blessed on 10 November 2026. The gate read the word table that is now the authoring skill's `references/language.md`, which a later `hedy prose check` reads as its data, with these cases as its acceptance tests. The expected outputs name the old gate tiers, FAIL and WARN, which map to the file's banned rows and examine rows. In an expected file, `WS` stands for the workspace root. Each case's expected file holds the gate's normalised stdout plus stderr, followed by an `exit-code:` line. The scope-docs cases run inside `fixtures/scope-docs/`, so their paths and labels are relative to that folder.
 
 | Case | Invocation | Input | Expected |
 | --- | --- | --- | --- |
