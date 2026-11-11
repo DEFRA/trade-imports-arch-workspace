@@ -17,7 +17,7 @@ const loadFixture = async (name) => {
 const parseError = (code, message) => expect.objectContaining({ name: 'HedyError', code, message })
 
 describe('parseLanguageRows', () => {
-  it('returns the word rows of both word tables and the numbered shape rows, ignoring prose beside a form and every other section', async () => {
+  it('returns the word rows of both word tables and the numbered pattern rows, ignoring prose beside a form and every other section', async () => {
     const { parse } = await loadFixture('well-formed.md')
     expect(parse()).toEqual({
       banned: [
@@ -31,7 +31,7 @@ describe('parseLanguageRows', () => {
         { forms: ['simply'], repair: 'delete the word', scope: 'all', caseSensitive: false },
         { forms: ['gizmo', 'gizmos'], repair: 'keep a literal use', scope: 'all', caseSensitive: false }
       ],
-      shapes: [
+      patterns: [
         { key: 1, description: 'A heading that opens on what', repair: 'name the topic' },
         { key: 2, description: 'An em dash, a spaced en dash or a spaced hyphen used as a sentence break', repair: 'a full stop, a comma or a colon' },
         { key: 3, description: 'A curly quote', repair: 'a straight quote' },
@@ -53,17 +53,17 @@ describe('parseLanguageRows', () => {
 
   const SOURCE = 'inline/language.md'
   const section = (heading, header, rows) => [`## ${heading}`, '', `| ${header} | Repair |`, '| --- | --- |', ...rows, ''].join('\n')
-  const languageText = ({ banned = ['| `frobnicate` | name the operation |'], shapes = ['| A curly quote | a straight quote |'] } = {}) => [
+  const languageText = ({ banned = ['| `frobnicate` | name the operation |'], patterns = ['| A curly quote | a straight quote |'] } = {}) => [
     section('Banned Words and Phrases', 'Term', banned),
     section('Words to Examine', 'Term', ['| `simply` | delete the word |']),
-    ...(shapes ? [section('Sentence Shapes', 'Shape', shapes)] : [])
+    ...(patterns ? [section('Patterns', 'Pattern', patterns)] : [])
   ].join('\n')
 
   it.each([
     {
       title: 'a missing heading with PARSE naming the heading',
-      text: languageText({ shapes: null }),
-      message: `The language file at ${SOURCE} has no ## Sentence Shapes heading. Add the heading and its table, then run the command again.`
+      text: languageText({ patterns: null }),
+      message: `The language file at ${SOURCE} has no ## Patterns heading. Add the heading and its table, then run the command again.`
     },
     {
       title: 'a word row with no backticked form with PARSE naming the Term cell',
@@ -109,8 +109,8 @@ describe('readLanguageRows', () => {
   })
 
   it('reads every row of the workspace language file, with only the you row scoped to documents and only the portal row case sensitive', async () => {
-    const { banned, examine, shapes } = await readLanguageRows(WORKSPACE_ROOT)
-    expect([banned.length, examine.length, shapes.length]).toEqual([20, 22, 13])
+    const { banned, examine, patterns } = await readLanguageRows(WORKSPACE_ROOT)
+    expect([banned.length, examine.length, patterns.length]).toEqual([20, 22, 13])
     const rowHolding = (form) => banned.find(({ forms }) => forms.includes(form))
     expect(rowHolding('you')).toMatchObject({ scope: 'documents', caseSensitive: false })
     expect(rowHolding('portal')).toMatchObject({ scope: 'all', caseSensitive: true })

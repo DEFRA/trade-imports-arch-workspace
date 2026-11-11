@@ -35,17 +35,17 @@
       "deferred": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "aside stacking"
         },
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "spaced hyphen"
         },
         {
           "line": 5,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "spaced hyphen"
         }
       ]
@@ -58,7 +58,7 @@
       "deferred": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "contact clause"
         }
       ]
@@ -83,7 +83,7 @@
       "findings": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "curly quote"
         }
       ],
@@ -96,7 +96,7 @@
       "findings": [
         {
           "line": 5,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "em dash"
         }
       ],
@@ -109,12 +109,12 @@
       "findings": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "em dash"
         },
         {
           "line": 5,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "em dash"
         }
       ],
@@ -127,7 +127,7 @@
       "findings": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "spaced en dash"
         }
       ],
@@ -141,17 +141,17 @@
       "deferred": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq label"
         },
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "header preposition"
         },
         {
           "line": 11,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq label"
         }
       ]
@@ -171,12 +171,12 @@
       "deferred": [
         {
           "line": 7,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "heading case"
         },
         {
           "line": 19,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "heading case"
         }
       ]
@@ -189,7 +189,7 @@
       "deferred": [
         {
           "line": 7,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "spaced hyphen"
         }
       ]
@@ -202,22 +202,22 @@
       "deferred": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "inventory opener"
         },
         {
           "line": 5,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "inventory opener"
         },
         {
           "line": 7,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "inventory opener"
         },
         {
           "line": 9,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "semicolon"
         }
       ]
@@ -339,17 +339,17 @@
       "findings": [
         {
           "line": 1,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "N/A"
         },
         {
           "line": 5,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "N/A"
         },
         {
           "line": 7,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "N/A"
         }
       ],
@@ -376,22 +376,22 @@
       "deferred": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq heading"
         },
         {
           "line": 7,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq heading"
         },
         {
           "line": 15,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq heading"
         },
         {
           "line": 19,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq heading"
         }
       ]
@@ -404,27 +404,27 @@
       "deferred": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq opener"
         },
         {
           "line": 7,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq opener"
         },
         {
           "line": 8,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq label"
         },
         {
           "line": 12,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq opener"
         },
         {
           "line": 14,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "faq opener"
         }
       ]
@@ -437,7 +437,7 @@
       "deferred": [
         {
           "line": 7,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "semicolon"
         }
       ]
@@ -449,12 +449,12 @@
       "findings": [
         {
           "line": 3,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "trailing it"
         },
         {
           "line": 5,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "trailing it"
         }
       ],
@@ -495,7 +495,7 @@
       "findings": [
         {
           "line": 1,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "em dash"
         }
       ],
@@ -520,7 +520,7 @@
         },
         {
           "line": 1,
-          "kind": "shape",
+          "kind": "pattern",
           "term": "em dash"
         },
         {

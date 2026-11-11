@@ -27,9 +27,9 @@ Each of these has a literal sense that stays.
 
 These words have no row: gadget, contraption.
 
-## Sentence Shapes
+## Patterns
 
-| Shape | Repair |
+| Pattern | Repair |
 | --- | --- |
 | A heading that opens on what | name the topic |
 | An em dash, a spaced en dash or a spaced hyphen used as a sentence break | a full stop, a comma or a colon |

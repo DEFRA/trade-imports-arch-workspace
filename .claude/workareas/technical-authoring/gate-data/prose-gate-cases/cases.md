@@ -51,8 +51,8 @@ These are the 41 cases of the deleted `check-prose.sh` golden suite, blessed on 
 The file `hedy/src/commands/prose/__fixtures__/expected-findings.json` holds the findings that each case gives under `hedy prose check`, as `{ line, kind, term }`. The script `gate-data/derive-expected-findings.mjs` derived the file from the expected outputs, and each case was reviewed against its expected output on 11 November 2026. The script applied these rules:
 
 - A FAIL line whose message names a banned term maps to `banned`, as does the message for a lower-case `portal`. A WARN line whose message names terms maps to `examine`. In both, `term` lists the named terms that appear on that line, in the order of the message.
-- The punctuation message maps to one `shape` finding for each mark on the line: `em dash`, `spaced en dash` or `curly quote`. The `N/A` message maps to `N/A`, and the trailing-pronoun message maps to `trailing it`.
-- A message for a shape outside round 1 maps to an entry under `deferred`, so that round 3 has the data. The names are `faq heading`, `faq label`, `faq opener`, `header preposition`, `heading case`, `inventory opener`, `contact clause`, `aside stacking`, `spaced hyphen` and `semicolon`.
+- The punctuation message maps to one `pattern` finding for each mark on the line: `em dash`, `spaced en dash` or `curly quote`. The `N/A` message maps to `N/A`, and the trailing-pronoun message maps to `trailing it`.
+- A message for a pattern outside round 1 maps to an entry under `deferred`, so that round 3 has the data. The names are `faq heading`, `faq label`, `faq opener`, `header preposition`, `heading case`, `inventory opener`, `contact clause`, `aside stacking`, `spaced hyphen` and `semicolon`.
 - A finding whose rule came from a terms file or a profile is not carried over.
 
 The review found that every FAIL and WARN word finding sits in the table of `language.md` that matches its tier. The derived data differs from a plain copy in five ways:

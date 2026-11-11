@@ -39,9 +39,9 @@ const punctuationShapes = (text) => [
 ]
 
 const classify = (message) => {
-  if (message.startsWith('banned punctuation')) return { kind: 'shape', punctuation: true }
-  if (message.startsWith('"N/A"')) return { kind: 'shape', terms: ['N/A'] }
-  if (message.startsWith('sentence ends on the pronoun')) return { kind: 'shape', terms: ['trailing it'] }
+  if (message.startsWith('banned punctuation')) return { kind: 'pattern', punctuation: true }
+  if (message.startsWith('"N/A"')) return { kind: 'pattern', terms: ['N/A'] }
+  if (message.startsWith('sentence ends on the pronoun')) return { kind: 'pattern', terms: ['trailing it'] }
   if (message.startsWith('lowercase generic "portal"')) return { kind: 'banned', terms: ['portal'] }
   const deferred = DEFERRED_SHAPES.find(([pattern]) => pattern.test(message))
   if (deferred) return { kind: 'deferred', terms: [deferred[1]] }
@@ -74,10 +74,10 @@ const deriveFindings = (expectedFile) => {
       const expectedTier = { banned: 'FAIL', examine: 'WARN' }[kind]
       if (expectedTier && tier !== expectedTier) note(`${expectedFile}:${line}: old tier ${tier} disagrees with table ${kind}`)
       if (kind === 'deferred') {
-        deferred.push({ line, kind: 'shape', term: terms[0] })
+        deferred.push({ line, kind: 'pattern', term: terms[0] })
       } else if (punctuation) {
         for (const term of punctuationShapes(text)) findings.push({ line, kind, term })
-      } else if (kind === 'shape') {
+      } else if (kind === 'pattern') {
         findings.push({ line, kind, term: terms[0] })
       } else {
         const onLine = terms.filter((term) => collapse(text).includes(collapse(term)))
@@ -106,7 +106,7 @@ const stdinCases = [
     label: 'plines',
     findings: [
       { line: 1, kind: 'banned', term: 'seamless' },
-      { line: 1, kind: 'shape', term: 'em dash' },
+      { line: 1, kind: 'pattern', term: 'em dash' },
       { line: 3, kind: 'banned', term: 'portal' }
     ],
     deferred: []

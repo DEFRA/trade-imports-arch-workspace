@@ -28,7 +28,7 @@ const byLineKindTerm = (a, b) => a.line - b.line || a.kind.localeCompare(b.kind)
 const lineKindTerms = (findings) => findings.map(({ line, kind, term }) => ({ line, kind, term })).sort(byLineKindTerm)
 
 const bannedRepairOf = (form) => rows.banned.find(({ forms }) => forms.includes(form)).repair
-const shapeRepairOf = (rowStart) => rows.shapes.find(({ description }) => description.startsWith(rowStart)).repair
+const patternRepairOf = (rowStart) => rows.patterns.find(({ description }) => description.startsWith(rowStart)).repair
 
 describe('runProseCheck on the fixture cases', () => {
   it.each(cases)('gives the $case case its expected line, kind and term findings, each under the case label with the line as written', async ({ input, label, findings }) => {
@@ -92,8 +92,8 @@ describe('runProseCheck', () => {
     ['curly quote', `The team${RIGHT_SINGLE_QUOTE}s page.`, 'A curly quote'],
     ['N/A', 'The value is N/A here.', '`N/A`'],
     ['trailing it', 'The service provides it.', 'A sentence or line that ends on the pronoun']
-  ])('reports the %s shape with the repair of the shape row it is keyed to', (name, text, rowStart) => {
-    expect(check(text).findings).toEqual([{ label: 'docs/page.md', line: 1, kind: 'shape', term: name, text, repair: shapeRepairOf(rowStart) }])
+  ])('reports the %s pattern with the repair of the pattern row it is keyed to', (name, text, rowStart) => {
+    expect(check(text).findings).toEqual([{ label: 'docs/page.md', line: 1, kind: 'pattern', term: name, text, repair: patternRepairOf(rowStart) }])
   })
 
   it.each([
@@ -103,12 +103,12 @@ describe('runProseCheck', () => {
     ['a slash between other words', 'Read the n/b note and the on/off switch.'],
     ['it followed by a code span that ends the sentence', 'Pass it `--json`.'],
     ['it followed by a URL that ends the sentence', 'Follow it https://example.test/page.']
-  ])('reports no shape for %s', (_label, text) => {
+  ])('reports no pattern for %s', (_label, text) => {
     expect(check(text).findings).toEqual([])
   })
 
   it('reports a sentence that ends on it inside a line, as the old gate did', () => {
-    expect(lineKindTerms(check('The service provides it. The team reads the log.').findings)).toEqual([{ line: 1, kind: 'shape', term: 'trailing it' }])
+    expect(lineKindTerms(check('The service provides it. The team reads the log.').findings)).toEqual([{ line: 1, kind: 'pattern', term: 'trailing it' }])
   })
 
   it.each([
@@ -153,11 +153,11 @@ describe('runProseCheck', () => {
     ])
   })
 
-  it('refuses rows whose shapes lack the em dash row with PARSE naming the shape and the language file', () => {
-    const withoutEmDashRow = { ...rows, shapes: rows.shapes.filter(({ description }) => !description.startsWith('An em dash')) }
+  it('refuses rows whose patterns lack the em dash row with PARSE naming the pattern and the language file', () => {
+    const withoutEmDashRow = { ...rows, patterns: rows.patterns.filter(({ description }) => !description.startsWith('An em dash')) }
     expect(() => runProseCheck({ texts: [], rows: withoutEmDashRow })).toThrow(expect.objectContaining({
       code: 'PARSE',
-      message: `The Sentence Shapes table in the language file ${LANGUAGE_FILE} has no row that starts "An em dash", the row the em dash shape reports. Restore the row, then run the command again.`
+      message: `The Patterns table in the language file ${LANGUAGE_FILE} has no row that starts "An em dash", the row the em dash pattern reports. Restore the row, then run the command again.`
     }))
   })
 })
@@ -228,15 +228,15 @@ describe('renderProseCheck', () => {
   const finding = (kind, term) => ({ label: 'docs/page.md', line: 3, kind, term, text: 'The original line.', repair: 'the repair' })
 
   it('prints each finding with its line indented, then the counts of a failing result', () => {
-    const text = renderProseCheck({ passed: false, findings: [finding('banned', 'portal'), finding('examine', 'shape, shapes'), finding('shape', 'em dash')] })
+    const text = renderProseCheck({ passed: false, findings: [finding('banned', 'portal'), finding('examine', 'shape, shapes'), finding('pattern', 'em dash')] })
     expect(text).toBe([
       'docs/page.md:3: banned "portal": the repair',
       '  The original line.',
       'docs/page.md:3: examine "shape, shapes": the repair',
       '  The original line.',
-      'docs/page.md:3: shape "em dash": the repair',
+      'docs/page.md:3: pattern "em dash": the repair',
       '  The original line.',
-      '1 banned, 1 examine, 1 shape'
+      '1 banned, 1 examine, 1 pattern'
     ].join('\n'))
   })
 
@@ -287,7 +287,7 @@ describe('the check command, in-process', () => {
     await h.program.parseAsync(['--json', 'check', page], { from: 'user' })
     const envelope = envelopeOf(h.out)
     expect(envelope.ok).toBe(false)
-    expect(envelope.errors).toEqual([{ code: 'PROSE', message: 'The check found 4 banned, 1 examine and 0 shape findings. Reword each banned and shape finding, then run the check again.' }])
+    expect(envelope.errors).toEqual([{ code: 'PROSE', message: 'The check found 4 banned, 1 examine and 0 pattern findings. Reword each banned and pattern finding, then run the check again.' }])
     expect(envelope.result.passed).toBe(false)
     expect(envelope.result.findings).toHaveLength(5)
     expect(envelope.result.findings.every(({ label }) => label === page)).toBe(true)
@@ -320,7 +320,7 @@ describe('the check command, in-process', () => {
     await h.program.parseAsync(['--json', 'check', '--stdin', '--label', 'title'], { from: 'user' })
     const envelope = envelopeOf(h.out)
     expect(envelope.result.findings.map(({ label, line, kind, term }) => ({ label, line, kind, term }))).toEqual([
-      { label: 'title', line: 1, kind: 'shape', term: 'em dash' }
+      { label: 'title', line: 1, kind: 'pattern', term: 'em dash' }
     ])
     expect(h.codes).toEqual([1])
   })
@@ -357,7 +357,7 @@ describe('hedy prose check, spawned', () => {
     const result = await runCli(['prose', 'check', '--json', '--stdin', '--label', 'title'], { workspace: WORKSPACE_ROOT, input })
     expect(result.exitCode).toBe(1)
     expect(result.envelope.result.findings).toEqual([
-      expect.objectContaining({ label: 'title', line: 1, kind: 'shape', term: 'em dash' })
+      expect.objectContaining({ label: 'title', line: 1, kind: 'pattern', term: 'em dash' })
     ])
   })
 
@@ -365,8 +365,8 @@ describe('hedy prose check, spawned', () => {
     const result = await runCli(['prose', 'check', failingPage], { workspace: WORKSPACE_ROOT })
     expect(result.exitCode).toBe(1)
     expect(result.stdout).toContain(`${failingPage}:3: banned "leverage": ${bannedRepairOf('leverage')}`)
-    expect(result.stdout.split('\n').at(-1)).toBe('4 banned, 1 examine, 0 shape')
-    expect(result.stderr).toBe('The check found 4 banned, 1 examine and 0 shape findings. Reword each banned and shape finding, then run the check again.')
+    expect(result.stdout.split('\n').at(-1)).toBe('4 banned, 1 examine, 0 pattern')
+    expect(result.stderr).toBe('The check found 4 banned, 1 examine and 0 pattern findings. Reword each banned and pattern finding, then run the check again.')
   })
 
   it('--stdin without --label exits 2', async () => {

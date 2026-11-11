@@ -1,10 +1,10 @@
 # Language
 
-This file lists the words, phrases and sentence shapes that technical text in this workspace does not use, each with its repair. The authoring skill reads this file with `writing.md` before drafting, editing or writing a short artefact, and applies every row in the closing pass. `hedy prose check` reads these rows and reports each listed form it finds in a draft, and five sentence shapes that need no reading: an em dash, a spaced en dash, a curly quote, `N/A` and a sentence that ends on `it`. The reading applies every other rule.
+This file lists the words, phrases and patterns that technical text in this workspace does not use, each with its repair. The authoring skill reads this file with `writing.md` before drafting, editing or writing a short artefact, and applies every row in the closing pass. `hedy prose check` reads these rows and reports each listed form it finds in a draft, and five patterns that need no reading: an em dash, a spaced en dash, a curly quote, `N/A` and a sentence that ends on `it`. The reading applies every other rule.
 
 The rows apply to every document, pull request body, ticket and commit message. Fenced code, inline code, blockquotes, URLs and front matter are exempt. The `you` row applies to documents for people and not to instructions written for an AI agent, such as a `SKILL.md`, `CLAUDE.md` or `AGENTS.md`, because an instruction may address the agent directly.
 
-To add a row, put each form in backticks in the Term cell and write the repair as the words to use instead or the fact to state. A trailing `*` stands for any ending, so `utilis*` covers every form. Two phrases in a Term cell change how the check applies a row: "documents for people only" limits the row to documents for people, and "in lower case" makes the row match lower case only. A rule about sentence shape is not a word, and belongs under "Sentence Shapes".
+To add a row, put each form in backticks in the Term cell and write the repair as the words to use instead or the fact to state. A trailing `*` stands for any ending, so `utilis*` covers every form. Two phrases in a Term cell change how the check applies a row: "documents for people only" limits the row to documents for people, and "in lower case" makes the row match lower case only. A rule about the pattern of a sentence, a heading or a punctuation mark is not a word, and belongs under "Patterns".
 
 ## Banned Words and Phrases
 
@@ -70,11 +70,11 @@ These words are used often in the estate, or in a literal sense that reading alo
 
 `quick` and `simple` go where they judge how difficult work should feel. `simple` stays where the change is in fact simple, and in a literal name, a request for the simplest workable option, and "simple language".
 
-## Sentence Shapes
+## Patterns
 
-Each shape is recognised by reading, and the repair is the whole fix.
+Each pattern is recognised by reading, and the repair is the whole fix.
 
-| Shape | Repair |
+| Pattern | Repair |
 | --- | --- |
 | A heading that opens on what, how, which, when, where, why, who or whether, with or without a question mark (FAQ voice) | name the topic as a noun phrase in title case: "Session Assertion Checks", not "What a journey backend checks" |
 | A table header, bold lead-in or list item that opens the same way | name the topic as a noun phrase in title case: "Condition", not "When the session is in it"; "End State", not "What John sees" |

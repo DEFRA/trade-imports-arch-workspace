@@ -13,8 +13,8 @@
 | --- | --- |
 | `simply` | delete the word |
 
-## Sentence Shapes
+## Patterns
 
-| Shape | Repair |
+| Pattern | Repair |
 | --- | --- |
 | A curly quote | a straight quote |

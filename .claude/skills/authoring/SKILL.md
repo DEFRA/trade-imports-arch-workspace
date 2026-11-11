@@ -22,7 +22,7 @@ An existing page that needs sections added, removed or reordered needs a structu
 ## Read List
 
 - Always read [writing.md](../../best-practices/writing/writing.md) in full before writing a word.
-- Always read [language.md](references/language.md) with `writing.md`: the words, phrases and sentence shapes ruled out, each with its repair.
+- Always read [language.md](references/language.md) with `writing.md`: the words, phrases and patterns ruled out, each with its repair.
 - Read [planning.md](references/planning.md) when planning a page or deck, before reading the material.
 - Always read the plan before drafting or editing: its form, reader, purpose, document type, opening, governing thought, detail rule, exclusions, questions, sections with their delivery lines, and open items.
 - Read [line-editing.md](references/line-editing.md) only when line editing, after reading the page and its plan.
@@ -33,8 +33,8 @@ The material stays with the planning conversation. The drafting agent reads the 
 ## Checks
 
 - The plan is checked by reading the plan against [plan-template.md](assets/plan-template.md) before drafting or editing. Drafting or editing stops on any missing part, which goes to the author.
-- `hedy prose check --json <file>` checks a draft against the word tables of `language.md` and five sentence shapes, and a short artefact goes through `hedy prose check --json --stdin --label <artefact>`. The check runs after the closing pass, and a failing run is a failing pass. Reword each banned and shape finding with the repair the finding gives, then run the check again. Keep the word of an examine finding where the sense is literal, and reword the sentence otherwise.
-- The closing pass applies every rule in `writing.md` and every row in `language.md` by reading, including the rules the check cannot see, such as headings in title case and FAQ voice. A clean check proves only that the listed words and the five shapes are absent.
+- `hedy prose check --json <file>` checks a draft against the word tables of `language.md` and five patterns, and a short artefact goes through `hedy prose check --json --stdin --label <artefact>`. The check runs after the closing pass, and a failing run is a failing pass. Reword each banned and pattern finding with the repair the finding gives, then run the check again. Keep the word of an examine finding where the sense is literal, and reword the sentence otherwise.
+- The closing pass applies every rule in `writing.md` and every row in `language.md` by reading, including the rules the check cannot see, such as headings in title case and FAQ voice. A clean check proves only that the listed words and the five patterns are absent.
 
 ## Planning a Document
 
@@ -126,7 +126,7 @@ Files: <path>: <words before> to <words after> words
 Renamed headings: <old> to <new>, or none
 Additions and removals: <each added or removed unit with its reason>, on a line edit
 Open questions: <each question still open>, or none
-Checks: plan read against the template <pass>, closing pass against writing.md and language.md <pass>, hedy prose check <passed | n banned, m examine, k shape>
+Checks: plan read against the template <pass>, closing pass against writing.md and language.md <pass>, hedy prose check <passed | n banned, m examine, k pattern>
 Nothing committed.
 ```
 

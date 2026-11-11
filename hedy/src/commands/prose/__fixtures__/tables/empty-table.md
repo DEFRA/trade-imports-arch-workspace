@@ -11,8 +11,8 @@
 | Term | Repair |
 | --- | --- |
 
-## Sentence Shapes
+## Patterns
 
-| Shape | Repair |
+| Pattern | Repair |
 | --- | --- |
 | A curly quote | a straight quote |

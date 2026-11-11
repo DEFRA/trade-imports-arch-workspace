@@ -55,11 +55,11 @@ const wordRow = ([termCell, repair], { source }) => ({
   caseSensitive: termCell.includes('in lower case')
 })
 
-const shapeRow = ([description, repair], index) => ({ key: index + 1, description, repair })
+const patternRow = ([description, repair], index) => ({ key: index + 1, description, repair })
 
 /**
  * Returns the rows of the language file's three tables: banned and examine
- * from the word tables, shapes from the Sentence Shapes table. Throws PARSE
+ * from the word tables, patterns from the Patterns table. Throws PARSE
  * naming source when a heading is missing, a table has no rows, a word row
  * has no backticked form, or a form holds a character outside the form rule.
  *
@@ -68,7 +68,7 @@ const shapeRow = ([description, repair], index) => ({ key: index + 1, descriptio
  * @returns {{
  *   banned: { forms: string[], repair: string, scope: 'all' | 'documents', caseSensitive: boolean }[],
  *   examine: { forms: string[], repair: string, scope: 'all' | 'documents', caseSensitive: boolean }[],
- *   shapes: { key: number, description: string, repair: string }[]
+ *   patterns: { key: number, description: string, repair: string }[]
  * }}
  */
 export const parseLanguageRows = (text, { source }) => {
@@ -77,7 +77,7 @@ export const parseLanguageRows = (text, { source }) => {
   return {
     banned: wordRowsUnder('## Banned Words and Phrases'),
     examine: wordRowsUnder('## Words to Examine'),
-    shapes: tableRowsUnder(lines, '## Sentence Shapes', { source }).map(shapeRow)
+    patterns: tableRowsUnder(lines, '## Patterns', { source }).map(patternRow)
   }
 }
 

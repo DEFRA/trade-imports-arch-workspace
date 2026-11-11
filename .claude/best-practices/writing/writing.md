@@ -1,6 +1,6 @@
 # House Writing Standard
 
-Technical text in this workspace is written so that a reader can act on it after one reading. This standard holds the rules that make a draft read that way. The words, phrases and sentence shapes ruled out, each with its repair, are listed in [language.md](../../skills/authoring/references/language.md), which the authoring skill reads with this standard.
+Technical text in this workspace is written so that a reader can act on it after one reading. This standard holds the rules that make a draft read that way. The words, phrases and patterns ruled out, each with its repair, are listed in [language.md](../../skills/authoring/references/language.md), which the authoring skill reads with this standard.
 
 What a document contains is decided before writing, from the source analysis and an agreed structure. The planning path of the authoring skill produces that plan. Without a plan, the rules here apply to every sentence an agent writes.
 

@@ -12,45 +12,45 @@ const formPattern = (form) => {
   return `${words.join('\\s+')}${anyEnding ? '[A-Za-z0-9-]*' : ''}`
 }
 
-const matchedTerm = (line, pattern) => {
-  const matches = [...line.matchAll(pattern)].map(([text]) => text.toLowerCase().replace(/\s+/g, ' '))
+const matchedTerm = (line, regex) => {
+  const matches = [...line.matchAll(regex)].map(([text]) => text.toLowerCase().replace(/\s+/g, ' '))
   return matches.length === 0 ? undefined : [...new Set(matches)].join(', ')
 }
 
 const longestFirst = (forms) => [...forms].sort((a, b) => b.length - a.length)
 
 const wordRule = (kind) => ({ forms, repair, scope, caseSensitive }) => {
-  const pattern = new RegExp(`\\b(?:${longestFirst(forms).map(formPattern).join('|')})\\b`, caseSensitive ? 'g' : 'gi')
-  return { kind, repair, scope, termIn: (line) => matchedTerm(line, pattern) }
+  const regex = new RegExp(`\\b(?:${longestFirst(forms).map(formPattern).join('|')})\\b`, caseSensitive ? 'g' : 'gi')
+  return { kind, repair, scope, termIn: (line) => matchedTerm(line, regex) }
 }
 
-const shapeRepair = (shapeRows, { name, rowStart }) => {
-  const row = shapeRows.find(({ description }) => description.startsWith(rowStart))
+const patternRepair = (patternRows, { name, rowStart }) => {
+  const row = patternRows.find(({ description }) => description.startsWith(rowStart))
   if (row === undefined) {
-    throw new HedyError('PARSE', `The Sentence Shapes table in the language file ${LANGUAGE_FILE} has no row that starts "${rowStart}", the row the ${name} shape reports. Restore the row, then run the command again.`)
+    throw new HedyError('PARSE', `The Patterns table in the language file ${LANGUAGE_FILE} has no row that starts "${rowStart}", the row the ${name} pattern reports. Restore the row, then run the command again.`)
   }
   return row.repair
 }
 
-const shapeRule = (shapeRows) => (shape) => ({
-  kind: 'shape',
-  repair: shapeRepair(shapeRows, shape),
+const patternRule = (patternRows) => (pattern) => ({
+  kind: 'pattern',
+  repair: patternRepair(patternRows, pattern),
   scope: 'all',
-  termIn: (line) => (shape.pattern.test(line) ? shape.name : undefined)
+  termIn: (line) => (pattern.regex.test(line) ? pattern.name : undefined)
 })
 
-const shapeRules = (shapeRows) => [
-  { name: 'em dash', pattern: /\u2014/, rowStart: 'An em dash' },
-  { name: 'spaced en dash', pattern: /\s\u2013\s/, rowStart: 'An em dash' },
-  { name: 'curly quote', pattern: /[\u2018\u2019\u201C\u201D]/, rowStart: 'A curly quote' },
-  { name: 'N/A', pattern: /\bn\/a\b/i, rowStart: '`N/A`' },
-  { name: 'trailing it', pattern: /\sit\s*([.!?]|$)/, rowStart: 'A sentence or line that ends on the pronoun' }
-].map(shapeRule(shapeRows))
+const patternRules = (patternRows) => [
+  { name: 'em dash', regex: /\u2014/, rowStart: 'An em dash' },
+  { name: 'spaced en dash', regex: /\s\u2013\s/, rowStart: 'An em dash' },
+  { name: 'curly quote', regex: /[\u2018\u2019\u201C\u201D]/, rowStart: 'A curly quote' },
+  { name: 'N/A', regex: /\bn\/a\b/i, rowStart: '`N/A`' },
+  { name: 'trailing it', regex: /\sit\s*([.!?]|$)/, rowStart: 'A sentence or line that ends on the pronoun' }
+].map(patternRule(patternRows))
 
-const rulesOf = ({ banned, examine, shapes }) => [
+const rulesOf = ({ banned, examine, patterns }) => [
   ...banned.map(wordRule('banned')),
   ...examine.map(wordRule('examine')),
-  ...shapeRules(shapes)
+  ...patternRules(patterns)
 ]
 
 const pathInsideWorktree = (label) => label.replace(/^(?:.*\/)?\.claude\/worktrees\/[^/]+\//, '')
@@ -79,9 +79,9 @@ const isFailingFinding = ({ kind }) => kind !== 'examine'
 
 /**
  * Returns the findings of every text against the rows, line by line, with
- * passed false when any banned or shape finding exists. Each line is matched
+ * passed false when any banned or pattern finding exists. Each line is matched
  * after maskText, and a finding holds the line as written. Throws PARSE when
- * the shape rows lack a row that a shape held in code reports.
+ * the pattern rows lack a row that a pattern held in code reports.
  *
  * @param {{
  *   texts: { label: string, text: string }[],
@@ -89,7 +89,7 @@ const isFailingFinding = ({ kind }) => kind !== 'examine'
  * }} options
  * @returns {{
  *   passed: boolean,
- *   findings: { label: string, line: number, kind: 'banned' | 'examine' | 'shape', term: string, text: string, repair: string }[]
+ *   findings: { label: string, line: number, kind: 'banned' | 'examine' | 'pattern', term: string, text: string, repair: string }[]
  * }}
  */
 export const runProseCheck = ({ texts, rows }) => {
@@ -100,14 +100,14 @@ export const runProseCheck = ({ texts, rows }) => {
 
 const countsOf = (findings) => {
   const countOf = (kind) => findings.filter((finding) => finding.kind === kind).length
-  return { banned: countOf('banned'), examine: countOf('examine'), shape: countOf('shape') }
+  return { banned: countOf('banned'), examine: countOf('examine'), pattern: countOf('pattern') }
 }
 
 const findingLines = ({ label, line, kind, term, text, repair }) => `${label}:${line}: ${kind} "${term}": ${repair}\n  ${text}`
 
 const summaryLine = ({ passed, findings }) => {
-  const { banned, examine, shape } = countsOf(findings)
-  if (!passed) return `${banned} banned, ${examine} examine, ${shape} shape`
+  const { banned, examine, pattern } = countsOf(findings)
+  if (!passed) return `${banned} banned, ${examine} examine, ${pattern} pattern`
   return examine === 0 ? 'passed' : `passed with ${examine} examine`
 }
 
@@ -174,8 +174,8 @@ const readTexts = async (input, { stdin }) =>
   input.stdin ? [await readStdinText(stdin, { label: input.label })] : Promise.all(input.files.map(readFileText))
 
 const failureMessage = (findings) => {
-  const { banned, examine, shape } = countsOf(findings)
-  return `The check found ${banned} banned, ${examine} examine and ${shape} shape findings. Reword each banned and shape finding, then run the check again.`
+  const { banned, examine, pattern } = countsOf(findings)
+  return `The check found ${banned} banned, ${examine} examine and ${pattern} pattern findings. Reword each banned and pattern finding, then run the check again.`
 }
 
 const runCheck = async (input, { stdin, workspaceRoot }) => {
