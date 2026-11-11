@@ -17,7 +17,7 @@
 #   JIRA_BASE_URL  - e.g. https://eaflood.atlassian.net
 #
 # Tools required on PATH:
-#   hedy           - fetches each page as markdown; `make link` installs it
+#   hedy           - fetches each page as markdown; `make install` installs it
 #
 
 set -euo pipefail

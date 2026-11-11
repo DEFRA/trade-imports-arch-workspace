@@ -9,7 +9,7 @@ Evaluate an architecture document against the three layers of Defra's architectu
 
 Source of truth: https://defra.github.io/architecture/ built from https://github.com/DEFRA/architecture (`docs/` folder, MkDocs). The framework is moving towards a final version under the CDIO; see "Keeping this skill current" at the end.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Scope and Limits of the Review
 

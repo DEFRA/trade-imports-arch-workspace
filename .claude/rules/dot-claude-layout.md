@@ -5,7 +5,7 @@ paths:
 
 # .claude layout - where new files go
 
-Placement rules for files under `.claude/`. The human-facing map with fuller descriptions is the "Inside `.claude/`" section of `~/trade-imports-arch-workspace/README.md`.
+Placement rules for files under `.claude/`. The human-facing map with fuller descriptions is the "Inside `.claude/`" section of the root `README.md`.
 
 - New agent capability (instructions plus supporting files) -> `skills/<name>/SKILL.md`, agentskills.io format. Scaffold with the skill-creator skill rather than by hand.
 - Deterministic shell work a skill calls -> `tools/<domain>/<script>.sh`. Keep logic in scripts, not in SKILL.md prose.

@@ -6,7 +6,7 @@ description: 'Plan a new technical page or slide deck with the author from the m
 # Authoring
 authoring plans a new page or slide deck with the author, hands the drafting to a fresh agent that writes from the agreed plan, line edits a page that has a plan, and writes short artefacts, applying the team's standard the same way every time. The plan is the only source of content for drafting. A point the plan does not support goes to the author as a question and is never filled by you or the drafting agent. authoring does not check facts or synthesise analysis: the author chooses the material and owns every judgement about content, including whether a claim is true.
 
-**Bash call hygiene:** one command per Bash call, and paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [agent-skills.md](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene:** one command per Bash call, and paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [agent-skills.md](../../best-practices/skills/agent-skills.md).
 
 ## Routing
 

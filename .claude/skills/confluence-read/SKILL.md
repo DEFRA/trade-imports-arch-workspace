@@ -5,7 +5,7 @@ description: 'Fetch a Confluence page by URL or page id as clean markdown throug
 
 Fetches one Confluence page, given a page id, a page URL or a share link, through the `hedy` CLI. The page reaches the session as markdown, so the user can summarise, review, extract or compare the page. Read-only: nothing is ever written back to Confluence.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Usage
 
@@ -27,7 +27,7 @@ Skip if this session has already verified Confluence auth.
 hedy auth
 ```
 
-If `hedy` is not found, run `make -C ~/trade-imports-arch-workspace link`.
+If `hedy` is not found, run `make install`.
 
 On failure, relay the error - it names the missing variable or the rejected credential. Do not print credential values.
 

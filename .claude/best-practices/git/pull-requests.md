@@ -35,7 +35,7 @@ The body has three sections under these headings. The section names are nouns, n
 - Create and edit PRs through the guard script - it refuses attribution content deterministically, so the rule holds regardless of which agent or session runs it:
 
   ```
-  bash ~/trade-imports-arch-workspace/.claude/tools/pr/create-pr.sh --help
+  bash .claude/tools/pr/create-pr.sh --help
   ```
 
 - Pass bodies with `--body-file`, never inline strings.

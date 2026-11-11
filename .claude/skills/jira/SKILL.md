@@ -6,7 +6,7 @@ model: sonnet
 
 Create, read and update JIRA issues from any session in this workspace through the `hedy` CLI. Reading returns flat JSON the session can reason over directly. Creation raises a new issue from a manifest and returns its key and browse URL. Updating replaces an issue's description. Creation and update each start with a dry run that sends nothing, and Jira changes only when a confirm carries the plan id the dry run printed. This skill owns no logic, only the procedure.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Credentials
 
@@ -16,7 +16,7 @@ Create, read and update JIRA issues from any session in this workspace through t
 hedy auth
 ```
 
-If `hedy` is not found, run `make -C ~/trade-imports-arch-workspace link`.
+If `hedy` is not found, run `make install`.
 
 ## Usage
 
@@ -65,7 +65,7 @@ hedy jira search 'project = IMTA AND status = "In Progress" ORDER BY updated DES
 
 Creating a ticket is an outward-facing action. The dry run shows the plan and sends nothing, and the dry run is never the user's consent. **Raise the ticket only after the user's own message says to raise the ticket.**
 
-Each ticket has its own folder, `~/trade-imports-arch-workspace/.claude/workareas/jira/<slug>/`, where the slug is a short kebab-case name for the ticket. The folder is gitignored and holds these files:
+Each ticket has its own folder, `.claude/workareas/jira/<slug>/`, where the slug is a short kebab-case name for the ticket. The folder is gitignored and holds these files:
 
 - `ticket.json` is the manifest.
 - `description.jira.txt` holds the description in Jira wiki markup.
@@ -95,7 +95,7 @@ Each ticket has its own folder, `~/trade-imports-arch-workspace/.claude/workarea
 3. Run the dry run:
 
 ```bash
-hedy jira create --from ~/trade-imports-arch-workspace/.claude/workareas/jira/<slug>/ticket.json --json
+hedy jira create --from .claude/workareas/jira/<slug>/ticket.json --json
 ```
 
 - `result` is `{ mode: 'dry-run', planId, project, type, summary, priority, parent, labels, description, warnings }`.
@@ -105,7 +105,7 @@ hedy jira create --from ~/trade-imports-arch-workspace/.claude/workareas/jira/<s
 5. Confirm with the exact plan id the dry run printed:
 
 ```bash
-hedy jira create --from ~/trade-imports-arch-workspace/.claude/workareas/jira/<slug>/ticket.json --confirm <planId> --json
+hedy jira create --from .claude/workareas/jira/<slug>/ticket.json --confirm <planId> --json
 ```
 
 - `result` is `{ mode: 'created', key, url }`. Always relay the key and the URL to the user.
@@ -121,11 +121,11 @@ A confirm can also end in one of these outcomes:
 Updating is outward-facing like creation, and the same consent rule holds: **replace the description only after the user's own message says to replace the description.** `hedy` replaces the whole description; there is no partial edit.
 
 1. Read the issue with `hedy jira ticket <key> --json` for the current description.
-2. Revise the full description using the rules in Writing Ticket Content. Write the revised description with the Write tool to `~/trade-imports-arch-workspace/.claude/workareas/jira/<key>/description.jira.txt`, a folder named after the issue key.
+2. Revise the full description using the rules in Writing Ticket Content. Write the revised description with the Write tool to `.claude/workareas/jira/<key>/description.jira.txt`, a folder named after the issue key.
 3. Run the dry run:
 
 ```bash
-hedy jira describe <key> --from ~/trade-imports-arch-workspace/.claude/workareas/jira/<key>/description.jira.txt --json
+hedy jira describe <key> --from .claude/workareas/jira/<key>/description.jira.txt --json
 ```
 
 - The dry run reads the issue and sends no update.
@@ -136,7 +136,7 @@ hedy jira describe <key> --from ~/trade-imports-arch-workspace/.claude/workareas
 5. Confirm with the exact plan id the dry run printed:
 
 ```bash
-hedy jira describe <key> --from ~/trade-imports-arch-workspace/.claude/workareas/jira/<key>/description.jira.txt --confirm <planId> --json
+hedy jira describe <key> --from .claude/workareas/jira/<key>/description.jira.txt --confirm <planId> --json
 ```
 
 - `result` is `{ mode: 'updated', key, url }`. Always relay the key and the URL to the user.

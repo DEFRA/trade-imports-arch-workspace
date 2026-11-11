@@ -10,7 +10,7 @@ A diagram that does not render is worse than no diagram: it ships as a broken im
 
 Diagrams here live in two places. Nearly all are fenced ` ```mermaid ` blocks inside Markdown under `analysis/` and `trade-imports-documentation/docs/`. A minority are standalone `.mmd` files under `trade-imports-documentation/architecture/`, which the documentation pipeline converts to SVG via `npm run build:mmd`.
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Usage
 
@@ -44,7 +44,7 @@ The mechanical rules in the third row are the subset of `writing.md` that can be
 ## Step 0: Start
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/mermaid-check/start-mermaid-check.sh <path>
+.claude/tools/mermaid-check/start-mermaid-check.sh <path>
 ```
 
 `<path>` is a file or a directory, and more than one may be given. A directory is walked recursively, skipping `node_modules`, `build`, `generated` and dotted directories.
@@ -70,7 +70,7 @@ Report to the user which diagrams failed and what you changed. Do not report a p
 Any agent with Bash can validate a diagram it is holding in context, without writing it into the repository first:
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/mermaid-check/render-mermaid.sh --text 'sequenceDiagram
+.claude/tools/mermaid-check/render-mermaid.sh --text 'sequenceDiagram
     Browser->>FrontDoor: GET /notifications
     FrontDoor-->>Browser: 200' --label 'draft: login sequence'
 ```
@@ -110,7 +110,7 @@ When nothing failed, say so in one line and give the counts. When nothing was fo
 
 ## Scripts cheat-sheet
 
-All under `~/trade-imports-arch-workspace/.claude/tools/mermaid-check/`:
+All under `.claude/tools/mermaid-check/`:
 
 | Script | Purpose |
 | --- | --- |
