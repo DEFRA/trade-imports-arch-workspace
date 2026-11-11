@@ -65,6 +65,7 @@ credentials with the auth doctor below rather than inspecting the file.
 - `hedy jira describe <key> --from <file>` replaces one issue's description with the file's Jira wiki markup. The command is a dry run by default, and `--confirm <planId>` runs only the plan the dry run showed.
 - `hedy confluence page <reference>` reads one page by id, URL or share link, as markdown by default.
 - `hedy confluence publish <page>` publishes one docs page to Confluence through the docs repo's publisher, after its pre-flight. The command publishes at once.
+- `hedy prose check <file>...` checks files, or a text read with `--stdin --label <name>`, against the word tables of `.claude/skills/authoring/references/language.md` and five sentence shapes. A banned word or a shape fails the run with exit 1, and every finding names its line and its repair.
 
 A bare `hedy` at a terminal opens a menu for people that reaches every command, and each write waits behind a plan or pre-flight screen and a confirm. Agents call the commands with `--json`. A bare `hedy` without a terminal, or with `--json` or `--no-ui`, is a usage error.
 
@@ -126,9 +127,11 @@ skill, `.claude/skills/authoring/SKILL.md`, plans a page or deck with
 the author, hands the drafting to a fresh agent, line edits an existing
 page, and writes pull request bodies, tickets and commit messages.
 
-No mechanical prose check runs. The closing pass in the authoring skill
-is the check, and it applies every row of `language.md` by reading. To
-ban a word, add a row to that file.
+`hedy prose check` finds every listed word and five literal sentence
+shapes in a draft, and the authoring skill runs the check after its
+closing pass. The closing pass applies every other rule of `writing.md`
+and `language.md` by reading. To ban a word, add a row to `language.md`,
+and the check reads the row on its next run.
 
 ## Git, GitHub and pull requests
 

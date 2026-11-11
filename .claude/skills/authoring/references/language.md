@@ -1,10 +1,10 @@
 # Language
 
-This file lists the words, phrases and sentence shapes that technical text in this workspace does not use, each with its repair. The authoring skill reads this file with `writing.md` before drafting, editing or writing a short artefact, and applies every row in the closing pass. No script checks a draft, so the reading is the enforcement, and a later `hedy prose check` takes these rows as its data.
+This file lists the words, phrases and sentence shapes that technical text in this workspace does not use, each with its repair. The authoring skill reads this file with `writing.md` before drafting, editing or writing a short artefact, and applies every row in the closing pass. `hedy prose check` reads these rows and reports each listed form it finds in a draft, and five sentence shapes that need no reading: an em dash, a spaced en dash, a curly quote, `N/A` and a sentence that ends on `it`. The reading applies every other rule.
 
 The rows apply to every document, pull request body, ticket and commit message. Fenced code, inline code, blockquotes, URLs and front matter are exempt. The `you` row applies to documents for people and not to instructions written for an AI agent, such as a `SKILL.md`, `CLAUDE.md` or `AGENTS.md`, because an instruction may address the agent directly.
 
-To add a row, put each form in backticks in the Term cell and write the repair as the words to use instead or the fact to state. A trailing `*` stands for any ending, so `utilis*` covers every form. A rule about sentence shape is not a word, and belongs under "Sentence Shapes".
+To add a row, put each form in backticks in the Term cell and write the repair as the words to use instead or the fact to state. A trailing `*` stands for any ending, so `utilis*` covers every form. Two phrases in a Term cell change how the check applies a row: "documents for people only" limits the row to documents for people, and "in lower case" makes the row match lower case only. A rule about sentence shape is not a word, and belongs under "Sentence Shapes".
 
 ## Banned Words and Phrases
 
