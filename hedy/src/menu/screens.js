@@ -19,5 +19,6 @@ export const SCREENS = Object.freeze({
   CONFLUENCE_PAGE_INPUT: 'confluence-page-input',
   CONFLUENCE_PAGE_RESULT: 'confluence-page-result',
   CONFLUENCE_PUBLISH_INPUT: 'confluence-publish-input',
-  CONFLUENCE_PUBLISH_CONFIRM: 'confluence-publish-confirm'
+  CONFLUENCE_PUBLISH_CONFIRM: 'confluence-publish-confirm',
+  WORKSPACE_RESULT: 'workspace-result'
 })

@@ -14,7 +14,7 @@ Never reach the checkout through a symlink. Claude Code compares file paths as t
 
 Three layers:
 
-- **In LLM-typed commands and file tool paths** (SKILL.md, references/*.md, spawn prompts): paths relative to the root, such as `.claude/tools/workspace/check-workspace.sh`.
+- **In LLM-typed commands and file tool paths** (SKILL.md, references/*.md, spawn prompts): paths relative to the root, such as `.claude/tools/workspace/check-deps.sh`.
 - **Inside `.claude/tools/<domain>/<script>.sh`**: the script takes the root from its own location, three folders up: `ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"`. A script under `tests/` counts four. The count is fixed, so a script that moves to another depth must change its count, and a wrong count fails the script's first check of the root. The script counts folders instead of walking up to the first `.claude/`, because a walk-up matches a stray `.claude/` in a parent folder. `pwd -P` gives the real path, so a call through a symlink still finds the real root.
 - **Commands a script prints**: a command a dispatcher prints for the agent to run verbatim stays root-relative, so it matches the allowlist. A remedy that a script or `hedy` names in an error message uses the resolved absolute root, because the reader of a message may be in any folder.
 
@@ -102,7 +102,7 @@ A skill that cannot function from its bundled tools alone declares what it needs
 
 Format: two-space indent under `metadata:`, no quotes, no inline comments. Rules:
 
-- **Baseline is assumed, never declared**: `bash`, `curl`, `jq`, `git`, and `hedy`, which `make install` puts on PATH. `check-workspace.sh` verifies the baseline once per machine; declaring it per skill would reduce declarations to boilerplate.
+- **Baseline is assumed, never declared**: `bash`, `curl`, `jq`, `git`, and `hedy`, which `make install` puts on PATH. `hedy workspace check` verifies the baseline once per machine; declaring it per skill would reduce declarations to boilerplate.
 - **Credentials are not dependencies** - env-var and auth needs belong to `hedy auth`, which `check-auth.sh` runs with any per-domain `auth.sh` the sweep still finds.
 - **Declare hard dependencies only** - things the skill cannot work without. A soft probe with graceful fallback (e.g. mermaid-check trying the tooling's mmdc, then npx) is not declared - and a fallback chain is soft only if its LAST rung degrades gracefully; a chain that ends in a raw failure is a hard dependency wearing a costume.
 

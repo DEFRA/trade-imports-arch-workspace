@@ -31,8 +31,8 @@ say() { echo "skills-lint: $1"; }
 
 FAIL=0
 WARNS=0
-# Parse + fallback pinned to check-workspace.sh and check-deps.sh -
-# change all three together.
+# Parse + fallback pinned to check-deps.sh, and hedy workspace check
+# reads the same line - change all three together.
 CHILDREN=$(awk -F':=' '/^CHILDREN[[:space:]]*:?=/{print $2}' "$ROOT/Makefile" 2>/dev/null)
 if [[ -z "${CHILDREN// /}" ]]; then
     say "WARN could not parse CHILDREN from $ROOT/Makefile - using fallback list"

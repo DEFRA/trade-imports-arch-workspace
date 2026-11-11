@@ -25,7 +25,7 @@ A file in `.claude/rules/` with `paths:` frontmatter is advisory context Claude 
 
 | Location | Wiring | Editor |
 | --- | --- | --- |
-| `.claude/hooks/` | `settings.json` (global, every session): the guards | the owner only, since `guard-edits.sh` blocks agent edits to both |
+| `.claude/hooks/` | `settings.json` (global, every session): the guards, and `session-start-workspace-check.sh`, which runs `hedy workspace check` at session start and adds each failed check to the session's context | the owner only, since `guard-edits.sh` blocks agent edits to both |
 | `.claude/tools/<domain>/` | skill frontmatter hooks, skill steps, other scripts | agents; covered by the blanket `Bash(.claude/tools/*)` and `Bash(bash .claude/tools/*)` allowlist entries |
 | `.githooks/` | `core.hooksPath` (set by `make install`) | agents; runs for every git user regardless of AI tooling |
 

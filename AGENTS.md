@@ -39,10 +39,10 @@ wraps is excluded by `.gitignore`:
 
 ## Paths
 
-The workspace has no fixed location, so a checkout works wherever it is cloned. Every path in skills, tools and docs is written relative to the workspace root, the folder that holds this file. Start each session at the workspace root and type paths such as `.claude/tools/workspace/check-workspace.sh` from there, never through a symlink and never as an absolute `/Users/...` path. The full contract and rationale: `.claude/rules/workspace-paths.md`. Verify a machine with:
+The workspace has no fixed location, so a checkout works wherever it is cloned. Every path in skills, tools and docs is written relative to the workspace root, the folder that holds this file. Start each session at the workspace root and type paths such as `.claude/tools/workspace/check-deps.sh` from there, never through a symlink and never as an absolute `/Users/...` path. The full contract and rationale: `.claude/rules/workspace-paths.md`. Verify a machine with:
 
 ```bash
-bash .claude/tools/workspace/check-workspace.sh
+hedy workspace check
 ```
 
 The root `Makefile` bootstraps a fresh machine. `make` clones any missing child repo, runs `make install`, which points `core.hooksPath` at `.githooks` and puts `hedy` on PATH, and then runs the check above. The steps also run one at a time as `make clone`, `make pull`, `make install` and `make check`. Children clone over SSH, and `GIT_BASE=https://github.com/DEFRA` clones them over HTTPS.
@@ -65,6 +65,7 @@ credentials with the auth doctor below rather than inspecting the file.
 - `hedy jira describe <key> --from <file>` replaces one issue's description with the file's Jira wiki markup. The command is a dry run by default, and `--confirm <planId>` runs only the plan the dry run showed.
 - `hedy confluence page <reference>` reads one page by id, URL or share link, as markdown by default.
 - `hedy confluence publish <page>` publishes one docs page to Confluence through the docs repo's publisher, after its pre-flight. The command publishes at once.
+- `hedy workspace check` checks the machine and the checkout against the expected setup, offline, and names the next step for each failed check.
 
 A bare `hedy` at a terminal opens a menu for people that reaches every command, and each write waits behind a plan or pre-flight screen and a confirm. Agents call the commands with `--json`. A bare `hedy` without a terminal, or with `--json` or `--no-ui`, is a usage error.
 
@@ -84,7 +85,7 @@ read its header) for usage.
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
 | `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
-| `workspace/` | `check-workspace.sh` (path contract doctor), `check-auth.sh` (runs `hedy auth` and every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine), `lint-skills.sh` (repo-only estate lint), `guard-bash-tests.sh` (the bash guard's deny and allow cases) and `guard-git-push-tests.sh` (the push guard's deny and allow cases) |
+| `workspace/` | `check-auth.sh` (runs `hedy auth` and every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine), `lint-skills.sh` (repo-only estate lint), `guard-bash-tests.sh` (the bash guard's deny and allow cases) and `guard-git-push-tests.sh` (the push guard's deny and allow cases) |
 
 ### Enforcement map
 
@@ -93,7 +94,7 @@ run when one fails:
 
 | Mechanism | Checks | Fires | On failure |
 | --- | --- | --- | --- |
-| `check-workspace.sh` | the root, child repos, baseline tools, hooksPath, `hedy` on PATH | `make` / `make check` | follow the remedy line (usually `make install` / `make clone`) |
+| `hedy workspace check` | Node, baseline tools, child repos, hooksPath, the `hedy` link and packages, the docs repo install, and the path contract: the current folder, home-folder links, local allow rules and the working-directory pin | `make` / `make check`, and the `SessionStart` hook at the start of every Claude Code session | follow the next step each failed check names (usually `make install` / `make clone`) |
 | `check-auth.sh` | the Atlassian credentials through `hedy auth`, plus any domain `auth.sh` | on demand | fix the named env var in `.env`; run `make install` when `hedy` is missing |
 | `check-deps.sh` | declared `workspace-deps` resolve on this machine | `make check` | clone the project / install the tool it names |
 | `lint-skills.sh` | declaration format, dangling links, undeclared-invocation sweep | pre-commit (staged index), scaffold tail, `make check` | fix and re-stage; acknowledge soft probes in `workspace-soft-deps` |

@@ -84,7 +84,7 @@ run deny  /tmp  "bash $OUTSIDE"
 run allow /tmp  'bash -c "echo hi"'
 run allow /tmp  'node -e "console.log(1)"'
 run allow /tmp  'python3 -m json.tool'
-run allow "$WS" 'bash .claude/tools/workspace/check-workspace.sh analysis/x.md'
+run allow "$WS" 'bash .claude/tools/workspace/check-deps.sh analysis/x.md'
 rm -f "$OUTSIDE"
 
 echo "== commits =="

@@ -134,7 +134,7 @@ describe('runProgram help and version', () => {
     expect(stdout).toMatch(/^ {2}hello\s/m)
   })
 
-  it.each(['auth', 'jira', 'confluence'])('lists the %s command in the top-level help', async (name) => {
+  it.each(['auth', 'jira', 'confluence', 'workspace'])('lists the %s command in the top-level help', async (name) => {
     const { stdout } = await run(['--help'])
     expect(stdout).toMatch(new RegExp(`^ {2}${name}\\s`, 'm'))
   })
@@ -249,7 +249,7 @@ describe('runProgram with no command', () => {
       checkoutRoot: root
     })
     await vi.waitFor(() => expect(stdin.listenerCount('readable')).toBeGreaterThan(0))
-    for (const key of ['\u001B[B', '\u001B[B', '\u001B[B', '\r']) {
+    for (const key of ['\u001B[B', '\u001B[B', '\u001B[B', '\u001B[B', '\r']) {
       await new Promise((resolve) => setTimeout(resolve, 30))
       stdin.write(key)
     }
