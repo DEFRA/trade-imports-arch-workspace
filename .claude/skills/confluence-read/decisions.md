@@ -5,13 +5,13 @@ changes; do not delete entries.
 
 ## 1. Purpose
 
-Fetch a Confluence page by URL or page id as clean markdown (via the confluence/ hand tools) so the session can analyse it - summarise, review, extract, compare.
+Fetch a Confluence page by URL or page id as clean markdown through the hedy CLI so the session can analyse it - summarise, review, extract, compare.
 
 ## 2. Dependencies
 
 **Resolution:** none
 **Declared:** (none)
-**Why:** (not applicable)
+**Reason:** (not applicable)
 **Pattern reference:** patterns.md §9
 
 ## 3. State shape
@@ -42,11 +42,7 @@ Fetch a Confluence page by URL or page id as clean markdown (via the confluence/
 
 ## 8. Helpers introduced
 
-None - the skill orchestrates the pre-existing `tools/confluence/`
-hand-tool domain (`auth.sh`, `page.sh`, `html_to_md.js`; `page.sh`
-gained an `md` format for this skill). The scaffold's helper stubs were
-deliberately skipped so the existing hand tools would not be
-overwritten; domain name ≠ skill name here by design.
+None. The skill calls `hedy confluence page`, and the `tools/confluence/` hand tools no longer hold a read path. The scaffold's helper stubs were deliberately skipped so the existing hand tools would not be overwritten. The domain name differs from the skill name by design.
 
 ## 9. Triggers
 

@@ -30,6 +30,8 @@ analysis/
 .claude/workareas/editorial/
 .claude/workareas/confluence-sync/
 .claude/workareas/design-consistency/
+# Task-local ticket drafts of the jira skill (manifests, descriptions, receipts)
+.claude/workareas/jira/
 
 # Editorial research run state (run records, cold-reader findings, story cards)
 editorial-research/
@@ -49,8 +51,12 @@ software-development-standards/
 # Installed npm dependencies
 node_modules/
 
+# Coverage reports a scoped vitest run writes under hedy/
+hedy/coverage/
+
 # Root npm manifest and lockfile
 package-lock.json
+!hedy/package-lock.json
 
 # Don't push Claude local settings
 settings.local.json

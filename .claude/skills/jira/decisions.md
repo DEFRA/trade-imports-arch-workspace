@@ -5,7 +5,7 @@ changes; do not delete entries.
 
 ## 1. Purpose
 
-Create and read JIRA tickets from the workspace via the standalone curl+jq scripts in tools/jira/: single-key or JQL batch fetch with a flat JSON projection, ticket creation with type/priority/labels/parent, and an auth pre-flight.
+Create, read and update JIRA tickets from the workspace. Reads, creation and description updates all go through the `hedy` CLI. Reads fetch one ticket by key, or run a JQL search with a flat JSON projection. Creation takes a manifest with type, priority, labels and parent. Creation and description replacement each run a dry run first, and only a confirm with the dry run's plan id changes Jira. `hedy auth` is the auth pre-flight.
 
 ## 2. State shape
 
@@ -35,9 +35,7 @@ Create and read JIRA tickets from the workspace via the standalone curl+jq scrip
 
 ## 7. Helpers introduced
 
-- create-ticket
-- fetch
-- auth
+- `hedy`, for reads, creation, description updates and the auth pre-flight
 
 ## 8. Triggers
 
@@ -45,5 +43,7 @@ Create and read JIRA tickets from the workspace via the standalone curl+jq scrip
 - "fetch jira ticket"
 - "read jira ticket"
 - "run jql"
+- "update jira description"
+- "rewrite the ticket"
 
-**Disambiguation:** Distinct from confluence-publish (Atlassian Confluence pages, not JIRA issues) and from the built-in /init (CLAUDE.md scaffolding). Owns JIRA issue creation and reading only - not updates, transitions or comments.
+**Disambiguation:** Distinct from confluence-publish (Atlassian Confluence pages, not JIRA issues) and from the built-in /init (CLAUDE.md scaffolding). Owns JIRA issue creation, reading and description updates - not transitions or comments.

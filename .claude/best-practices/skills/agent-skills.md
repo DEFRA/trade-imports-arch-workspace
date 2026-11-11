@@ -101,8 +101,8 @@ A skill that cannot function from its bundled tools alone declares what it needs
 
 Format: two-space indent under `metadata:`, no quotes, no inline comments. Rules:
 
-- **Baseline is assumed, never declared**: `bash`, `curl`, `jq`, `git`. `check-workspace.sh` verifies the baseline once per machine; declaring it per skill would reduce declarations to boilerplate.
-- **Credentials are not dependencies** - env-var/auth needs belong to the per-domain `auth.sh` checks swept by `check-auth.sh`.
+- **Baseline is assumed, never declared**: `bash`, `curl`, `jq`, `git`, and `hedy`, which `make link` puts on PATH. `check-workspace.sh` verifies the baseline once per machine; declaring it per skill would reduce declarations to boilerplate.
+- **Credentials are not dependencies** - env-var and auth needs belong to `hedy auth`, which `check-auth.sh` runs with any per-domain `auth.sh` the sweep still finds.
 - **Declare hard dependencies only** - things the skill cannot work without. A soft probe with graceful fallback (e.g. mermaid-check trying the tooling's mmdc, then npx) is not declared - and a fallback chain is soft only if its LAST rung degrades gracefully; a chain that ends in a raw failure is a hard dependency wearing a costume.
 
 Acknowledged soft probes may be listed in `workspace-soft-deps` (same format, same `metadata:` map). That key is purely a lint-noise acknowledgment - never verified, never pre-flighted; it says "yes, the sweep saw this, and it is a graceful-fallback probe, not a hard dep".
