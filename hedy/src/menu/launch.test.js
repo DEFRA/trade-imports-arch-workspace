@@ -99,7 +99,7 @@ describe('launchMenu with the real Ink render', () => {
     const streams = terminal()
     const exited = launch(streams)
     await shownIn(streams.stdout.text, 'Quit')
-    await press(streams.stdin, DOWN, DOWN, DOWN, '\r')
+    await press(streams.stdin, DOWN, DOWN, DOWN, DOWN, '\r')
     expect(await exited).toBe(EXIT.OK)
     expect(getCurrent()).toBe(undefined)
   })
@@ -150,7 +150,7 @@ describe('launchMenu with an injected render', () => {
     const exited = launch(terminal(), { render, overrides: { onQuit: unmount } })
     const [instance] = instances
     await shownIn(instance.lastFrame, 'Quit')
-    await press(instance.stdin, DOWN, DOWN, DOWN, '\r')
+    await press(instance.stdin, DOWN, DOWN, DOWN, DOWN, '\r')
     expect(await exited).toBe(EXIT.OK)
     expect(getCurrent()).toBe(undefined)
   })
