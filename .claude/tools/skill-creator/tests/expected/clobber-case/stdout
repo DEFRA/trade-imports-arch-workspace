@@ -1,2 +1,2 @@
-Refusing to scaffold: helper 'start-test-clobber.sh' already exists in HOME/trade-imports-arch-workspace/.claude/tools/test-clobber
+Refusing to scaffold: helper 'start-test-clobber.sh' already exists in ROOT/.claude/tools/test-clobber
 Reused scripts are never listed in the helpers answer; remove the name, or delete the file first if a fresh stub is intended.

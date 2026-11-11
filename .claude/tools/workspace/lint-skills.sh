@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Repo-only lint for the skills estate. Machine-agnostic counterpart to
 # check-deps.sh: nothing here needs child repos or PATH tools present.
-# Invoke with bash (no execute bit required):
-#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh
+# Invoke with bash from the workspace root (no execute bit required):
+#   bash .claude/tools/workspace/lint-skills.sh
 #
 # Checks (FAIL -> exit 1):
 #   1. workspace-deps declarations: structurally parseable, non-empty,
@@ -25,7 +25,7 @@
 
 set -u
 
-ROOT="$HOME/trade-imports-arch-workspace"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 
 say() { echo "skills-lint: $1"; }
 

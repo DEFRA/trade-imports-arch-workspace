@@ -1,12 +1,13 @@
 #!/bin/bash
 # Runs every case against the bash guard and prints ok or FAIL per case.
-# Invoke with bash; $1 names the guard to test, the live hook by default:
-#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-bash-tests.sh
-#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-bash-tests.sh <draft guard>
+# Invoke with bash from the workspace root; $1 names the guard to test, the
+# live hook by default:
+#   bash .claude/tools/workspace/guard-bash-tests.sh
+#   bash .claude/tools/workspace/guard-bash-tests.sh <draft guard>
 # The dirty-tree cases create and remove an untracked probe file under hedy/src
 # and a probe script under /tmp. Exit 1 when any case fails.
 set -u
-WS="$HOME/trade-imports-arch-workspace"
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 GUARD=${1:-$WS/.claude/hooks/guard-bash.sh}
 HEDY="$WS/hedy"
 PROBE="$HEDY/src/zz-guard-probe.js"
@@ -15,7 +16,7 @@ FAILS=0
 
 run() {
   local expected=$1 cwd=$2 cmd=$3 out actual mark
-  out=$(jq -n --arg c "$cmd" --arg d "$cwd" '{tool_name:"Bash",tool_input:{command:$c},cwd:$d}' | bash "$GUARD")
+  out=$(jq -n --arg c "$cmd" --arg d "$cwd" '{tool_name:"Bash",tool_input:{command:$c},cwd:$d}' | CLAUDE_PROJECT_DIR="$WS" bash "$GUARD")
   if [ -n "$out" ]; then actual=deny; else actual=allow; fi
   if [ "$expected" = "$actual" ]; then mark=ok; else mark=FAIL; FAILS=$((FAILS+1)); fi
   printf '%-4s want %-5s got %-5s %s\n' "$mark" "$expected" "$actual" "$cmd"
@@ -36,35 +37,36 @@ run deny  /tmp  'timeout 30 hedy auth'
 run deny  /tmp  'npx hedy auth'
 run deny  /tmp  'env hedy auth'
 run deny  /tmp  'xargs -I{} hedy auth'
-run deny  /tmp  'node ~/trade-imports-arch-workspace/hedy/src/cli.js hello'
+run deny  "$WS" 'node hedy/src/cli.js hello'
+run deny  /tmp  "node $HEDY/src/cli.js hello"
 run deny  "$HEDY" 'node src/cli.js hello'
 run deny  "$HEDY" './src/cli.js hello'
-run deny  /tmp  '~/trade-imports-arch-workspace/hedy/src/zz-guard-probe.js'
-run deny  /tmp  'bash ~/trade-imports-arch-workspace/hedy/src/zz-guard-probe.js'
+run deny  "$WS" 'hedy/src/zz-guard-probe.js'
+run deny  "$WS" 'bash hedy/src/zz-guard-probe.js'
 run allow "$HEDY" 'npm test'
 run allow "$HEDY" 'npm run lint'
 run allow "$HEDY" 'npx vitest run src/cli.test.js'
-run allow /tmp  'git -C ~/trade-imports-arch-workspace status -- hedy'
-run allow /tmp  'ls ~/trade-imports-arch-workspace/hedy/src'
-run allow /tmp  'grep -rn whoami ~/trade-imports-arch-workspace/hedy/src'
+run allow "$WS" 'git status -- hedy'
+run allow "$WS" 'ls hedy/src'
+run allow "$WS" 'grep -rn whoami hedy/src'
 rm -f "$PROBE"
 
 echo "== clean hedy tree =="
 run allow /tmp  'hedy hello'
 run allow /tmp  'JIRA_TOKEN=x hedy auth --json'
 run allow /tmp  'npx hedy auth'
-run allow /tmp  'node ~/trade-imports-arch-workspace/hedy/src/cli.js hello'
+run allow "$WS" 'node hedy/src/cli.js hello'
 run allow "$HEDY" './src/cli.js hello'
 
 echo "== secret reads =="
-run deny  /tmp  'grep foo ~/trade-imports-arch-workspace/.env -n'
-run deny  /tmp  'grep -n foo ~/trade-imports-arch-workspace/.env'
-run deny  /tmp  'jq . ~/trade-imports-arch-workspace/.env'
-run deny  /tmp  'cat x | awk 1 ~/trade-imports-arch-workspace/.env'
-run deny  /tmp  'echo $(grep token ~/trade-imports-arch-workspace/.env)'
+run deny  "$WS" 'grep foo .env -n'
+run deny  "$WS" 'grep -n foo .env'
+run deny  "$WS" 'jq . .env'
+run deny  "$WS" 'cat x | awk 1 .env'
+run deny  "$WS" 'echo $(grep token .env)'
 run deny  /tmp  'rg KEY ~/.aws/credentials'
-run allow /tmp  'grep -n foo ~/trade-imports-arch-workspace/README.md'
-run allow /tmp  'grep -rn auth ~/trade-imports-arch-workspace/.claude/tools'
+run allow "$WS" 'grep -n foo README.md'
+run allow "$WS" 'grep -rn auth .claude/tools'
 
 echo "== chmod =="
 run deny  /tmp  'chmod +x x.sh'
@@ -75,14 +77,14 @@ run allow /tmp  'echo chmod'
 
 echo "== executables by path and by launcher =="
 printf '#!/bin/bash\necho probe\n' > "$OUTSIDE"
-run allow /tmp  '~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh'
-run allow /tmp  'bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh'
+run allow "$WS" '.claude/tools/workspace/check-auth.sh'
+run allow "$WS" 'bash .claude/tools/workspace/check-auth.sh'
 run deny  /tmp  "$OUTSIDE"
 run deny  /tmp  "bash $OUTSIDE"
 run allow /tmp  'bash -c "echo hi"'
 run allow /tmp  'node -e "console.log(1)"'
 run allow /tmp  'python3 -m json.tool'
-run allow /tmp  'bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-workspace.sh ~/trade-imports-arch-workspace/analysis/x.md'
+run allow "$WS" 'bash .claude/tools/workspace/check-workspace.sh analysis/x.md'
 rm -f "$OUTSIDE"
 
 echo "== commits =="
@@ -136,15 +138,17 @@ run allow "$WS" 'git log -n 3'
 
 echo "== direnv exec as a wrapper =="
 run deny  "$WS" 'direnv exec . chmod +x x.sh'
-run deny  "$WS" 'direnv exec . grep token ~/trade-imports-arch-workspace/.env'
-run allow "$WS" 'direnv exec . bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-auth.sh'
+run deny  "$WS" 'direnv exec . grep token .env'
+run allow "$WS" 'direnv exec . bash .claude/tools/workspace/check-auth.sh'
 run allow "$WS" 'direnv exec . env'
 
-echo "== redirects =="
-run deny  /tmp  'ls /Users/benoit/projects'
-run deny  /tmp  'npm --prefix ~/trade-imports-arch-workspace/hedy ci'
-run deny  /tmp  'npm --prefix ~/projects/defra/trade-imports-arch-workspace/hedy install nock'
-run allow /tmp  'npm --prefix ~/projects/defra/trade-imports-arch-workspace/hedy test'
+echo "== absolute paths and npm =="
+run allow /tmp  "bash $WS/.claude/tools/workspace/check-auth.sh"
+run allow /tmp  "ls $WS"
+run allow /tmp  "npm --prefix $WS/hedy test"
+run allow /tmp  "npm --prefix $WS/hedy ci"
+
+echo "== chaining =="
 run deny  /tmp  'cd x && ls'
 run allow /tmp  "awk 'NR>1 && NR<3' f"
 run allow /tmp  'jq "select(.a && .b)" f.json'

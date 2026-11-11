@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Dependency doctor - verifies every skill's declared dependencies
 # resolve on this machine.
-# Invoke with bash (no execute bit required):
-#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-deps.sh
+# Invoke with bash from the workspace root (no execute bit required):
+#   bash .claude/tools/workspace/check-deps.sh
 #
 # Skills declare unbundled needs in SKILL.md frontmatter as
 #   metadata:
@@ -18,7 +18,7 @@
 
 set -u
 
-ROOT="$HOME/trade-imports-arch-workspace"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 
 say() { echo "deps-check: $1"; }
 
@@ -87,7 +87,7 @@ for skill_md in "$ROOT"/.claude/skills/*/SKILL.md; do
 
         if is_child "$token"; then
             if [[ ! -d "$ROOT/$token" ]]; then
-                say "FAIL $skill — project missing: $ROOT/$token (clone it: make -C ~/trade-imports-arch-workspace clone)"
+                say "FAIL $skill — project missing: $ROOT/$token (clone it: make -C $ROOT clone)"
                 FAIL=1
             fi
             continue

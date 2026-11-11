@@ -7,7 +7,7 @@ metadata:
 
 <!-- TODO: one-paragraph intro. State the audience (which tickets, which work) and the outcome (what artifact lands where). -->
 
-**Bash call hygiene** - one command per Bash call; paths in the literal `~/trade-imports-arch-workspace/...` form. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
+**Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 
 ## Usage
 
@@ -24,7 +24,7 @@ This skill needs demo-project demo-tool  - invoked at runtime instead of a local
 ## Step 0: Start
 
 ```bash
-~/trade-imports-arch-workspace/.claude/tools/test-depend/start-test-depend.sh TODO_ARGS
+.claude/tools/test-depend/start-test-depend.sh TODO_ARGS
 ```
 
 First stdout line is `MODE: <BRANCH>`. Branch on that value.
@@ -46,7 +46,7 @@ Next: TODO hint.
 
 ## Scripts cheat-sheet
 
-All under `~/trade-imports-arch-workspace/.claude/tools/test-depend/`:
+All under `.claude/tools/test-depend/`:
 
 | Script | Purpose |
 |---|---|

@@ -20,7 +20,7 @@ set -e
 
 [[ $# -eq 0 ]] && { sed -n '2,17p' "$0" >&2; exit 1; }
 
-WS="$HOME/trade-imports-arch-workspace"
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 RENDER="$WS/.claude/tools/mermaid-check/render-mermaid.sh"
 
 [[ -x "$RENDER" ]] || { echo "Missing helper: $RENDER" >&2; exit 1; }

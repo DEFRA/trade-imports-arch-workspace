@@ -11,8 +11,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$HOME/trade-imports-arch-workspace/.claude/tools/confluence"
-OUTPUT_DIR="$HOME/trade-imports-arch-workspace/.claude/workareas/confluence-sync"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+OUTPUT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd -P)/.claude/workareas/confluence-sync"
 
 if [[ -d "$OUTPUT_DIR" ]]; then
   echo "Removing $OUTPUT_DIR..."

@@ -1,12 +1,13 @@
 #!/bin/bash
 # Runs every case against the push guard and prints ok or FAIL per case.
-# Invoke with bash; $1 names the guard to test, the live hook by default:
-#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-git-push-tests.sh
-#   bash ~/trade-imports-arch-workspace/.claude/tools/workspace/guard-git-push-tests.sh <draft guard>
+# Invoke with bash from the workspace root; $1 names the guard to test, the
+# live hook by default:
+#   bash .claude/tools/workspace/guard-git-push-tests.sh
+#   bash .claude/tools/workspace/guard-git-push-tests.sh <draft guard>
 # The guard reads the command text only, so no case touches a repository.
 # Exit 1 when any case fails.
 set -u
-WS="$HOME/trade-imports-arch-workspace"
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 GUARD=${1:-$WS/.claude/hooks/guard-git-push.sh}
 FAILS=0
 
@@ -28,7 +29,7 @@ run deny  /tmp  'git push origin HEAD:refs/heads/main'
 run deny  /tmp  'git push origin HEAD'
 run deny  /tmp  'git push origin'
 run deny  /tmp  'git push'
-run deny  /tmp  'git -C ~/trade-imports-arch-workspace push origin main'
+run deny  /tmp  'git -C trade-imports-documentation push origin main'
 run deny  /tmp  'cd /tmp; git push origin main'
 run allow /tmp  'git push origin HEAD:feature'
 run allow /tmp  'git push -u origin feature'
