@@ -14,13 +14,19 @@ const sectionLines = (lines, heading, { source }) => {
   return end === -1 ? following : following.slice(0, end)
 }
 
-const tableCells = (line) => line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim())
+const tableCells = (line, { source }) => {
+  const cells = line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim())
+  if (cells.length !== 2) {
+    throw new HedyError('PARSE', `The row "${line.trim()}" in the language file at ${source} has ${cells.length} cells, not 2. Give the row one cell for the term and one for the repair, with no | inside either, then run the command again.`)
+  }
+  return cells
+}
 
 const tableRowsUnder = (lines, heading, { source }) => {
   const rows = sectionLines(lines, heading, { source })
     .filter((line) => line.startsWith('|'))
     .slice(2)
-    .map(tableCells)
+    .map((line) => tableCells(line, { source }))
   if (rows.length === 0) {
     throw new HedyError('PARSE', `The table under ${heading} in the language file at ${source} has no rows. Add at least one row to the table, then run the command again.`)
   }

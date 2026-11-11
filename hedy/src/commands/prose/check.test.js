@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Readable } from 'node:stream'
@@ -56,7 +56,11 @@ describe('runProseCheck', () => {
     ['AGENTS.md', 0],
     ['/abs/workspace/.claude/rules/x.md', 0],
     ['docs/page.md', 1],
-    ['docs/claude/CLAUDE.md.bak', 1]
+    ['docs/claude/CLAUDE.md.bak', 1],
+    ['.claude/worktrees/w/docs/page.md', 1],
+    ['/tmp/x/.claude/worktrees/w/docs/page.md', 1],
+    ['.claude/worktrees/w/.claude/skills/x/SKILL.md', 0],
+    ['.claude/worktrees/w/AGENTS.md', 0]
   ])('gives the text "You decide." labelled %s exactly %i banned findings', (label, count) => {
     const { findings } = check('You decide.\n', { label })
     expect(findings.filter(({ kind }) => kind === 'banned')).toHaveLength(count)
@@ -96,7 +100,9 @@ describe('runProseCheck', () => {
     ['an unspaced en dash', `pages 1${EN_DASH}5`],
     ['the abbreviation IT at the end of a sentence', 'The team runs IT.'],
     ['it inside a sentence', 'The service sends it to the queue'],
-    ['a slash between other words', 'Read the n/b note and the on/off switch.']
+    ['a slash between other words', 'Read the n/b note and the on/off switch.'],
+    ['it followed by a code span that ends the sentence', 'Pass it `--json`.'],
+    ['it followed by a URL that ends the sentence', 'Follow it https://example.test/page.']
   ])('reports no shape for %s', (_label, text) => {
     expect(check(text).findings).toEqual([])
   })
@@ -133,6 +139,10 @@ describe('runProseCheck', () => {
       passed: true,
       findings: [{ label: 'docs/page.md', line: 1, kind: 'examine', term: 'deliver', text: 'The team will deliver the report.', repair: rows.examine.find(({ forms }) => forms.includes('deliver')).repair }]
     })
+  })
+
+  it('reports the line of a CRLF text as written, without the carriage return', () => {
+    expect(check('Clean line.\r\nThe portal opens.\r\n').findings.map(({ line, text }) => ({ line, text }))).toEqual([{ line: 2, text: 'The portal opens.' }])
   })
 
   it('reports the findings of every text under its own label, in the order the texts are given', () => {
@@ -173,6 +183,23 @@ describe('the readers', () => {
     const path = join(folder, 'missing.md')
     const error = await rejectionOf(readFileText(path))
     expect(error).toMatchObject({ code: 'USAGE', message: `No file exists at ${path}. Check the path, then run the command again.` })
+  })
+
+  it('refuses a path under a file with USAGE naming the path', async () => {
+    const file = join(folder, 'page.md')
+    await writeFile(file, 'Line one.\n')
+    const path = join(file, 'x.md')
+    const error = await rejectionOf(readFileText(path))
+    expect(error).toMatchObject({ code: 'USAGE', message: `No file exists at ${path}. Check the path, then run the command again.` })
+  })
+
+  it('reports a path in a folder without permission as UNKNOWN naming the path and the next step', async () => {
+    const locked = join(folder, 'locked')
+    await mkdir(locked)
+    await chmod(locked, 0o000)
+    const path = join(locked, 'page.md')
+    const error = await rejectionOf(readFileText(path)).finally(() => chmod(locked, 0o700))
+    expect(error).toMatchObject({ code: 'UNKNOWN', message: `The path ${path} could not be read. Check that the path is a regular file with read permission, then run the command again.` })
   })
 
   it('refuses a folder with USAGE naming the path', async () => {

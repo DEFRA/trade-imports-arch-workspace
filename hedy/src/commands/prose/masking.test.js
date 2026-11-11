@@ -25,7 +25,8 @@ describe('maskText', () => {
   it.each([
     ['a ``` fenced block', 'Before\n```\nWe leverage it.\n```\nAfter'],
     ['a ~~~ fenced block', 'Before\n~~~\nWe leverage it.\n~~~\nAfter'],
-    ['a block opened by ``` and closed by ~~~', 'Before\n```\nWe leverage it.\n~~~\nAfter'],
+    ['a ```` block that holds a ``` block', 'Before\n````md\n```js\nWe leverage it.\n```\nWe leverage it.\n````\nAfter'],
+    ['a ``` block that holds a ~~~ line', 'Before\n```\n~~~\nWe leverage it.\n```\nAfter'],
     ['an indented fence', 'Before\n  ```js\nWe leverage it.\n  ```\nAfter'],
     ['a blockquote line', 'Before\n  > We leverage it.\nAfter'],
     ['a single-backtick span', 'Write `leverage` as data.'],
@@ -39,10 +40,12 @@ describe('maskText', () => {
 
   it.each([
     ['the lines before and after a fence', 'Before\n```\ncode\n```\nAfter', 'Before\n\n\n\nAfter'],
-    ['prose beside a span', 'Use leverage here, not `code`.', 'Use leverage here, not .'],
-    ['prose beside a URL', 'Use leverage at https://example.test/page.', 'Use leverage at '],
+    ['prose beside a span, with the span replaced by one @', 'Use leverage here, not `code`.', 'Use leverage here, not @.'],
+    ['prose beside a URL, with the URL replaced by one @', 'Use leverage at https://example.test/page.', 'Use leverage at @'],
     ['a --- rule that is not on line 1', '# Page\n\n---\nUse leverage here.', '# Page\n\n---\nUse leverage here.'],
+    ['a --- rule on line 1 that no later --- line closes', '---\nUse leverage here.', '---\nUse leverage here.'],
     ['the body after closed front matter', '---\ntitle: Page\n---\nUse leverage here.', '\n\n\nUse leverage here.'],
+    ['the lines after a fence that the same fence closes', 'A\n````\n```\n````\nUse leverage here.', 'A\n\n\n\nUse leverage here.'],
     ['a line with no masked region', 'Use leverage here.', 'Use leverage here.']
   ])('leaves %s unchanged', (_, text, masked) => {
     expect(maskText(text)).toBe(masked)
@@ -50,9 +53,13 @@ describe('maskText', () => {
 
   it.each([
     ['an unclosed fence', 'Before\n```\nWe leverage it.\nStill code', 'Before\n\n\n'],
-    ['unclosed front matter', '---\ntitle: We leverage it\nBody', '\n\n']
+    ['a ``` fence that a shorter or other fence does not close', 'Before\n````\nWe leverage it.\n```\n~~~~\nStill code', 'Before\n\n\n\n\n']
   ])('masks %s to the end of the text', (_, text, masked) => {
     expect(maskText(text)).toBe(masked)
+  })
+
+  it('splits a CRLF text into the same lines as the LF text', () => {
+    expect(maskText('Line one.\r\n`code` here.\r\n')).toBe('Line one.\n@ here.\n')
   })
 
   it.each(['fenced-exemplar.md', 'blockquote-quote.md'])('leaves no em dash and no curly quote in %s', async (name) => {

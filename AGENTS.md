@@ -67,7 +67,7 @@ credentials with the auth doctor below rather than inspecting the file.
 - `hedy confluence publish <page>` publishes one docs page to Confluence through the docs repo's publisher, after its pre-flight. The command publishes at once.
 - `hedy prose check <file>...` checks files, or a text read with `--stdin --label <name>`, against the word tables of `.claude/skills/authoring/references/language.md` and five sentence shapes. A banned word or a shape fails the run with exit 1, and every finding names its line and its repair.
 
-A bare `hedy` at a terminal opens a menu for people that reaches every command, and each write waits behind a plan or pre-flight screen and a confirm. Agents call the commands with `--json`. A bare `hedy` without a terminal, or with `--json` or `--no-ui`, is a usage error.
+A bare `hedy` at a terminal opens a menu for people that reaches the auth, Jira and Confluence commands, and each write waits behind a plan or pre-flight screen and a confirm. Agents call the commands with `--json`. A bare `hedy` without a terminal, or with `--json` or `--no-ui`, is a usage error.
 
 With `--json`, every command prints one envelope line, `{ ok, schema_version, hedy_version, result, errors, metadata }`, where `errors` lists `{ code, message }` entries. A command exits 0 on success, 1 on an error and 2 on a usage error.
 

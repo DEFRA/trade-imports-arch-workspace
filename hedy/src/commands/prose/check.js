@@ -53,8 +53,12 @@ const rulesOf = ({ banned, examine, shapes }) => [
   ...shapeRules(shapes)
 ]
 
-const isAgentInstructionFile = (label) =>
-  label.startsWith('.claude/') || label.includes('/.claude/') || ['CLAUDE.md', 'AGENTS.md'].includes(label.split('/').at(-1))
+const pathInsideWorktree = (label) => label.replace(/^(?:.*\/)?\.claude\/worktrees\/[^/]+\//, '')
+
+const isAgentInstructionFile = (label) => {
+  const path = pathInsideWorktree(label)
+  return path.startsWith('.claude/') || path.includes('/.claude/') || ['CLAUDE.md', 'AGENTS.md'].includes(path.split('/').at(-1))
+}
 
 const rulesForLabel = (rules, label) =>
   isAgentInstructionFile(label) ? rules.filter(({ scope }) => scope !== 'documents') : rules
@@ -66,7 +70,7 @@ const findingsOnLine = (rules, { label, line, maskedLine, text }) => rules.flatM
 
 const findingsInText = (rules, { label, text }) => {
   const labelRules = rulesForLabel(rules, label)
-  const lines = text.split('\n')
+  const lines = text.split(/\r?\n/)
   return maskText(text).split('\n').flatMap((maskedLine, index) =>
     findingsOnLine(labelRules, { label, line: index + 1, maskedLine, text: lines[index] }))
 }
@@ -111,8 +115,12 @@ export const renderProseCheck = (result) => [...result.findings.map(findingLines
 
 const missingFile = (path) => new HedyError('USAGE', `No file exists at ${path}. Check the path, then run the command again.`)
 
+const statError = (path, error) => ['ENOENT', 'ENOTDIR'].includes(error.code)
+  ? missingFile(path)
+  : new HedyError('UNKNOWN', `The path ${path} could not be read. Check that the path is a regular file with read permission, then run the command again.`, { cause: error })
+
 const checkRegularFile = async (path) => {
-  const status = await stat(path).catch((error) => { throw error.code === 'ENOENT' ? missingFile(path) : error })
+  const status = await stat(path).catch((error) => { throw statError(path, error) })
   if (!status.isFile()) {
     throw new HedyError('USAGE', `The path ${path} is not a regular file. Give the path of a file to check, then run the command again.`)
   }

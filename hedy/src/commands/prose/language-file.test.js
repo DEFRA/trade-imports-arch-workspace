@@ -71,6 +71,11 @@ describe('parseLanguageRows', () => {
       message: `The row whose Term cell is "frobnicate" in the language file at ${SOURCE} has no form in backticks. Put each form in backticks in the Term cell, then run the command again.`
     },
     {
+      title: 'a row with a third cell with PARSE naming the row',
+      text: languageText({ banned: ['| `frob` | use `a | b` instead |'] }),
+      message: `The row "| \`frob\` | use \`a | b\` instead |" in the language file at ${SOURCE} has 3 cells, not 2. Give the row one cell for the term and one for the repair, with no | inside either, then run the command again.`
+    },
+    {
       title: 'a form that starts with a hyphen with PARSE naming the form',
       text: languageText({ banned: ['| `-frob` | name the operation |'] }),
       message: `The form \`-frob\` in the language file at ${SOURCE} is not a word or phrase. A form holds only letters, digits, spaces, hyphens and straight apostrophes, starts with a letter or digit, and may end on one *. Correct the row in the file, then run the command again.`
