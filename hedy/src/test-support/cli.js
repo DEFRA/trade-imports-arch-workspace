@@ -22,17 +22,19 @@ const envelopeOf = (stdout) => {
  * else undefined.
  *
  * @param {string[]} args
- * @param {{ workspace?: string, env?: Record<string, string | undefined>, cwd?: string }} [options]
+ * @param {{ workspace?: string, env?: Record<string, string | undefined>, cwd?: string, input?: string }} [options]
  *   workspace is passed as --workspace before the arguments; without it the child uses the checkout it runs from.
- *   env is merged over process.env; a name set to undefined is left out of the child's environment
+ *   env is merged over process.env; a name set to undefined is left out of the child's environment.
+ *   input is written to the child's stdin, which then closes
  * @returns {Promise<{ stdout: string, stderr: string, exitCode: number, envelope: unknown }>}
  */
-export const runCli = async (args, { workspace, env = {}, cwd } = {}) => {
+export const runCli = async (args, { workspace, env = {}, cwd, input } = {}) => {
   const workspaceArgs = workspace === undefined ? [] : ['--workspace', workspace]
   const { stdout, stderr, exitCode } = await execa('node', [CLI_PATH, ...workspaceArgs, ...args], {
     reject: false,
     env: { ...process.env, ...env },
-    cwd
+    cwd,
+    input
   })
   return { stdout, stderr, exitCode, envelope: envelopeOf(stdout) }
 }

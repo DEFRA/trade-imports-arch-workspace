@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { z } from 'zod'
-import { ERROR_CODES, HedyError, isHedyError, toHedyError, toHedyErrors } from './errors.js'
+import { ERROR_CODES, HedyError, isHedyError, resultHeldBy, toHedyError, toHedyErrors } from './errors.js'
 
 describe('ERROR_CODES', () => {
-  it('holds exactly the seven codes and cannot be changed', () => {
-    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE'])
+  it('holds exactly the eight codes and cannot be changed', () => {
+    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE', 'PROSE'])
     expect(Object.isFrozen(ERROR_CODES)).toBe(true)
   })
 })
@@ -34,6 +34,30 @@ describe('HedyError', () => {
     const upstream = new Error('upstream')
     expect(new HedyError('UNKNOWN', 'x', { cause: upstream }).cause).toBe(upstream)
     expect(Object.hasOwn(new HedyError('UNKNOWN', 'x'), 'cause')).toBe(false)
+  })
+
+  it('keeps a result only when one is given, a null result included', () => {
+    const result = { passed: false, findings: [] }
+    expect(new HedyError('PROSE', 'x', { result }).result).toBe(result)
+    expect(new HedyError('PROSE', 'x', { result: null }).result).toBeNull()
+    expect(Object.hasOwn(new HedyError('PROSE', 'x'), 'result')).toBe(false)
+    expect(Object.hasOwn(new HedyError('PROSE', 'x', { cause: new Error('upstream') }), 'result')).toBe(false)
+  })
+})
+
+describe('resultHeldBy', () => {
+  it('returns the result of the first error that holds one, skipping errors that hold none', () => {
+    const first = { passed: false, findings: ['first'] }
+    const errors = [
+      new HedyError('USAGE', 'x'),
+      new HedyError('PROSE', 'y', { result: first }),
+      new HedyError('PROSE', 'z', { result: { passed: false, findings: ['second'] } })
+    ]
+    expect(resultHeldBy(errors)).toBe(first)
+  })
+
+  it('returns undefined when no error holds a result', () => {
+    expect(resultHeldBy([new HedyError('USAGE', 'x'), new HedyError('AUTH', 'y')])).toBeUndefined()
   })
 })
 
