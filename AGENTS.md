@@ -81,7 +81,6 @@ read its header) for usage.
 
 | Domain | Tools |
 | --- | --- |
-| `confluence/` | Hand tools for Confluence page writes and the folder sync. Reads are `hedy confluence page` |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
 | `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |

@@ -25,7 +25,6 @@ analysis/
 
 # Task-local skill run state (individual work, derived from the ignored analysis corpus).
 # Estate-state workareas (skills-audit, skill-creator) stay tracked - they are the payload.
-.claude/workareas/confluence-sync/
 # Task-local ticket drafts of the jira skill (manifests, descriptions, receipts)
 .claude/workareas/jira/
 
