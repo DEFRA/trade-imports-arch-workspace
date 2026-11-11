@@ -16,7 +16,7 @@ cd trade-imports-arch-workspace
 make
 ```
 
-`make` clones the child repos, creates the canonical symlink and verifies the result. The steps run individually as `make clone`, `make pull`, `make link` and `make check`; add `GIT_BASE=git@github.com:DEFRA` to clone over SSH.
+`make` clones the child repos, creates the canonical symlink and verifies the result. The steps run individually as `make clone`, `make pull`, `make link` and `make check`. Clones use SSH; add `GIT_BASE=https://github.com/DEFRA` to clone over HTTPS.
 
 The symlink is part of a path contract: everything in the workspace refers to the root as `~/trade-imports-arch-workspace`, so the same commands work on every machine regardless of where the checkout lives. The contract is documented in `.claude/rules/workspace-paths.md`.
 
