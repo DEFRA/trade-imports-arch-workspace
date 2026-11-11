@@ -27,8 +27,6 @@
       "Bash(tail:*)",
       "Bash(wc:*)",
       "Bash(~/trade-imports-arch-workspace/.claude/tools/:*)",
-      "Skill(editorial)",
-      "Skill(editorial-triage)",
       "Skill(skill-creator)",
       "WebFetch(domain:agents.md)"
     ],
@@ -56,6 +54,11 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-git-push.sh\"",
             "timeout": 10
           }
+
+
+
+
+
         ]
       },
       {

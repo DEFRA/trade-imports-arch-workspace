@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# Pre-commit: lint the skills estate when staged changes touch .claude/,
-# and gate all staged markdown through the editorial style check.
+# Pre-commit: lint and test the hedy CLI when staged changes touch hedy/,
+# lint the skills estate when staged changes touch .claude/ or the
+# Makefile, and run the scaffold and workspace golden suites when staged
+# changes touch a gated tools domain.
 # Wired via `git config core.hooksPath .githooks` (make link does this).
-# Tool-agnostic by design — fires for any editor or agent. Bypassing
+# Tool-agnostic by design: runs for any editor or agent. Bypassing
 # with --no-verify is denied by the workspace's own bash guard.
 #
 # Lints the STAGED INDEX, not the worktree: the content being committed
 # is checked out into a temp HOME (the same seam the golden tests use),
-# so an unstaged fix can't mask a staged break and vice versa.
+# so an unstaged fix cannot mask a staged break and vice versa.
 
 STAGED=$(git diff --cached --name-only)
-MD_STAGED=$(git diff --cached --name-only --diff-filter=ACMR \
-    | grep -E '\.md$' | grep -v '^\.claude/tools/[^/]*/tests/')
 
 # hedy CLI: lint and test in the WORKTREE's hedy/, not the staged copy -
 # the installed packages (hedy/node_modules/, gitignored) exist only in
@@ -27,69 +27,33 @@ if echo "$STAGED" | grep -q '^hedy/'; then
     }
 fi
 
-NEED_TMP=0
-echo "$STAGED" | grep -Eq '^(\.claude/|Makefile$)' && NEED_TMP=1
-[ -n "$MD_STAGED" ] && NEED_TMP=1
-[ "$NEED_TMP" -eq 0 ] && exit 0
+# Everything below applies only when the skills estate or the Makefile
+# is staged. Doc-only commits stay fast.
+echo "$STAGED" | grep -Eq '^(\.claude/|Makefile$)' || exit 0
 
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 git checkout-index --prefix="$TMP/trade-imports-arch-workspace/" -a
 
-if echo "$STAGED" | grep -Eq '^(\.claude/|Makefile$)'; then
-    if ! HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh"; then
-        echo "pre-commit: skills lint failed on the staged content - fix and re-stage" >&2
-        exit 1
-    fi
-    # Golden suites run when staged paths touch a gated tools domain —
-    # the edit-generator-forget-to-bless failure a commit gate exists
-    # to catch. ALL suites run for any gated domain: the scaffold's
-    # blessed stdout embeds lint-skills.sh output, so a workspace-side
-    # lint change can break scaffold goldens too. Doc-only commits
-    # stay fast.
-    if echo "$STAGED" | grep -Eq '^\.claude/tools/(skill-creator|workspace|editorial|editorial-triage|editorial-metrics|pr)/'; then
-        HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/run-golden.sh" || {
-            echo "pre-commit: scaffold goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
-            exit 1
-        }
-        HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/workspace/tests/run-golden.sh" || {
-            echo "pre-commit: deps-doctor goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
-            exit 1
-        }
-        HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/editorial/tests/run-golden.sh" || {
-            echo "pre-commit: prose-gate goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
-            exit 1
-        }
-        HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/editorial-triage/tests/run-golden.sh" || {
-            echo "pre-commit: triage goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
-            exit 1
-        }
-        HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/editorial-metrics/tests/run-golden.sh" || {
-            echo "pre-commit: editorial-metrics goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
-            exit 1
-        }
-    fi
+if ! HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/workspace/lint-skills.sh"; then
+    echo "pre-commit: skills lint failed on the staged content - fix and re-stage" >&2
+    exit 1
 fi
 
-# Editorial style gate on every staged markdown file (estate-wide), run
-# against the STAGED content with the STAGED gate script. The gate's own
-# test fixtures legitimately hold banned bytes and are excluded above.
-if [ -n "$MD_STAGED" ]; then
-    GATE="$TMP/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh"
-    if [ ! -f "$GATE" ]; then
-        echo "pre-commit: prose gate missing from staged tree ($GATE)" >&2
+# Golden suites run when staged paths touch a gated tools domain -
+# the edit-generator-forget-to-bless failure a commit gate exists
+# to catch. Both suites run for any gated domain: the scaffold's
+# blessed stdout embeds lint-skills.sh output, so a workspace-side
+# lint change can break scaffold goldens too.
+if echo "$STAGED" | grep -Eq '^\.claude/tools/(skill-creator|workspace|pr)/'; then
+    HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/skill-creator/tests/run-golden.sh" || {
+        echo "pre-commit: scaffold goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
         exit 1
-    fi
-    RC=0
-    while IFS= read -r f; do
-        [ -n "$f" ] || continue
-        [ -f "$TMP/trade-imports-arch-workspace/$f" ] || continue
-        bash "$GATE" "$TMP/trade-imports-arch-workspace/$f" \
-            2> >(sed "s|$TMP/trade-imports-arch-workspace/||g" >&2) || RC=1
-    done <<< "$MD_STAGED"
-    if [ "$RC" -ne 0 ]; then
-        echo "pre-commit: editorial style gate failed on staged markdown - fix the FAIL lines and re-stage" >&2
+    }
+    HOME="$TMP" bash "$TMP/trade-imports-arch-workspace/.claude/tools/workspace/tests/run-golden.sh" || {
+        echo "pre-commit: deps-doctor goldens failed on staged content - re-bless with reviewed diffs, or fix" >&2
         exit 1
-    fi
+    }
 fi
+
 exit 0

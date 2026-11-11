@@ -52,4 +52,4 @@ Collect every open decision from the conversation and its working records and pr
 - "ask me the open questions"
 - "what do I need to decide"
 
-**Disambiguation:** Distinct from /init (CLAUDE.md scaffolding) and from editorial-triage, whose Decide section and spot check close review findings inside a triage run; /decide gathers any open decisions of the current work, from any domain, and puts them to the user as question prompts. It decides nothing itself and owns no domain state.
+**Disambiguation:** Distinct from /init (CLAUDE.md scaffolding). /decide gathers any open decisions of the current work, from any domain, and puts them to the user as question prompts. It decides nothing itself and owns no domain state.

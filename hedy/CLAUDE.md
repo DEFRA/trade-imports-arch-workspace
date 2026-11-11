@@ -73,4 +73,4 @@ npm --prefix <real checkout path>/hedy test
 
 ## User-Facing Text
 
-Help text, error messages and text output follow `.claude/best-practices/writing/language.md`.
+Help text, error messages and text output follow `.claude/best-practices/writing/writing.md`.

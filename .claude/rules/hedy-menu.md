@@ -9,7 +9,7 @@ These rules apply to every file under `hedy/src/menu/`, tests included, on top o
 
 ## Language
 
-- Every string a person reads follows `.claude/best-practices/writing/language.md`.
+- Every string a person reads follows `.claude/best-practices/writing/writing.md`.
 - A screen addresses the person as "you" and states the action in plain words.
 - An error names the next step the person can take.
 

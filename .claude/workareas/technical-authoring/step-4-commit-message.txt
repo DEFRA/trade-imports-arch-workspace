@@ -1,0 +1,12 @@
+refactor(editorial): Delete the editorial estate
+
+The authoring skill replaces the editorial, editorial-triage,
+editorial-help and design-consistency skills, their tool domains with
+editorial-metrics, language.md, the authoring-voice rule, the
+snapshot and ubiquitous-language guides, the commit-msg hook, the
+saved triage workflow, and the workareas that existed only for them.
+The prose gate goes with no replacement: its word table and 41 golden
+cases are preserved under workareas/technical-authoring/gate-data/
+for a later hedy check. lint-skills.sh drops the checks that read the
+deleted rule and hook, and pre-commit drops the prose gate and the
+three deleted golden suites.

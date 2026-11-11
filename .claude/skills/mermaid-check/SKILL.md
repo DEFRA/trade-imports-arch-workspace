@@ -1,6 +1,6 @@
 ---
 name: mermaid-check
-description: 'Authors and verifies Mermaid diagrams in Markdown files and standalone .mmd files, rendering each with mermaid-cli to confirm it parses before a doc ships. Use when adding a diagram to a document, or when checking that existing diagrams still render. Triggers: "check mermaid", "validate diagrams", "verify mermaid renders", "add a diagram". Owns Mermaid syntax, diagram-type fit and render correctness only. NOT for label wording, jargon or acronym-on-first-use, which belong to `editorial`. NOT for LikeC4 `.c4` models, which have their own `npm run validate:c4` and `npm run build:diagrams`. NOT for Claude Code CLAUDE.md scaffolding, which is the built-in /init.'
+description: 'Authors and verifies Mermaid diagrams in Markdown files and standalone .mmd files, rendering each with mermaid-cli to confirm it parses before a doc ships. Use when adding a diagram to a document, or when checking that existing diagrams still render. Triggers: "check mermaid", "validate diagrams", "verify mermaid renders", "add a diagram". Owns Mermaid syntax, diagram-type fit and render correctness only. NOT for label wording, jargon or acronym-on-first-use, which belong to `authoring`. NOT for LikeC4 `.c4` models, which have their own `npm run validate:c4` and `npm run build:diagrams`. NOT for Claude Code CLAUDE.md scaffolding, which is the built-in /init.'
 model: sonnet
 metadata:
   workspace-soft-deps: delivery-info-arch-tooling trade-imports-documentation npm npx mmdc
@@ -23,23 +23,23 @@ Diagrams here live in two places. Nearly all are fenced ` ```mermaid ` blocks in
 
 Also run Verify unprompted before publishing any document you have added or edited a diagram in.
 
-NOT for label wording, acronym introduction, or jargon in diagram text - that is `editorial`, and the handoff is described below. NOT for LikeC4 `.c4` architecture models, which are validated by `npm run validate:c4` and exported by `npm run build:diagrams` in `trade-imports-documentation`. NOT for whether a diagram should exist at all, which is an editorial judgement about the document.
+NOT for label wording, acronym introduction, or jargon in diagram text - that is `authoring`, and the handoff is described below. NOT for LikeC4 `.c4` architecture models, which are validated by `npm run validate:c4` and exported by `npm run build:diagrams` in `trade-imports-documentation`. NOT for whether a diagram should exist at all, which the document's plan decides.
 
-## Working with `editorial`
+## Working with `authoring`
 
-The two skills split on a clean line: **`mermaid-check` owns whether the diagram parses and whether the diagram type fits; `editorial` owns the words inside the diagram.**
+The two skills split on a clean line: **`mermaid-check` owns whether the diagram parses and whether the diagram type fits. `authoring` owns the words inside the diagram.**
 
 | Concern | Owner |
 | --- | --- |
 | Does it render | `mermaid-check` |
 | Right diagram type for what is being shown | `mermaid-check` |
-| Exact identifiers, no em-dashes in labels | `mermaid-check` (mechanical rules from the editorial [language guide](../../best-practices/writing/language.md)) |
-| Label wording, jargon, acronym on first use | `editorial` |
-| Whether the diagram earns its place in the document | `editorial` |
+| Exact identifiers, no em-dashes in labels | `mermaid-check` (the punctuation and heading rules in [writing.md](../../best-practices/writing/writing.md)) |
+| Label wording, jargon, acronym on first use | `authoring` |
+| Whether the diagram earns its place in the document | `authoring` |
 
-In practice: when `editorial` is reviewing a document that contains diagrams, run Verify as part of the pass and report render failures alongside the prose findings. When this skill authors a diagram whose labels introduce a term the document has not used before, say so and hand that to `editorial` rather than settling the wording here.
+In practice: when the authoring skill's drafting agent draws a diagram, the agent checks the diagram here through the single-block entry point below. When this skill authors a diagram whose labels introduce a term the document has not used before, say so and hand that to `authoring` rather than settling the wording here.
 
-The mechanical rules in the third row are borrowed deliberately, not duplicated. They are the subset of the editorial language guide that can be checked without reading the surrounding prose. Everything requiring document context stays with `editorial`.
+The mechanical rules in the third row are the subset of `writing.md` that can be checked without reading the surrounding prose. Everything requiring document context stays with `authoring`.
 
 ## Step 0: Start
 
@@ -103,7 +103,7 @@ mermaid-check complete for <path>.
 Failures:
   <file>:<line>  <what was wrong, what was changed>
 
-Next: <re-run after fixes, or hand label wording to editorial>.
+Next: <re-run after fixes, or hand label wording to authoring>.
 ```
 
 When nothing failed, say so in one line and give the counts. When nothing was found, say that explicitly rather than reporting success.

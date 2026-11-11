@@ -66,8 +66,5 @@ check:
 	@bash .claude/tools/workspace/lint-skills.sh
 	@bash .claude/tools/skill-creator/tests/run-golden.sh
 	@bash .claude/tools/workspace/tests/run-golden.sh
-	@bash .claude/tools/editorial/tests/run-golden.sh
-	@bash .claude/tools/editorial-triage/tests/run-golden.sh
-	@bash .claude/tools/editorial-metrics/tests/run-golden.sh
 	@cd "$(REAL)/hedy" && npm run lint
 	@cd "$(REAL)/hedy" && npm test

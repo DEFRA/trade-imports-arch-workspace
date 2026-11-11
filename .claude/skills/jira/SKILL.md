@@ -31,13 +31,13 @@ NOT for transitions or comments - `hedy` has no command for them, so extend `hed
 
 ## Writing Ticket Content
 
-Before drafting a summary or a new or replacement description, follow the [editorial skill](../editorial/SKILL.md) and its [language guide](../../best-practices/writing/language.md). Jira fields have a fixed shape, so you do not need to select a Diátaxis mode.
+Before drafting a summary or a new or replacement description, follow the [authoring skill](../authoring/SKILL.md)'s ticket form and [writing.md](../../best-practices/writing/writing.md). Jira fields have a fixed shape, so the ticket form in the authoring skill applies.
 
 - Keep the summary specific and aim for fewer than 80 characters.
-- Put the problem, user need or reason before implementation detail.
-- State scope and important boundaries explicitly.
+- State why the work is needed: the problem, user need or reason.
+- State the outcome the work must reach, with its scope and important boundaries.
 - Write acceptance criteria as observable outcomes that someone can verify.
-- Separate context, proposed work and acceptance criteria when the ticket needs all three.
+- State the constraints, and never how to do the work.
 - Preserve exact identifiers and interface labels. In Jira wiki markup, format code tokens as `{{token}}`.
 
 **Write Jira wiki markup, not markdown.** The v2 API accepts any text but renders only wiki markup, so markdown backticks and pipe tables display as literal characters. Wiki markup uses `h3.` headings, `{{token}}` for monospace, `*bold*`, `||header||` table rows and `#` numbered lists.

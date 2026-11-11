@@ -82,7 +82,7 @@ run deny  /tmp  "bash $OUTSIDE"
 run allow /tmp  'bash -c "echo hi"'
 run allow /tmp  'node -e "console.log(1)"'
 run allow /tmp  'python3 -m json.tool'
-run allow /tmp  'bash ~/trade-imports-arch-workspace/.claude/tools/editorial/check-prose.sh ~/trade-imports-arch-workspace/analysis/x.md'
+run allow /tmp  'bash ~/trade-imports-arch-workspace/.claude/tools/workspace/check-workspace.sh ~/trade-imports-arch-workspace/analysis/x.md'
 rm -f "$OUTSIDE"
 
 echo "== commits =="

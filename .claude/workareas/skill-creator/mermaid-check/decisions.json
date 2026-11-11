@@ -24,7 +24,7 @@
         "verify mermaid renders",
         "add a diagram"
       ],
-      "disambiguation": "Not /init (which scaffolds CLAUDE.md). Owns Mermaid syntax and render correctness only: label wording, jargon and acronym-on-first-use belong to editorial, which this skill hands off to and is handed off from. Not for LikeC4 .c4 models, which have their own validate and export commands."
+      "disambiguation": "Not /init (which scaffolds CLAUDE.md). Owns Mermaid syntax and render correctness only: label wording, jargon and acronym-on-first-use belong to authoring, which this skill hands off to and is handed off from. Not for LikeC4 .c4 models, which have their own validate and export commands."
     }
   }
 }

@@ -13,6 +13,13 @@
 #   3. Fenced code blocks invoking child projects or beyond-baseline
 #      tools (node, npm, npx, mmdc) in a skill that declares no matching
 #      token. Judgment stays human; the warn surfaces candidates.
+# Rule checks (FAIL -> exit 1; silent when clean or when the input is absent):
+#   4. Every .claude/rules/*.md with frontmatter has the one shape Claude
+#      Code reads: keys paths, gate-paths or
+#      gate-exclude, each followed by one or more `  - "glob"` lines;
+#      globs of letters, digits, space, _ . / * ? and -, ** only as a whole
+#      segment, and no wildcard without a / (it may match at any depth).
+#      A frontmatter Claude Code cannot read loads the rule everywhere.
 #
 # Triggers: make check, the scaffold tail, and the pre-commit hook.
 
@@ -142,6 +149,49 @@ done
 for doc in "$ROOT"/.claude/best-practices/skills/*.md; do
     [[ -e "$doc" ]] || continue
     check_links "$doc"
+done
+
+# 4. Rule frontmatter shape.
+PARSE_NOTE="Claude Code loads a rule whose frontmatter it cannot read in every session"
+for rule in "$ROOT"/.claude/rules/*.md; do
+    [[ -e "$rule" ]] || continue
+    [[ "$(head -n 1 "$rule")" == "---" ]] || continue
+    rel="${rule#"$ROOT"/}"
+    problems=$(awk '
+        function endkey() { if (key != "" && items == 0) print keyline "\tkey " key " lists no glob" }
+        NR == 1 { next }
+        /^---$/ { endkey(); closed = 1; exit }
+        /^$/ { print NR "\tblank line inside the frontmatter"; next }
+        /^[^ ]/ {
+            endkey(); key = ""
+            k = $0
+            if (k !~ /^[a-z-]+:$/) { print NR "\tnot a bare key line (a key, a colon, and its list on the lines below)"; next }
+            sub(/:$/, "", k)
+            if (k != "paths" && k != "gate-paths" && k != "gate-exclude") { print NR "\tunknown key " k " (paths, gate-paths or gate-exclude)"; next }
+            if (k in seen) print NR "\tkey " k " repeated"
+            seen[k] = 1; key = k; keyline = NR; items = 0; next
+        }
+        {
+            if (key == "") { print NR "\tlist entry outside a key"; next }
+            if ($0 !~ /^  - "[^"]*"$/) { print NR "\tnot one double-quoted glob on a \"  - \" line"; next }
+            g = $0; sub(/^  - "/, "", g); sub(/"$/, "", g); items++
+            if (g == "") { print NR "\tempty glob"; next }
+            if (g ~ /[^A-Za-z0-9 _.\/*?-]/) { print NR "\tglob \"" g "\" holds a character outside letters, digits, space, _ . / * ? -"; next }
+            n = split(g, seg, "/")
+            for (i = 1; i <= n; i++) if (seg[i] ~ /\*\*/ && seg[i] != "**") { print NR "\tglob \"" g "\" uses ** inside a segment"; break }
+            if (g ~ /[*?]/ && g !~ /\//) print NR "\tglob \"" g "\" has a wildcard but no /, so it may match at any depth"
+        }
+        END {
+            if (!closed) print NR "\tfrontmatter never closed with ---"
+            else if (!("paths" in seen) && !("gate-paths" in seen)) print "1\tno paths or gate-paths list"
+        }' "$rule")
+    if [[ -n "$problems" ]]; then
+        while IFS=$'\t' read -r line reason; do
+            say "FAIL $rel:$line — $reason ($PARSE_NOTE)"
+        done <<< "$problems"
+        FAIL=1
+        continue
+    fi
 done
 
 if [[ "$FAIL" -eq 1 ]]; then
