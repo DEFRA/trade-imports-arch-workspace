@@ -1,12 +1,11 @@
 # Workspace bootstrap - clones the child architecture repos this workspace wraps.
 # See CLAUDE.md and .claude/rules/workspace-paths.md for the layout contract.
 #
-#   make            clone missing children, create the canonical symlink, verify
+#   make            clone missing children, install, verify
 #   make clone      clone the child repos; wires origin on any that
 #                   exist without one (idempotent)
 #   make pull       fast-forward the children
-#   make link       create ~/trade-imports-arch-workspace -> this checkout,
-#                   point core.hooksPath at .githooks (pre-commit lint),
+#   make install    point core.hooksPath at .githooks (pre-commit lint),
 #                   install hedy/ and npm-link hedy onto PATH
 #   make check      run the doctors, the skills lint, the golden tests
 #                   and the hedy CLI lint and tests
@@ -16,13 +15,10 @@
 
 GIT_BASE ?= git@github.com:DEFRA
 CHILDREN := trade-imports-documentation delivery-info-arch-tooling trade-imports-schemas
-CANONICAL := $(HOME)/trade-imports-arch-workspace
-# Resolved checkout path: npm never runs across the canonical symlink.
-REAL := $(shell cd "$(CURDIR)" && pwd -P)
 
-.PHONY: setup clone pull link check
+.PHONY: setup clone pull install check
 
-setup: clone link check
+setup: clone install check
 
 # Converges each child to the correct state: present AND origin wired.
 # A bare directory target would treat any pre-existing directory as
@@ -46,19 +42,13 @@ pull:
 
 # hedy: a bare `npm link` from inside hedy/, never `npm --prefix`: asdf's
 # npm wrapper reshims only after the bare form, which puts hedy on PATH.
-link:
-	@if [ -e $(CANONICAL) ] || [ -L $(CANONICAL) ]; then \
-		echo "link: $(CANONICAL) already present"; \
-	else \
-		ln -s $(CURDIR) $(CANONICAL); \
-		echo "link: $(CANONICAL) -> $(CURDIR)"; \
-	fi
+install:
 	@git config core.hooksPath .githooks
-	@echo "link: core.hooksPath -> .githooks (pre-commit skills lint)"
-	@echo "link: npm ci in $(REAL)/hedy"
-	@cd "$(REAL)/hedy" && npm ci
-	@echo "link: npm link in $(REAL)/hedy (hedy onto PATH)"
-	@cd "$(REAL)/hedy" && npm link
+	@echo "install: core.hooksPath -> .githooks (pre-commit skills lint)"
+	@echo "install: npm ci in hedy/"
+	@cd hedy && npm ci
+	@echo "install: npm link in hedy/ (hedy onto PATH)"
+	@cd hedy && npm link
 
 check:
 	@bash .claude/tools/workspace/check-workspace.sh
@@ -66,5 +56,5 @@ check:
 	@bash .claude/tools/workspace/lint-skills.sh
 	@bash .claude/tools/skill-creator/tests/run-golden.sh
 	@bash .claude/tools/workspace/tests/run-golden.sh
-	@cd "$(REAL)/hedy" && npm run lint
-	@cd "$(REAL)/hedy" && npm test
+	@cd hedy && npm run lint
+	@cd hedy && npm test
