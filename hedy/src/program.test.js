@@ -237,6 +237,8 @@ describe('runProgram with no command', () => {
   })
 
   it('with no launcher injected opens the real menu on the given terminal streams and exits 0 after Quit', async () => {
+    // Load the menu before the wait below, so the wait times the menu opening and not the first load of Ink.
+    await import('./menu/launch.js')
     const stdout = fakeStdout()
     const stdin = fakeStdin()
     const codes = []

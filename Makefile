@@ -7,7 +7,7 @@
 #   make pull       fast-forward the children
 #   make install    check for Node 24, point core.hooksPath at .githooks
 #                   (pre-commit lint), install hedy/ and npm-link hedy
-#                   onto PATH
+#                   onto PATH, and install the docs repo's packages
 #   make check      run hedy workspace check, the deps doctor, the skills
 #                   lint, the golden tests and the hedy CLI lint and tests
 #
@@ -56,6 +56,12 @@ install:
 	@cd hedy && npm ci
 	@echo "install: npm link in hedy/ (hedy onto PATH)"
 	@cd hedy && npm link
+	@if [ -d trade-imports-documentation ]; then \
+		echo "install: npm install in trade-imports-documentation/ (links the tooling)"; \
+		cd trade-imports-documentation && npm install; \
+	else \
+		echo "install: trade-imports-documentation/ is not cloned - run make clone, then make install"; \
+	fi
 
 check:
 	@hedy workspace check

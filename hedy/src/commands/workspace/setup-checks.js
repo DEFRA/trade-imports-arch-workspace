@@ -6,6 +6,19 @@ import { findStat, locateDocsRepo } from '../confluence/docs-repo.js'
 
 const setupError = (message) => new HedyError('SETUP', message)
 
+/**
+ * Returns env without the variables that point git at a repository, such as
+ * the GIT_DIR and GIT_INDEX_FILE that git sets for a hook, so a git call reads
+ * the repository its -C folder names.
+ *
+ * @param {Record<string, string | undefined>} env
+ * @returns {Record<string, string | undefined>}
+ */
+export const withoutRepositoryLocation = (env) => {
+  const locating = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_PREFIX']
+  return Object.fromEntries(Object.entries(env).filter(([name]) => !locating.includes(name)))
+}
+
 const wordList = (words) => words.length <= 1 ? words.join('') : `${words.slice(0, -1).join(', ')} and ${words.at(-1)}`
 
 const realpathOrUndefined = async (path) => {
@@ -64,7 +77,7 @@ const checkBaselineTools = async ({ env }) => {
 const childProblem = async ({ root, child, env, runTool }) => {
   const folder = join(root, child)
   if ((await findStat(stat, folder))?.isDirectory() !== true) return `${child} is not cloned`
-  const { exitCode } = await runTool({ command: 'git', args: ['-C', folder, 'remote', 'get-url', 'origin'], env })
+  const { exitCode } = await runTool({ command: 'git', args: ['-C', folder, 'remote', 'get-url', 'origin'], env: withoutRepositoryLocation(env) })
   return exitCode === 0 ? undefined : `${child} has no origin remote`
 }
 
@@ -78,7 +91,7 @@ const checkChildRepos = async ({ root, env, runTool }) => {
 }
 
 const checkGitHooks = async ({ root, env, runTool }) => {
-  const { stdout } = await runTool({ command: 'git', args: ['-C', root, 'config', '--get', 'core.hooksPath'], env })
+  const { stdout } = await runTool({ command: 'git', args: ['-C', root, 'config', '--get', 'core.hooksPath'], env: withoutRepositoryLocation(env) })
   const hooksPath = stdout.trim()
   if (hooksPath === '.githooks') return 'core.hooksPath is .githooks'
   throw setupError(`core.hooksPath is ${hooksPath === '' ? 'not set' : hooksPath}, so the pre-commit gates do not run. Set it with make -C ${root} install.`)

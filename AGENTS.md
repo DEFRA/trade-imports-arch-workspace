@@ -45,14 +45,11 @@ The workspace has no fixed location, so a checkout works wherever it is cloned. 
 hedy workspace check
 ```
 
-The root `Makefile` bootstraps a fresh machine. `make` clones any missing child repo, runs `make install`, which points `core.hooksPath` at `.githooks` and puts `hedy` on PATH, and then runs the check above. The steps also run one at a time as `make clone`, `make pull`, `make install` and `make check`. Children clone over SSH, and `GIT_BASE=https://github.com/DEFRA` clones them over HTTPS.
+The root `Makefile` bootstraps a fresh machine. `make` clones any missing child repo, runs `make install`, which points `core.hooksPath` at `.githooks`, puts `hedy` on PATH and installs the docs repo's packages, and then runs the check above. The steps also run one at a time as `make clone`, `make pull`, `make install` and `make check`. Children clone over SSH, and `GIT_BASE=https://github.com/DEFRA` clones them over HTTPS.
 
 ## Credentials
 
-The root `.env` holds Atlassian credentials, loaded into the environment
-by direnv. Never read it - not with file readers, not with `jq`/`grep`
-style tools. Scripts consume its variables from the environment; verify
-credentials with the auth doctor below rather than inspecting the file.
+The root `.env` holds the Atlassian credentials, and `hedy` reads the file itself. Never read the file, with file readers or with `jq`/`grep` style tools. Verify the credentials with `hedy auth`, which reports display names only, rather than inspecting the file.
 
 ## The `hedy` CLI
 
@@ -82,7 +79,6 @@ read its header) for usage.
 
 | Domain | Tools |
 | --- | --- |
-| `confluence/` | Hand tools for Confluence page writes and the folder sync. Reads are `hedy confluence page` |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
 | `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
