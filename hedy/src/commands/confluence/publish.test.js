@@ -172,7 +172,7 @@ describe('runPublish pre-flight refusals', () => {
     const confirmCalls = []
     const error = await rejectionOf(publish({ page: 'docs/systems/HEDY/components.md', env: {}, confirm: recordingConfirm(confirmCalls) }))
     expect(error.code).toBe('USAGE')
-    expect(error.message).toBe('The page docs/systems/HEDY/components.md embeds diagrams whose exports are missing or stale: mermaid "hedy-flow" (missing). Run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run build:mmd, then run the command again. The page also holds 1 fenced Mermaid block(s). Check each block renders before the build.')
+    expect(error.message).toBe(`The page docs/systems/HEDY/components.md embeds diagrams whose exports are missing or stale: mermaid "hedy-flow" (missing). Run npm --prefix ${await realpath(docsRepo)} run build:mmd, then run the command again. The page also holds 1 fenced Mermaid block(s). Check each block renders before the build.`)
     expect(await publisherRan()).toBe(false)
     expect(confirmCalls).toEqual([])
   })
@@ -385,7 +385,7 @@ describe('the confluence publish command', () => {
 })
 
 describe('hedy confluence publish, spawned', () => {
-  const childEnv = { HEDY_WORKSPACE: undefined, JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined }
+  const childEnv = { JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined }
 
   it('with no page gives one USAGE entry naming the page argument and exits 2', async () => {
     const result = await runCli(['--workspace', root, 'confluence', 'publish', '--json'], { env: childEnv })
@@ -400,7 +400,7 @@ describe('hedy confluence publish, spawned', () => {
       const result = await runCli(['--workspace', bare, 'confluence', 'publish', 'x.md', '--json'], { env: childEnv })
       expect(result.exitCode).toBe(2)
       expect(result.envelope.errors.map(({ code }) => code)).toEqual(['USAGE'])
-      expect(result.envelope.errors[0].message).toContain('make -C ~/trade-imports-arch-workspace clone')
+      expect(result.envelope.errors[0].message).toContain(`make -C ${bare} clone`)
     } finally {
       await rm(bare, { recursive: true, force: true })
     }

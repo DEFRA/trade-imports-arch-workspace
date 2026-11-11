@@ -56,7 +56,7 @@ describe('the jira group', () => {
 
 describe('hedy jira --help, spawned', () => {
   it('lists the ticket, search, create and describe commands and exits 0', async () => {
-    const result = await runCli(['jira', '--help'], { env: { HEDY_WORKSPACE: root } })
+    const result = await runCli(['jira', '--help'], { workspace: root })
     expect(result.exitCode).toBe(0)
     expect(result.stdout).toMatch(/^ {2}ticket <key>\s/m)
     expect(result.stdout).toMatch(/^ {2}search \[options\] <jql>\s/m)

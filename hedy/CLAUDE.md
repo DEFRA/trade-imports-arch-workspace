@@ -53,7 +53,7 @@ All paths are under `hedy/src/`.
 - `exit-codes.js` is the exit map: 0 for success, 1 for an error, 2 for a usage error.
 - `envelope.js` builds the JSON envelope: `ok`, `schema_version`, `hedy_version`, `result`, `errors`, and `metadata.ranAt` on success only.
 - `run-action.js` writes a command's result: one JSON line on stdout with `--json`, text otherwise, notes on stderr, and the exit code from the map. An `AggregateError` reports several errors at once, one envelope entry or stderr line per error, with the lowest exit code among them.
-- `workspace-root.js` resolves the workspace from `--workspace`, then `HEDY_WORKSPACE`, then `~/trade-imports-arch-workspace`. It never walks up from the current folder.
+- `workspace-root.js` resolves the workspace from `--workspace`, else from the checkout that holds the hedy source. It never walks up from the current folder.
 - `test-support/cli.js` spawns the entry and returns stdout, stderr, the exit code and the parsed envelope.
 - `test-support/http.js` sets up nock for a test file: real connections are refused, and interceptors are removed after each test. It also holds the test credentials, the credentials environment, the Basic header builder, the failure table the client tests share, a reader for JSON fixtures, a loopback server that never answers for timeout tests, and `startAnsweringServer`, a loopback server for spawned tests that answers with the status and JSON body the test gives and records each request's URL and Authorization header.
 - `test-support/io.js` captures what a command or `runAction` writes to stdout and stderr and the exit codes it sets.
@@ -63,12 +63,12 @@ All paths are under `hedy/src/`.
 
 ## npm
 
-Run npm against the checkout's real path and type plain `npm`. Where the shell wraps `npm` in a function, that function routes installs through Socket Firewall, and `command npm` would skip the check. The Bash guard denies `npm --prefix` across the canonical symlink and for install-like commands on any workspace path, so install from inside the folder.
+Type plain `npm`. Where the shell wraps `npm` in a function, that function routes installs through Socket Firewall, and `command npm` would skip the check. From the workspace root:
 
 ```
-(cd <real checkout path>/hedy; npm ci)
-npm --prefix <real checkout path>/hedy run lint
-npm --prefix <real checkout path>/hedy test
+npm --prefix hedy ci
+npm --prefix hedy run lint
+npm --prefix hedy test
 ```
 
 ## User-Facing Text

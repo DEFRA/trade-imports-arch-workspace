@@ -121,6 +121,6 @@ export const inventoryAssets = async ({ docsRepo, pagePath, text }) => {
     images: await imagesOf({ docsRepo, pagePath, text, diagrams }),
     fencedMermaidBlocks: fencedMermaidBlockCount(text),
     buildNeeded,
-    buildCommands: buildNeeded.map((script) => `npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation run ${script}`)
+    buildCommands: buildNeeded.map((script) => `npm --prefix ${docsRepo} run ${script}`)
   }
 }

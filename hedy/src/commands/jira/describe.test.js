@@ -178,13 +178,13 @@ describe('the jira describe command', () => {
 })
 
 describe('hedy jira describe, spawned', () => {
-  const childEnv = () => ({ HEDY_WORKSPACE: root, JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined })
+  const childEnv = () => ({ JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined })
 
   it.each([
     ['with no key', ['jira', 'describe', '--json'], "'key'"],
     ['with a key and no --from', ['jira', 'describe', 'HEDY-101', '--json'], '--from']
   ])('%s gives one USAGE entry naming %s and exits 2', async (_label, args, fragment) => {
-    const result = await runCli(args, { env: childEnv() })
+    const result = await runCli(args, { workspace: root, env: childEnv() })
     expect(result.exitCode).toBe(2)
     expect(result.envelope.ok).toBe(false)
     expect(result.envelope.errors.map(({ code }) => code)).toEqual(['USAGE'])
@@ -195,7 +195,7 @@ describe('hedy jira describe, spawned', () => {
     const server = await startAnsweringServer(() => ({ status: 200, body: issueResponse }))
     try {
       await writeFile(join(root, '.env'), `JIRA_USER=file-user\nJIRA_TOKEN=file-token\nJIRA_BASE_URL=${server.baseUrl}\n`)
-      const result = await runCli(['jira', 'describe', 'HEDY-101', '--from', descriptionPath, '--json'], { env: childEnv() })
+      const result = await runCli(['jira', 'describe', 'HEDY-101', '--from', descriptionPath, '--json'], { workspace: root, env: childEnv() })
       expect(result.exitCode).toBe(0)
       expect(result.envelope.ok).toBe(true)
       expect(result.envelope.result.mode).toBe('dry-run')

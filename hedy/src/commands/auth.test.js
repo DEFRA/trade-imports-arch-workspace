@@ -143,7 +143,6 @@ describe('hedy auth, spawned', () => {
   })
 
   const childEnv = (overrides = {}) => ({
-    HEDY_WORKSPACE: root,
     JIRA_USER: undefined,
     JIRA_TOKEN: undefined,
     JIRA_BASE_URL: undefined,
@@ -153,7 +152,7 @@ describe('hedy auth, spawned', () => {
   const writeEnvFile = (lines) => writeFile(join(root, '.env'), `${lines.join('\n')}\n`)
 
   it('with no .env and no credentials gives one AUTH entry naming all three variables, exit 1, and sends no request', async () => {
-    const result = await runCli(['auth', '--json'], { env: childEnv() })
+    const result = await runCli(['auth', '--json'], { workspace: root, env: childEnv() })
     expect(result.exitCode).toBe(1)
     expect(result.envelope.ok).toBe(false)
     expect(result.envelope.errors).toHaveLength(1)
@@ -164,7 +163,7 @@ describe('hedy auth, spawned', () => {
 
   it('reads the credentials from the workspace .env and probes both services with them', async () => {
     await writeEnvFile(['JIRA_USER=file-user', 'JIRA_TOKEN=file-token', `JIRA_BASE_URL=${server.baseUrl}`])
-    const result = await runCli(['auth', '--json'], { env: childEnv() })
+    const result = await runCli(['auth', '--json'], { workspace: root, env: childEnv() })
     expect(result.exitCode).toBe(1)
     expect(result.envelope.errors.map(({ code }) => code)).toEqual(['AUTH', 'AUTH'])
     expect([...server.requests].sort((a, b) => a.url.localeCompare(b.url))).toEqual([
@@ -175,7 +174,7 @@ describe('hedy auth, spawned', () => {
 
   it('takes a variable from the environment over the same variable in the workspace .env', async () => {
     await writeEnvFile(['JIRA_USER=file-user', 'JIRA_TOKEN=file-token', `JIRA_BASE_URL=${server.baseUrl}`])
-    const result = await runCli(['auth', '--json'], { env: childEnv({ JIRA_TOKEN: 'env-token' }) })
+    const result = await runCli(['auth', '--json'], { workspace: root, env: childEnv({ JIRA_TOKEN: 'env-token' }) })
     expect(result.exitCode).toBe(1)
     expect(server.requests.map(({ authorization }) => authorization)).toEqual([
       basicAuthorizationFor('file-user', 'env-token'),

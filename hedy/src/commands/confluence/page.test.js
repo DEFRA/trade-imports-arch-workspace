@@ -194,13 +194,13 @@ describe('the confluence page command', () => {
 })
 
 describe('hedy confluence page, spawned', () => {
-  const childEnv = () => ({ HEDY_WORKSPACE: root, JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined })
+  const childEnv = () => ({ JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined })
 
   it.each([
     ['a reference that is not a page', ['confluence', 'page', 'ftp://x', '--json'], 'The reference ftp://x is not a Confluence page.'],
     ['an unknown --format', ['confluence', 'page', '12', '--format', 'pdf', '--json'], '--format']
   ])('with %s gives one USAGE entry and no AUTH entry, so no .env was read, and exits 2', async (_label, args, message) => {
-    const result = await runCli(args, { env: childEnv() })
+    const result = await runCli(args, { workspace: root, env: childEnv() })
     expect(result.exitCode).toBe(2)
     expect(result.envelope.ok).toBe(false)
     expect(result.envelope.errors.map(({ code }) => code)).toEqual(['USAGE'])
@@ -211,7 +211,7 @@ describe('hedy confluence page, spawned', () => {
     const server = await startAnsweringServer(() => ({ status: 200, body: pageResponse }))
     try {
       await writeFile(join(root, '.env'), `JIRA_USER=file-user\nJIRA_TOKEN=file-token\nJIRA_BASE_URL=${server.baseUrl}\n`)
-      const result = await runCli(['confluence', 'page', '123456'], { env: childEnv() })
+      const result = await runCli(['confluence', 'page', '123456'], { workspace: root, env: childEnv() })
       expect(result.exitCode).toBe(0)
       expect(result.stdout.replaceAll(server.baseUrl, ATLASSIAN_BASE_URL)).toBe(pageText.replace(/\n$/, ''))
       expect(server.requests.map(({ authorization }) => authorization)).toEqual([basicAuthorizationFor('file-user', 'file-token')])

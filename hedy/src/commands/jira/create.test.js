@@ -248,14 +248,14 @@ describe('the jira create command', () => {
 })
 
 describe('hedy jira create, spawned', () => {
-  const childEnv = () => ({ HEDY_WORKSPACE: root, JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined })
+  const childEnv = () => ({ JIRA_USER: undefined, JIRA_TOKEN: undefined, JIRA_BASE_URL: undefined })
 
   it.each([
     ['with no --from', ['jira', 'create', '--json'], "'--from <path>'"],
     ['with a --from path that holds no manifest', ['jira', 'create', '--from', '/nonexistent/ticket.json', '--json'], '/nonexistent/ticket.json'],
     ['with a plan id that is not 64 hex characters', ['jira', 'create', '--from', '/nonexistent/ticket.json', '--confirm', 'abc', '--json'], 'The plan id abc']
   ])('%s gives one USAGE entry naming %s and exits 2', async (_label, args, fragment) => {
-    const result = await runCli(args, { env: childEnv() })
+    const result = await runCli(args, { workspace: root, env: childEnv() })
     expect(result.exitCode).toBe(2)
     expect(result.envelope.ok).toBe(false)
     expect(result.envelope.errors.map(({ code }) => code)).toEqual(['USAGE'])
@@ -263,7 +263,7 @@ describe('hedy jira create, spawned', () => {
   })
 
   it('with the fixture manifest and no .env returns the dry run and exits 0', async () => {
-    const result = await runCli(['jira', 'create', '--from', manifestPath, '--json'], { env: childEnv() })
+    const result = await runCli(['jira', 'create', '--from', manifestPath, '--json'], { workspace: root, env: childEnv() })
     expect(result.exitCode).toBe(0)
     expect(result.envelope.ok).toBe(true)
     expect(result.envelope.result.mode).toBe('dry-run')

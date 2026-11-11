@@ -23,19 +23,19 @@ export const findStat = async (statOf, path) => {
 const realDocsRepo = async (workspaceRoot) => {
   const folder = join(workspaceRoot, 'trade-imports-documentation')
   if ((await findStat(stat, folder))?.isDirectory() !== true) {
-    throw new HedyError('USAGE', `The docs repo is not at ${folder}. Clone it with make -C ~/trade-imports-arch-workspace clone, then run the command again.`)
+    throw new HedyError('USAGE', `The docs repo is not at ${folder}. Clone it with make -C ${workspaceRoot} clone, then run the command again.`)
   }
   return realpath(folder)
 }
 
-const checkToolingInstalled = async (docsRepo) => {
+const checkToolingInstalled = async ({ docsRepo, workspaceRoot }) => {
   const toolingPackage = 'node_modules/@defra/delivery-info-arch-tooling'
   const entry = join(docsRepo, ...toolingPackage.split('/'))
   if (await findStat(lstat, entry) === undefined) {
-    throw new HedyError('USAGE', `The docs repo at ${docsRepo} is not installed: ${toolingPackage} is missing. Run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install, then run the command again.`)
+    throw new HedyError('USAGE', `The docs repo at ${docsRepo} is not installed: ${toolingPackage} is missing. Run npm --prefix ${docsRepo} install, then run the command again.`)
   }
   if (await findStat(stat, entry) === undefined) {
-    throw new HedyError('USAGE', `The docs repo at ${docsRepo} links ${toolingPackage} to a folder that does not exist. Clone the tooling with make -C ~/trade-imports-arch-workspace clone and run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install, then run the command again.`)
+    throw new HedyError('USAGE', `The docs repo at ${docsRepo} links ${toolingPackage} to a folder that does not exist. Clone the tooling with make -C ${workspaceRoot} clone and run npm --prefix ${docsRepo} install, then run the command again.`)
   }
 }
 
@@ -50,7 +50,7 @@ const checkToolingInstalled = async (docsRepo) => {
  */
 export const locateDocsRepo = async (workspaceRoot) => {
   const docsRepo = await realDocsRepo(workspaceRoot)
-  await checkToolingInstalled(docsRepo)
+  await checkToolingInstalled({ docsRepo, workspaceRoot })
   return { docsRepo, configPath: join(docsRepo, 'scripts', 'confluence', 'confluence-config.json') }
 }
 

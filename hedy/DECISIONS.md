@@ -28,7 +28,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 **Folder.** The CLI lives at `hedy/` in the workspace root, not under `.claude/`, and has no nested `.claude/` folder. The edit guard blocks agent writes to any `.claude/hooks/` folder and any `.claude/settings.json`, and a session started inside `hedy/` would lose the workspace skills. The rails are therefore root-scoped: `hedy/CLAUDE.md`, the CLI rule files in `.claude/rules/`, and hooks in `.claude/hooks/`.
 
-**Install.** `make link` runs `npm link` from the checkout's real path, because the Bash guard denies `npm --prefix` across the canonical symlink. Agents type the bare name `hedy` under the `Bash(hedy:*)` allowlist entry.
+**Install.** `make install` runs a bare `npm link` from inside `hedy/`, because the asdf npm wrapper reshims only after the bare form, and the reshim puts `hedy` on PATH. Agents type the bare name `hedy` under the `Bash(hedy:*)` allowlist entry.
 
 **Push guard.** A workspace hook denies force pushes and any push to `main`, and names the branch form to use. Unattended runs make an unreviewed push to `main` possible, and the hook guards against that path. The residual is that the hook sees only commands typed through the Bash tool, so until a ruleset exists on `main`, GitHub accepts a push to `main` from any other route.
 
@@ -46,7 +46,7 @@ This file records the design decisions behind `hedy` and the reason for each. It
 
 ## Workspace Root
 
-**Resolution.** `hedy` takes the root from `--workspace`, then `HEDY_WORKSPACE`, then the canonical path `~/trade-imports-arch-workspace`. It never walks up from the current folder, because the workspace path contract forbids runtime root discovery. Both overrides exist for tests and for machines without the canonical symlink.
+**Resolution.** `hedy` takes the root from `--workspace`, else from the checkout that holds its own source, two folders above `hedy/src/`. Node loads a linked package from its real path, so the root is the real checkout path wherever the checkout was cloned. `hedy` never walks up from the current folder, because a person can run `hedy` from any folder. `--workspace` exists for tests and for a workspace other than the one `hedy` was installed from.
 
 **Roster last.** The roster file and the workspace verbs that read it arrive in the final increment, because no skill calls them. The roster is read inside those verbs and never at import, because in `tim` a missing manifest read at import crashes every command with a raw stack trace.
 

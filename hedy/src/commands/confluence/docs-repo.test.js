@@ -40,14 +40,14 @@ describe('locateDocsRepo', () => {
     await rm(docsRepo, { recursive: true })
     const error = await rejectionOf(locateDocsRepo(workspace))
     expect(error.code).toBe('USAGE')
-    expect(error.message).toBe(`The docs repo is not at ${join(workspace, 'trade-imports-documentation')}. Clone it with make -C ~/trade-imports-arch-workspace clone, then run the command again.`)
+    expect(error.message).toBe(`The docs repo is not at ${join(workspace, 'trade-imports-documentation')}. Clone it with make -C ${workspace} clone, then run the command again.`)
   })
 
   it('refuses a docs repo without the tooling package with USAGE naming the repo and the install command', async () => {
     await rm(toolingEntry(), { recursive: true })
     const error = await rejectionOf(locateDocsRepo(workspace))
     expect(error.code).toBe('USAGE')
-    expect(error.message).toBe(`The docs repo at ${docsRepo} is not installed: node_modules/@defra/delivery-info-arch-tooling is missing. Run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install, then run the command again.`)
+    expect(error.message).toBe(`The docs repo at ${docsRepo} is not installed: node_modules/@defra/delivery-info-arch-tooling is missing. Run npm --prefix ${docsRepo} install, then run the command again.`)
   })
 
   it('refuses a tooling package linked to a folder that does not exist with USAGE naming the clone and the install commands', async () => {
@@ -55,7 +55,7 @@ describe('locateDocsRepo', () => {
     await symlink(join(workspace, 'delivery-info-arch-tooling'), toolingEntry())
     const error = await rejectionOf(locateDocsRepo(workspace))
     expect(error.code).toBe('USAGE')
-    expect(error.message).toBe(`The docs repo at ${docsRepo} links node_modules/@defra/delivery-info-arch-tooling to a folder that does not exist. Clone the tooling with make -C ~/trade-imports-arch-workspace clone and run npm --prefix ~/trade-imports-arch-workspace/trade-imports-documentation install, then run the command again.`)
+    expect(error.message).toBe(`The docs repo at ${docsRepo} links node_modules/@defra/delivery-info-arch-tooling to a folder that does not exist. Clone the tooling with make -C ${workspace} clone and run npm --prefix ${docsRepo} install, then run the command again.`)
   })
 
   it('rejects with the file system error, not as a missing folder, when the tooling package is a link that loops', async () => {
