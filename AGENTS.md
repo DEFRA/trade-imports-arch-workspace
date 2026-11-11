@@ -126,15 +126,18 @@ read the SKILL.md and follow it as a procedure - the scripts it calls
 run anywhere. Conventions shared by all skills:
 `.claude/best-practices/skills/agent-skills.md`.
 
-The house writing standard is `.claude/best-practices/writing/writing.md`.
-Every agent reads it before drafting prose, and a subagent brief names
-it, so the standard is in context before the first draft. The authoring
+The house writing standard is `.claude/best-practices/writing/writing.md`,
+and the words, phrases and sentence shapes it rules out are listed with
+their repairs in `.claude/skills/authoring/references/language.md`.
+Every agent reads both before drafting prose, and a subagent brief names
+them, so the standard is in context before the first draft. The authoring
 skill, `.claude/skills/authoring/SKILL.md`, plans a page or deck with
 the author, hands the drafting to a fresh agent, line edits an existing
 page, and writes pull request bodies, tickets and commit messages.
 
 No mechanical prose check runs. The closing pass in the authoring skill
-is the check.
+is the check, and it applies every row of `language.md` by reading. To
+ban a word, add a row to that file.
 
 ## Git, GitHub and pull requests
 
