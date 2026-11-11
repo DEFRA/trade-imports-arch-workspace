@@ -17,12 +17,17 @@ STAGED=$(git diff --cached --name-only)
 # hedy CLI: lint and test in the WORKTREE's hedy/, not the staged copy -
 # the installed packages (hedy/node_modules/, gitignored) exist only in
 # the worktree. Git runs hooks from the repository root.
+#
+# The tests run with git's hook variables removed. A hook inherits
+# GIT_DIR, GIT_INDEX_FILE and GIT_PREFIX from the committing git, and any
+# git the tests run in a temporary folder would otherwise read this
+# repository instead of that folder.
 if echo "$STAGED" | grep -q '^hedy/'; then
     (cd hedy && npm run lint) || {
         echo "pre-commit: hedy CLI lint failed - fix and re-stage" >&2
         exit 1
     }
-    (cd hedy && npm test) || {
+    (cd hedy && for v in "${!GIT_@}"; do unset "$v"; done && npm test) || {
         echo "pre-commit: hedy CLI tests failed - fix and re-stage" >&2
         exit 1
     }

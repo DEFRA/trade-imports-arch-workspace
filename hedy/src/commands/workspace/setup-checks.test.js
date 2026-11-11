@@ -6,7 +6,7 @@ import { runLocalTool } from '../../local-tool.js'
 import { createWorkspace } from '../../test-support/cli.js'
 import { copyFixtureDocsRepo } from '../../test-support/docs-repo.js'
 import { rejectionOf } from '../../test-support/http.js'
-import { SETUP_CHECKS } from './setup-checks.js'
+import { SETUP_CHECKS, withoutRepositoryLocation } from './setup-checks.js'
 
 const created = []
 
@@ -49,7 +49,7 @@ const failureOf = async (name, overrides) => {
   return error.message
 }
 
-const git = (args, cwd = root) => runLocalTool({ command: 'git', args, cwd, env: process.env })
+const git = (args, cwd = root) => runLocalTool({ command: 'git', args, cwd, env: withoutRepositoryLocation(process.env) })
 
 const writeJson = (path, value) => writeFile(path, JSON.stringify(value))
 
@@ -147,6 +147,33 @@ describe('the git hooks check', () => {
   ])('fails when core.hooksPath is %s, with make install', async (shown, value) => {
     if (value !== null) await git(['config', 'core.hooksPath', value])
     expect(await failureOf('Git hooks')).toBe(`core.hooksPath is ${shown}, so the pre-commit gates do not run. Set it with make -C ${root} install.`)
+  })
+})
+
+describe('the git calls under a git hook', () => {
+  it('ignore GIT_DIR and GIT_INDEX_FILE, so the check reads the workspace and never touches the repo a hook points at', async () => {
+    const hookRepo = await tempFolder('hedy-hook-repo-')
+    await git(['init', '--quiet'], hookRepo)
+    await git(['init', '--quiet'])
+    await git(['config', 'core.hooksPath', '.githooks'])
+    const env = { ...process.env, GIT_DIR: join(hookRepo, '.git'), GIT_INDEX_FILE: join(hookRepo, '.git', 'index') }
+    expect(await runCheck('Git hooks', { env })).toBe('core.hooksPath is .githooks')
+    expect((await git(['config', '--get', 'core.hooksPath'], hookRepo)).stdout).toBe('')
+  })
+
+  it('withoutRepositoryLocation drops every variable that points git at a repository and keeps the rest', () => {
+    expect(withoutRepositoryLocation({
+      PATH: '/bin',
+      GIT_DIR: 'a',
+      GIT_WORK_TREE: 'b',
+      GIT_INDEX_FILE: 'c',
+      GIT_COMMON_DIR: 'd',
+      GIT_OBJECT_DIRECTORY: 'e',
+      GIT_ALTERNATE_OBJECT_DIRECTORIES: 'f',
+      GIT_NAMESPACE: 'g',
+      GIT_PREFIX: 'h',
+      GIT_SSH_COMMAND: 'ssh'
+    })).toEqual({ PATH: '/bin', GIT_SSH_COMMAND: 'ssh' })
   })
 })
 
