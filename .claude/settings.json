@@ -90,6 +90,18 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start-workspace-check.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
     ]
   }
 }
