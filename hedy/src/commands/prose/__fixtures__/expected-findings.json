@@ -1,0 +1,579 @@
+{
+  "cases": [
+    {
+      "case": "alone-warn",
+      "input": "pages/alone-warn.md",
+      "label": "pages/alone-warn.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "examine",
+          "term": "alone"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "blockquote-quote",
+      "input": "pages/blockquote-quote.md",
+      "label": "pages/blockquote-quote.md",
+      "findings": [],
+      "deferred": []
+    },
+    {
+      "case": "clean",
+      "input": "pages/clean.md",
+      "label": "pages/clean.md",
+      "findings": [],
+      "deferred": []
+    },
+    {
+      "case": "compression-asides",
+      "input": "pages/compression-asides.md",
+      "label": "pages/compression-asides.md",
+      "findings": [],
+      "deferred": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "aside stacking"
+        },
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "spaced hyphen"
+        },
+        {
+          "line": 5,
+          "kind": "shape",
+          "term": "spaced hyphen"
+        }
+      ]
+    },
+    {
+      "case": "compression-contact",
+      "input": "pages/compression-contact.md",
+      "label": "pages/compression-contact.md",
+      "findings": [],
+      "deferred": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "contact clause"
+        }
+      ]
+    },
+    {
+      "case": "compression-ledger",
+      "input": "pages/compression-ledger.md",
+      "label": "pages/compression-ledger.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "examine",
+          "term": "held open under, argued under, its case is made, point back to, stated below the table, collected under"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "curly-quotes",
+      "input": "pages/curly-quotes.md",
+      "label": "pages/curly-quotes.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "curly quote"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "double-backtick",
+      "input": "pages/double-backtick.md",
+      "label": "pages/double-backtick.md",
+      "findings": [
+        {
+          "line": 5,
+          "kind": "shape",
+          "term": "em dash"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "emdash",
+      "input": "pages/emdash.md",
+      "label": "pages/emdash.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "em dash"
+        },
+        {
+          "line": 5,
+          "kind": "shape",
+          "term": "em dash"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "endash-break",
+      "input": "pages/endash-break.md",
+      "label": "pages/endash-break.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "spaced en dash"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "faq-label",
+      "input": "pages/faq-label.md",
+      "label": "pages/faq-label.md",
+      "findings": [],
+      "deferred": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "faq label"
+        },
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "header preposition"
+        },
+        {
+          "line": 11,
+          "kind": "shape",
+          "term": "faq label"
+        }
+      ]
+    },
+    {
+      "case": "fenced-exemplar",
+      "input": "pages/fenced-exemplar.md",
+      "label": "pages/fenced-exemplar.md",
+      "findings": [],
+      "deferred": []
+    },
+    {
+      "case": "heading-case",
+      "input": "pages/heading-case.md",
+      "label": "pages/heading-case.md",
+      "findings": [],
+      "deferred": [
+        {
+          "line": 7,
+          "kind": "shape",
+          "term": "heading case"
+        },
+        {
+          "line": 19,
+          "kind": "shape",
+          "term": "heading case"
+        }
+      ]
+    },
+    {
+      "case": "hyphen-break",
+      "input": "pages/hyphen-break.md",
+      "label": "pages/hyphen-break.md",
+      "findings": [],
+      "deferred": [
+        {
+          "line": 7,
+          "kind": "shape",
+          "term": "spaced hyphen"
+        }
+      ]
+    },
+    {
+      "case": "inventory-opener",
+      "input": "pages/inventory-opener.md",
+      "label": "pages/inventory-opener.md",
+      "findings": [],
+      "deferred": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "inventory opener"
+        },
+        {
+          "line": 5,
+          "kind": "shape",
+          "term": "inventory opener"
+        },
+        {
+          "line": 7,
+          "kind": "shape",
+          "term": "inventory opener"
+        },
+        {
+          "line": 9,
+          "kind": "shape",
+          "term": "semicolon"
+        }
+      ]
+    },
+    {
+      "case": "jargon-new",
+      "input": "pages/jargon-new.md",
+      "label": "pages/jargon-new.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "banned",
+          "term": "seamless"
+        },
+        {
+          "line": 3,
+          "kind": "banned",
+          "term": "user-friendly"
+        },
+        {
+          "line": 5,
+          "kind": "banned",
+          "term": "seamless"
+        },
+        {
+          "line": 5,
+          "kind": "banned",
+          "term": "streamlined"
+        },
+        {
+          "line": 7,
+          "kind": "banned",
+          "term": "load-bearing"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "jargon-shape",
+      "input": "pages/jargon-shape.md",
+      "label": "pages/jargon-shape.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "examine",
+          "term": "shape, shapes"
+        },
+        {
+          "line": 4,
+          "kind": "examine",
+          "term": "bounds"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "jargon",
+      "input": "pages/jargon.md",
+      "label": "pages/jargon.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "banned",
+          "term": "facilitate"
+        },
+        {
+          "line": 3,
+          "kind": "banned",
+          "term": "leverage"
+        },
+        {
+          "line": 3,
+          "kind": "banned",
+          "term": "portal"
+        },
+        {
+          "line": 3,
+          "kind": "banned",
+          "term": "utilise"
+        },
+        {
+          "line": 3,
+          "kind": "examine",
+          "term": "deliver"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "metaphor-softens",
+      "input": "pages/metaphor-softens.md",
+      "label": "pages/metaphor-softens.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "examine",
+          "term": "softens, bootstrapped, axis"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "metaphor-warn",
+      "input": "pages/metaphor-warn.md",
+      "label": "pages/metaphor-warn.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "examine",
+          "term": "lands, bites"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "na-cell",
+      "input": "pages/na-cell.md",
+      "label": "pages/na-cell.md",
+      "findings": [
+        {
+          "line": 1,
+          "kind": "shape",
+          "term": "N/A"
+        },
+        {
+          "line": 5,
+          "kind": "shape",
+          "term": "N/A"
+        },
+        {
+          "line": 7,
+          "kind": "shape",
+          "term": "N/A"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "portal-proper-noun",
+      "input": "pages/portal-proper-noun.md",
+      "label": "pages/portal-proper-noun.md",
+      "findings": [
+        {
+          "line": 5,
+          "kind": "banned",
+          "term": "portal"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "question-heading",
+      "input": "pages/question-heading.md",
+      "label": "pages/question-heading.md",
+      "findings": [],
+      "deferred": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "faq heading"
+        },
+        {
+          "line": 7,
+          "kind": "shape",
+          "term": "faq heading"
+        },
+        {
+          "line": 15,
+          "kind": "shape",
+          "term": "faq heading"
+        },
+        {
+          "line": 19,
+          "kind": "shape",
+          "term": "faq heading"
+        }
+      ]
+    },
+    {
+      "case": "question-opener",
+      "input": "pages/question-opener.md",
+      "label": "pages/question-opener.md",
+      "findings": [],
+      "deferred": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "faq opener"
+        },
+        {
+          "line": 7,
+          "kind": "shape",
+          "term": "faq opener"
+        },
+        {
+          "line": 8,
+          "kind": "shape",
+          "term": "faq label"
+        },
+        {
+          "line": 12,
+          "kind": "shape",
+          "term": "faq opener"
+        },
+        {
+          "line": 14,
+          "kind": "shape",
+          "term": "faq opener"
+        }
+      ]
+    },
+    {
+      "case": "semicolon-body",
+      "input": "pages/semicolon-body.md",
+      "label": "pages/semicolon-body.md",
+      "findings": [],
+      "deferred": [
+        {
+          "line": 7,
+          "kind": "shape",
+          "term": "semicolon"
+        }
+      ]
+    },
+    {
+      "case": "trailing-pronoun",
+      "input": "pages/trailing-pronoun.md",
+      "label": "pages/trailing-pronoun.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "shape",
+          "term": "trailing it"
+        },
+        {
+          "line": 5,
+          "kind": "shape",
+          "term": "trailing it"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "vague-warn",
+      "input": "pages/vague-warn.md",
+      "label": "pages/vague-warn.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "examine",
+          "term": "appropriate"
+        },
+        {
+          "line": 3,
+          "kind": "examine",
+          "term": "robust"
+        },
+        {
+          "line": 5,
+          "kind": "examine",
+          "term": "foster"
+        },
+        {
+          "line": 5,
+          "kind": "examine",
+          "term": "overarching"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "stdin-title-viol",
+      "input": "stdin/stdin-title-viol.txt",
+      "label": "title",
+      "findings": [
+        {
+          "line": 1,
+          "kind": "shape",
+          "term": "em dash"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "stdin-title-clean",
+      "input": "stdin/stdin-title-clean.txt",
+      "label": "title",
+      "findings": [],
+      "deferred": []
+    },
+    {
+      "case": "stdin-print-fail-lines",
+      "input": "stdin/stdin-print-fail-lines.txt",
+      "label": "plines",
+      "findings": [
+        {
+          "line": 1,
+          "kind": "banned",
+          "term": "seamless"
+        },
+        {
+          "line": 1,
+          "kind": "shape",
+          "term": "em dash"
+        },
+        {
+          "line": 3,
+          "kind": "banned",
+          "term": "portal"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "scope-docs-page",
+      "input": "pages/scope-docs.md",
+      "label": "docs/page.md",
+      "findings": [
+        {
+          "line": 3,
+          "kind": "banned",
+          "term": "you, your"
+        },
+        {
+          "line": 7,
+          "kind": "examine",
+          "term": "simply"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "scope-docs-agent-skill",
+      "input": "pages/scope-docs.md",
+      "label": ".claude/skills/x/SKILL.md",
+      "findings": [
+        {
+          "line": 7,
+          "kind": "examine",
+          "term": "simply"
+        }
+      ],
+      "deferred": []
+    },
+    {
+      "case": "scope-docs-agent-claude-md",
+      "input": "pages/scope-docs.md",
+      "label": "hedy/CLAUDE.md",
+      "findings": [
+        {
+          "line": 7,
+          "kind": "examine",
+          "term": "simply"
+        }
+      ],
+      "deferred": []
+    }
+  ]
+}

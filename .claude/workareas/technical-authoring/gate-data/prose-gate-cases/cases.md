@@ -45,3 +45,28 @@ These are the 41 cases of the deleted `check-prose.sh` golden suite, blessed on 
 | `scope-bad-token` | `--terms bad-scope.md page.md`, run inside `scope-docs/` | `fixtures/scope-docs/bad-scope.md` and `fixtures/scope-docs/page.md` | `expected/scope-bad-token.txt` |
 | `profile-discovery` | `profile-discovery/pages/page.md` | `fixtures/profile-discovery/pages/page.md`, with `fixtures/profile-discovery/editorial-profile.md` found by discovery | `expected/profile-discovery.txt` |
 | `profile-discovery-stdin` | `--stdin --label profile-discovery/pages/page.md --print-fail-lines` | `fixtures/profile-discovery/pages/page.md` on stdin, with `fixtures/profile-discovery/editorial-profile.md` found by discovery | `expected/profile-discovery-stdin.txt` |
+
+## Mapping to hedy Prose Check
+
+The file `hedy/src/commands/prose/__fixtures__/expected-findings.json` holds the findings that each case gives under `hedy prose check`, as `{ line, kind, term }`. The script `gate-data/derive-expected-findings.mjs` derived the file from the expected outputs, and each case was reviewed against its expected output on 11 November 2026. The script applied these rules:
+
+- A FAIL line whose message names a banned term maps to `banned`, as does the message for a lower-case `portal`. A WARN line whose message names terms maps to `examine`. In both, `term` lists the named terms that appear on that line, in the order of the message.
+- The punctuation message maps to one `shape` finding for each mark on the line: `em dash`, `spaced en dash` or `curly quote`. The `N/A` message maps to `N/A`, and the trailing-pronoun message maps to `trailing it`.
+- A message for a shape outside round 1 maps to an entry under `deferred`, so that round 3 has the data. The names are `faq heading`, `faq label`, `faq opener`, `header preposition`, `heading case`, `inventory opener`, `contact clause`, `aside stacking`, `spaced hyphen` and `semicolon`.
+- A finding whose rule came from a terms file or a profile is not carried over.
+
+The review found that every FAIL and WARN word finding sits in the table of `language.md` that matches its tier. The derived data differs from a plain copy in five ways:
+
+- The output of `stdin-print-fail-lines` held only the failing lines, so its findings were written by hand from the text: `seamless` and an em dash on line 1, and `portal` on line 3.
+- The three scope cases share the page `pages/scope-docs.md` and differ only in label. The label `docs/page.md` gives the `you` finding, and the labels `.claude/skills/x/SKILL.md` and `hedy/CLAUDE.md` do not.
+- The hedy copy of `portal-proper-noun.md` holds the URL `https://portal.example.test/services` in place of an internal address, because the repository is public. The findings do not change.
+- The tests label each page `pages/<case>.md`. The old gate read the pages under `.claude/`, which skipped the `you` row. No page holds a `you` form, so no finding changes.
+- `hedy prose check` masks front matter for every rule. The two pages with front matter, `hyphen-break` and `semicolon-body`, hold only deferred findings, and none of those lies inside the front matter.
+
+These cases are retired:
+
+- `missing-file`, because a missing file is a usage error in hedy and exits 2, not 1. The command's own test covers the case.
+- `terms-table`, `scope-docs-file` and `scope-bad-token`, because hedy has no `--terms` option. The parser's fixtures `tables/bad-form.md` and `tables/empty-table.md` take the place of `terms-bad-form` and `terms-no-table`.
+- `profile-discovery` and `profile-discovery-stdin`, because hedy has no profile discovery.
+
+`stdin-print-fail-lines` stays as a standard input case without the `--print-fail-lines` option, which hedy does not have.
