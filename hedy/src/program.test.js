@@ -134,7 +134,7 @@ describe('runProgram help and version', () => {
     expect(stdout).toMatch(/^ {2}hello\s/m)
   })
 
-  it.each(['auth', 'jira', 'confluence', 'prose'])('lists the %s command in the top-level help', async (name) => {
+  it.each(['auth', 'jira', 'confluence', 'prose', 'workspace'])('lists the %s command in the top-level help', async (name) => {
     const { stdout } = await run(['--help'])
     expect(stdout).toMatch(new RegExp(`^ {2}${name}\\s`, 'm'))
   })
@@ -237,6 +237,8 @@ describe('runProgram with no command', () => {
   })
 
   it('with no launcher injected opens the real menu on the given terminal streams and exits 0 after Quit', async () => {
+    // Load the menu before the wait below, so the wait times the menu opening and not the first load of Ink.
+    await import('./menu/launch.js')
     const stdout = fakeStdout()
     const stdin = fakeStdin()
     const codes = []
@@ -249,7 +251,7 @@ describe('runProgram with no command', () => {
       checkoutRoot: root
     })
     await vi.waitFor(() => expect(stdin.listenerCount('readable')).toBeGreaterThan(0))
-    for (const key of ['\u001B[B', '\u001B[B', '\u001B[B', '\r']) {
+    for (const key of ['\u001B[B', '\u001B[B', '\u001B[B', '\u001B[B', '\r']) {
       await new Promise((resolve) => setTimeout(resolve, 30))
       stdin.write(key)
     }

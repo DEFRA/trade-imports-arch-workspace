@@ -21,6 +21,7 @@ These rules apply to every test file under `hedy/`. Hooks under `.claude/hooks/`
 - Import `describe`, `it`, `expect` and any other helper from `vitest` explicitly. No globals.
 - Mock only at the network boundary, with nock. Never `vi.mock()` a module under `hedy/src/`.
 - Use real temp folders from `fs.mkdtemp` under `os.tmpdir()` and remove them after the test. Never mock `fs`.
+- A test that runs `git` drops `GIT_DIR`, `GIT_INDEX_FILE` and the other repository variables from the child's environment, through `withoutRepositoryLocation` in `commands/workspace/setup-checks.js`. The pre-commit hook runs the tests, and in a linked worktree git points those variables at the shared repository, so a `git config` in a temp folder would otherwise write the shared configuration.
 - Fixtures are captured data from the real service or tool, with credentials and personal data removed. Where the repository is public and the real data cannot be committed, a fixture is invented with the key set of a real answer, and `hedy/DECISIONS.md` records the method. They live in a `__fixtures__/` folder beside the test.
 - Set-up used by more than one test goes in `hedy/src/test-support/`. Promoting a helper deletes the local copies.
 

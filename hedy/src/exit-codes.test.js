@@ -12,6 +12,7 @@ describe('exitCodeFor', () => {
   it.each([
     ['USAGE', 2],
     ['UNKNOWN', 1],
+    ['SETUP', 1],
     ['NOT_A_CODE', 1],
     [undefined, 1]
   ])('exitCodeFor(%j) is %i', (code, expected) => {

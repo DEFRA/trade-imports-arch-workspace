@@ -1,6 +1,6 @@
 import { ZodError } from 'zod'
 
-export const ERROR_CODES = Object.freeze(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE', 'PROSE'])
+export const ERROR_CODES = Object.freeze(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE', 'SETUP', 'PROSE'])
 
 export class HedyError extends Error {
   /**

@@ -47,7 +47,7 @@ const updatedResult = {
   links: { checked: 3, pages: 1, broken: 0, unreachable: 0 }
 }
 
-const MAIN_ITEMS = ['Check the credentials', 'Jira', 'Confluence', 'Quit']
+const MAIN_ITEMS = ['Check the credentials', 'Jira', 'Confluence', 'Check the workspace setup', 'Quit']
 
 const DOWN = '\u001B[B'
 
@@ -98,7 +98,7 @@ const renderMenu = (props = {}) => {
 }
 
 describe('MainMenu', () => {
-  it('opens on the hedy title, its subtitle and the four items in order', () => {
+  it('opens on the hedy title, its subtitle and the five items in order', () => {
     const { lastFrame } = renderMenu()
     const frame = lastFrame()
     expect(frame).toContain('hedy')
@@ -186,9 +186,20 @@ describe('MainMenu', () => {
     expect(renderMenu({ initialScreen: 'no-such-screen' }).lastFrame()).toBe('')
   })
 
+  it('runs the injected workspace check from Check the workspace setup, shows the pass summary and one pass row per check, and Enter returns to the main menu', async () => {
+    const check = recorder(() => ({ root: '/ws', checks: [{ name: 'Git hooks', detail: 'core.hooksPath is .githooks' }] }))
+    const menu = renderMenu({ checkWorkspace: check.fake })
+    await chooseItem(menu, { on: 'Quit', index: 3 })
+    await shown(menu.lastFrame, 'The 1 workspace setup check passes.')
+    expect(menu.lastFrame()).toContain('Git hooks: pass, core.hooksPath is .githooks')
+    expect(check.calls).toEqual([undefined])
+    await press(menu.stdin, '\r')
+    await shown(menu.lastFrame, 'Check the workspace setup')
+  })
+
   it('calls onQuit when you choose Quit', async () => {
     const menu = renderMenu()
-    await chooseItem(menu, { on: 'Quit', index: 3 })
+    await chooseItem(menu, { on: 'Quit', index: 4 })
     await vi.waitFor(() => expect(menu.quits).toEqual(['quit']))
   })
 

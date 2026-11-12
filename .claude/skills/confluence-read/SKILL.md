@@ -1,6 +1,6 @@
 ---
 name: confluence-read
-description: 'Fetch a Confluence page by URL or page id as clean markdown through the hedy CLI so the session can analyse it - summarise, review, extract, compare. Triggers: "read confluence page", "fetch confluence page", "analyse confluence page", "analyze confluence page". Read-only, Confluence-to-session direction. NOT for publishing docs pages (confluence-publish), creating or updating Confluence pages (the create-page/update-page hand tools directly), Jira tickets (jira), or pages whose markdown source lives in trade-imports-documentation - read the source file directly instead.'
+description: 'Fetch a Confluence page by URL or page id as clean markdown through the hedy CLI so the session can analyse it - summarise, review, extract, compare. Triggers: "read confluence page", "fetch confluence page", "analyse confluence page", "analyze confluence page". Read-only, Confluence-to-session direction. NOT for publishing docs pages (confluence-publish), creating or updating a Confluence page (not supported until hedy gains a confluence create or update command), Jira tickets (jira), or pages whose markdown source lives in trade-imports-documentation - read the source file directly instead.'
 ---
 
 Fetches one Confluence page, given a page id, a page URL or a share link, through the `hedy` CLI. The page reaches the session as markdown, so the user can summarise, review, extract or compare the page. Read-only: nothing is ever written back to Confluence.
@@ -15,7 +15,7 @@ Fetches one Confluence page, given a page id, a page URL or a share link, throug
 | "fetch confluence page" | Steps 1-2 (stop after presenting the page) |
 | "analyse/analyze confluence page" | Steps 1-3 |
 
-NOT for: publishing a docs page (use `confluence-publish`), creating or updating Confluence pages (use the `create-page.sh` / `update-page.sh` hand tools directly), Jira tickets (use `jira`), or pages whose markdown source lives in `trade-imports-documentation` - read the source file from disk instead; the Confluence copy is a rendered artifact of that source file.
+NOT for: publishing a docs page (use `confluence-publish`), creating or updating a Confluence page (not supported until `hedy` gains a `confluence create` or `confluence update` command), Jira tickets (use `jira`), or pages whose markdown source lives in `trade-imports-documentation`. Read such a source file from disk instead, because the Confluence copy is a rendered artefact of that source file.
 
 Prerequisites: `hedy` on PATH, and `JIRA_USER`, `JIRA_TOKEN` and `JIRA_BASE_URL` in the root `.env`. `hedy` reads that file itself. Never read the file: verify the credentials with the auth check below.
 

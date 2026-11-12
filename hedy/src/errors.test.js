@@ -3,8 +3,8 @@ import { z } from 'zod'
 import { ERROR_CODES, HedyError, isHedyError, resultHeldBy, toHedyError, toHedyErrors } from './errors.js'
 
 describe('ERROR_CODES', () => {
-  it('holds exactly the eight codes and cannot be changed', () => {
-    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE', 'PROSE'])
+  it('holds exactly the nine codes and cannot be changed', () => {
+    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE', 'SETUP', 'PROSE'])
     expect(Object.isFrozen(ERROR_CODES)).toBe(true)
   })
 })

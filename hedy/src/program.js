@@ -4,6 +4,7 @@ import { register as registerConfluence } from './commands/confluence/index.js'
 import { register as registerHello } from './commands/hello.js'
 import { register as registerJira } from './commands/jira/index.js'
 import { register as registerProse } from './commands/prose/index.js'
+import { register as registerWorkspace } from './commands/workspace/index.js'
 import { hedyVersion } from './envelope.js'
 import { HedyError } from './errors.js'
 import { EXIT } from './exit-codes.js'
@@ -108,6 +109,7 @@ export const buildProgram = (deps) => {
   registerJira(program, commandDeps)
   registerConfluence(program, commandDeps)
   registerProse(program, commandDeps)
+  registerWorkspace(program, commandDeps)
   return program
 }
 

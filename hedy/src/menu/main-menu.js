@@ -8,6 +8,7 @@ import { useConfluenceFeature } from './confluence/use-confluence-feature.js'
 import { useJiraFeature } from './jira/use-jira-feature.js'
 import { SCREENS } from './screens.js'
 import { createTransitions } from './transitions.js'
+import { useWorkspaceFeature } from './workspace/use-workspace-feature.js'
 
 const mainRoute = ({ handlers }) => ({
   [SCREENS.MAIN]: {
@@ -19,6 +20,7 @@ const mainRoute = ({ handlers }) => ({
         { label: 'Check the credentials', value: 'auth' },
         { label: 'Jira', value: 'jira' },
         { label: 'Confluence', value: 'confluence' },
+        { label: 'Check the workspace setup', value: 'workspace' },
         { label: 'Quit', value: 'quit' }
       ],
       onSelect: (value) => handlers[value]()
@@ -45,7 +47,8 @@ export const MainMenu = ({
   createIssue,
   describeIssue,
   readPage,
-  publishPage
+  publishPage,
+  checkWorkspace
 }) => {
   const { exit } = useApp()
   const [screen, setScreen] = useState(initialScreen)
@@ -62,6 +65,7 @@ export const MainMenu = ({
   const auth = useAuthFeature({ ...shared, checkCredentials })
   const jira = useJiraFeature({ ...shared, readIssue, searchIssues, createIssue, describeIssue })
   const confluence = useConfluenceFeature({ ...shared, io, detach, readPage, publishPage })
+  const workspace = useWorkspaceFeature({ ...shared, checkWorkspace })
 
   if (screen === SCREENS.LOADING) return createElement(LoadingScreen, { key: screen, message: loadingMessage })
   if (screen === SCREENS.ERROR) {
@@ -72,11 +76,13 @@ export const MainMenu = ({
     ...auth.routes,
     ...jira.routes,
     ...confluence.routes,
+    ...workspace.routes,
     ...mainRoute({
       handlers: {
         auth: auth.handleMainMenuSelect,
         jira: jira.handleMainMenuSelect,
         confluence: confluence.handleMainMenuSelect,
+        workspace: workspace.handleMainMenuSelect,
         quit: onQuit ?? exit
       }
     })

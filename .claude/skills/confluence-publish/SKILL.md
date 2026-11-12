@@ -1,6 +1,6 @@
 ---
 name: confluence-publish
-description: 'Publish a single documentation page from trade-imports-documentation to Confluence through hedy confluence publish, which runs the pre-flight and the docs repo publisher and reports the outcome with a link to the page. The skill runs the diagram builds a failed pre-flight names. The command publishes at once with no dry run, so the skill runs the command only when the user has asked to publish that page. Triggers: "publish to confluence", "push to confluence", "publish page". NOT for validating diagrams without publishing (mermaid-check), content quality (authoring), the full-estate publish (npm run publish:confluence directly), GitHub Pages (a separate workflow), or ad-hoc Confluence page reads (use the confluence-read skill) and one-off pages whose source of truth is Confluence itself (use the hand tools in .claude/tools/confluence/). Requires npm (Node 24).'
+description: 'Publish a single documentation page from trade-imports-documentation to Confluence through hedy confluence publish, which runs the pre-flight and the docs repo publisher and reports the outcome with a link to the page. The skill runs the diagram builds a failed pre-flight names. The command publishes at once with no dry run, so the skill runs the command only when the user has asked to publish that page. Triggers: "publish to confluence", "push to confluence", "publish page". NOT for validating diagrams without publishing (mermaid-check), content quality (authoring), the full-estate publish (npm run publish:confluence directly), GitHub Pages (a separate workflow), ad-hoc Confluence page reads (use the confluence-read skill), or a one-off page whose source of truth is Confluence itself (not supported until hedy gains a confluence create or update command). Requires npm (Node 24).'
 model: sonnet
 effort: low
 metadata:
@@ -17,7 +17,7 @@ Publishes one markdown page from the docs repo's `docs/` tree to Confluence thro
 | --- | --- |
 | "publish to confluence", "push to confluence", "publish page" | Steps 1 to 4 |
 
-NOT for validating diagrams without publishing (use `mermaid-check`), improving the page's wording (use `authoring`), publishing the whole configured set or a whole space (run `npm run publish:confluence` or `publish:confluence:space` in the docs repo directly), or the GitHub Pages site. Reading a page by id or URL is the `confluence-read` skill. One-off pages whose source of truth is Confluence itself are the hand tools in `.claude/tools/confluence/`, never a route for a `docs/` page.
+NOT for validating diagrams without publishing (use `mermaid-check`), improving the page's wording (use `authoring`), publishing the whole configured set or a whole space (run `npm run publish:confluence` or `publish:confluence:space` in the docs repo directly), or the GitHub Pages site. Reading a page by id or URL is the `confluence-read` skill. Creating or updating a one-off page whose source of truth is Confluence itself is not supported until `hedy` gains a `confluence create` or `confluence update` command, and that command would never be a route for a `docs/` page.
 
 ## Dependencies
 

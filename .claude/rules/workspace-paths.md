@@ -21,7 +21,7 @@ Never, anywhere: a `~/...` or `/Users/<user>/...` path to the workspace, or a be
 ## Verifying a machine
 
 ```
-bash .claude/tools/workspace/check-workspace.sh
+hedy workspace check
 ```
 
-Reports the root, the child repos, the baseline tools, `core.hooksPath` and `hedy` on PATH.
+Each failed check names its next step, including a current folder reached through a symlink, a home-folder link to the checkout and a local allow rule that names the checkout by an absolute path.
