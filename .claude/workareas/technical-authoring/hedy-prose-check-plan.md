@@ -14,7 +14,7 @@ The check is not a review, not a score, and not evidence that a page is good. A 
 
 The two word tables are structured. Each form sits in backticks, a trailing `*` stands for any ending, and the repair is the next cell. The old gate parsed exactly that for three months with 41 golden cases. The prose beside a form, such as "as a verb" or "after a noun", is for the reader. The parser ignores that prose and matches the bare form, so `architect` fires on the noun too and the reader decides. That is the behaviour the old gate had.
 
-The Patterns table is not structured. Each row describes a pattern in English, and no code derives a check from a description. Code implements each pattern by hand, and the table supplies only the repair text the finding prints. Five patterns are one character class each: an em dash, a spaced en dash, a curly quote, `N/A`, and a line ending on `it`. The other eight were regexes in the old gate with known false positives, and three rows in the word tables, the "as a verb" kind, are honoured only by a part-of-speech tagger. None of those is in round 1.
+The Patterns table is not structured. Each row describes a pattern in English, and no code derives a check from a description. Code implements each pattern by hand, and the table supplies only the repair text the finding prints. Five patterns are one character class each: an em dash, a spaced en dash, a curly quote, `N/A`, and a line ending on `it`. The old gate also ran ten regex checks with known false positives, for the other nine rows and the spaced hyphen in the em dash row, and three rows in the word tables, the "as a verb" kind, are honoured only by a part-of-speech tagger. None of those is in round 1.
 
 The collaboration is therefore fixed. Code finds every listed form and every literal pattern. The agent decides, for each examine finding, whether the sense is literal, and reads for the patterns code does not check. When Ben adds a row, the parser proves the row is well formed and the agent reads the repair text the code printed.
 
@@ -24,7 +24,7 @@ The collaboration is therefore fixed. Code finds every listed form and every lit
 | --- | --- | --- |
 | 1 | `hedy prose check` over files and stdin: the two word tables, the old gate's masking and matching, the five literal patterns, findings with line, matched text and repair. Tests: the parser's contract on the real file, and the old fixture pages as tables of expected findings | the definition of done below |
 | 2 | The check run over every markdown file in this repo and the docs repo and the last fifty commit messages, with the count per row and per pattern, in a report under this workarea | Ben reads the counts. A row that fires on text Ben wrote and kept is a bad row or a bad repair, and the fix goes in `language.md`, not in code |
-| 3, only if round 2 changed what Ben does | The old gate's eight regex patterns, one commit each with its old fixture, each dropped if the round 2 corpus shows the pattern firing wrongly | the same counts, per pattern |
+| 3, only if round 2 changed what Ben does | The old gate's remaining eight patterns, measured first, then one commit each with its old fixture and the tier Ben chooses. Decision 30 dropped the contact clause and aside stacking | the counts and sample lines per pattern in the round 3 report |
 
 Stop at the first round whose findings Ben does not act on. No syntax tree, no part-of-speech tagging, no retext or Vale, no labelled corpus, unless round 3 leaves a pattern worth that cost, and that is a separate decision.
 
@@ -78,6 +78,39 @@ Files: `hedy/CLAUDE.md` (the layout lines for `commands/prose/`); `hedy/DECISION
 ## Round 2
 
 The orchestrator's step with Ben. Run `hedy prose check --json` over `git ls-files '*.md'` in this repo, over every `.md` under `docs/` in the docs repo, and over the last fifty commit messages through `--stdin`. Count findings per row and per pattern, and list the ten lines each row fires on most. Write the report to `hedy-prose-check-round-2.md` in this workarea. Ben reads the counts and decides which rows and repairs change in `language.md` and whether the check is wired into the pre-commit hook, which is his owner step because agents cannot edit `.githooks/`. Code does not change in round 2.
+
+## Round 3
+
+Ben acted on round 2, so round 3 runs. Decision 30 dropped two of the old gate's ten regex checks: a regex caught 2 of 10 written contact clauses, and a census found no real case of aside stacking. Decision 30 also added `only`, `just`, `solely`, `merely`, `exclusively` and `purely` to the words to examine, which needed no code. Eight checks remain. Each is ported from `check-prose.sh` at commit 4d68719, and the old gate's expected findings for each are under `deferred` in `expected-findings.json`.
+
+| Check | `language.md` row | The old gate's rule | Old tier | Expected false positives |
+| --- | --- | --- | --- | --- |
+| FAQ heading | a heading that opens on a question word | a heading that opens on what, how, which, when, where, why, who, whom, whose or whether, or ends on `?` | FAIL | a heading that states a condition, such as "When the Session Has Lapsed" |
+| FAQ label | a table header, bold lead-in or list item that opens the same way | a header cell, or a bold lead-in at the start of a line or list item, that opens on a question word | FAIL | a `Who` or `When` column in a schedule or a RACI table |
+| FAQ opener | a sentence, list item or cell that opens on a half-question | a sentence, list item or cell that opens on capitalised What, How, Which, Why, Whether or Who, outside headings, header rows and bold lead-ins | WARN | a real question in body text |
+| Header preposition | a table header that ends on a preposition | a header cell that ends on by, as, for, to, of, from, with, in, on or at | WARN | a header that names an action, such as "Sign in" |
+| Heading case | a heading not in title case | a heading word that starts in lower case, other than a short article, conjunction or preposition after the first word | WARN | a lower-case product name, such as `hedy` or `npm`, written without backticks |
+| Inventory opener | an opening sentence that lists the page's parts | "This" or "The" with page, document, section and similar nouns, then covers, describes, lists and similar verbs, then three or more items before the full stop | WARN | none known, but the fixed lists miss most inventory openers |
+| Spaced hyphen | the em dash row | a word, a spaced hyphen and a word, outside table rows and front matter | WARN | a name that holds a spaced hyphen, such as the docs repo's "TIG - Analysis" folders |
+| Semicolon | a semicolon in body text | any semicolon outside table rows, list items, front matter and HTML entities | WARN | none, but the estate's own instruction files use semicolons throughout |
+
+Every pattern finding fails the run today. Round 3 gives each code-held pattern a tier. A `fail` pattern reports kind `pattern` and fails the run. An `examine` pattern reports kind `examine`, with the check's name as the term and the row's repair, and the run passes. The default tier follows the old gate: FAIL becomes `fail`, and WARN becomes `examine`. Ben sets the tier for each check after step 3.0. The check runs on every commit message and pull request body (decision 29), so a `fail` tier refuses a pull request whose body has a heading such as `## How to Test`.
+
+### Step 3.0, The Measurement
+
+The orchestrator's step, with no change to hedy. A probe script in this workarea ports the eight regexes and runs them over the masked text of the round 2 corpus: this repo's markdown, the docs repo's `docs/` folder without the third-party folders, the last fifty commit messages on `main`, and the bodies of the last fifty pull requests, read with `gh pr list --state all --limit 50 --json body`. The report, `hedy-prose-check-round-3.md` in this workarea, gives each check's count for each corpus, the number of files, and ten sample lines. Ben reads the report and chooses `fail`, `examine` or drop for each check. A check that Ben drops is recorded in `decisions.md` with its count. If Ben keeps no check, round 3 ends with the report.
+
+### Step 3.1, The Tier
+
+Files: `hedy/src/commands/prose/check.js` and its test. Each code-held pattern carries its tier beside its regex, and the five round 1 patterns keep `fail`. Done when lint exits 0, the full test run passes above the coverage threshold, and the tests prove that an `examine` pattern gives an examine finding with the pattern's name and repair and leaves `passed` true.
+
+### Step 3.2, One Commit per Kept Check
+
+Files: `check.js`, its test, and `expected-findings.json`, where the check's entries move from `deferred` into `findings` with the kind its tier gives. The heading, header-row and bold lead-in checks share one helper that finds those lines, because the old gate found them three times. Done for each check when lint exits 0, the full test run passes above the coverage threshold, and every fixture case gives the check's expected findings. Each check is its own commit, so reverting a check that misbehaves leaves the other checks in place.
+
+### Step 3.3, The Records
+
+`hedy/DECISIONS.md` ("Prose check": the tiers and each check kept or dropped), `hedy/CLAUDE.md` (the layout line for `commands/prose/`), the authoring skill's "Checks" (the closing pass no longer reads for the checks the code now runs), `AGENTS.md` (the number of patterns the check finds), `decisions.md` (Ben's tiers) and `delivery-plan.md` (step 6). Done when `make check` exits 0 and the check's run over `writing.md` and `language.md` reports findings inside quoted examples and nowhere else.
 
 ## Environment Facts for the Session That Runs Round 1
 
