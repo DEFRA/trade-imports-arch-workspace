@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { resultHeldBy } from './errors.js'
 
 export const SCHEMA_VERSION = 1
 
@@ -19,12 +20,17 @@ export const successEnvelope = (result) => ({
 })
 
 /**
+ * The result is the result of the first error that holds one, else null.
+ *
  * @param {import('./errors.js').HedyError | import('./errors.js').HedyError[]} errors
  */
-export const failureEnvelope = (errors) => ({
-  ok: false,
-  schema_version: SCHEMA_VERSION,
-  hedy_version: hedyVersion(),
-  result: null,
-  errors: (Array.isArray(errors) ? errors : [errors]).map(({ code, message }) => ({ code, message }))
-})
+export const failureEnvelope = (errors) => {
+  const errorList = Array.isArray(errors) ? errors : [errors]
+  return {
+    ok: false,
+    schema_version: SCHEMA_VERSION,
+    hedy_version: hedyVersion(),
+    result: resultHeldBy(errorList) ?? null,
+    errors: errorList.map(({ code, message }) => ({ code, message }))
+  }
+}

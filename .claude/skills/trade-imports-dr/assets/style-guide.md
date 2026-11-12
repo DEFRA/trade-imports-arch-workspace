@@ -1,6 +1,6 @@
 # DR writing style guide
 
-Read this every time you write or edit a DR. The rules are opinionated and easy to breach on autopilot. Reviewers have corrected each of these more than once in past DRs.
+Read this every time you write or edit a DR. The rules are opinionated, and a draft written on autopilot breaks several of them. Reviewers have corrected each of these more than once in past DRs.
 
 ## Voice and register
 

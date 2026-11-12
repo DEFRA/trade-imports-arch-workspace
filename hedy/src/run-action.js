@@ -1,13 +1,21 @@
 import { failureEnvelope, successEnvelope } from './envelope.js'
-import { toHedyErrors } from './errors.js'
+import { resultHeldBy, toHedyErrors } from './errors.js'
 import { EXIT, exitCodeForAll } from './exit-codes.js'
+
+const writeTextFailure = (errors, { render, stdout, stderr }) => {
+  const result = resultHeldBy(errors)
+  if (result !== undefined) stdout.write(`${render(result)}\n`)
+  for (const { message } of errors) stderr.write(`${message}\n`)
+}
 
 /**
  * Runs one command action and writes its outcome: the rendered result or a JSON
  * envelope on stdout, or in text mode each error's message on its own stderr
- * line. An AggregateError the action throws reports each error it holds, and
- * the exit code is the lowest among them. Sets the exit code through
- * setExitCode and returns it; never calls process.exit().
+ * line. In text mode a failure whose errors hold a result also writes the
+ * rendered result on stdout, before the messages. An AggregateError the action
+ * throws reports each error it holds, and the exit code is the lowest among
+ * them. Sets the exit code through setExitCode and returns it; never calls
+ * process.exit().
  *
  * @param {() => unknown} action sync or async; its return value is the result
  * @param {object} [options]
@@ -34,7 +42,7 @@ export async function runAction (action, {
     if (json) {
       stdout.write(`${JSON.stringify(failureEnvelope(errors))}\n`)
     } else {
-      for (const { message } of errors) stderr.write(`${message}\n`)
+      writeTextFailure(errors, { render, stdout, stderr })
     }
     const code = exitCodeForAll(errors.map(({ code }) => code))
     setExitCode(code)

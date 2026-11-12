@@ -92,6 +92,30 @@ describe('runAction', () => {
   })
 })
 
+describe('runAction on an error that holds a result', () => {
+  const failingCheck = () => { throw new HedyError('PROSE', 'The check found 1 banned finding.', { result: { banned: 1 } }) }
+
+  it('in text mode prints the rendered result on stdout, the message on stderr, and returns 1', async () => {
+    const h = captureIo()
+    const code = await runAction(failingCheck, { ...h, render: ({ banned }) => `${banned} banned` })
+    expect(h.out).toEqual(['1 banned\n'])
+    expect(h.err).toEqual(['The check found 1 banned finding.\n'])
+    expect(code).toBe(1)
+    expect(h.codes).toEqual([1])
+  })
+
+  it('in JSON mode prints one failure envelope holding the result and the error, nothing on stderr, and returns 1', async () => {
+    const h = captureIo()
+    const code = await runAction(failingCheck, { ...h, json: true })
+    const envelope = singleJsonLine(h.out)
+    expect(envelope.ok).toBe(false)
+    expect(envelope.result).toEqual({ banned: 1 })
+    expect(envelope.errors).toEqual([{ code: 'PROSE', message: 'The check found 1 banned finding.' }])
+    expect(h.err).toEqual([])
+    expect(code).toBe(1)
+  })
+})
+
 describe('runAction on an AggregateError', () => {
   const failures = () => new AggregateError([
     new HedyError('USAGE', 'Jira refused the request.'),

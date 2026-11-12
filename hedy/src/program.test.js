@@ -134,7 +134,7 @@ describe('runProgram help and version', () => {
     expect(stdout).toMatch(/^ {2}hello\s/m)
   })
 
-  it.each(['auth', 'jira', 'confluence', 'workspace'])('lists the %s command in the top-level help', async (name) => {
+  it.each(['auth', 'jira', 'confluence', 'prose', 'workspace'])('lists the %s command in the top-level help', async (name) => {
     const { stdout } = await run(['--help'])
     expect(stdout).toMatch(new RegExp(`^ {2}${name}\\s`, 'm'))
   })

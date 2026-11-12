@@ -42,6 +42,21 @@ describe('failureEnvelope', () => {
   })
 
   it.each([
+    ['one error that holds it', new HedyError('PROSE', 'Two findings.', { result: { passed: false } })],
+    ['the first error of an array that holds one', [
+      new HedyError('USAGE', 'Bad flag.'),
+      new HedyError('PROSE', 'Two findings.', { result: { passed: false } }),
+      new HedyError('PROSE', 'One finding.', { result: { passed: true } })
+    ]]
+  ])('carries the result of %s', (_label, errors) => {
+    expect(failureEnvelope(errors).result).toEqual({ passed: false })
+  })
+
+  it('keeps the result null when no error holds a result', () => {
+    expect(failureEnvelope([new HedyError('USAGE', 'Bad flag.'), new HedyError('AUTH', 'No token.')]).result).toBeNull()
+  })
+
+  it.each([
     ['one error', new HedyError('USAGE', 'Bad flag.'), [{ code: 'USAGE', message: 'Bad flag.' }]],
     ['an array of errors', [
       new HedyError('USAGE', 'Bad flag.'),

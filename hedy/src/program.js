@@ -3,6 +3,7 @@ import { register as registerAuth } from './commands/auth.js'
 import { register as registerConfluence } from './commands/confluence/index.js'
 import { register as registerHello } from './commands/hello.js'
 import { register as registerJira } from './commands/jira/index.js'
+import { register as registerProse } from './commands/prose/index.js'
 import { register as registerWorkspace } from './commands/workspace/index.js'
 import { hedyVersion } from './envelope.js'
 import { HedyError } from './errors.js'
@@ -73,7 +74,7 @@ const usageMessage = ({ code, message }) => {
  *
  * @param {object} [deps]
  * @param {{ write: (chunk: string) => unknown, isTTY?: boolean }} [deps.stdout]
- * @param {{ isTTY?: boolean }} [deps.stdin]
+ * @param {AsyncIterable<string | Uint8Array> & { isTTY?: boolean }} [deps.stdin] the text a command reads from stdin
  * @param {{ write: (chunk: string) => unknown }} [deps.stderr]
  * @param {(code: number) => void} [deps.setExitCode]
  * @param {Record<string, string | undefined>} [deps.env]
@@ -82,7 +83,7 @@ const usageMessage = ({ code, message }) => {
  * @returns {Command}
  */
 export const buildProgram = (deps) => {
-  const { stdout, stderr, setExitCode, env, checkoutRoot } = withDefaults(deps)
+  const { stdout, stdin, stderr, setExitCode, env, checkoutRoot } = withDefaults(deps)
   let root
   const program = new Command()
     .name('hedy')
@@ -102,11 +103,12 @@ export const buildProgram = (deps) => {
     .hook('preAction', (_program, actionCommand) => {
       root = resolveWorkspaceRoot({ workspace: actionCommand.optsWithGlobals().workspace, checkoutRoot })
     })
-  const commandDeps = { stdout, stderr, setExitCode, env, workspaceRoot: () => root }
+  const commandDeps = { stdout, stdin, stderr, setExitCode, env, workspaceRoot: () => root }
   registerHello(program, commandDeps)
   registerAuth(program, commandDeps)
   registerJira(program, commandDeps)
   registerConfluence(program, commandDeps)
+  registerProse(program, commandDeps)
   registerWorkspace(program, commandDeps)
   return program
 }

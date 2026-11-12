@@ -58,13 +58,14 @@ The root `.env` holds the Atlassian credentials, and `hedy` reads the file itsel
 - `hedy auth` checks the Atlassian credentials and reports display names only.
 - `hedy jira ticket <key>` reads one issue, description included.
 - `hedy jira search '<jql>'` reads the issues a JQL query matches, up to `--max` (200 by default).
-- `hedy jira create --from <manifest>` creates one issue from a ticket manifest. The command is a dry run by default, and `--confirm <planId>` runs only the plan the dry run showed.
-- `hedy jira describe <key> --from <file>` replaces one issue's description with the file's Jira wiki markup. The command is a dry run by default, and `--confirm <planId>` runs only the plan the dry run showed.
+- `hedy jira create --from <manifest>` creates one issue from a ticket manifest. The command is a dry run by default, and `--confirm <planId>` runs exactly the same plan as the dry run.
+- `hedy jira describe <key> --from <file>` replaces one issue's description with the file's Jira wiki markup. The command is a dry run by default, and `--confirm <planId>` runs exactly the same plan as the dry run.
 - `hedy confluence page <reference>` reads one page by id, URL or share link, as markdown by default.
 - `hedy confluence publish <page>` publishes one docs page to Confluence through the docs repo's publisher, after its pre-flight. The command publishes at once.
+- `hedy prose check <file>...` checks files, or a text read with `--stdin --label <name>`, against the word tables of `.claude/skills/authoring/references/language.md` and five patterns. A banned word or a pattern fails the run with exit 1, and the output shows the line and the repair for each finding.
 - `hedy workspace check` checks the machine and the checkout against the expected setup, offline, and names the next step for each failed check.
 
-A bare `hedy` at a terminal opens a menu for people that reaches every command, and each write waits behind a plan or pre-flight screen and a confirm. Agents call the commands with `--json`. A bare `hedy` without a terminal, or with `--json` or `--no-ui`, is a usage error.
+A bare `hedy` at a terminal opens a menu of the auth, Jira and Confluence commands for people to use. Each write in the menu shows a plan or a pre-flight screen first, and runs after the person confirms. Agents call the commands with `--json`. A bare `hedy` without a terminal, or with `--json` or `--no-ui`, is a usage error.
 
 With `--json`, every command prints one envelope line, `{ ok, schema_version, hedy_version, result, errors, metadata }`, where `errors` lists `{ code, message }` entries. A command exits 0 on success, 1 on an error and 2 on a usage error.
 
@@ -80,7 +81,7 @@ read its header) for usage.
 | Domain | Tools |
 | --- | --- |
 | `mermaid-check/` | Render Mermaid sources to prove they parse; sweep paths for diagrams |
-| `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard |
+| `pr/` | `create-pr.sh` - create/edit GitHub PRs with a deterministic no-attribution guard and the prose check |
 | `skill-creator/` | Interview, scaffold and audit tooling for workspace skills |
 | `workspace/` | `check-auth.sh` (runs `hedy auth` and every domain's auth check), `check-deps.sh` (verifies every skill's declared dependencies resolve on this machine), `lint-skills.sh` (repo-only estate lint), `guard-bash-tests.sh` (the bash guard's deny and allow cases) and `guard-git-push-tests.sh` (the push guard's deny and allow cases) |
 
@@ -95,6 +96,8 @@ run when one fails:
 | `check-auth.sh` | the Atlassian credentials through `hedy auth`, plus any domain `auth.sh` | on demand | fix the named env var in `.env`; run `make install` when `hedy` is missing |
 | `check-deps.sh` | declared `workspace-deps` resolve on this machine | `make check` | clone the project / install the tool it names |
 | `lint-skills.sh` | declaration format, dangling links, undeclared-invocation sweep | pre-commit (staged index), scaffold tail, `make check` | fix and re-stage; acknowledge soft probes in `workspace-soft-deps` |
+| `.githooks/commit-msg` | the commit message, through `hedy prose check` | every commit, once `make install` has set `core.hooksPath` | reword each banned and pattern finding the hook names, then commit again |
+| `create-pr.sh` | the pull request title and body, for AI attribution and through `hedy prose check` | every pull request created or edited through the `pr` skill or the script | reword the title or body and run the script again |
 | Golden tests (2 suites) | scaffold and doctor behaviour vs blessed output | pre-commit when their tools change, `make check` | review the diff; `--bless` if intended, fix if not |
 | Audit (pattern checklist) | skill shape, judgment-level | on demand; checklist changes re-open all audits | triage the plan; Step A4 sweeps open questions every run |
 | Guard hooks (`.claude/hooks/`) | agent Bash and file-edit calls in Claude Code sessions | every matched tool call | follow the sanctioned alternative the denial names |
@@ -115,7 +118,7 @@ run anywhere. Conventions shared by all skills:
 `.claude/best-practices/skills/agent-skills.md`.
 
 The house writing standard is `.claude/best-practices/writing/writing.md`,
-and the words, phrases and sentence shapes it rules out are listed with
+and the words, phrases and patterns it rules out are listed with
 their repairs in `.claude/skills/authoring/references/language.md`.
 Every agent reads both before drafting prose, and a subagent brief names
 them, so the standard is in context before the first draft. The authoring
@@ -123,9 +126,11 @@ skill, `.claude/skills/authoring/SKILL.md`, plans a page or deck with
 the author, hands the drafting to a fresh agent, line edits an existing
 page, and writes pull request bodies, tickets and commit messages.
 
-No mechanical prose check runs. The closing pass in the authoring skill
-is the check, and it applies every row of `language.md` by reading. To
-ban a word, add a row to that file.
+`hedy prose check` finds every listed word and five literal
+patterns in a draft, and the authoring skill runs the check after its
+closing pass. The closing pass applies every other rule of `writing.md`
+and `language.md` by reading. To ban a word, add a row to `language.md`,
+and the check reads the row on its next run.
 
 ## Git, GitHub and pull requests
 
@@ -136,5 +141,5 @@ that appends an attribution footer. Full rules:
 and `.claude/best-practices/git/pull-requests.md`. PR creation and body
 edits go through the `pr` skill, which delegates to
 `.claude/tools/pr/create-pr.sh` - the script refuses attribution
-content deterministically. Prefer SSH remotes and the `gh` CLI when
+content and a title or body that fails `hedy prose check`. Prefer SSH remotes and the `gh` CLI when
 available; fall back to plain `git` when not.

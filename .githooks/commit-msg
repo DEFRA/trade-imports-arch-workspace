@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Commit-msg: refuse a commit message that fails hedy prose check, which
+# applies the word tables and patterns of
+# .claude/skills/authoring/references/language.md.
+# Wired via `git config core.hooksPath .githooks` (make install does this).
+# Git passes the path of the message file as $1. Comment lines, and every
+# line from the scissors line down, are dropped first, as git drops them.
+# The check runs this checkout's hedy, as the pre-commit hook does, because
+# the hedy on PATH may be linked to another checkout.
+
+ROOT=$(git rev-parse --show-toplevel)
+
+if [ ! -d "$ROOT/hedy/node_modules" ]; then
+    echo "commit-msg: hedy is not installed in $ROOT - run make -C $ROOT install, then commit again" >&2
+    exit 1
+fi
+
+MESSAGE=$(sed -e '/^# -* >8 -*$/,$d' -e '/^#/d' "$1")
+
+if ! FINDINGS=$(printf '%s\n' "$MESSAGE" | node "$ROOT/hedy/src/cli.js" prose check --stdin --label "commit message" 2>&1); then
+    printf 'commit-msg: the commit message fails hedy prose check - reword each banned and pattern finding, then commit again:\n%s\n' "$FINDINGS" >&2
+    exit 1
+fi

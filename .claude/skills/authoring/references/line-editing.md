@@ -87,7 +87,7 @@ A missing explanation is first a suspect claim. Before you ask for the explanati
 
 ## Threshold and Stop
 
-Change a passage only when the change makes the text easier for the plan's reader to understand or verify. Never change wording for preference or for a synonym. A paragraph with no defect stays as written. Leaving a passage unchanged is a real outcome, and the existence of a better version is no reason to change acceptable text. A synonym, a reordering the reader does not need and a second split of a paragraph already on one job are churn. The edit stops when a pass over the page finds nothing new.
+Change a passage only when the change helps the plan's reader understand or verify the text. Never change wording for preference or for a synonym. A paragraph with no defect stays as written. Leaving a passage unchanged is a real outcome, and the existence of a better version is no reason to change acceptable text. A synonym, a reordering the reader does not need and a second split of a paragraph already on one job are churn. The edit stops when a pass over the page finds nothing new.
 
 ## Exemptions
 
@@ -106,7 +106,7 @@ Fenced and inline code, quotations, blockquotes, URLs and front matter are exemp
 | `The second difference is renewal, and it is the one a user will notice.` | `In the session-service design the user sees nothing of renewal. In the cookie design a renewal redirect passes silently while the provider's session is live. When that session has lapsed, the provider signs the user in to a fresh session, so a user who holds more than one organisation meets the organisation picker again.` | framing restated as the consequence the passage supports, with every condition kept |
 | `Sign-in is unchanged: the front door remains the only component that contacts the provider, the same checks run on the assertion, and the return path is checked against the allowlist.` | `Sign-in is unchanged. In both designs:` followed by three bullets holding the same three clauses in the same order | parallel facts whose order carries no meaning become a list of the same words |
 | `This adds a deployable to every request path.` | `Running a programme-owned proxy adds a deployable to every request path.` | the bare demonstrative replaced by the thing the page names |
-| `a store only the front door reaches` | `a store that only the front door can access` | the relative pronoun and the capability verb restored |
+| `The session records are kept in a store only the front door reaches.` | `The session records are kept in a store. Access to the store is restricted to the front door.` | the restriction stated as the point of its own sentence |
 | `That detail is not repeated here. The token expires after 15 minutes.` | `The token expires after 15 minutes.` | a sentence that narrates the document removed as a whole unit |
 | `The service deletes the record after 30 days unless the case is open.` | `Unless the case is open, the service deletes the record after 30 days.` | the condition moved first, every word kept |
 | `The gateway retries only failed requests.` | `Only the gateway retries failed requests.` | rejected: the same words make a different claim, so the source stays |
