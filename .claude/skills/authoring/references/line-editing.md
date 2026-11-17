@@ -44,6 +44,7 @@ Compression saves the writer words and makes the reader reconstruct the meaning.
 - **Figurative mechanism:** a metaphor the reader has to decode before the system makes sense.
 - **Condensed rule:** a principle as a quotable formula, with an abstraction as subject (`the estate distils`) or a passive with no actor and no object (`the loss is named`).
 - **FAQ voice:** a heading, label or sentence that opens on a question or half-question, as in `What a journey backend checks`. A sentence opening on When or Where that states a condition passes.
+- **Verb-no-noun negation:** an action verb followed by `no` and a noun in place of a negated verb, as in `a refresh adds no relationship`, `holds no role` or `IDM gives no guidance`. Explain the sentence, then rebuild it around the one thing it is about, stating what does hold (`a refresh keeps the user's current relationship`), or negate the verb (`does not hold a role`, `no longer holds a role`). `has no`, `with no` and `there is no` before a noun pass.
 
 ### Framing That Carries a Judgement
 
@@ -107,6 +108,7 @@ Fenced and inline code, quotations, blockquotes, URLs and front matter are exemp
 | `Sign-in is unchanged: the front door remains the only component that contacts the provider, the same checks run on the assertion, and the return path is checked against the allowlist.` | `Sign-in is unchanged. In both designs:` followed by three bullets holding the same three clauses in the same order | parallel facts whose order carries no meaning become a list of the same words |
 | `This adds a deployable to every request path.` | `Running a programme-owned proxy adds a deployable to every request path.` | the bare demonstrative replaced by the thing the page names |
 | `The session records are kept in a store only the front door reaches.` | `The session records are kept in a store. Access to the store is restricted to the front door.` | the restriction stated as the point of its own sentence |
+| `The currentRelationshipId stops being valid when the user loses access to the organisation or holds no role for the service there.` | `The currentRelationshipId stops being valid when the user loses access to the organisation or no longer holds a role for the service there.` | the verb-no-noun negation rebuilt on the verb, with the change of state the source describes |
 | `That detail is not repeated here. The token expires after 15 minutes.` | `The token expires after 15 minutes.` | a sentence that narrates the document removed as a whole unit |
 | `The service deletes the record after 30 days unless the case is open.` | `Unless the case is open, the service deletes the record after 30 days.` | the condition moved first, every word kept |
 | `The gateway retries only failed requests.` | `Only the gateway retries failed requests.` | rejected: the same words make a different claim, so the source stays |

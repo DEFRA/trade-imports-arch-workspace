@@ -82,6 +82,7 @@ Each pattern is recognised by reading, and the repair is the whole fix.
 | A table header that ends on a preposition: "Set by", "Used by" | name the role: "Source", "Writer" |
 | A heading not in title case | capitalise every word except articles, short conjunctions and short prepositions after the first word: "Activity and the Idle Point" |
 | An opening sentence that lists the page's parts as noun phrases: "This page covers the assertion, the operations and the rules" | write one sentence per job of the page, each with an actor and a verb |
+| An action verb followed by `no` and a noun, in place of a negated verb: "a refresh adds no relationship" | negate the verb: "a refresh does not add a relationship" |
 | A sentence or line that ends on the pronoun `it` | name the noun the pronoun stands for. The subject the pronoun hides usually belongs at the front of the sentence |
 | A contact clause, a dropped relative pronoun that gives agency to a thing: "a store only the front door reaches" | restore the relative pronoun and the capability verb: "a store that only the front door can access" |
 | Aside stacking, three or more spaced hyphens in one sentence | recast the asides as sentences or a list |

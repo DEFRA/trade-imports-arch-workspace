@@ -1,2 +1,0 @@
-The service frobnicates each record; the profile one folder up bans the word.
-exit-code: 2

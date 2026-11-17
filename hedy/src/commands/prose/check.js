@@ -39,12 +39,20 @@ const patternRule = (patternRows) => (pattern) => ({
   termIn: (line) => (pattern.regex.test(line) ? pattern.name : undefined)
 })
 
+const verbNoNounRegex = () => {
+  const wordsBeforeNoThatPass = ['has', 'have', 'had', 'having', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'with', 'without', 'there', 'and', 'or', 'but', 'nor', 'of', 'to', 'at', 'in', 'on', 'for', 'by', 'as', 'from', 'into', 'onto', 'than', 'that', 'yes', 'say', 'says', 'said', 'if', 'whether', 'so', 'the', 'a', 'an', 'when', 'where', 'because', 'which', 'what', 'who', 'whose', 'it', 'its', 's']
+  const wordsAfterNoThatPass = ['longer', 'more', 'one', 'matter', 'doubt', 'less', 'later', 'sooner', 'earlier', 'worse', 'further']
+  const inEitherCase = (words) => words.flatMap((word) => [word, word[0].toUpperCase() + word.slice(1)]).join('|')
+  return new RegExp(`\\b(?!(?:${inEitherCase(wordsBeforeNoThatPass)})\\b)[A-Za-z]+ no (?!(?:${wordsAfterNoThatPass.join('|')})\\b)[a-z]`)
+}
+
 const patternRules = (patternRows) => [
   { name: 'em dash', regex: /\u2014/, rowStart: 'An em dash' },
   { name: 'spaced en dash', regex: /\s\u2013\s/, rowStart: 'An em dash' },
   { name: 'curly quote', regex: /[\u2018\u2019\u201C\u201D]/, rowStart: 'A curly quote' },
   { name: 'N/A', regex: /\bn\/a\b/i, rowStart: '`N/A`' },
-  { name: 'trailing it', regex: /\sit\s*([.!?]|$)/, rowStart: 'A sentence or line that ends on the pronoun' }
+  { name: 'trailing it', regex: /\sit\s*([.!?]|$)/, rowStart: 'A sentence or line that ends on the pronoun' },
+  { name: 'verb-no-noun negation', regex: verbNoNounRegex(), rowStart: 'An action verb followed by `no` and a noun' }
 ].map(patternRule(patternRows))
 
 const rulesOf = ({ banned, examine, patterns }) => [

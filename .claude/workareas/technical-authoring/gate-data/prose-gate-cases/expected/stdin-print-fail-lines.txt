@@ -1,3 +1,0 @@
-A seamless launch — done.
-Sign in to the portal.
-exit-code: 2

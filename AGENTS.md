@@ -62,7 +62,7 @@ The root `.env` holds the Atlassian credentials, and `hedy` reads the file itsel
 - `hedy jira describe <key> --from <file>` replaces one issue's description with the file's Jira wiki markup. The command is a dry run by default, and `--confirm <planId>` runs exactly the same plan as the dry run.
 - `hedy confluence page <reference>` reads one page by id, URL or share link, as markdown by default.
 - `hedy confluence publish <page>` publishes one docs page to Confluence through the docs repo's publisher, after its pre-flight. The command publishes at once.
-- `hedy prose check <file>...` checks files, or a text read with `--stdin --label <name>`, against the word tables of `.claude/skills/authoring/references/language.md` and five patterns. A banned word or a pattern fails the run with exit 1, and the output shows the line and the repair for each finding.
+- `hedy prose check <file>...` checks files, or a text read with `--stdin --label <name>`, against the word tables of `.claude/skills/authoring/references/language.md` and six patterns. A banned word or a pattern fails the run with exit 1, and the output shows the line and the repair for each finding.
 - `hedy workspace check` checks the machine and the checkout against the expected setup, offline, and names the next step for each failed check.
 
 A bare `hedy` at a terminal opens a menu of the auth, Jira and Confluence commands for people to use. Each write in the menu shows a plan or a pre-flight screen first, and runs after the person confirms. Agents call the commands with `--json`. A bare `hedy` without a terminal, or with `--json` or `--no-ui`, is a usage error.

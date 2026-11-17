@@ -93,7 +93,9 @@ describe('runProseCheck', () => {
     ['spaced en dash', `A ${EN_DASH} B`, 'An em dash'],
     ['curly quote', `The team${RIGHT_SINGLE_QUOTE}s page.`, 'A curly quote'],
     ['N/A', 'The value is N/A here.', '`N/A`'],
-    ['trailing it', 'The service provides it.', 'A sentence or line that ends on the pronoun']
+    ['trailing it', 'The service provides it.', 'A sentence or line that ends on the pronoun'],
+    ['verb-no-noun negation', 'A refresh adds no relationship.', 'An action verb followed by `no` and a noun'],
+    ['verb-no-noun negation', 'Use no semicolon in body text.', 'An action verb followed by `no` and a noun']
   ])('reports the %s pattern with the repair of the pattern row it is keyed to', (name, text, rowStart) => {
     expect(check(text).findings).toEqual([{ label: 'docs/page.md', line: 1, kind: 'pattern', term: name, text, repair: patternRepairOf(rowStart) }])
   })
@@ -104,7 +106,13 @@ describe('runProseCheck', () => {
     ['it inside a sentence', 'The service sends it to the queue'],
     ['a slash between other words', 'Read the n/b note and the on/off switch.'],
     ['it followed by a code span that ends the sentence', 'Pass it `--json`.'],
-    ['it followed by a URL that ends the sentence', 'Follow it https://example.test/page.']
+    ['it followed by a URL that ends the sentence', 'Follow it https://example.test/page.'],
+    ['has no before a noun', 'The relationship has no organisation.'],
+    ['with no and there is no before a noun', 'There is no bulk load for a relationship with no organisation.'],
+    ['a capitalised exempt word before no', 'With no session, the user signs in.'],
+    ['no longer after a verb', 'The user loses access or no longer holds a role.'],
+    ['a conjunction or a condition word before no', 'The service signs the user out when no session exists, and no record stays.'],
+    ['a capitalised No', 'No session exists.']
   ])('reports no pattern for %s', (_label, text) => {
     expect(check(text).findings).toEqual([])
   })
