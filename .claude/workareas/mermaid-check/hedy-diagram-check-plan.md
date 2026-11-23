@@ -108,15 +108,9 @@ Given a page with a diagram Mermaid rejects, `hedy confluence publish` refuses t
 
 The command needs Mermaid's parser, and the parser needs a browser's document model for most diagram types. Of the 278 diagrams in the estate, 167 parsed in plain Node: 166 sequence diagrams and one ER diagram. 106 diagrams stopped with `DOMPurify.addHook is not a function`, because Mermaid's label sanitiser looks for a browser window. Most of the 106 are flowcharts and state diagrams, and 5 are sequence diagrams. The remaining 5 diagrams failed with true parse errors, and `mmdc` failed the same 5 at the same lines. No document model library, such as `jsdom`, `linkedom` or `happy-dom`, is installed anywhere in the estate.
 
-Three places can run the parser:
+A spike on 23 November 2026 gave Mermaid's parser a document model from `linkedom` 0.18.15, and separately from `jsdom` 31.0.1. With either library, the parser gave the bash check's verdict for all 278 diagrams: 272 pass, and the same 6 fail at the same Mermaid lines. The sixth failure, in `analysis/field-config/ipaffs-referencedata-fieldconfig-analysis.md` at line 42, had been hidden behind the missing document model. The parser checked the 278 diagrams in about 2 seconds, and the bash check took about 2 minutes.
 
-| Place | Effect |
-| --- | --- |
-| A parse script in `delivery-info-arch-tooling`, which hedy runs as a child process | The tooling already holds Mermaid 11.17.2 and `mmdc`, and gains a document model library. hedy keeps commander and zod as its runtime dependencies, and wraps the tooling as `confluence publish` wraps the publisher. Colleagues who use the tooling can call the same script. |
-| Mermaid and a document model library inside hedy | hedy gains Mermaid's dependency tree, which includes d3, cytoscape and katex, against the rule that hedy's commands use commander and zod at run time. |
-| `mmdc` run by hedy, as the bash check runs it | No new dependency, but the browser start for every diagram and the search of error text both stay. |
-
-The recommendation is the first place, because the tooling owns Mermaid in this estate and hedy's dependency rule stays intact. The first step of the work proves that a document model library gives Mermaid's parser the same verdicts as `mmdc` on all 278 diagrams.
+hedy runs the parser itself. hedy gains `linkedom`, 2.8 MB, as a runtime dependency, and loads the Mermaid that `delivery-info-arch-tooling` installs, in a child process, because Mermaid sets global browser objects and takes 3.3 seconds to load. The check uses the Mermaid version that the docs pipeline renders with. All of the code sits in hedy, under hedy's rules, tests and lint limits. The tooling repository does not change. Two other places were weighed. A parse script in the tooling would let the docs repo run the check without the workspace, but would put the code outside hedy's rules and need a contract kept in step across two repositories. `mmdc` would keep the browser start for every diagram and the search of error text.
 
 ## Instructions for Agents
 
@@ -168,16 +162,16 @@ The tests state the behaviours above, and follow the method of `hedy diagram seq
 
 - **Reading pages.** A table of short Markdown snippets states the blocks each snippet must give, with each block's fence line. The table covers a page without blocks, two blocks, an indented fence, a fence that never closes and a block inside a list.
 - **Line translation.** A table of fence lines and Mermaid messages states the page line each message must give.
-- **The parser boundary.** The parse script runs as a child process, so the tests run a fake parse script through the real spawn, as the publish tests run a fake publisher. The fake returns recorded verdicts, so the tests do not depend on Mermaid's version.
+- **The parser boundary.** The parser runs in a child process that loads Mermaid from the workspace's `delivery-info-arch-tooling`. The tests give the command a temporary workspace whose tooling folder holds a fake Mermaid package, so the real spawn runs and the fake returns recorded verdicts, as the publish tests run a fake publisher. The tests then do not depend on Mermaid's version.
 - **Parity with the bash check.** No golden output exists for the bash scripts, so the bash verdicts are captured first: for a fixture set of passing and failing diagrams of every type in use, the bash check's verdict for each diagram is recorded. The hedy command must give the same verdict for every diagram, and the line it names must match the line the bash check implies.
-- **The real parser.** One test runs the real parse script against the fixture set when the tooling is installed. The test proves that the fake and the real script agree.
+- **The real parser.** One suite runs the real Mermaid against the fixture set when the workspace's tooling is installed, and is skipped where the tooling is absent, as in hedy's continuous integration. The suite proves that the fake and the real Mermaid agree.
 - **The command.** Spawned runs prove the result, the exit codes, `--stdin`, and the `SETUP` error on a checkout without the tooling's packages.
 
 Fixtures are public, because the workspace repository is public: the docs repo's diagrams are public already, and the failing diagrams are written for the tests.
 
 ## Code Standards
 
-- **Functional core, thin shell.** Pure functions find the blocks, translate lines and build the result. The shell reads files, walks folders and runs the parse script. No module holds shared state that changes.
+- **Functional core, thin shell.** Pure functions find the blocks, translate lines and build the result. The shell reads files, walks folders and runs the parser's child process. No module holds shared state that changes.
 - **Small functions, checked by the linter.** `hedy/eslint.config.js` gains the `complexity` rule at a limit of 6 and `max-lines-per-function` at 30 lines, for source files under `hedy/src/commands/diagram/`. The code of `hedy diagram sequence` passes both limits already. Test files stay outside the limits, because a `describe` block holds many tests.
 - **Test, implement, refactor.** One behaviour per cycle: a test that fails on its assertion, the code that passes the test, then a refactor before the next behaviour. A refactor is proved by the fixtures, compared exactly.
 
@@ -185,7 +179,7 @@ The rest of hedy breaks the limits in 14 functions for complexity and 6 function
 
 ## Order of Work
 
-1. **Prove the parser.** A spike in `delivery-info-arch-tooling` gives Mermaid's parser a document model and parses the 278 diagrams of the estate. The pass mark is the same verdict as `mmdc` for every diagram. If a diagram type fails the mark, that type falls back to `mmdc`, and the plan records the type. The spike comes first because every later step depends on the parser's place.
+1. **Prove the parser.** Done on 23 November 2026: the parser, given a document model, gave the same verdict as `mmdc` for every one of the 278 diagrams, as "Parser" records.
 2. **Add the lint limits** for `hedy/src/commands/diagram/`, so every later step is written under them.
 3. **Capture the bash verdicts** on the fixture set, before any hedy code exists.
 4. **Check a Mermaid file**, with the `SETUP` error for a broken machine and the machine-readable result. The command's help text, its `AGENTS.md` entry and its `hedy/CLAUDE.md` lines come in the same change.
@@ -195,10 +189,11 @@ The rest of hedy breaks the limits in 14 functions for complexity and 6 function
 8. **Cut over.** The four skills in "Skills That Write Mermaid" call `hedy diagram check` after every step that writes Mermaid. The bash check and every reference to the check are deleted in the same change, as "Deletion of the Bash Check" lists. The allowlist entry for `.claude/tools/mermaid-check/` is an owner step for Ben.
 9. **Later:** the publish pre-flight refuses a page with a broken diagram, when decision 2 says so.
 
-Steps 1 to 8 make one pull request to hedy and one to `delivery-info-arch-tooling`. The tooling pull request merges first, because hedy runs its script.
+Steps 2 to 8 make one pull request to the workspace repository.
 
 ## Decisions
 
-1. **Parser place.** Should the parser run as a script in `delivery-info-arch-tooling`, which hedy wraps? The recommendation is yes. The tooling repository is shared with colleagues, so the change there goes through that repository's review.
-2. **Publishing.** Should `hedy confluence publish` refuse a page whose diagram Mermaid rejects? The recommendation is yes, after the cutover, because a broken diagram reaches Confluence today as a broken image.
-3. **The five broken diagrams.** Should the four drafts in `analysis/ins-authnz/one-shot/candidate-3.md` and the diagram on the published TRACES page be fixed? The plan does not depend on the answer, and the published page is the one a reader sees.
+Ben decided on 23 November 2026 that hedy runs the parser itself, with `linkedom`, and loads the tooling's Mermaid. Two decisions remain:
+
+1. **Publishing.** Should `hedy confluence publish` refuse a page whose diagram Mermaid rejects? The recommendation is yes, after the cutover, because a broken diagram reaches Confluence today as a broken image.
+2. **The six broken diagrams.** Should the four drafts in `analysis/ins-authnz/one-shot/candidate-3.md`, the diagram in `analysis/field-config/ipaffs-referencedata-fieldconfig-analysis.md` and the diagram on the published TRACES page be fixed? The plan does not depend on the answer, and the published page is the one a reader sees.
