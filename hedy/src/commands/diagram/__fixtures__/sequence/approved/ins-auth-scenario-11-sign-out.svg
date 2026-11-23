@@ -5,6 +5,7 @@
 <text x="991.2" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PUBLIC ZONE</text>
 <rect x="1027.4" y="22" width="159.4" height="1604" rx="8" fill="#fafafa" stroke="#bbbbbb" stroke-dasharray="5 4"/>
 <text x="1176.7" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PROTECTED ZONE</text>
+<rect x="50" y="724" width="1282.1" height="334" rx="6" fill="#e8f1f8" stroke="#5694ca" stroke-width="1.2"/>
 <line x1="105" y1="110" x2="105" y2="1616" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
 <rect x="40" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
 <text x="105" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Browser</text>
@@ -26,7 +27,6 @@
 <line x1="1277.1" y1="110" x2="1277.1" y2="1616" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
 <rect x="1212.1" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
 <text x="1277.1" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">IDM</text>
-<rect x="50" y="724" width="1282.1" height="334" rx="6" fill="#e8f1f8" stroke="#5694ca" stroke-width="1.2"/>
 <text x="62" y="744" font-size="10.5" fill="#666666" text-anchor="start" font-weight="700" letter-spacing="0.07em">alt.</text>
 <text x="87.9" y="744" font-size="12" fill="#222222" text-anchor="start">IDM accepts the hint</text>
 <line x1="50" y1="982" x2="1332.1" y2="982" stroke="#bbbbbb" stroke-dasharray="5 4"/>

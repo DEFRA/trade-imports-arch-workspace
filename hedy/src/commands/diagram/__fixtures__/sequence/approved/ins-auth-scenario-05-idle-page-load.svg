@@ -5,6 +5,7 @@
 <text x="1020" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PUBLIC ZONE</text>
 <rect x="1128.2" y="22" width="159.4" height="2330" rx="8" fill="#fafafa" stroke="#bbbbbb" stroke-dasharray="5 4"/>
 <text x="1277.5" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PROTECTED ZONE</text>
+<rect x="50" y="1454" width="1444.3" height="144" rx="6" fill="#e8f1f8" stroke="#5694ca" stroke-width="1.2"/>
 <line x1="105" y1="110" x2="105" y2="2342" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
 <rect x="40" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
 <text x="105" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Browser</text>
@@ -26,7 +27,6 @@
 <line x1="1439.3" y1="110" x2="1439.3" y2="2342" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
 <rect x="1374.3" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
 <text x="1439.3" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">IDM</text>
-<rect x="50" y="1454" width="1444.3" height="144" rx="6" fill="#e8f1f8" stroke="#5694ca" stroke-width="1.2"/>
 <text x="62" y="1474" font-size="10.5" fill="#666666" text-anchor="start" font-weight="700" letter-spacing="0.07em">alt.</text>
 <text x="87.9" y="1474" font-size="12" fill="#222222" text-anchor="start">John signed in through Government Gateway</text>
 <line x1="50" y1="1528" x2="1494.3" y2="1528" stroke="#bbbbbb" stroke-dasharray="5 4"/>
