@@ -36,12 +36,11 @@ describe('readSequenceSource reads participants and zones', () => {
   })
 
   it.each([
-    ['box rgb(240, 240, 240) Public zone'],
-    ['box rgba(0,0,0,0.1) Public zone'],
-    ['box hsl(0, 0%, 95%) Public zone'],
-    ['box transparent Public zone']
-  ])('reads the zone name after the colour in %s', (boxLine) => {
-    expect(read(boxLine, 'participant RS as Routing Service', 'end').zones[0].name).toBe('Public zone')
+    ['box rgb(240, 240, 240) Public zone', 'rgb(240, 240, 240) Public zone'],
+    ['box Aqua Public zone', 'Aqua Public zone'],
+    ['box transparent Public zone', 'transparent Public zone']
+  ])('keeps the whole text of %s as the zone name, because Mermaid decides which word is a colour', (boxLine, name) => {
+    expect(read(boxLine, 'participant RS as Routing Service', 'end').zones[0].name).toBe(name)
   })
 })
 

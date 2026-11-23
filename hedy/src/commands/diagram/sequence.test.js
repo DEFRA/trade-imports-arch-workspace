@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import { runCli } from '../../test-support/cli.js'
 import { createFakeMermaidWorkspace } from '../../test-support/fake-mermaid.js'
 import { captureIo } from '../../test-support/io.js'
-import { svgTokens } from '../../test-support/svg-tokens.js'
+import { svgTokens, zoneBandLabels } from '../../test-support/svg-tokens.js'
 import { register } from './sequence.js'
 
 const TRIAL = fileURLToPath(new URL('./__fixtures__/sequence/body-01.mmd', import.meta.url))
@@ -38,6 +38,19 @@ const writeSource = async (name, ...lines) => {
   await writeFile(path, ['sequenceDiagram', ...lines].join('\n'))
   return path
 }
+
+describe('hedy diagram sequence labels zone bands', () => {
+  it('labels each band with the name Mermaid gives the group, and leaves a group Mermaid gives no name without a label', async () => {
+    const h = harness()
+    const source = await writeSource('zones.mmd',
+      'box Aqua Public zone', '  participant A as Alpha', 'end',
+      'box Red', '  participant B as Beta', 'end',
+      'A->>B: Hello')
+    const output = join(folder, 'zones.svg')
+    await h.run(source, output)
+    expect(zoneBandLabels(await readFile(output, 'utf8'))).toEqual(['PUBLIC ZONE'])
+  })
+})
 
 describe('hedy diagram sequence draws a source', () => {
   it('writes the SVG and reports the source, the output, the size and the number of steps', async () => {

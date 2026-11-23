@@ -14,7 +14,7 @@ describe('parseDiagrams', () => {
       { label: 'a.mmd', text: 'sequenceDiagram\n  A->>B: Hi' },
       { label: 'p.md:4', text: 'flowchart LR\n  FAIL on line 2' }
     ], { workspaceRoot: workspace })).toEqual([
-      { label: 'a.mmd', ok: true, type: 'sequenceDiagram' },
+      { label: 'a.mmd', ok: true, type: 'sequence', groups: [] },
       { label: 'p.md:4', ok: false, message: 'Parse error on line 2:\nflowchart LR\n  FAIL on line 2' }
     ])
   })

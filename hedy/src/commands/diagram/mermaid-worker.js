@@ -20,7 +20,17 @@ const loadMermaid = async (entry) => {
   return mermaid
 }
 
+const groupNames = async (mermaid, text) => {
+  const diagram = await mermaid.mermaidAPI.getDiagramFromText(text)
+  return diagram.db.getBoxes().map(({ name }) => name ?? '')
+}
+
+const describedParse = (mermaid) => async (text) => {
+  const { diagramType } = await mermaid.parse(text)
+  return diagramType === 'sequence' ? { diagramType, groups: await groupNames(mermaid, text) } : { diagramType }
+}
+
 const [mermaidEntry] = process.argv.slice(2)
 const mermaid = await loadMermaid(mermaidEntry)
 const diagrams = JSON.parse(await readInput(process.stdin))
-process.stdout.write(JSON.stringify(await verdictsOf((text) => mermaid.parse(text), diagrams)))
+process.stdout.write(JSON.stringify(await verdictsOf(describedParse(mermaid), diagrams)))

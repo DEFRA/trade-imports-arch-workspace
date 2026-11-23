@@ -1,7 +1,7 @@
 const verdictOf = async (parse, { label, text }) => {
   try {
-    const { diagramType } = await parse(text)
-    return { label, ok: true, type: diagramType }
+    const { diagramType, groups } = await parse(text)
+    return groups === undefined ? { label, ok: true, type: diagramType } : { label, ok: true, type: diagramType, groups }
   } catch (error) {
     return { label, ok: false, message: error.message }
   }

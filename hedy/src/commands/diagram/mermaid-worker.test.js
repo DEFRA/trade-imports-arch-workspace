@@ -26,6 +26,13 @@ describe('the Mermaid worker', () => {
     expect(JSON.parse(stdout)).toEqual([{ label: 'a.mmd', ok: true, type: 'graph' }])
   })
 
+  it('gives a sequence diagram\'s verdict the names Mermaid gives its box groups, in order', async () => {
+    const entry = join(workspace, 'delivery-info-arch-tooling', 'node_modules', 'mermaid', 'index.js')
+    const text = 'sequenceDiagram\n  box Aqua Public zone\n    participant A as Alpha\n  end\n  box Red\n    participant B as Beta\n  end'
+    const { stdout } = await runWorker(entry, [{ label: 'a.mmd', text }])
+    expect(JSON.parse(stdout)).toEqual([{ label: 'a.mmd', ok: true, type: 'sequence', groups: ['Public zone', ''] }])
+  })
+
   it('exits 1 with the reason on stderr when Mermaid cannot be loaded', async () => {
     const missing = join(workspace, 'missing', 'index.js')
     const { exitCode, stderr } = await runWorker(missing, [])

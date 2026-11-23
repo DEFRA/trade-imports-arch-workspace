@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { svgTokens } from './svg-tokens.js'
+import { svgTokens, zoneBandLabels } from './svg-tokens.js'
+
+describe('zoneBandLabels', () => {
+  it('reads the italic texts, which the house style uses for zone labels, in drawing order', () => {
+    const svg = '<svg><text font-style="italic">PUBLIC ZONE</text><text>Browser</text><text font-style="italic">AWS PLATFORM</text></svg>'
+    expect(zoneBandLabels(svg)).toEqual(['PUBLIC ZONE', 'AWS PLATFORM'])
+  })
+})
 
 describe('svgTokens', () => {
   it('lists elements with their attributes and the texts between them, leaving out whitespace', () => {

@@ -17,6 +17,13 @@ describe('verdictsOf', () => {
     ])
   })
 
+  it('passes on the names of a sequence diagram\'s groups, as Mermaid names them', async () => {
+    const parse = async () => ({ diagramType: 'sequence', groups: ['Public zone', ''] })
+    expect(await verdictsOf(parse, [{ label: 'a.mmd', text: 'x' }])).toEqual([
+      { label: 'a.mmd', ok: true, type: 'sequence', groups: ['Public zone', ''] }
+    ])
+  })
+
   it('parses one diagram at a time, because Mermaid keeps the state of a parse in shared modules', async () => {
     const overlap = { active: 0, most: 0 }
     const slowParse = async () => {

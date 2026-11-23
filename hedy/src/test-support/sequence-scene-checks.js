@@ -9,6 +9,8 @@ const boundsOfRect = ({ x, y, width, height }) => ({ left: x, right: x + width, 
 
 const stepsOf = (scene) => scene.body.filter(({ kind }) => kind === 'step')
 
+const zoneLabels = ({ label }) => label === undefined ? [] : [label]
+
 const frameTexts = ({ heading, dividers }) => [...heading, ...dividers.map(({ text }) => text)]
 
 const notesOf = (scene) => scene.body.filter(({ kind }) => kind === 'note')
@@ -16,7 +18,7 @@ const notesOf = (scene) => scene.body.filter(({ kind }) => kind === 'note')
 const lifelineX = (scene, id) => scene.participants.find((participant) => participant.id === id).lifeline.x
 
 const allTexts = (scene) => [
-  ...scene.zones.map(({ label }) => label),
+  ...scene.zones.flatMap(zoneLabels),
   ...scene.participants.flatMap(({ texts }) => texts),
   ...scene.frames.flatMap(frameTexts),
   ...stepsOf(scene).flatMap(({ labels }) => labels),
@@ -37,7 +39,7 @@ const textsInside = (owner, rect, texts) => texts
 const textsInsideBoxes = (scene) => [
   ...scene.participants.flatMap(({ id, rect, texts }) => textsInside(`participant ${id}`, rect, texts)),
   ...notesOf(scene).flatMap(({ over, rect, texts }) => textsInside(`note over ${over.join(',')}`, rect, texts)),
-  ...scene.zones.flatMap(({ name, rect, label }) => textsInside(`zone ${name}`, rect, [label])),
+  ...scene.zones.flatMap(({ name, rect, label }) => textsInside(`zone ${name}`, rect, zoneLabels({ label }))),
   ...scene.frames.flatMap((frame, index) => textsInside(`frame ${index + 1}`, frame.rect, frameTexts(frame)))
 ]
 

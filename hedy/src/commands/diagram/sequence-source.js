@@ -49,12 +49,10 @@ const boxPlacementRefusal = (state) => {
   return undefined
 }
 
-const zoneName = (text) => text.replace(/^(?:transparent|(?:rgba?|hsla?)\([^)]*\))\s*/i, '')
-
 const readBox = (state, lineNumber, [, text]) => {
   const refusal = boxPlacementRefusal(state)
   const checked = refusal === undefined ? state : refused(state, lineNumber, refusal)
-  return { ...checked, blocks: [...checked.blocks, { kind: 'box', lineNumber, name: zoneName(text ?? ''), members: [] }] }
+  return { ...checked, blocks: [...checked.blocks, { kind: 'box', lineNumber, name: text ?? '', members: [] }] }
 }
 
 const readMessage = (state, lineNumber, [, from, arrow, to, label]) => {
