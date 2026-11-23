@@ -15,8 +15,22 @@ describe('parseDiagrams', () => {
       { label: 'p.md:4', text: 'flowchart LR\n  FAIL on line 2' }
     ], { workspaceRoot: workspace })).toEqual([
       { label: 'a.mmd', ok: true, type: 'sequence', groups: [] },
-      { label: 'p.md:4', ok: false, message: 'Parse error on line 2:\nflowchart LR\n  FAIL on line 2' }
+      { label: 'p.md:4', ok: false, cause: 'diagram', message: 'Parse error on line 2:\nflowchart LR\n  FAIL on line 2' }
     ])
+  })
+
+  it('gives a diagram hedy could not check the cause hedy and the triage report of the fault, naming the Mermaid and jsdom versions and holding the diagram', async () => {
+    const text = 'sequenceDiagram\n  box NEEDS Option'
+    const [verdict] = await parseDiagrams([{ label: 'a.mmd', text }], { workspaceRoot: workspace })
+    expect(verdict).toMatchObject({
+      label: 'a.mmd',
+      ok: false,
+      cause: 'hedy',
+      message: 'ReferenceError: Option is not defined',
+      report: { fault: 'ReferenceError: Option is not defined', missingFeature: 'the global Option', input: text }
+    })
+    expect(verdict.report.environment).toMatch(/mermaid 0\.0\.0-fake, jsdom \d+\.\d+\.\d+/)
+    expect(Object.hasOwn(verdict, 'fault')).toBe(false)
   })
 
   it('accepts a workspace root given relative to the current folder', async () => {
@@ -56,12 +70,11 @@ describe('parseDiagrams', () => {
     })
   })
 
-  it('reports an internal fault, as UNKNOWN, when the parser\'s output is not its verdicts', async () => {
+  it('reports a fault in hedy, as INTERNAL with its triage report, when the parser\'s output is not its verdicts', async () => {
     await replaceMermaid("export default { async parse () { process.stdout.write('noise'); return { diagramType: 'graph' } } }")
-    await expect(parseDiagrams([{ label: 'a.mmd', text: 'graph TD' }], { workspaceRoot: workspace })).rejects.toMatchObject({
-      code: 'UNKNOWN',
-      message: expect.stringContaining('The Mermaid parser gave output that is not its verdicts')
-    })
+    const error = await parseDiagrams([{ label: 'a.mmd', text: 'graph TD' }], { workspaceRoot: workspace }).catch((rejection) => rejection)
+    expect(error).toMatchObject({ code: 'INTERNAL', message: expect.stringContaining('The Mermaid parser gave output that is not its verdicts') })
+    expect(error.report.fault).toMatch(/^SyntaxError: /)
   })
 
   it('stops a parser that runs past its time limit and reports the limit', async () => {

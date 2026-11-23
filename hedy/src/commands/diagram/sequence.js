@@ -68,11 +68,15 @@ const placeOf = (diagram, message) => {
   return line === undefined ? diagram.label : `${diagram.label}:${line}`
 }
 
+const refusal = (verdict, diagram) => verdict.cause === 'hedy'
+  ? new HedyError('INTERNAL', `hedy could not check ${diagram.label} with Mermaid: ${verdict.message}. The fault is in hedy, not in the source. File the report as a hedy bug.`, { report: verdict.report })
+  : new HedyError('PARSE', `${placeOf(diagram, verdict.message)}: Mermaid does not accept the source: ${verdict.message.split('\n')[0]} Fix the line, check the file with hedy diagram check, then run the command again.`)
+
 const acceptedVerdict = async (text, { source, workspaceRoot }) => {
   const diagram = { label: source, text, linesBefore: 0 }
   const [verdict] = await parseDiagrams([diagram], { workspaceRoot })
   if (verdict.ok) return verdict
-  throw new HedyError('PARSE', `${placeOf(diagram, verdict.message)}: Mermaid does not accept the source: ${verdict.message.split('\n')[0]} Fix the line, check the file with hedy diagram check, then run the command again.`)
+  throw refusal(verdict, diagram)
 }
 
 const drawSequenceFile = async ({ source, output }, { workspaceRoot }) => {

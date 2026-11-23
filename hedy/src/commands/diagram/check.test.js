@@ -55,7 +55,7 @@ describe('hedy diagram check on a Mermaid file', () => {
     const { ok, errors, result } = envelopeOf(h)
     expect(ok).toBe(false)
     expect(errors).toEqual([{ code: 'PARSE', message: 'The check found 1 diagram that Mermaid rejects. Fix each line the result names, then run the check again.' }])
-    expect(result).toMatchObject({ passed: false, files: 1, diagrams: [{ label: path, ok: false, line: 2, message: expect.stringContaining('Parse error on line 2:') }] })
+    expect(result).toMatchObject({ passed: false, files: 1, diagrams: [{ label: path, ok: false, cause: 'diagram', line: 2, message: expect.stringContaining('Parse error on line 2:') }] })
     expect(h.codes).toEqual([1])
   })
 
@@ -75,6 +75,38 @@ describe('hedy diagram check on a Mermaid file', () => {
       ''
     ].join('\n'))
     expect(h.err.join('')).toContain('The check found 1 diagram that Mermaid rejects.')
+  })
+})
+
+describe('hedy diagram check on a diagram hedy could not check', () => {
+  it('fails with exit 1 and an INTERNAL error that holds the triage report, and gives the diagram the cause hedy, apart from the diagrams Mermaid rejects', async () => {
+    const h = harness()
+    const faulty = await writeFixture('a.mmd', 'sequenceDiagram\n  box NEEDS Option\n')
+    const bad = await writeFixture('b.mmd', 'sequenceDiagram\n  FAIL on line 2\n')
+    await h.run('--json', faulty, bad)
+    const { errors, result } = envelopeOf(h)
+    expect(errors.map(({ code }) => code)).toEqual(['INTERNAL', 'PARSE'])
+    expect(errors[0].message).toBe(`hedy could not check ${faulty}: ReferenceError: Option is not defined. The fault is in hedy, not in the diagram. File the report as a hedy bug.`)
+    expect(errors[0].report).toMatchObject({ missingFeature: 'the global Option', input: 'sequenceDiagram\n  box NEEDS Option\n' })
+    expect(result.diagrams[0]).toEqual({ label: faulty, ok: false, cause: 'hedy', message: 'ReferenceError: Option is not defined' })
+    expect(errors[1].message).toBe('The check found 1 diagram that Mermaid rejects. Fix each line the result names, then run the check again.')
+    expect(h.codes).toEqual([1])
+  })
+
+  it('prints an ERROR line for the diagram in text mode, counts it as not checked, and writes the report on stderr', async () => {
+    const h = harness()
+    const good = await writeFixture('a.mmd', 'flowchart LR\n')
+    const faulty = await writeFixture('b.mmd', 'sequenceDiagram\n  box NEEDS Option\n')
+    await h.run(good, faulty)
+    expect(h.out.join('')).toBe([
+      `PASS  ${good}  flowchart`,
+      `ERROR ${faulty}`,
+      '      hedy could not check the diagram: ReferenceError: Option is not defined',
+      '',
+      '2 diagrams in 2 files: 1 passed, 0 failed, 1 not checked.',
+      ''
+    ].join('\n'))
+    expect(h.err.join('')).toContain('Missing feature: the global Option')
   })
 })
 

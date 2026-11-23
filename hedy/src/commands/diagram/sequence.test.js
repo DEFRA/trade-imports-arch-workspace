@@ -95,6 +95,23 @@ describe('hedy diagram sequence refuses what it cannot draw', () => {
     expect(await readFile(output, 'utf8')).toBe('earlier drawing')
   })
 
+  it('refuses with INTERNAL and the triage report when a fault in hedy stops the Mermaid check, and leaves the earlier drawing untouched', async () => {
+    const h = harness()
+    const source = await writeSource('zones.mmd', 'box NEEDS Option', '  participant A as Alpha', 'end')
+    const output = join(folder, 'zones.svg')
+    await writeFile(output, 'earlier drawing')
+    await h.run('--json', source, output)
+    const [error, ...rest] = envelopeOf(h).errors
+    expect(rest).toEqual([])
+    expect(error).toMatchObject({
+      code: 'INTERNAL',
+      message: `hedy could not check ${source} with Mermaid: ReferenceError: Option is not defined. The fault is in hedy, not in the source. File the report as a hedy bug.`,
+      report: { missingFeature: 'the global Option' }
+    })
+    expect(h.codes).toEqual([1])
+    expect(await readFile(output, 'utf8')).toBe('earlier drawing')
+  })
+
   it('reports every refused line as a PARSE error with exit 1 and leaves the earlier drawing untouched', async () => {
     const h = harness()
     const source = await writeSource('flow.mmd', 'participant A as Alpha', 'loop Every minute', 'A->>B: Hello', 'end')

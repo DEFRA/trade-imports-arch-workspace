@@ -36,8 +36,11 @@ const checkInputSchema = z.object({
   if (problem !== undefined) context.addIssue({ code: 'custom', message: problem })
 })
 
-const withFileLine = (verdict, diagram) =>
-  verdict.ok ? verdict : { label: verdict.label, ok: false, line: fileLineOf(diagram, verdict.message), message: verdict.message }
+const resultVerdict = (verdict, diagram) => {
+  if (verdict.ok) return verdict
+  const { label, cause, message } = verdict
+  return cause === 'hedy' ? { label, ok: false, cause, message } : { label, ok: false, cause, line: fileLineOf(diagram, message), message }
+}
 
 const failureMessage = (failed) =>
   `The check found ${failed} ${failed === 1 ? 'diagram' : 'diagrams'} that Mermaid rejects. Fix each line the result names, then run the check again.`
@@ -45,10 +48,10 @@ const failureMessage = (failed) =>
 const checkResult = ({ fileCount, diagrams, verdicts }) => ({
   passed: verdicts.every(({ ok }) => ok),
   files: fileCount,
-  diagrams: verdicts.map((verdict, i) => withFileLine(verdict, diagrams[i]))
+  diagrams: verdicts.map((verdict, i) => resultVerdict(verdict, diagrams[i]))
 })
 
-const failedCount = ({ diagrams }) => diagrams.filter(({ ok }) => !ok).length
+const countOf = ({ diagrams }, cause) => diagrams.filter((verdict) => verdict.cause === cause).length
 
 const counted = (count, noun) => `${count} ${noun}${count === 1 ? '' : 's'}`
 
@@ -57,11 +60,18 @@ const failLines = ({ label, line, message }) => {
   return [`FAIL  ${where}`, ...message.trimEnd().split('\n').map((text) => `      ${text}`)]
 }
 
-const verdictLines = (verdict) => verdict.ok ? [`PASS  ${verdict.label}  ${verdict.type}`] : failLines(verdict)
+const errorLines = ({ label, message }) => [`ERROR ${label}`, `      hedy could not check the diagram: ${message}`]
+
+const verdictLines = (verdict) => {
+  if (verdict.ok) return [`PASS  ${verdict.label}  ${verdict.type}`]
+  return verdict.cause === 'hedy' ? errorLines(verdict) : failLines(verdict)
+}
 
 const summaryLine = (result) => {
-  const failed = failedCount(result)
-  return `${counted(result.diagrams.length, 'diagram')} in ${counted(result.files, 'file')}: ${result.diagrams.length - failed} passed, ${failed} failed.`
+  const failed = countOf(result, 'diagram')
+  const notChecked = countOf(result, 'hedy')
+  const notCheckedPart = notChecked === 0 ? '' : `, ${notChecked} not checked`
+  return `${counted(result.diagrams.length, 'diagram')} in ${counted(result.files, 'file')}: ${result.diagrams.length - failed - notChecked} passed, ${failed} failed${notCheckedPart}.`
 }
 
 export const renderCheck = (result) => result.diagrams.length === 0
@@ -75,8 +85,9 @@ Each diagram is parsed by the Mermaid that delivery-info-arch-tooling installs, 
   hedy diagram check docs/                             every .mmd file and page beneath a folder,
                                                        leaving out node_modules, build, generated and dot folders
   hedy diagram check --stdin --label "draft: sign-in"  one diagram held in context, read from stdin
-The result gives each diagram's verdict. A failure gives the line of the file and Mermaid's message.
-Exit 0: every diagram parses. Exit 1: a diagram does not parse, or Mermaid is not installed (run make install). Exit 2: a usage error.`
+The result gives each diagram's verdict. A FAIL gives the line of the file and Mermaid's message.
+An ERROR means a fault in hedy stopped the check of that diagram, and the error holds a report to file as a hedy bug.
+Exit 0: every diagram parses. Exit 1: a diagram does not parse, hedy could not check a diagram, or Mermaid is not installed (run make install). Exit 2: a usage error.`
 
 const stdinSources = async ({ label }, stdin) => {
   const { text } = await readStdinText(stdin, { label })
@@ -88,11 +99,26 @@ const fileSources = async ({ paths }) => {
   return { fileCount: files.length, diagrams: files.flatMap(({ label, text }) => diagramsInText({ path: label, text })) }
 }
 
+const faultError = ({ label, message, report }, result) => new HedyError(
+  'INTERNAL',
+  `hedy could not check ${label}: ${message}. The fault is in hedy, not in the diagram. File the report as a hedy bug.`,
+  { report, result }
+)
+
+const checkErrors = (verdicts, result) => {
+  const failed = countOf(result, 'diagram')
+  return [
+    ...verdicts.filter(({ cause }) => cause === 'hedy').map((verdict) => faultError(verdict, result)),
+    ...(failed === 0 ? [] : [new HedyError('PARSE', failureMessage(failed), { result })])
+  ]
+}
+
 const runCheck = async (input, { stdin, workspaceRoot }) => {
   const { fileCount, diagrams } = input.stdin ? await stdinSources(input, stdin) : await fileSources(input)
   const verdicts = await parseDiagrams(diagrams, { workspaceRoot: workspaceRoot() })
   const result = checkResult({ fileCount, diagrams, verdicts })
-  if (!result.passed) throw new HedyError('PARSE', failureMessage(failedCount(result)), { result })
+  const errors = checkErrors(verdicts, result)
+  if (errors.length > 0) throw new AggregateError(errors, 'The diagram check failed')
   return result
 }
 

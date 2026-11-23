@@ -154,12 +154,14 @@ describe('runPublish with a publisher that succeeds', () => {
 })
 
 describe('runPublish warning about a broken diagram', () => {
-  const addBrokenBlock = async () => {
+  const addBlock = async (body) => {
     const pagePath = join(docsRepo, PAGE)
     const original = (await readFile(pagePath, 'utf8')).trimEnd()
-    await writeFile(pagePath, `${original}\n\n\`\`\`mermaid\ngraph TD\n  FAIL on line 2\n\`\`\`\n`)
+    await writeFile(pagePath, `${original}\n\n\`\`\`mermaid\n${body}\n\`\`\`\n`)
     return original.split('\n').length + 2
   }
+
+  const addBrokenBlock = () => addBlock('graph TD\n  FAIL on line 2')
 
   const brokenWarning = (fenceLine) =>
     `Mermaid rejects the diagram at ${PAGE}:${fenceLine + 2} (Parse error on line 2), so the published page shows the diagram broken. Fix the diagram, check the page with hedy diagram check, then publish the page again.`
@@ -183,6 +185,17 @@ describe('runPublish warning about a broken diagram', () => {
     const calls = []
     await publish({ confirm: recordingConfirm(calls, { answer: false }) })
     expect(calls[0].warnings).toEqual([brokenWarning(fenceLine)])
+  })
+
+  it('warns that a fault in hedy stopped the check of a diagram, naming the diagram and the command that gives the report, and still publishes the page', async () => {
+    await installFakeMermaid(root)
+    const fenceLine = await addBlock('sequenceDiagram\n  box NEEDS Option')
+    await installScenario('updated')
+    stagePreChecks()
+    stageReadBack('201')
+    const result = await publish()
+    expect(result.warnings[0]).toBe(`The diagram at ${PAGE}:${fenceLine} was not checked, because a fault in hedy stopped the check (ReferenceError: Option is not defined). Run hedy diagram check on the page, and file the report it prints as a hedy bug.`)
+    expect(await publisherRan()).toBe(true)
   })
 
   it('warns that the page\'s diagrams were not checked when the workspace has no Mermaid, and still publishes the page', async () => {
