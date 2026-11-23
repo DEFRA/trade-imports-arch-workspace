@@ -13,10 +13,7 @@
       "workers": []
     },
     "walker": false,
-    "helpers": [
-      "start-mermaid-check",
-      "render-mermaid"
-    ],
+    "helpers": [],
     "triggers": {
       "phrases": [
         "check mermaid",

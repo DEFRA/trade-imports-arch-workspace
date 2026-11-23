@@ -35,8 +35,7 @@ Authors and verifies Mermaid diagrams in Markdown files and standalone .mmd file
 
 ## 7. Helpers introduced
 
-- start-mermaid-check
-- render-mermaid
+None. The skill calls `hedy diagram check` and `hedy diagram sequence`.
 
 ## 8. Triggers
 
