@@ -1,5 +1,5 @@
 import { pathToFileURL } from 'node:url'
-import { parseHTML } from 'linkedom'
+import { JSDOM } from 'jsdom'
 import { verdictsOf } from './mermaid-verdicts.js'
 
 const readInput = async (stream) => {
@@ -9,9 +9,9 @@ const readInput = async (stream) => {
 }
 
 const installBrowserWindow = () => {
-  const { window, document } = parseHTML('<!doctype html><html><body></body></html>')
+  const { window } = new JSDOM('<!doctype html><html><body></body></html>')
   globalThis.window = window
-  globalThis.document = document
+  globalThis.document = window.document
 }
 
 const loadMermaid = async (entry) => {

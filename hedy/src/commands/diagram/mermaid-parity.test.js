@@ -29,4 +29,12 @@ describe('parity with the bash check on the real Mermaid', () => {
     const byLabel = (a, b) => (a.label < b.label ? -1 : 1)
     expect(verdicts.map(asRecorded).toSorted(byLabel)).toEqual(expected.toSorted(byLabel))
   }, 60_000)
+
+  it.skipIf(!toolingHasMermaid)('passes every approved sequence fixture, each of which holds box blocks', async () => {
+    const sequenceFixtures = fileURLToPath(new URL('./__fixtures__/sequence/', import.meta.url))
+    const paths = await mermaidFiles([sequenceFixtures])
+    const diagrams = await Promise.all(paths.map(async (path) => ({ label: path.slice(sequenceFixtures.length), text: await readFile(path, 'utf8') })))
+    const verdicts = await parseDiagrams(diagrams, { workspaceRoot: WORKSPACE })
+    expect(verdicts.filter(({ ok }) => !ok).map(({ label, message }) => `${label}: ${message}`)).toEqual([])
+  }, 60_000)
 })
