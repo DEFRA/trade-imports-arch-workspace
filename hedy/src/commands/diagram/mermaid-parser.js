@@ -38,7 +38,8 @@ const verdictsFrom = ({ exitCode, stdout, stderr, timedOut }, { entry, timeoutMs
 
 /**
  * Resolves to one verdict per diagram from the Mermaid that the workspace's
- * delivery-info-arch-tooling installs, parsed in a child process. Rejects
+ * delivery-info-arch-tooling installs, parsed in a child process that starts
+ * when there is at least one diagram. Rejects
  * with SETUP when Mermaid is not installed or cannot run, and with UNKNOWN
  * when the parser runs past timeoutMs or its output is not its verdicts.
  *
@@ -46,6 +47,7 @@ const verdictsFrom = ({ exitCode, stdout, stderr, timedOut }, { entry, timeoutMs
  * @param {{ workspaceRoot: string, timeoutMs?: number }} options
  */
 export const parseDiagrams = async (diagrams, { workspaceRoot, timeoutMs = 120_000 }) => {
+  if (diagrams.length === 0) return []
   const entry = mermaidEntry(workspaceRoot)
   const run = await runLocalTool({
     command: process.execPath,

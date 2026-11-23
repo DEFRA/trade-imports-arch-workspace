@@ -24,6 +24,15 @@ describe('parseDiagrams', () => {
     expect(verdicts).toEqual([{ label: 'a.mmd', ok: true, type: 'graph' }])
   })
 
+  it('gives no verdicts, without loading Mermaid, when there is no diagram to parse', async () => {
+    const bare = await createFakeMermaidWorkspace({ withMermaid: false })
+    try {
+      expect(await parseDiagrams([], { workspaceRoot: bare })).toEqual([])
+    } finally {
+      await rm(bare, { recursive: true, force: true })
+    }
+  })
+
   it('refuses with SETUP and the next step when the workspace tooling has no Mermaid installed', async () => {
     const bare = await createFakeMermaidWorkspace({ withMermaid: false })
     try {

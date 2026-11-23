@@ -3,6 +3,7 @@ import { HedyError } from '../../errors.js'
 import { runAction } from '../../run-action.js'
 import { readFileText } from '../prose/check.js'
 import { diagramsInText, fileLineOf } from './mermaid-diagrams.js'
+import { mermaidFiles } from './mermaid-files.js'
 import { parseDiagrams } from './mermaid-parser.js'
 
 const checkInputSchema = z.object({
@@ -37,10 +38,12 @@ const summaryLine = (result) => {
   return `${counted(result.diagrams.length, 'diagram')} in ${counted(result.files, 'file')}: ${result.diagrams.length - failed} passed, ${failed} failed.`
 }
 
-export const renderCheck = (result) => [...result.diagrams.flatMap(verdictLines), '', summaryLine(result)].join('\n')
+export const renderCheck = (result) => result.diagrams.length === 0
+  ? `No Mermaid diagrams found in ${counted(result.files, 'file')}.`
+  : [...result.diagrams.flatMap(verdictLines), '', summaryLine(result)].join('\n')
 
 const runCheck = async ({ paths }, { workspaceRoot }) => {
-  const files = await Promise.all(paths.map(readFileText))
+  const files = await Promise.all((await mermaidFiles(paths)).map(readFileText))
   const diagrams = files.flatMap(({ label, text }) => diagramsInText({ path: label, text }))
   const verdicts = await parseDiagrams(diagrams, { workspaceRoot: workspaceRoot() })
   const result = checkResult({ fileCount: files.length, diagrams, verdicts })
@@ -52,7 +55,7 @@ export const register = (group, { stdout, stderr, setExitCode, workspaceRoot }) 
   group
     .command('check')
     .description('Check that Mermaid diagrams parse')
-    .argument('[paths...]', 'The Mermaid files to check')
+    .argument('[paths...]', 'The .mmd files, Markdown pages and folders to check')
     .action((paths, options, command) => runAction(
       () => runCheck(checkInputSchema.parse({ paths }), { workspaceRoot }),
       { json: command.optsWithGlobals().json === true, render: renderCheck, stdout, stderr, setExitCode }

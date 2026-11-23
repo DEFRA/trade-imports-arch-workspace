@@ -1,6 +1,6 @@
-import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { Readable } from 'node:stream'
 import { Command } from 'commander'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
@@ -75,6 +75,42 @@ describe('hedy diagram check on a Mermaid file', () => {
       ''
     ].join('\n'))
     expect(h.err.join('')).toContain('The check found 1 diagram that Mermaid rejects.')
+  })
+})
+
+describe('hedy diagram check on pages and folders', () => {
+  const page = ['# Page', '', '```mermaid', 'graph TD', '```', '', '```mermaid', 'sequenceDiagram', '  FAIL on line 2', '```', ''].join('\n')
+
+  it('checks every .mmd file and page beneath a folder, leaving out node_modules, build, generated and dot folders, and gives a page failure its page line', async () => {
+    for (const [name, text] of [
+      ['docs/a.mmd', 'graph TD\n'],
+      ['docs/deep/page.md', page],
+      ['docs/notes.md', 'No diagrams here.\n'],
+      ['docs/node_modules/x.mmd', 'graph TD\n  FAIL on line 2\n'],
+      ['docs/build/x.mmd', 'graph TD\n  FAIL on line 2\n'],
+      ['docs/generated/x.mmd', 'graph TD\n  FAIL on line 2\n'],
+      ['docs/.cache/x.mmd', 'graph TD\n  FAIL on line 2\n'],
+      ['docs/readme.txt', 'graph TD\n  FAIL on line 2\n']
+    ]) {
+      await mkdir(dirname(join(folder, name)), { recursive: true })
+      await writeFile(join(folder, name), text)
+    }
+    const h = harness()
+    await h.run('--json', join(folder, 'docs'))
+    const { result } = envelopeOf(h)
+    expect(result.files).toBe(3)
+    expect(result.diagrams.map(({ label, ok, line }) => ({ label, ok, line }))).toEqual([
+      { label: join(folder, 'docs/a.mmd'), ok: true, line: undefined },
+      { label: join(folder, 'docs/deep/page.md:3'), ok: true, line: undefined },
+      { label: join(folder, 'docs/deep/page.md:7'), ok: false, line: 9 }
+    ])
+  })
+
+  it('says that it found no diagram, rather than that every diagram passed, when the files hold none', async () => {
+    const h = harness()
+    await h.run(await writeFixture('notes.md', 'No diagrams here.\n'))
+    expect(h.out).toEqual(['No Mermaid diagrams found in 1 file.\n'])
+    expect(h.codes).toEqual([0])
   })
 })
 
