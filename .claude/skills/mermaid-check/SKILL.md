@@ -1,9 +1,9 @@
 ---
 name: mermaid-check
-description: 'Authors and verifies Mermaid diagrams in Markdown files and standalone .mmd files, rendering each with mermaid-cli to confirm it parses before a doc ships. Use when adding a diagram to a document, or when checking that existing diagrams still render. Triggers: "check mermaid", "validate diagrams", "verify mermaid renders", "add a diagram". Owns Mermaid syntax, diagram-type fit and render correctness only. NOT for label wording, jargon or acronym-on-first-use, which belong to `authoring`. NOT for LikeC4 `.c4` models, which have their own `npm run validate:c4` and `npm run build:diagrams`. NOT for Claude Code CLAUDE.md scaffolding, which is the built-in /init.'
+description: 'Authors and verifies Mermaid diagrams in Markdown files and standalone .mmd files, rendering each with mermaid-cli to confirm it parses before a doc ships, and draws a sequence diagram as an SVG in the house style through hedy diagram sequence. Use when adding a diagram to a document, or when checking that existing diagrams still render. Triggers: "check mermaid", "validate diagrams", "verify mermaid renders", "add a diagram", "draw a sequence diagram". Owns Mermaid syntax, diagram-type fit and render correctness only. NOT for label wording, jargon or acronym-on-first-use, which belong to `authoring`. NOT for LikeC4 `.c4` models, which have their own `npm run validate:c4` and `npm run build:diagrams`. NOT for Claude Code CLAUDE.md scaffolding, which is the built-in /init.'
 model: sonnet
 metadata:
-  workspace-soft-deps: delivery-info-arch-tooling trade-imports-documentation npm npx mmdc
+  workspace-soft-deps: delivery-info-arch-tooling trade-imports-documentation npm npx mmdc rsvg-convert
 ---
 
 A diagram that does not render is worse than no diagram: it ships as a broken image or an empty block, and nobody notices until a reader opens the page. This skill closes that gap. It renders every Mermaid diagram in the files you name, reports which fail and where, and helps you author new ones that parse first time. Nothing is written to your documents: rendering happens in a temp directory and source files are never modified.
@@ -20,6 +20,7 @@ Diagrams here live in two places. Nearly all are fenced ` ```mermaid ` blocks in
 | "validate diagrams"      | Step 0, then Verify                       |
 | "verify mermaid renders" | Step 0, then Verify                       |
 | "add a diagram"          | Author, then Step 0 to confirm it renders |
+| "draw a sequence diagram" | Author, Step 0, then Draw in the House Style |
 
 Also run Verify unprompted before publishing any document you have added or edited a diagram in.
 
@@ -92,6 +93,23 @@ When adding a diagram:
 5. **Render before moving on** via Step 0 on the file. A diagram that has not been rendered is not finished.
 
 For a diagram destined for the documentation pipeline rather than a single document, write it as a `.mmd` file under `trade-imports-documentation/architecture/` so `npm run build:mmd` picks it up.
+
+## Draw in the House Style
+
+A sequence diagram for a page can be drawn as an SVG in the house style, from the same `.mmd` file that Mermaid renders. The drawing fits notes to their text, sets request lines in monospace, shows each service's repository name beneath its title, and draws a zone band behind the participants of each `box` block.
+
+1. Write the source as a standalone `.mmd` file. Group the participants of each network zone in a `box` block, such as `box Public zone`, then the `participant` lines, then `end`.
+2. Run Step 0 on the file, so the source parses in Mermaid as well.
+3. Draw the SVG into the page's `diagrams/` folder:
+
+   ```bash
+   hedy diagram sequence <source.mmd> <output.svg> --json
+   ```
+
+4. Read the envelope. On success, `result` gives the size and the number of steps. On failure, each `PARSE` error names the line and the change to make: fix every line it names, then run the command again. `hedy diagram sequence --help` lists the constructs the command draws.
+5. Look at the drawing before placing it on the page: `rsvg-convert -w 1400 -o <file>.png <file>.svg`, then read the PNG.
+
+A failed run leaves any earlier SVG at the output path untouched.
 
 ## Completion output
 

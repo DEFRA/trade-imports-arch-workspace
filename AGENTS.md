@@ -53,7 +53,7 @@ The root `.env` holds the Atlassian credentials, and `hedy` reads the file itsel
 
 ## The `hedy` CLI
 
-`hedy` is the workspace's command-line tool, a Node 24 program in `hedy/`. `make install` puts `hedy` on PATH. The commands read Jira and Confluence, write Jira and publish to Confluence:
+`hedy` is the workspace's command-line tool, a Node 24 program in `hedy/`. `make install` puts `hedy` on PATH. The commands read Jira and Confluence, write Jira, publish to Confluence, draw sequence diagrams and check prose and the workspace:
 
 - `hedy auth` checks the Atlassian credentials and reports display names only.
 - `hedy jira ticket <key>` reads one issue, description included.
@@ -62,6 +62,7 @@ The root `.env` holds the Atlassian credentials, and `hedy` reads the file itsel
 - `hedy jira describe <key> --from <file>` replaces one issue's description with the file's Jira wiki markup. The command is a dry run by default, and `--confirm <planId>` runs exactly the same plan as the dry run.
 - `hedy confluence page <reference>` reads one page by id, URL or share link, as markdown by default.
 - `hedy confluence publish <page>` publishes one docs page to Confluence through the docs repo's publisher, after its pre-flight. The command publishes at once.
+- `hedy diagram sequence <source.mmd> <output.svg>` draws a Mermaid sequence diagram as an SVG in the house style, with a zone band for each `box` block. A line the command cannot draw fails the run with exit 1, the line number and the change to make, and leaves any earlier drawing in place.
 - `hedy prose check <file>...` checks files, or a text read with `--stdin --label <name>`, against the word tables of `.claude/skills/authoring/references/language.md` and six patterns. A banned word or a pattern fails the run with exit 1, and the output shows the line and the repair for each finding.
 - `hedy workspace check` checks the machine and the checkout against the expected setup, offline, and names the next step for each failed check.
 
