@@ -114,6 +114,30 @@ describe('hedy diagram check on pages and folders', () => {
   })
 })
 
+describe('hedy diagram check on a diagram held in context', () => {
+  it('checks the diagram on stdin as one diagram under its label, with lines counted from its first line', async () => {
+    const h = harness({ stdinText: 'sequenceDiagram\n  A->>B: Hi\n  FAIL on line 3\n' })
+    await h.run('--json', '--stdin', '--label', 'draft: sign-in')
+    expect(envelopeOf(h).result).toMatchObject({
+      passed: false,
+      files: 1,
+      diagrams: [{ label: 'draft: sign-in', ok: false, line: 3 }]
+    })
+  })
+
+  it.each([
+    [['--stdin'], '--stdin needs a non-empty --label <name>'],
+    [['--label', 'x', 'a.mmd'], '--label applies only to a diagram read from --stdin'],
+    [['--stdin', '--label', 'x', 'a.mmd'], 'The check reads either paths or --stdin, not both.'],
+    [[], 'No diagram was given to check.']
+  ])('refuses %j as a usage error with exit 2', async (args, message) => {
+    const h = harness()
+    await h.run(...args)
+    expect(h.err.join('')).toContain(message)
+    expect(h.codes).toEqual([2])
+  })
+})
+
 describe('hedy diagram check, spawned', () => {
   it('prints one envelope line and exits 0 when every diagram parses, and 1 when one does not', async () => {
     const good = await writeFixture('a.mmd', 'graph TD\n')
