@@ -31,3 +31,13 @@ export const svgTokens = (svg) => {
   if (unclosed.length > 0) throw new Error(`<${unclosed.at(-1)}> is not closed`)
   return tokens
 }
+
+/**
+ * Returns the labels of a sequence drawing's zone bands, in drawing order:
+ * the texts set in italics, which the house style uses for zone labels and
+ * nothing else.
+ *
+ * @param {string} svg
+ */
+export const zoneBandLabels = (svg) => svgTokens(svg).flatMap((token, index, tokens) =>
+  token.kind === 'open' && token.tag === 'text' && token.attributes['font-style'] === 'italic' ? [tokens[index + 1].text] : [])

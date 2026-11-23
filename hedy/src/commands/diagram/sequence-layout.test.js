@@ -51,6 +51,20 @@ describe('layOutSequence draws the services', () => {
   })
 })
 
+describe('layOutSequence draws a zone without a name', () => {
+  it('draws the band around its services with no label, as Mermaid draws a group without a name', () => {
+    const model = {
+      participants: [{ id: 'A', title: 'Alpha', caption: '' }],
+      zones: [{ name: '', members: ['A'] }],
+      events: [],
+      autonumber: false
+    }
+    const [zone] = layOutSequence(model).zones
+    expect(zone.members).toEqual(['A'])
+    expect(zone.label).toBeUndefined()
+  })
+})
+
 describe('layOutSequence draws zones from box blocks', () => {
   const zoned = sceneOf(
     'participant B as Browser',

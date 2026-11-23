@@ -3,8 +3,8 @@ import { z } from 'zod'
 import { ERROR_CODES, HedyError, isHedyError, resultHeldBy, toHedyError, toHedyErrors } from './errors.js'
 
 describe('ERROR_CODES', () => {
-  it('holds exactly the nine codes and cannot be changed', () => {
-    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE', 'SETUP', 'PROSE'])
+  it('holds exactly the ten codes and cannot be changed', () => {
+    expect([...ERROR_CODES]).toEqual(['USAGE', 'UNKNOWN', 'AUTH', 'NOT_FOUND', 'RATE_LIMIT', 'NETWORK', 'PARSE', 'SETUP', 'PROSE', 'INTERNAL'])
     expect(Object.isFrozen(ERROR_CODES)).toBe(true)
   })
 })
@@ -78,13 +78,24 @@ describe('toHedyError', () => {
     expect(toHedyError(error)).toBe(error)
   })
 
-  it('wraps a non-HedyError as UNKNOWN with the original as cause', () => {
+  it('wraps a non-HedyError as INTERNAL, naming hedy as the fault, with the original as cause', () => {
     const original = new TypeError('x is not a function')
     const wrapped = toHedyError(original)
     expect(isHedyError(wrapped)).toBe(true)
-    expect(wrapped.code).toBe('UNKNOWN')
-    expect(wrapped.message).toBe('x is not a function')
+    expect(wrapped.code).toBe('INTERNAL')
+    expect(wrapped.message).toBe('hedy stopped on a fault in hedy: TypeError: x is not a function. The fault is not in the command\'s input. File the report as a hedy bug.')
     expect(wrapped.cause).toBe(original)
+  })
+
+  it('gives an INTERNAL error the triage report of the fault when the caller gives the context', () => {
+    const original = new TypeError('x is not a function')
+    const context = { argv: ['diagram', 'check', 'a.mmd'], workspaceRoot: '/work', versions: { hedy: '0.1.0' }, platform: 'linux', arch: 'x64' }
+    expect(toHedyError(original, context).report).toMatchObject({
+      fault: 'TypeError: x is not a function',
+      missingFeature: 'the function x',
+      reproduction: 'hedy diagram check a.mmd'
+    })
+    expect(Object.hasOwn(toHedyError(original), 'report')).toBe(false)
   })
 
   it('turns a ZodError into one USAGE error joining each issue message with a space, keeping it as the cause', () => {
@@ -101,13 +112,13 @@ describe('toHedyError', () => {
   })
 
   it.each([
-    ['a thrown string', 'disk full', 'disk full'],
-    ['a thrown number', 42, '42'],
-    ['undefined', undefined, 'undefined']
-  ])('uses String(value) as the message for %s', (_label, value, message) => {
+    ['a thrown string', 'disk full', 'Error: disk full'],
+    ['a thrown number', 42, 'Error: 42'],
+    ['undefined', undefined, 'Error: undefined']
+  ])('wraps %s as INTERNAL, naming the value as the fault', (_label, value, fault) => {
     const wrapped = toHedyError(value)
-    expect(wrapped.code).toBe('UNKNOWN')
-    expect(wrapped.message).toBe(message)
+    expect(wrapped.code).toBe('INTERNAL')
+    expect(wrapped.message).toContain(`hedy stopped on a fault in hedy: ${fault}.`)
   })
 })
 
@@ -118,12 +129,19 @@ describe('toHedyErrors', () => {
     expect(toHedyErrors(new AggregateError([auth, usage], 'Several failures'))).toEqual([auth, usage])
   })
 
-  it('wraps a plain Error inside an AggregateError as UNKNOWN, keeping it as the cause', () => {
+  it('wraps a plain Error inside an AggregateError as INTERNAL, keeping it as the cause', () => {
     const auth = new HedyError('AUTH', 'Jira rejected the credentials.')
     const original = new TypeError('x is not a function')
     const [first, second] = toHedyErrors(new AggregateError([auth, original]))
     expect(first).toBe(auth)
-    expect(second).toMatchObject({ name: 'HedyError', code: 'UNKNOWN', message: 'x is not a function', cause: original })
+    expect(second).toMatchObject({ name: 'HedyError', code: 'INTERNAL', cause: original })
+    expect(second.message).toContain('TypeError: x is not a function')
+  })
+
+  it('gives each wrapped error its own report when the caller gives the context', () => {
+    const context = { argv: ['jira', 'ticket', 'EUDPA-1'], workspaceRoot: '/work', versions: { hedy: '0.1.0' }, platform: 'linux', arch: 'x64' }
+    const [, second] = toHedyErrors(new AggregateError([new HedyError('AUTH', 'No.'), new TypeError('x is not a function')]), context)
+    expect(second.report.fault).toBe('TypeError: x is not a function')
   })
 
   it('returns a single HedyError unchanged as the only entry', () => {
@@ -131,16 +149,18 @@ describe('toHedyErrors', () => {
     expect(toHedyErrors(error)).toEqual([error])
   })
 
-  it('wraps a single non-HedyError as the only entry, UNKNOWN', () => {
+  it('wraps a single non-HedyError as the only entry, INTERNAL', () => {
     const [only, ...rest] = toHedyErrors(new Error('disk full'))
     expect(rest).toEqual([])
-    expect(only).toMatchObject({ code: 'UNKNOWN', message: 'disk full' })
+    expect(only.code).toBe('INTERNAL')
+    expect(only.message).toContain('Error: disk full')
   })
 
-  it('treats an AggregateError holding no errors as one UNKNOWN error, keeping it as the cause', () => {
+  it('treats an AggregateError holding no errors as one INTERNAL error, keeping it as the cause', () => {
     const empty = new AggregateError([], 'Nothing inside')
     const [only, ...rest] = toHedyErrors(empty)
     expect(rest).toEqual([])
-    expect(only).toMatchObject({ code: 'UNKNOWN', message: 'Nothing inside', cause: empty })
+    expect(only).toMatchObject({ code: 'INTERNAL', cause: empty })
+    expect(only.message).toContain('AggregateError: Nothing inside')
   })
 })

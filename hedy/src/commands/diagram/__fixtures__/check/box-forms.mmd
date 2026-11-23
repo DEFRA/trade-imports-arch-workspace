@@ -1,0 +1,38 @@
+sequenceDiagram
+    box PUBLIC ZONE
+        participant A1 as A1
+    end
+    box Aqua Public zone
+        participant A2 as A2
+    end
+    box rgb(240,240,240) Rgb zone
+        participant A3 as A3
+    end
+    box rgba(0,0,0,0.1) Rgba zone
+        participant A4 as A4
+    end
+    box hsl(0, 0%, 95%) Hsl zone
+        participant A5 as A5
+    end
+    box transparent Transparent zone
+        participant A6 as A6
+    end
+    box Highlight System zone
+        participant A7 as A7
+    end
+    box Red
+        participant A8 as A8
+    end
+    box AWS PLATFORM
+        participant A9 as A9
+    end
+    box green PROTECTED ZONE
+        participant A10 as A10
+    end
+    box currentcolor Current zone
+        participant A11 as A11
+    end
+    box rgb(nonsense) Bad rgb zone
+        participant A12 as A12
+    end
+    A1->>A12: Hello

@@ -65,11 +65,20 @@ describe('failureEnvelope', () => {
       { code: 'USAGE', message: 'Bad flag.' },
       { code: 'UNKNOWN', message: 'Boom.' }
     ]]
-  ])('reduces %s to entries carrying exactly code and message', (_label, errors, expected) => {
+  ])('reduces %s that hold no report to entries carrying exactly code and message', (_label, errors, expected) => {
     const envelope = failureEnvelope(errors)
     expect(envelope.errors).toEqual(expected)
     for (const entry of envelope.errors) {
       expect(Object.keys(entry)).toEqual(['code', 'message'])
     }
+  })
+})
+
+describe('failureEnvelope on a fault in hedy', () => {
+  it('carries the triage report of an error that holds one, after its code and message', () => {
+    const report = { fault: 'TypeError: x is not a function', causes: [], environment: 'linux x64', reproduction: 'h diagram check a.mmd' }
+    const [entry] = failureEnvelope([new HedyError('INTERNAL', 'A fault.', { report })]).errors
+    expect(entry).toEqual({ code: 'INTERNAL', message: 'A fault.', report })
+    expect(Object.keys(entry)).toEqual(['code', 'message', 'report'])
   })
 })

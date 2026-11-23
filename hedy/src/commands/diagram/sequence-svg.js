@@ -59,7 +59,7 @@ const rectElement = ({ x, y, width, height }, style) =>
 const lineElement = ({ x1, y1, x2, y2 }, style) =>
   element('line', { x1: svgNumber(x1), y1: svgNumber(y1), x2: svgNumber(x2), y2: svgNumber(y2), ...style })
 
-const zoneElements = ({ rect, label }) => [rectElement(rect, SHAPE_STYLES.zoneBand), textElement(label)]
+const zoneElements = ({ rect, label }) => [rectElement(rect, SHAPE_STYLES.zoneBand), ...(label === undefined ? [] : [textElement(label)])]
 
 const participantElements = ({ rect, lifeline, texts }) => [
   lineElement({ x1: lifeline.x, y1: lifeline.top, x2: lifeline.x, y2: lifeline.bottom }, SHAPE_STYLES.lifeline),

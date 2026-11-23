@@ -292,12 +292,12 @@ const zoneLabel = ({ name, right, top }) => textAt({
 
 const zoneBand = ({ zone, columns, top, bottom }) => {
   const { left, right } = zoneEdges(zone, columns)
-  return {
+  const band = {
     name: zone.name,
     members: zone.members,
-    rect: { x: left, y: top - SPACING.zoneAboveTop, width: right - left, height: bottom - top + (SPACING.zoneAboveTop + SPACING.zoneBelowBottom) },
-    label: zoneLabel({ name: zone.name, right, top })
+    rect: { x: left, y: top - SPACING.zoneAboveTop, width: right - left, height: bottom - top + (SPACING.zoneAboveTop + SPACING.zoneBelowBottom) }
   }
+  return zone.name === '' ? band : { ...band, label: zoneLabel({ name: zone.name, right, top }) }
 }
 
 /**

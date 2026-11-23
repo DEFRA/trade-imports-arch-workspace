@@ -51,8 +51,11 @@ const writeReplacing = async (output, text) => {
   }
 }
 
-const drawing = (text, { label }) => {
-  const scene = layOutSequence(readSequenceSource(text, { label }))
+const withGroupNames = (model, groups) =>
+  ({ ...model, zones: model.zones.map((zone, i) => ({ ...zone, name: groups[i] ?? zone.name })) })
+
+const drawing = (text, { label, groups }) => {
+  const scene = layOutSequence(withGroupNames(readSequenceSource(text, { label }), groups))
   return {
     svg: svgOfScene(scene),
     ...diagramSize(scene),
@@ -65,18 +68,22 @@ const placeOf = (diagram, message) => {
   return line === undefined ? diagram.label : `${diagram.label}:${line}`
 }
 
-const refuseUnlessMermaidAccepts = async (text, { source, workspaceRoot }) => {
+const refusal = (verdict, diagram) => verdict.cause === 'hedy'
+  ? new HedyError('INTERNAL', `hedy could not check ${diagram.label} with Mermaid: ${verdict.message}. The fault is in hedy, not in the source. File the report as a hedy bug.`, { report: verdict.report })
+  : new HedyError('PARSE', `${placeOf(diagram, verdict.message)}: Mermaid does not accept the source: ${verdict.message.split('\n')[0]} Fix the line, check the file with hedy diagram check, then run the command again.`)
+
+const acceptedVerdict = async (text, { source, workspaceRoot }) => {
   const diagram = { label: source, text, linesBefore: 0 }
   const [verdict] = await parseDiagrams([diagram], { workspaceRoot })
-  if (verdict.ok) return
-  throw new HedyError('PARSE', `${placeOf(diagram, verdict.message)}: Mermaid does not accept the source: ${verdict.message.split('\n')[0]} Fix the line, check the file with hedy diagram check, then run the command again.`)
+  if (verdict.ok) return verdict
+  throw refusal(verdict, diagram)
 }
 
 const drawSequenceFile = async ({ source, output }, { workspaceRoot }) => {
   await checkOutputFolder(output)
   const { text } = await readFileText(source)
-  await refuseUnlessMermaidAccepts(text, { source, workspaceRoot: workspaceRoot() })
-  const { svg, width, height, steps } = drawing(text, { label: source })
+  const { groups = [] } = await acceptedVerdict(text, { source, workspaceRoot: workspaceRoot() })
+  const { svg, width, height, steps } = drawing(text, { label: source, groups })
   await writeReplacing(output, svg)
   return { source, output, width, height, steps }
 }

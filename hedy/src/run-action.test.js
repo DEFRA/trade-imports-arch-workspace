@@ -10,6 +10,8 @@ const singleJsonLine = (chunks) => {
   return JSON.parse(lines[0])
 }
 
+const FAULT_CONTEXT = { argv: ['diagram', 'check', 'a.mmd'], workspaceRoot: '/work', versions: { hedy: '0.1.0' }, platform: 'linux', arch: 'x64' }
+
 describe('runAction', () => {
   it('in text mode prints the rendered result to stdout and returns 0', async () => {
     const h = captureIo()
@@ -52,14 +54,30 @@ describe('runAction', () => {
     expect(h.codes).toEqual([2])
   })
 
-  it('on a thrown TypeError in text mode prints only the message to stderr, nothing on stdout, and returns 1', async () => {
+  it('on a thrown TypeError in text mode prints the INTERNAL message and the triage report to stderr, no raw stack, nothing on stdout, and returns 1', async () => {
     const h = captureIo()
-    const code = await runAction(() => { throw new TypeError('x is not a function') }, h)
+    const code = await runAction(() => { throw new TypeError('x is not a function') }, { ...h, faultContext: () => FAULT_CONTEXT })
     expect(code).toBe(1)
-    expect(h.err).toEqual(['x is not a function\n'])
+    const [message, ...reportLines] = h.err.join('').split('\n')
+    expect(message).toBe('hedy stopped on a fault in hedy: TypeError: x is not a function. The fault is not in the command\'s input. File the report as a hedy bug.')
+    expect(reportLines).toEqual(expect.arrayContaining(['Fault: TypeError: x is not a function', 'Missing feature: the function x', 'Reproduction: hedy diagram check a.mmd']))
     expect(h.err.join('')).not.toMatch(/\n\s+at /)
     expect(h.out).toEqual([])
     expect(h.codes).toEqual([1])
+  })
+
+  it('on a thrown TypeError in JSON mode gives the INTERNAL entry its triage report', async () => {
+    const h = captureIo()
+    await runAction(() => { throw new TypeError('x is not a function') }, { ...h, json: true, faultContext: () => FAULT_CONTEXT })
+    const [entry] = singleJsonLine(h.out).errors
+    expect(entry.code).toBe('INTERNAL')
+    expect(entry.report).toMatchObject({ fault: 'TypeError: x is not a function', reproduction: 'hedy diagram check a.mmd' })
+  })
+
+  it('keeps a deliberate UNKNOWN error as UNKNOWN, with no report', async () => {
+    const h = captureIo()
+    await runAction(() => { throw new HedyError('UNKNOWN', 'The folder could not be read.') }, { ...h, json: true, faultContext: () => FAULT_CONTEXT })
+    expect(singleJsonLine(h.out).errors).toEqual([{ code: 'UNKNOWN', message: 'The folder could not be read.' }])
   })
 
   it('awaits an async action that resolves later', async () => {
@@ -79,14 +97,15 @@ describe('runAction', () => {
     expect(h.codes).toEqual([2])
   })
 
-  it('treats a render that throws as an UNKNOWN failure and writes nothing to stdout', async () => {
+  it('treats a render that throws as a fault in hedy and writes nothing to stdout', async () => {
     const h = captureIo()
     const code = await runAction(() => 'x', {
       ...h,
+      faultContext: () => FAULT_CONTEXT,
       render: () => { throw new Error('render failed') }
     })
     expect(code).toBe(1)
-    expect(h.err).toEqual(['render failed\n'])
+    expect(h.err.join('')).toContain('Fault: Error: render failed')
     expect(h.out).toEqual([])
     expect(h.codes).toEqual([1])
   })

@@ -4,12 +4,15 @@ import { HedyError } from '../errors.js'
 import { SCREENS } from './screens.js'
 import { createTransitions } from './transitions.js'
 
+const FAULT_CONTEXT = { argv: [], workspaceRoot: '/work', versions: { hedy: '0.1.0' }, platform: 'linux', arch: 'x64' }
+
 const recordTransitions = () => {
   const calls = []
   const transitions = createTransitions({
     setScreen: (screen) => { calls.push(['screen', screen]) },
     setScreenData: (screenData) => { calls.push(['screenData', screenData]) },
-    setLoadingMessage: (message) => { calls.push(['loadingMessage', message]) }
+    setLoadingMessage: (message) => { calls.push(['loadingMessage', message]) },
+    faultContext: () => FAULT_CONTEXT
   })
   return { ...transitions, calls }
 }
@@ -33,10 +36,17 @@ describe('createTransitions', () => {
   it.each([
     ['an AggregateError as each error it holds', new AggregateError([new HedyError('AUTH', 'Jira refused.'), new HedyError('NETWORK', 'Confluence did not answer.')]), [['AUTH', 'Jira refused.'], ['NETWORK', 'Confluence did not answer.']]],
     ['a ZodError as USAGE', z.string().safeParse(1).error, [['USAGE', 'Invalid input: expected string, received number']]],
-    ['a plain Error as UNKNOWN', new TypeError('confirm is not a function'), [['UNKNOWN', 'confirm is not a function']]]
+    ['a plain Error as INTERNAL', new TypeError('confirm is not a function'), [['INTERNAL', 'hedy stopped on a fault in hedy: TypeError: confirm is not a function. The fault is not in the command\'s input. File the report as a hedy bug.']]]
   ])('showErrors shows %s', (_case, error, expected) => {
     const { showErrors, calls } = recordTransitions()
     showErrors(error)
     expect(errorsShown(calls)).toEqual(expected)
+  })
+
+  it('showErrors gives a fault in hedy the triage report of the fault', () => {
+    const { showErrors, calls } = recordTransitions()
+    showErrors(new TypeError('confirm is not a function'))
+    const [shown] = calls.find(([setter]) => setter === 'screenData')[1].errors
+    expect(shown.report).toMatchObject({ fault: 'TypeError: confirm is not a function', missingFeature: 'the function confirm', reproduction: 'hedy' })
   })
 })

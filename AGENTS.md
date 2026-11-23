@@ -69,7 +69,7 @@ The root `.env` holds the Atlassian credentials, and `hedy` reads the file itsel
 
 A bare `hedy` at a terminal opens a menu of the auth, Jira and Confluence commands for people to use. Each write in the menu shows a plan or a pre-flight screen first, and runs after the person confirms. Agents call the commands with `--json`. A bare `hedy` without a terminal, or with `--json` or `--no-ui`, is a usage error.
 
-With `--json`, every command prints one envelope line, `{ ok, schema_version, hedy_version, result, errors, metadata }`, where `errors` lists `{ code, message }` entries. A command exits 0 on success, 1 on an error and 2 on a usage error.
+With `--json`, every command prints one envelope line, `{ ok, schema_version, hedy_version, result, errors, metadata }`, where `errors` lists `{ code, message }` entries. An `INTERNAL` entry is a fault in hedy, not in the input, and also holds `report`, a triage report that names the fault, the missing feature, the versions and the command that reproduces the fault. Hand the report to the user to file as a hedy bug, and do not change the input to work around the fault. A command exits 0 on success, 1 on an error and 2 on a usage error.
 
 Prefer `hedy <command> --json` over ad-hoc `curl` or `jq` against Jira or Confluence.
 

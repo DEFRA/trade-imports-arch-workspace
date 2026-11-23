@@ -3,7 +3,10 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { HedyError } from './errors.js'
 
-const CHECKOUT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
+/**
+ * The checkout that holds the hedy source.
+ */
+export const CHECKOUT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
 const isDirectory = (path) => statSync(path, { throwIfNoEntry: false })?.isDirectory() === true
 const isFile = (path) => statSync(path, { throwIfNoEntry: false })?.isFile() === true

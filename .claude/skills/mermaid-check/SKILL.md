@@ -50,13 +50,15 @@ hedy diagram check <path> --json
 
 `<path>` is a `.mmd` file, a Markdown page or a folder, and more than one may be given. A folder is walked recursively, leaving out `node_modules`, `build`, `generated` and folders whose names start with a dot. `hedy diagram check --help` lists every form.
 
-Each diagram is parsed by the Mermaid that `delivery-info-arch-tooling` installs, the version the docs pipeline renders with. Exit 0 means every diagram parses. Exit 1 means a diagram does not parse, with one `PARSE` error, or that Mermaid is not installed, with one `SETUP` error naming `make install`: a `SETUP` error is a machine problem and never a diagram verdict. Exit 2 is a usage error. Usable as a gate.
+Each diagram is parsed by the Mermaid that `delivery-info-arch-tooling` installs, the version the docs pipeline renders with. Exit 0 means every diagram parses. Exit 1 means a diagram does not parse, with one `PARSE` error, that a fault in hedy stopped the check of a diagram, with one `INTERNAL` error per such diagram, or that Mermaid is not installed, with one `SETUP` error naming `make install`. Neither a `SETUP` nor an `INTERNAL` error is a diagram verdict. Exit 2 is a usage error. Usable as a gate.
 
 ## Verify
 
 Read the envelope's `result`: `files` is the number of files read, and `diagrams` holds one verdict per diagram. A verdict's `label` is `<file>:<line>` for a Markdown block, where `<line>` is the line the ` ```mermaid ` fence opens on, or just `<file>` for a standalone `.mmd`. A passing verdict gives the `type` Mermaid found.
 
-For each verdict with `ok` false:
+For each verdict with `ok` false and `cause` `hedy`, the text mode's `ERROR` line, the diagram was not checked. Do not edit the diagram to make the error go away. Give the user the `report` of the matching `INTERNAL` error to file as a hedy bug, and say which diagrams were not checked.
+
+For each verdict with `ok` false and `cause` `diagram`:
 
 1. Open the file at `line`, which is the line of the file Mermaid names, already worked out from the fence line. `message` is Mermaid's full message.
 2. Fix the syntax and run Step 0 on that file again.
@@ -97,7 +99,7 @@ For a diagram destined for the documentation pipeline rather than a single docum
 
 A sequence diagram for a page can be drawn as an SVG in the house style, from the same `.mmd` file that Mermaid renders. The drawing fits notes to their text, sets request lines in monospace, shows each service's repository name beneath its title, and draws a zone band behind the participants of each `box` block.
 
-1. Write the source as a standalone `.mmd` file. Group the participants of each network zone in a `box` block, such as `box Public zone`, then the `participant` lines, then `end`.
+1. Write the source as a standalone `.mmd` file. Group the participants of each network zone in a `box` block, such as `box Public zone`, then the `participant` lines, then `end`. Mermaid reads a first word that is a CSS colour, such as `Aqua`, `transparent` or `rgb(240, 240, 240)`, as the zone's fill and leaves the word out of the label, so `box Red` gives a band with no label.
 2. Run Step 0 on the file straight after writing it, and fix every line the check names.
 3. Draw the SVG into the page's `diagrams/` folder:
 
@@ -105,7 +107,7 @@ A sequence diagram for a page can be drawn as an SVG in the house style, from th
    hedy diagram sequence <source.mmd> <output.svg> --json
    ```
 
-4. Read the envelope. On success, `result` gives the size and the number of steps. On failure, each `PARSE` error names the line and the change to make: fix every line it names, run Step 0 again, then run the command again. The command also asks Mermaid first and refuses a source Mermaid rejects. `hedy diagram sequence --help` lists the constructs the command draws.
+4. Read the envelope. On success, `result` gives the size and the number of steps. On failure, each `PARSE` error names the line and the change to make: fix every line it names, run Step 0 again, then run the command again. An `INTERNAL` error is a fault in hedy and not in the source: give the user its `report` to file as a hedy bug. The command also asks Mermaid first and refuses a source Mermaid rejects. `hedy diagram sequence --help` lists the constructs the command draws.
 5. Look at the drawing before placing it on the page: `rsvg-convert -w 1400 -o <file>.png <file>.svg`, then read the PNG.
 
 A failed run leaves any earlier SVG at the output path untouched.

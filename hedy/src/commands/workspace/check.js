@@ -1,20 +1,21 @@
 import { realpath } from 'node:fs/promises'
 import { homedir as osHomedir } from 'node:os'
 import { z } from 'zod'
-import { HedyError, toHedyError } from '../../errors.js'
+import { HedyError, isHedyError } from '../../errors.js'
 import { runLocalTool } from '../../local-tool.js'
 import { runAction } from '../../run-action.js'
 import { SETUP_CHECKS } from './setup-checks.js'
 
 const checkOptionsSchema = z.object({}).strict()
 
-const failedCheckError = (name, reason) => new HedyError('SETUP', `${name} failed: ${toHedyError(reason).message}`, { cause: reason })
+const failedCheckError = (name, reason) => isHedyError(reason) ? new HedyError('SETUP', `${name} failed: ${reason.message}`, { cause: reason }) : reason
 
 /**
  * Runs every setup check against the workspace's real root and resolves to
  * { root, checks }, one { name, detail } per check in order, when every check
- * passes. Otherwise rejects with an AggregateError holding one SETUP error per
- * failed check, in check order, its message led by the check's name and "failed".
+ * passes. Otherwise rejects with an AggregateError holding, in check order, one
+ * SETUP error per failed check, its message led by the check's name and
+ * "failed", and each fault a check throws that is not a HedyError, unchanged.
  *
  * @param {{
  *   workspaceRoot: () => string, env: Record<string, string | undefined>,

@@ -61,11 +61,19 @@ const brokenDiagramWarning = ({ pagePath, diagram, message }) => {
   return `Mermaid rejects the diagram at ${where} (${message.split('\n')[0].replace(/:$/, '')}), so the published page shows the diagram broken. Fix the diagram, check the page with hedy diagram check, then publish the page again.`
 }
 
+const uncheckedDiagramWarning = ({ diagram, message }) =>
+  `The diagram at ${diagram.label} was not checked, because a fault in hedy stopped the check (${message}). Run hedy diagram check on the page, and file the report it prints as a hedy bug.`
+
+const verdictWarnings = ({ ok, cause, message }, { pagePath, diagram }) => {
+  if (ok) return []
+  return [cause === 'hedy' ? uncheckedDiagramWarning({ diagram, message }) : brokenDiagramWarning({ pagePath, diagram, message })]
+}
+
 const diagramWarnings = async ({ pagePath, text, workspaceRoot }) => {
   const diagrams = diagramsInText({ path: pagePath, text })
   try {
     const verdicts = await parseDiagrams(diagrams, { workspaceRoot })
-    return verdicts.flatMap(({ ok, message }, i) => ok ? [] : [brokenDiagramWarning({ pagePath, diagram: diagrams[i], message })])
+    return verdicts.flatMap((verdict, i) => verdictWarnings(verdict, { pagePath, diagram: diagrams[i] }))
   } catch (error) {
     if (error.code !== 'SETUP') throw error
     return [`The diagrams on ${pagePath} were not checked: ${error.message}`]
@@ -189,8 +197,10 @@ const publishedOutcome = async ({ result, client, preflight }) => {
  * Confluence probe, and the generated label on a page Confluence already
  * holds under the title. The page's mermaid blocks are parsed with the
  * workspace's Mermaid, and each block Mermaid rejects gives a warning that
- * names the page line; a workspace without Mermaid gives one warning that the
- * diagrams were not checked. Neither stops the publish. After the last check,
+ * names the page line; a block that a fault in hedy stopped the check of gives
+ * a warning that the block was not checked, and a workspace without Mermaid
+ * gives one warning that the diagrams were not checked. None stops the
+ * publish. After the last check,
  * the required confirm is called once with
  * { absolutePath, page, title, space, existing, warnings }, where page is the
  * docs/ path, absolutePath its real path, and existing { id, url } for the page
