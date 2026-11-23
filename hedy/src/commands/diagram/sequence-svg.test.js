@@ -44,6 +44,25 @@ describe('svgNumber', () => {
   })
 })
 
+describe('svgOfScene paints an alternatives frame around the lifelines', () => {
+  const svg = drawnLines(
+    'participant A as Alpha',
+    'participant B as Beta',
+    'alt Access confirmed',
+    'A->>B: Refresh',
+    'end'
+  )
+  const positionOf = (pattern) => svg.search(pattern)
+
+  it('paints the frame box before the lifelines, so the lifelines run through the frame', () => {
+    expect(positionOf(/<rect[^>]*rx="6" fill="#e8f1f8"/)).toBeLessThan(positionOf(/<line[^>]*stroke-dasharray="4 4"/))
+  })
+
+  it('paints the frame heading after the lifelines, so no lifeline crosses the heading', () => {
+    expect(positionOf(/>alt\.</)).toBeGreaterThan(positionOf(/<line[^>]*stroke-dasharray="4 4"/))
+  })
+})
+
 describe('svgOfScene', () => {
   const svg = drawnLines(
     'participant A as Alpha & "Beta"',

@@ -67,8 +67,9 @@ const participantElements = ({ rect, lifeline, texts }) => [
   ...texts.map(textElement)
 ]
 
-const frameElements = ({ rect, heading, dividers }) => [
-  rectElement(rect, SHAPE_STYLES.frame),
+const frameBoxElement = ({ rect }) => rectElement(rect, SHAPE_STYLES.frame)
+
+const frameMarkingElements = ({ heading, dividers }) => [
   ...heading.map(textElement),
   ...dividers.flatMap(({ x1, x2, y, text }) => [lineElement({ x1, y1: y, x2, y2: y }, SHAPE_STYLES.divider), textElement(text)])
 ]
@@ -89,9 +90,10 @@ const arrowheadDefinition = () =>
 
 /**
  * Returns the SVG text of a laid-out sequence diagram: the zone bands, then
- * the lifelines and service boxes, then the alternative frames, then the
- * steps and notes in source order, on a white background whose size is the
- * view box. Coordinates are written to one decimal place.
+ * the alternative frames' boxes, then the lifelines and service boxes, then
+ * the frames' headings and dividers, then the steps and notes in source
+ * order, on a white background whose size is the view box. Coordinates are
+ * written to one decimal place.
  *
  * @param {ReturnType<typeof import('./sequence-layout.js').layOutSequence>} scene
  * @returns {string}
@@ -103,8 +105,9 @@ export const svgOfScene = (scene) => {
     arrowheadDefinition(),
     element('rect', { x: '0', y: '0', width, height, ...SHAPE_STYLES.background }),
     ...scene.zones.flatMap(zoneElements),
+    ...scene.frames.map(frameBoxElement),
     ...scene.participants.flatMap(participantElements),
-    ...scene.frames.flatMap(frameElements),
+    ...scene.frames.flatMap(frameMarkingElements),
     ...scene.body.flatMap(bodyElements),
     '</svg>'
   ].join('\n') + '\n'
