@@ -71,7 +71,7 @@ Each build prompts for permission by design, because both builds cover the whole
 When `ok` is true, `result` is `{ mode, page, id, title, space, url, version, warnings, links }`, and `mode` is `created` or `updated`. Report the following:
 
 - The outcome, and the page link from `url`.
-- Each line in `warnings`, naming the asset or link the line concerns. A warning marks a missing image, a link left pointing at GitHub or unchanged, an anchor that matches no heading, or an external link the publisher could not reach, which the user checks by hand.
+- Each line in `warnings`, naming the asset or link the line concerns. A warning marks a diagram Mermaid rejects, a page whose diagrams were not checked, a missing image, a link left pointing at GitHub or unchanged, an anchor that does not match a heading, or an external link the publisher could not reach, which the user checks by hand. A warning that Mermaid rejects a diagram means the published page shows the diagram broken: fix the line it names through the `mermaid-check` skill, check the page with `hedy diagram check`, and tell the user the page needs publishing again.
 - The links line from `links`, which is null when the publisher ran no link check.
 
 ## Completion Output

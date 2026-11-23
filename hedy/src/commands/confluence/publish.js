@@ -4,6 +4,8 @@ import { loadCredentials } from '../../credentials.js'
 import { HedyError, toHedyError } from '../../errors.js'
 import { runLocalTool } from '../../local-tool.js'
 import { runAction } from '../../run-action.js'
+import { diagramsInText, fileLineOf } from '../diagram/mermaid-diagrams.js'
+import { parseDiagrams } from '../diagram/mermaid-parser.js'
 import { readTextFile } from '../jira/files.js'
 import { locateDocsRepo, publishEntryFor, readPublishConfig, resolvePage, spaceFor } from './docs-repo.js'
 import { inventoryAssets } from './page-assets.js'
@@ -29,7 +31,7 @@ const readPageText = (absolutePath) => readTextFile(absolutePath, {
 
 const fencedMermaidNote = ({ buildNeeded, fencedMermaidBlocks }) =>
   buildNeeded.includes('build:mmd') && fencedMermaidBlocks > 0
-    ? ` The page also holds ${fencedMermaidBlocks} fenced Mermaid block(s). Check each block renders before the build.`
+    ? ` The page also holds ${fencedMermaidBlocks} fenced Mermaid block(s). Check the page with hedy diagram check before the build.`
     : ''
 
 const checkDiagramExports = (assets, pagePath) => {
@@ -53,6 +55,23 @@ const checkGeneratedLabel = (existing, { title, space }) => {
   }
 }
 
+const brokenDiagramWarning = ({ pagePath, diagram, message }) => {
+  const line = fileLineOf(diagram, message)
+  const where = line === undefined ? diagram.label : `${pagePath}:${line}`
+  return `Mermaid rejects the diagram at ${where} (${message.split('\n')[0].replace(/:$/, '')}), so the published page shows the diagram broken. Fix the diagram, check the page with hedy diagram check, then publish the page again.`
+}
+
+const diagramWarnings = async ({ pagePath, text, workspaceRoot }) => {
+  const diagrams = diagramsInText({ path: pagePath, text })
+  try {
+    const verdicts = await parseDiagrams(diagrams, { workspaceRoot })
+    return verdicts.flatMap(({ ok, message }, i) => ok ? [] : [brokenDiagramWarning({ pagePath, diagram: diagrams[i], message })])
+  } catch (error) {
+    if (error.code !== 'SETUP') throw error
+    return [`The diagrams on ${pagePath} were not checked: ${error.message}`]
+  }
+}
+
 const checkLocalFiles = async ({ page, workspaceRoot, cwd }) => {
   const { docsRepo, configPath } = await locateDocsRepo(workspaceRoot())
   const { absolutePath, page: pagePath, relativeToDocs } = await resolvePage({ docsRepo, given: page, cwd })
@@ -63,7 +82,8 @@ const checkLocalFiles = async ({ page, workspaceRoot, cwd }) => {
   const assets = await inventoryAssets({ docsRepo, pagePath: absolutePath, text })
   checkDiagramExports(assets, pagePath)
   checkImageFiles(assets, pagePath)
-  return { docsRepo, configPath, absolutePath, pagePath, space, title: titleOf(text, absolutePath) }
+  const warnings = await diagramWarnings({ pagePath, text, workspaceRoot: workspaceRoot() })
+  return { docsRepo, configPath, absolutePath, pagePath, space, title: titleOf(text, absolutePath), warnings }
 }
 
 const checkConfluence = async ({ env, workspaceRoot, title, space }) => {
@@ -75,12 +95,13 @@ const checkConfluence = async ({ env, workspaceRoot, title, space }) => {
   return { credentials, client, existing }
 }
 
-const publishFactsOf = ({ absolutePath, pagePath, title, space }, existing) => ({
+const publishFactsOf = ({ absolutePath, pagePath, title, space, warnings }, existing) => ({
   absolutePath,
   page: pagePath,
   title,
   space,
-  existing: existing && { id: existing.id, url: existing.url }
+  existing: existing && { id: existing.id, url: existing.url },
+  warnings
 })
 
 const publishAtOnce = async () => true
@@ -154,7 +175,7 @@ const publishedOutcome = async ({ result, client, preflight }) => {
     space: preflight.space,
     url: back.url,
     version: back.version,
-    warnings: reading.warnings,
+    warnings: [...preflight.warnings, ...reading.warnings],
     links: reading.links
   }
 }
@@ -166,10 +187,13 @@ const publishedOutcome = async ({ result, client, preflight }) => {
  * install, the page path, the publish config, the publishPaths entry, the
  * space, the diagram exports, the image files, the credentials and the
  * Confluence probe, and the generated label on a page Confluence already
- * holds under the title. After the last check, the required confirm is
- * called once with
- * { absolutePath, page, title, space, existing }, where page is the docs/
- * path, absolutePath its real path, and existing { id, url } for the page
+ * holds under the title. The page's mermaid blocks are parsed with the
+ * workspace's Mermaid, and each block Mermaid rejects gives a warning that
+ * names the page line; a workspace without Mermaid gives one warning that the
+ * diagrams were not checked. Neither stops the publish. After the last check,
+ * the required confirm is called once with
+ * { absolutePath, page, title, space, existing, warnings }, where page is the
+ * docs/ path, absolutePath its real path, and existing { id, url } for the page
  * Confluence holds under the title, else undefined. Unless confirm resolves
  * true, the result is { mode: 'cancelled', page, title, space } and nothing
  * is sent. Then npm run publish:confluence runs in the docs repo with env
@@ -187,7 +211,7 @@ const publishedOutcome = async ({ result, client, preflight }) => {
  *   cwd?: string, timeoutMs?: number, stderr: { write: (chunk: string) => unknown },
  *   confirm: (facts: {
  *     absolutePath: string, page: string, title: string, space: string,
- *     existing: { id: string, url: string } | undefined
+ *     existing: { id: string, url: string } | undefined, warnings: string[]
  *   }) => Promise<boolean>
  * }} options
  */

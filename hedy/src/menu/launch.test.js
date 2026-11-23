@@ -17,7 +17,8 @@ const publishFacts = {
   page: pagePath,
   title: 'Publishing to Confluence',
   space: 'DOCS',
-  existing: { id: '123456', url: 'https://example.atlassian.net/wiki/spaces/DOCS/pages/123456' }
+  existing: { id: '123456', url: 'https://example.atlassian.net/wiki/spaces/DOCS/pages/123456' },
+  warnings: []
 }
 
 const updatedResult = {

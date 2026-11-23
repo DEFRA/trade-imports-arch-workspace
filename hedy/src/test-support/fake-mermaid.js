@@ -14,26 +14,39 @@ export default {
 }
 `
 
+const installTooling = async (root) => {
+  const tooling = join(root, 'delivery-info-arch-tooling')
+  await mkdir(tooling, { recursive: true })
+  await writeFile(join(tooling, 'package.json'), JSON.stringify({ name: '@defra/delivery-info-arch-tooling' }))
+  return tooling
+}
+
 /**
- * Creates a temporary workspace, as createWorkspace does, whose
- * delivery-info-arch-tooling folder holds
- * a fake Mermaid package. The fake's parse rejects a text holding
+ * Gives the workspace at root a delivery-info-arch-tooling folder holding a
+ * fake Mermaid package. The fake's parse rejects a text holding
  * "FAIL on line <n>" with Mermaid's message for line n, and otherwise gives the
  * text's first word as the diagram type, or "loaded-without-window" when no
- * browser window existed when the fake loaded. The caller removes the folder.
+ * browser window existed when the fake loaded.
  *
- * @param {{ withMermaid?: boolean }} [options] withMermaid false leaves Mermaid out
+ * @param {string} root
+ */
+export const installFakeMermaid = async (root) => {
+  const mermaid = join(await installTooling(root), 'node_modules', 'mermaid')
+  await mkdir(mermaid, { recursive: true })
+  await writeFile(join(mermaid, 'package.json'), JSON.stringify({ name: 'mermaid', type: 'module', exports: { import: './index.js', default: './index.js' } }))
+  await writeFile(join(mermaid, 'index.js'), FAKE_MERMAID)
+}
+
+/**
+ * Creates a temporary workspace, as createWorkspace does, with the fake
+ * Mermaid of installFakeMermaid. The caller removes the folder.
+ *
+ * @param {{ withMermaid?: boolean }} [options] withMermaid false leaves the tooling folder without Mermaid
  * @returns {Promise<string>} the workspace's absolute path
  */
 export const createFakeMermaidWorkspace = async ({ withMermaid = true } = {}) => {
   const root = await createWorkspace()
-  const tooling = join(root, 'delivery-info-arch-tooling')
-  await mkdir(tooling, { recursive: true })
-  await writeFile(join(tooling, 'package.json'), JSON.stringify({ name: '@defra/delivery-info-arch-tooling' }))
-  if (!withMermaid) return root
-  const mermaid = join(tooling, 'node_modules', 'mermaid')
-  await mkdir(mermaid, { recursive: true })
-  await writeFile(join(mermaid, 'package.json'), JSON.stringify({ name: 'mermaid', type: 'module', exports: { import: './index.js', default: './index.js' } }))
-  await writeFile(join(mermaid, 'index.js'), FAKE_MERMAID)
+  if (withMermaid) await installFakeMermaid(root)
+  else await installTooling(root)
   return root
 }

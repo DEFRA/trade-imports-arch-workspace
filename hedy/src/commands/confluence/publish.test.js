@@ -5,6 +5,7 @@ import nock from 'nock'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import { createWorkspace, runCli } from '../../test-support/cli.js'
 import { copyFixtureDocsRepo, installFakePublisher } from '../../test-support/docs-repo.js'
+import { installFakeMermaid } from '../../test-support/fake-mermaid.js'
 import {
   ATLASSIAN_BASE_URL,
   TEST_AUTHORIZATION,
@@ -152,6 +153,49 @@ describe('runPublish with a publisher that succeeds', () => {
   })
 })
 
+describe('runPublish warning about a broken diagram', () => {
+  const addBrokenBlock = async () => {
+    const pagePath = join(docsRepo, PAGE)
+    const original = (await readFile(pagePath, 'utf8')).trimEnd()
+    await writeFile(pagePath, `${original}\n\n\`\`\`mermaid\ngraph TD\n  FAIL on line 2\n\`\`\`\n`)
+    return original.split('\n').length + 2
+  }
+
+  const brokenWarning = (fenceLine) =>
+    `Mermaid rejects the diagram at ${PAGE}:${fenceLine + 2} (Parse error on line 2), so the published page shows the diagram broken. Fix the diagram, check the page with hedy diagram check, then publish the page again.`
+
+  it('warns that Mermaid rejects a diagram on the page, and still publishes the page', async () => {
+    await installFakeMermaid(root)
+    const fenceLine = await addBrokenBlock()
+    await installScenario('updated')
+    stagePreChecks()
+    stageReadBack('201')
+    const result = await publish()
+    expect(result.warnings[0]).toBe(brokenWarning(fenceLine))
+    expect(await publisherRan()).toBe(true)
+  })
+
+  it('gives confirm the same warning, so a person sees the warning before the page is sent', async () => {
+    await installFakeMermaid(root)
+    const fenceLine = await addBrokenBlock()
+    await installScenario('updated')
+    stagePreChecks()
+    const calls = []
+    await publish({ confirm: recordingConfirm(calls, { answer: false }) })
+    expect(calls[0].warnings).toEqual([brokenWarning(fenceLine)])
+  })
+
+  it('warns that the page\'s diagrams were not checked when the workspace has no Mermaid, and still publishes the page', async () => {
+    await addBrokenBlock()
+    await installScenario('updated')
+    stagePreChecks()
+    stageReadBack('201')
+    const result = await publish()
+    expect(result.warnings[0]).toMatch(new RegExp(`^The diagrams on ${PAGE} were not checked: Mermaid is not installed in`))
+    expect(await publisherRan()).toBe(true)
+  })
+})
+
 describe('runPublish pre-flight refusals', () => {
   it.each([
     ['a page no publishPaths entry lists', 'docs/notes/unlisted.md', 'notes/unlisted.md'],
@@ -172,7 +216,7 @@ describe('runPublish pre-flight refusals', () => {
     const confirmCalls = []
     const error = await rejectionOf(publish({ page: 'docs/systems/HEDY/components.md', env: {}, confirm: recordingConfirm(confirmCalls) }))
     expect(error.code).toBe('USAGE')
-    expect(error.message).toBe(`The page docs/systems/HEDY/components.md embeds diagrams whose exports are missing or stale: mermaid "hedy-flow" (missing). Run npm --prefix ${await realpath(docsRepo)} run build:mmd, then run the command again. The page also holds 1 fenced Mermaid block(s). Check each block renders before the build.`)
+    expect(error.message).toBe(`The page docs/systems/HEDY/components.md embeds diagrams whose exports are missing or stale: mermaid "hedy-flow" (missing). Run npm --prefix ${await realpath(docsRepo)} run build:mmd, then run the command again. The page also holds 1 fenced Mermaid block(s). Check the page with hedy diagram check before the build.`)
     expect(await publisherRan()).toBe(false)
     expect(confirmCalls).toEqual([])
   })
@@ -209,7 +253,7 @@ describe('runPublish pre-flight refusals', () => {
 })
 
 describe('runPublish asking confirm', () => {
-  it('asks confirm once with the real path, the docs page, the title, the space and the id and address of the labelled page Confluence holds', async () => {
+  it('asks confirm once with the real path, the docs page, the title, the space, the id and address of the labelled page Confluence holds, and no warning for a page without diagrams', async () => {
     await installScenario('updated')
     stagePreChecks()
     stageReadBack('201')
@@ -220,7 +264,8 @@ describe('runPublish asking confirm', () => {
       page: PAGE,
       title: 'Publishing guide',
       space: 'HEDYDOCS',
-      existing: { id: '201', url: pageUrlFor('201') }
+      existing: { id: '201', url: pageUrlFor('201') },
+      warnings: []
     }])
     expect(result.mode).toBe('updated')
   })
