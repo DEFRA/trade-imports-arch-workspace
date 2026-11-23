@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1263 1028" width="1263" height="1028" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#555555"/></marker></defs>
+<rect x="0" y="0" width="1263" height="1028" fill="#ffffff"/>
+<rect x="308.3" y="22" width="763" height="986" rx="8" fill="#fafafa" stroke="#bbbbbb" stroke-dasharray="5 4"/>
+<text x="1061.2" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PUBLIC ZONE</text>
+<rect x="1075.2" y="22" width="159.4" height="986" rx="8" fill="#fafafa" stroke="#bbbbbb" stroke-dasharray="5 4"/>
+<text x="1224.6" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PROTECTED ZONE</text>
+<line x1="105" y1="110" x2="105" y2="998" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="40" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="105" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Browser</text>
+<line x1="427.4" y1="110" x2="427.4" y2="998" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="320.3" y="52" width="214.3" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="427.4" y="76" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Routing Service</text>
+<text x="427.4" y="95" font-size="11.5" fill="#666666" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">trade-imports-routing-proxy</text>
+<line x1="699.4" y1="110" x2="699.4" y2="998" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="575" y="52" width="248.8" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="699.4" y="76" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Journey Frontend</text>
+<text x="699.4" y="95" font-size="11.5" fill="#666666" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">trade-imports-{journey}-frontend</text>
+<line x1="955.5" y1="110" x2="955.5" y2="998" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="851.8" y="52" width="207.4" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="955.5" y="76" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Front Door</text>
+<text x="955.5" y="95" font-size="11.5" fill="#666666" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">trade-imports-ins-frontend</text>
+<line x1="1154.9" y1="110" x2="1154.9" y2="998" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="1087.2" y="52" width="135.4" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="1154.9" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Session Service</text>
+<rect x="75" y="136" width="1109.9" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="629.9" y="153" font-size="12" fill="#333333" text-anchor="middle">John&#x27;s page load refreshed</text>
+<text x="629.9" y="169" font-size="12" fill="#333333" text-anchor="middle">the session, then he left his desk</text>
+<rect x="75" y="192" width="1109.9" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="629.9" y="209" font-size="12" fill="#333333" text-anchor="middle">The idle point passes,</text>
+<text x="629.9" y="225" font-size="12" fill="#333333" text-anchor="middle">nothing runs or is written</text>
+<text x="266.2" y="260" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">GET /gbn-ag/documents/456/scan-status</text>
+<text x="266.2" y="276" font-size="12.5" fill="#666666" text-anchor="middle">session cookie</text>
+<line x1="117" y1="288" x2="425.4" y2="288" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
+<circle cx="105" cy="288" r="10" fill="#222222"/>
+<text x="105" y="292" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">1</text>
+<text x="563.4" y="322" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">GET /documents/456/scan-status</text>
+<text x="563.4" y="338" font-size="12.5" fill="#666666" text-anchor="middle">X-Forwarded-Prefix: /gbn-ag,</text>
+<text x="563.4" y="354" font-size="12.5" fill="#666666" text-anchor="middle">session cookie</text>
+<line x1="439.4" y1="366" x2="697.4" y2="366" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
+<circle cx="427.4" cy="366" r="10" fill="#222222"/>
+<text x="427.4" y="370" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">2</text>
+<rect x="622" y="388" width="154.7" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="699.4" y="405" font-size="12" fill="#333333" text-anchor="middle">Sealed cookie value read</text>
+<text x="699.4" y="421" font-size="12" fill="#333333" text-anchor="middle">from the cookie</text>
+<text x="927.1" y="456" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">GET /sessions/assertion</text>
+<text x="927.1" y="472" font-size="12.5" fill="#666666" text-anchor="middle">Ins-Session-Token, Sec-Fetch-*,</text>
+<text x="927.1" y="488" font-size="12.5" fill="#666666" text-anchor="middle">Ins-Browser-Accept</text>
+<line x1="711.4" y1="500" x2="1152.9" y2="500" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
+<circle cx="699.4" cy="500" r="10" fill="#222222"/>
+<text x="699.4" y="504" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">3</text>
+<rect x="1087.2" y="522" width="135.4" height="58" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="1154.9" y="539" font-size="12" fill="#333333" text-anchor="middle">lastSeenAt more than</text>
+<text x="1154.9" y="555" font-size="12" fill="#333333" text-anchor="middle">30 minutes old,</text>
+<text x="1154.9" y="571" font-size="12" fill="#333333" text-anchor="middle">left unchanged</text>
+<text x="927.1" y="606" font-size="12.5" fill="#222222" text-anchor="middle">410 idle</text>
+<line x1="1142.9" y1="618" x2="701.4" y2="618" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+<circle cx="1154.9" cy="618" r="10" fill="#222222"/>
+<text x="1154.9" y="622" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">4</text>
+<rect x="623.4" y="640" width="152" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="699.4" y="657" font-size="12" fill="#333333" text-anchor="middle">Script call not redirected,</text>
+<text x="699.4" y="673" font-size="12" fill="#333333" text-anchor="middle">return path built</text>
+<text x="402.2" y="708" font-size="12.5" fill="#222222" text-anchor="middle">401 problem details,</text>
+<text x="402.2" y="724" font-size="12.5" fill="#666666" text-anchor="middle">sign-in link /auth/sign-in</text>
+<text x="402.2" y="740" font-size="12.5" fill="#666666" text-anchor="middle">?redirect=/gbn-ag/notifications/123</text>
+<line x1="687.4" y1="752" x2="107" y2="752" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+<circle cx="699.4" cy="752" r="10" fill="#222222"/>
+<text x="699.4" y="756" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">5</text>
+<rect x="42.2" y="774" width="125.7" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="105" y="791" font-size="12" fill="#333333" text-anchor="middle">Page&#x27;s script shows</text>
+<text x="105" y="807" font-size="12" fill="#333333" text-anchor="middle">the message</text>
+<rect x="75" y="830" width="1109.9" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="629.9" y="847" font-size="12" fill="#333333" text-anchor="middle">John selects the link,</text>
+<text x="629.9" y="863" font-size="12" fill="#333333" text-anchor="middle">sign-in proceeds as in scenario 0</text>
+<rect x="882.8" y="886" width="145.4" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="955.5" y="903" font-size="12" fill="#333333" text-anchor="middle">New session cookie set</text>
+<text x="530.3" y="938" font-size="12.5" fill="#222222" text-anchor="middle">302 Location: /gbn-ag/notifications/123</text>
+<text x="530.3" y="954" font-size="12.5" fill="#666666" text-anchor="middle">the same page</text>
+<line x1="943.5" y1="966" x2="107" y2="966" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+<circle cx="955.5" cy="966" r="10" fill="#222222"/>
+<text x="955.5" y="970" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">6</text>
+</svg>

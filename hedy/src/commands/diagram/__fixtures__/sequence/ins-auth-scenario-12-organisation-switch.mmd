@@ -1,0 +1,45 @@
+%%{init: {"fontSize": 14, "themeVariables": {"fontSize": "14px"}, "sequence": {"actorMargin": 24, "messageMargin": 30, "noteMargin": 6, "width": 140, "wrap": true}}}%%
+sequenceDiagram
+    participant B as Browser
+    box PUBLIC ZONE
+        participant RS as Routing Service<br>trade-imports-<br>routing-proxy
+        participant JF as Journey Frontend<br>trade-imports-<br>{journey}-frontend
+        participant FD as Front Door<br>trade-imports-<br>ins-frontend
+    end
+    box PROTECTED ZONE
+        participant SS as Session Service
+    end
+    participant IDM as IDM
+
+    B->>RS: POST /auth/switch<br>anti-forgery token,<br>session cookie
+    RS->>FD: POST /auth/switch<br>anti-forgery token,<br>session cookie
+    Note over FD: Sealed cookie value read<br>from the cookie
+    FD->>SS: GET /sessions/assertion<br>Ins-Session-Token, Sec-Fetch-*,<br>Ins-Browser-Accept
+    Note over SS: lastSeenAt written,<br>no refresh
+    SS-->>FD: 200 csrfSecret
+    Note over FD: Anti-forgery token checked
+    FD->>SS: POST /sign-ins<br>mode switch,<br>sealed cookie value
+    Note over SS: Round trip stored<br>with sessionId
+    SS-->>FD: 201 Created<br>IDM address, binding value
+    FD-->>B: 302 Location: IDM authorize endpoint<br>Set-Cookie: binding cookie
+    B->>IDM: GET IDM authorize endpoint<br>?client_id, redirect_uri,<br>scope=openid {serviceId} offline_access,<br>state, nonce, code_challenge,<br>forceReselection=true
+    Note over B,IDM: Government Gateway session still live, not asked for credentials
+    IDM-->>B: 200 organisation picker
+    B->>IDM: Picks Riverside Imports Ltd
+    IDM-->>B: 302 Location: /auth/callback<br>?code=…&state=…
+    B->>RS: GET /auth/callback?code=…&state=…<br>session and binding cookies
+    RS->>FD: GET /auth/callback?code=…&state=…<br>session and binding cookies
+    FD->>SS: POST /sign-ins/{state}/completion<br>code, binding value,<br>sealed cookie value
+    Note over SS: Round trip consumed,<br>binding value<br>and session checked
+    SS->>IDM: POST IDM token endpoint<br>grant_type=authorization_code,<br>via CDP's outbound proxy
+    IDM-->>SS: 200 tokens for<br>the new organisation
+    Note over SS: ID token checked,<br>roles filtered
+    Note over SS: Record updated in place,<br>lastSeenAt written
+    SS-->>FD: 204 switch complete
+    Note over FD: Session cookie unchanged
+    FD-->>B: 302 Location: / (dashboard)<br>binding cookie cleared
+    Note over B,JF: Later, John submits the Northgate form
+    B->>RS: POST /gbn-ag/notifications/123/commodity-lines<br>second tab, Northgate anti-forgery token
+    RS->>JF: POST /notifications/123/commodity-lines<br>session cookie
+    Note over JF: Sealed cookie value read<br>from the cookie
+    Note over JF: Anti-forgery check fails,<br>csrfSecret replaced

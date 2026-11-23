@@ -1,0 +1,26 @@
+%%{init: {"fontSize": 14, "themeVariables": {"fontSize": "14px"}, "sequence": {"actorMargin": 24, "messageMargin": 30, "noteMargin": 6, "width": 140, "wrap": true}}}%%
+sequenceDiagram
+    participant B as Browser
+    box PUBLIC ZONE
+        participant RS as Routing Service<br>trade-imports-<br>routing-proxy
+        participant JF as Journey Frontend<br>trade-imports-<br>{journey}-frontend
+        participant FD as Front Door<br>trade-imports-<br>ins-frontend
+    end
+    box PROTECTED ZONE
+        participant SS as Session Service
+    end
+
+    Note over B,SS: John's page load refreshed<br>the session, then he left his desk
+    Note over B,SS: The idle point passes,<br>nothing runs or is written
+    B->>RS: GET /gbn-ag/documents/456/scan-status<br>session cookie
+    RS->>JF: GET /documents/456/scan-status<br>X-Forwarded-Prefix: /gbn-ag,<br>session cookie
+    Note over JF: Sealed cookie value read<br>from the cookie
+    JF->>SS: GET /sessions/assertion<br>Ins-Session-Token, Sec-Fetch-*,<br>Ins-Browser-Accept
+    Note over SS: lastSeenAt more than<br>30 minutes old,<br>left unchanged
+    SS-->>JF: 410 idle
+    Note over JF: Script call not redirected,<br>return path built
+    JF-->>B: 401 problem details,<br>sign-in link /auth/sign-in<br>?redirect=/gbn-ag/notifications/123
+    Note over B: Page's script shows<br>the message
+    Note over B,SS: John selects the link,<br>sign-in proceeds as in scenario 0
+    Note over FD: New session cookie set
+    FD-->>B: 302 Location: /gbn-ag/notifications/123<br>the same page

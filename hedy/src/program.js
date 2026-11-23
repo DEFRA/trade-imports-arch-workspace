@@ -1,6 +1,7 @@
 import { Command, CommanderError } from 'commander'
 import { register as registerAuth } from './commands/auth.js'
 import { register as registerConfluence } from './commands/confluence/index.js'
+import { register as registerDiagram } from './commands/diagram/index.js'
 import { register as registerHello } from './commands/hello.js'
 import { register as registerJira } from './commands/jira/index.js'
 import { register as registerProse } from './commands/prose/index.js'
@@ -108,6 +109,7 @@ export const buildProgram = (deps) => {
   registerAuth(program, commandDeps)
   registerJira(program, commandDeps)
   registerConfluence(program, commandDeps)
+  registerDiagram(program, commandDeps)
   registerProse(program, commandDeps)
   registerWorkspace(program, commandDeps)
   return program

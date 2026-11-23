@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    participant B as Browser
+    box PUBLIC ZONE
+        participant RS as Routing Service<br>trade-imports-<br>routing-proxy
+        participant JF as Journey Frontend<br>trade-imports-<br>{journey}-frontend
+    end
+    box PROTECTED ZONE
+        participant SS as Session Service
+        participant JB as Journey Backend<br>trade-imports-<br>{journey}-backend
+        participant PS as Permissions Service
+    end
+    box AWS PLATFORM
+        participant STS as AWS STS
+    end
+
+    B->>RS: GET /gbn-ag/notifications/123<br>session cookie
+    RS->>JF: GET /notifications/123<br>X-Forwarded-Prefix: /gbn-ag,<br>session cookie
+    Note over JF: Sealed cookie value read<br>from the cookie
+    JF->>STS: GetWebIdentityToken
+    STS-->>JF: Service token
+    JF->>SS: GET /sessions/assertion<br>Authorization: service token,<br>Ins-Session-Token, Sec-Fetch-*,<br>Ins-Browser-Accept
+    Note over SS: Value unsealed, record loaded,<br>limits and confirmation checked
+    Note over SS: lastSeenAt written,<br>no refresh
+    SS-->>JF: 200 session assertion,<br>csrfSecret, displayName,<br>organisation, role names
+    JF->>JB: GET /notifications/123<br>Authorization: service token,<br>Ins-Session-Assertion
+    Note over JB: Assertion signature,<br>audience and expiry checked
+    JB->>PS: POST /permissions/expansions<br>roles
+    PS-->>JB: 200 permissions
+    Note over JB: Query scoped to<br>Northgate Produce Ltd
+    JB-->>JF: 200 notification 123
+    Note over JF: Page rendered
+    JF-->>RS: 200 page
+    RS-->>B: 200 page

@@ -1,0 +1,27 @@
+%%{init: {"fontSize": 14, "themeVariables": {"fontSize": "14px"}, "sequence": {"actorMargin": 24, "messageMargin": 30, "noteMargin": 6, "width": 140, "wrap": true}}}%%
+sequenceDiagram
+    participant B as Browser
+    box PUBLIC ZONE
+        participant RS as Routing Service<br>trade-imports-<br>routing-proxy
+        participant JF as Journey Frontend<br>trade-imports-<br>{journey}-frontend
+    end
+    box PROTECTED ZONE
+        participant SS as Session Service
+        participant JB as Journey Backend<br>trade-imports-<br>{journey}-backend
+        participant PS as Permissions Service
+    end
+
+    B->>RS: POST /gbn-ag/notifications/123/commodity-lines<br>session cookie, anti-forgery token
+    RS->>JF: POST /notifications/123/commodity-lines<br>X-Forwarded-Prefix: /gbn-ag,<br>session cookie, anti-forgery token
+    Note over JF: Sealed cookie value read<br>from the cookie
+    JF->>SS: GET /sessions/assertion<br>Ins-Session-Token, Sec-Fetch-*,<br>Ins-Browser-Accept
+    Note over SS: Same-origin form submission<br>recognised,<br>lastSeenAt written
+    SS-->>JF: 200 csrfSecret,<br>session assertion
+    Note over JF: Anti-forgery token checked
+    JF->>JB: POST /notifications/123/commodity-lines<br>Ins-Session-Assertion,<br>rendered organisation
+    Note over JB: Assertion signature,<br>audience, expiry checked
+    JB->>PS: POST /permissions/expansions<br>roles
+    PS-->>JB: 200 permissions
+    Note over JB: Commodity line written
+    JB-->>JF: 201 commodity line
+    JF-->>B: 303 Location: next page
