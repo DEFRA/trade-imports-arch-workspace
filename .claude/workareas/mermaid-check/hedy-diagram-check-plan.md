@@ -7,6 +7,8 @@ hedy gains `hedy diagram check`, which proves that each Mermaid diagram parses b
 | Learn why the port is worth doing | Reasons |
 | Learn what the command does | Capabilities |
 | Learn where the Mermaid parser runs | Parser |
+| Learn how other agents find and call the command | Instructions for Agents |
+| Learn which skills check their diagrams | Skills That Write Mermaid |
 | Learn how the work is tested and written | Testing, Code Standards |
 | Learn the order of the work | Order of Work |
 | Answer the open points | Decisions |
@@ -115,6 +117,33 @@ Three places can run the parser:
 
 The recommendation is the first place, because the tooling owns Mermaid in this estate and hedy's dependency rule stays intact. The first step of the work proves that a document model library gives Mermaid's parser the same verdicts as `mmdc` on all 278 diagrams.
 
+## Instructions for Agents
+
+An agent that has never seen the command must learn from the workspace's documents how to call the command and how to read its result. Each step of the work updates these documents in the same change as the behaviour the documents describe:
+
+| Document | What the document tells an agent |
+| --- | --- |
+| `hedy diagram check --help` | the four forms of input (a file, a page, a folder, and `--stdin --label`), the result's fields and the exit codes |
+| `AGENTS.md`, "The `hedy` CLI" | one entry for `hedy diagram check`. The entry for `hedy diagram sequence` says that the renderer checks its source with Mermaid before drawing |
+| `AGENTS.md`, "Runnable tooling" | the `mermaid-check/` row leaves the table when the bash scripts are deleted |
+| `hedy/CLAUDE.md`, "Source Layout" | each new module and the function each module holds |
+| `hedy/DECISIONS.md`, "Diagrams" | the parser's place, the parity method and the reason for each |
+
+A command added without its `AGENTS.md` entry and its help text is not finished, because agents in other tools read `AGENTS.md` and not this plan.
+
+## Skills That Write Mermaid
+
+Every skill step that creates or changes a Mermaid diagram runs `hedy diagram check` on the diagram straight after writing the diagram, and fixes every line the check names before the next step. A diagram that has not been checked is not finished. The rule applies to these skills:
+
+| Skill | Step that writes Mermaid | Check |
+| --- | --- | --- |
+| mermaid-check | "Author", and "Draw in the House Style", which writes the `.mmd` source of a sequence diagram | `hedy diagram check <file> --json` after the source is written, then `hedy diagram sequence` |
+| authoring | "Draw each image" in the Drafting Brief, where the drafting agent draws each diagram the plan describes | `hedy diagram check --stdin --label <name>` for a diagram held in context, and `hedy diagram check <page>` once the page is written |
+| trade-imports-dr | "Diagrams", which prefers Mermaid for a flow | `hedy diagram check <file>` on each `.mmd` file or page the decision record adds |
+| confluence-publish | the pre-flight refusal that names `build:mmd` | `hedy diagram check <page>` in place of the hand-off to mermaid-check |
+
+`hedy diagram sequence` runs the same check before drawing, so a skill that misses the step cannot draw from a source Mermaid rejects. The skill step is still needed, because the docs repo's `build:mmd` and GitHub Pages render a `.mmd` file without the sequence renderer.
+
 ## Testing
 
 The tests state the behaviours above, and follow the method of `hedy diagram sequence`.
@@ -141,11 +170,11 @@ The rest of hedy breaks the limits in 14 functions for complexity and 6 function
 1. **Prove the parser.** A spike in `delivery-info-arch-tooling` gives Mermaid's parser a document model and parses the 278 diagrams of the estate. The pass mark is the same verdict as `mmdc` for every diagram. If a diagram type fails the mark, that type falls back to `mmdc`, and the plan records the type. The spike comes first because every later step depends on the parser's place.
 2. **Add the lint limits** for `hedy/src/commands/diagram/`, so every later step is written under them.
 3. **Capture the bash verdicts** on the fixture set, before any hedy code exists.
-4. **Check a Mermaid file**, with the `SETUP` error for a broken machine and the machine-readable result.
-5. **Check pages and folders**, with the page line worked out by the command.
-6. **Check a diagram held in context** through `--stdin`.
-7. **Make the renderer check first**, so `hedy diagram sequence` refuses a source Mermaid rejects.
-8. **Cut over.** The mermaid-check skill calls `hedy diagram check`. The authoring and confluence-publish skills, `AGENTS.md` and the skills' records drop the bash scripts, and the two scripts are deleted in the same change. The allowlist entry for `.claude/tools/mermaid-check/` is an owner step for Ben.
+4. **Check a Mermaid file**, with the `SETUP` error for a broken machine and the machine-readable result. The command's help text, its `AGENTS.md` entry and its `hedy/CLAUDE.md` lines come in the same change.
+5. **Check pages and folders**, with the page line worked out by the command. The help text and the `AGENTS.md` entry gain the page and folder forms.
+6. **Check a diagram held in context** through `--stdin`. The help text and the `AGENTS.md` entry gain the `--stdin` form.
+7. **Make the renderer check first**, so `hedy diagram sequence` refuses a source Mermaid rejects. The `AGENTS.md` entry for `hedy diagram sequence` says so.
+8. **Cut over.** The four skills in "Skills That Write Mermaid" call `hedy diagram check` after every step that writes Mermaid. `AGENTS.md` drops the `mermaid-check/` tooling row, the skills' records drop the bash scripts, and the two scripts are deleted in the same change. The allowlist entry for `.claude/tools/mermaid-check/` is an owner step for Ben.
 9. **Later:** the publish pre-flight refuses a page with a broken diagram, when decision 2 says so.
 
 Steps 1 to 8 make one pull request to hedy and one to `delivery-info-arch-tooling`. The tooling pull request merges first, because hedy runs its script.
