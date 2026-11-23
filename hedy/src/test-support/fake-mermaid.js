@@ -1,6 +1,6 @@
-import { mkdir, mkdtemp, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { createWorkspace } from './cli.js'
 
 const FAKE_MERMAID = `
 const windowAtLoad = typeof globalThis.window?.document === 'object'
@@ -15,7 +15,8 @@ export default {
 `
 
 /**
- * Creates a temporary workspace whose delivery-info-arch-tooling folder holds
+ * Creates a temporary workspace, as createWorkspace does, whose
+ * delivery-info-arch-tooling folder holds
  * a fake Mermaid package. The fake's parse rejects a text holding
  * "FAIL on line <n>" with Mermaid's message for line n, and otherwise gives the
  * text's first word as the diagram type, or "loaded-without-window" when no
@@ -25,7 +26,7 @@ export default {
  * @returns {Promise<string>} the workspace's absolute path
  */
 export const createFakeMermaidWorkspace = async ({ withMermaid = true } = {}) => {
-  const root = await mkdtemp(join(tmpdir(), 'hedy-mermaid-'))
+  const root = await createWorkspace()
   const tooling = join(root, 'delivery-info-arch-tooling')
   await mkdir(tooling, { recursive: true })
   await writeFile(join(tooling, 'package.json'), JSON.stringify({ name: '@defra/delivery-info-arch-tooling' }))
