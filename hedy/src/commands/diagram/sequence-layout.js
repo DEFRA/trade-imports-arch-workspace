@@ -218,7 +218,7 @@ const conditionText = ({ x, y, condition }) =>
   textAt({ x, y: y + SPACING.frameTextBaseline, text: condition, role: 'condition' })
 
 const frameHeading = ({ left, top, condition }) => {
-  const heading = textAt({ x: left + SPACING.frameTextInset, y: top + SPACING.frameTextBaseline, text: 'ALTERNATIVE', role: 'frameHeading' })
+  const heading = textAt({ x: left + SPACING.frameTextInset, y: top + SPACING.frameTextBaseline, text: 'alt.', role: 'frameHeading' })
   return [heading, conditionText({ x: heading.bounds.right + SPACING.frameConditionGap, y: top, condition })]
 }
 

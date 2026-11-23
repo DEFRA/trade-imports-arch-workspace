@@ -125,7 +125,7 @@ describe('layOutSequence draws notes and alternatives', () => {
     expect(note.rect.width).toBeLessThan(widest + 40)
   })
 
-  it('heads each branch of an alternative with its condition and divides the branches', () => {
+  it('heads the frame alt. and each branch with its condition, and divides the branches', () => {
     const [frame] = sceneOf(
       'participant A as Alpha',
       'participant B as Beta',
@@ -135,7 +135,7 @@ describe('layOutSequence draws notes and alternatives', () => {
       'B-->>A: Error',
       'end'
     ).frames
-    expect([...frame.heading, ...frame.dividers.map(({ text }) => text)].map(({ text }) => text)).toEqual(['ALTERNATIVE', 'Access confirmed', 'Request fails'])
+    expect([...frame.heading, ...frame.dividers.map(({ text }) => text)].map(({ text }) => text)).toEqual(['alt.', 'Access confirmed', 'Request fails'])
     expect(frame.dividers).toHaveLength(1)
     expect(frame.stepNumbers).toEqual([1, 2])
   })

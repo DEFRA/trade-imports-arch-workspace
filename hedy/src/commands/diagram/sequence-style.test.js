@@ -18,6 +18,11 @@ describe('textStyle', () => {
 })
 
 describe('SHAPE_STYLES', () => {
+  it('fills notes pale yellow and frames pale blue, each with an edge of its own colour', () => {
+    expect(SHAPE_STYLES.note).toMatchObject({ fill: '#fdf6d8', stroke: '#d6c26a' })
+    expect(SHAPE_STYLES.frame).toMatchObject({ fill: '#e8f1f8', stroke: '#5694ca' })
+  })
+
   it('draws replies dashed and requests solid, both ending in the arrowhead', () => {
     expect(SHAPE_STYLES.reply).toMatchObject({ 'stroke-dasharray': '5 4', 'marker-end': 'url(#arw)' })
     expect(SHAPE_STYLES.request['stroke-dasharray']).toBeUndefined()
