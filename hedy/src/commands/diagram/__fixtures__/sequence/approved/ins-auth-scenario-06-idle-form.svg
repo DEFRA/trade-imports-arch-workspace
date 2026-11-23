@@ -23,10 +23,10 @@
 <line x1="1284.5" y1="110" x2="1284.5" y2="958" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
 <rect x="1216.8" y="52" width="135.4" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
 <text x="1284.5" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Session Service</text>
-<rect x="75" y="136" width="1239.5" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="75" y="136" width="1239.5" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="694.7" y="153" font-size="12" fill="#333333" text-anchor="middle">John&#x27;s form page load refreshed</text>
 <text x="694.7" y="169" font-size="12" fill="#333333" text-anchor="middle">the session, then he left his desk</text>
-<rect x="75" y="192" width="1239.5" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="75" y="192" width="1239.5" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="694.7" y="209" font-size="12" fill="#333333" text-anchor="middle">The idle point passes,</text>
 <text x="694.7" y="225" font-size="12" fill="#333333" text-anchor="middle">nothing runs or is written</text>
 <text x="298.6" y="260" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">POST /gbn-ag/notifications/123/commodity-lines</text>
@@ -40,7 +40,7 @@
 <line x1="504.2" y1="366" x2="827" y2="366" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="492.2" cy="366" r="10" fill="#222222"/>
 <text x="492.2" y="370" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">2</text>
-<rect x="751.6" y="388" width="154.7" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="751.6" y="388" width="154.7" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="829" y="405" font-size="12" fill="#333333" text-anchor="middle">Sealed cookie value read</text>
 <text x="829" y="421" font-size="12" fill="#333333" text-anchor="middle">from the cookie</text>
 <text x="1056.7" y="456" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">GET /sessions/assertion</text>
@@ -49,7 +49,7 @@
 <line x1="841" y1="500" x2="1282.5" y2="500" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="829" cy="500" r="10" fill="#222222"/>
 <text x="829" y="504" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">3</text>
-<rect x="1216.8" y="522" width="135.4" height="58" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1216.8" y="522" width="135.4" height="58" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1284.5" y="539" font-size="12" fill="#333333" text-anchor="middle">lastSeenAt more than</text>
 <text x="1284.5" y="555" font-size="12" fill="#333333" text-anchor="middle">30 minutes old,</text>
 <text x="1284.5" y="571" font-size="12" fill="#333333" text-anchor="middle">left unchanged</text>
@@ -57,7 +57,7 @@
 <line x1="1272.5" y1="618" x2="831" y2="618" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="1284.5" cy="618" r="10" fill="#222222"/>
 <text x="1284.5" y="622" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">4</text>
-<rect x="705.3" y="640" width="247.4" height="58" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="705.3" y="640" width="247.4" height="58" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="829" y="657" font-size="12" fill="#333333" text-anchor="middle">Form post not redirected,</text>
 <text x="829" y="673" font-size="12" fill="#333333" text-anchor="middle">the redirect would drop the submitted data.</text>
 <text x="829" y="689" font-size="12" fill="#333333" text-anchor="middle">Sign-in link carries the form page&#x27;s path</text>
@@ -67,10 +67,10 @@
 <line x1="817" y1="768" x2="107" y2="768" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="829" cy="768" r="10" fill="#222222"/>
 <text x="829" y="772" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">5</text>
-<rect x="75" y="790" width="1239.5" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="75" y="790" width="1239.5" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="694.7" y="807" font-size="12" fill="#333333" text-anchor="middle">John selects the link,</text>
 <text x="694.7" y="823" font-size="12" fill="#333333" text-anchor="middle">sign-in proceeds as in scenario 0</text>
-<rect x="1012.4" y="846" width="145.4" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1012.4" y="846" width="145.4" height="26" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1085.1" y="863" font-size="12" fill="#333333" text-anchor="middle">New session cookie set</text>
 <text x="595.1" y="898" font-size="12.5" fill="#222222" text-anchor="middle">302 Location: /gbn-ag/notifications/123/commodity-lines</text>
 <text x="595.1" y="914" font-size="12.5" fill="#666666" text-anchor="middle">the empty form</text>

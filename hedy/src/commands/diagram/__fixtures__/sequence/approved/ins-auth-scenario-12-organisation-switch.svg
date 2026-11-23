@@ -38,7 +38,7 @@
 <line x1="504.2" y1="270" x2="1083.1" y2="270" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="492.2" cy="270" r="10" fill="#222222"/>
 <text x="492.2" y="274" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">2</text>
-<rect x="1007.7" y="292" width="154.7" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1007.7" y="292" width="154.7" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1085.1" y="309" font-size="12" fill="#333333" text-anchor="middle">Sealed cookie value read</text>
 <text x="1085.1" y="325" font-size="12" fill="#333333" text-anchor="middle">from the cookie</text>
 <text x="1231.9" y="360" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">GET /sessions/assertion</text>
@@ -47,14 +47,14 @@
 <line x1="1097.1" y1="404" x2="1376.7" y2="404" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="1085.1" cy="404" r="10" fill="#222222"/>
 <text x="1085.1" y="408" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">3</text>
-<rect x="1318.7" y="426" width="120" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1318.7" y="426" width="120" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1378.7" y="443" font-size="12" fill="#333333" text-anchor="middle">lastSeenAt written,</text>
 <text x="1378.7" y="459" font-size="12" fill="#333333" text-anchor="middle">no refresh</text>
 <text x="1231.9" y="494" font-size="12.5" fill="#222222" text-anchor="middle">200 csrfSecret</text>
 <line x1="1366.7" y1="506" x2="1087.1" y2="506" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="1378.7" cy="506" r="10" fill="#222222"/>
 <text x="1378.7" y="510" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">4</text>
-<rect x="1003.7" y="528" width="162.7" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1003.7" y="528" width="162.7" height="26" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1085.1" y="545" font-size="12" fill="#333333" text-anchor="middle">Anti-forgery token checked</text>
 <text x="1231.9" y="580" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">POST /sign-ins</text>
 <text x="1231.9" y="596" font-size="12.5" fill="#666666" text-anchor="middle">mode switch,</text>
@@ -62,7 +62,7 @@
 <line x1="1097.1" y1="624" x2="1376.7" y2="624" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="1085.1" cy="624" r="10" fill="#222222"/>
 <text x="1085.1" y="628" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">5</text>
-<rect x="1322.7" y="646" width="112" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1322.7" y="646" width="112" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1378.7" y="663" font-size="12" fill="#333333" text-anchor="middle">Round trip stored</text>
 <text x="1378.7" y="679" font-size="12" fill="#333333" text-anchor="middle">with sessionId</text>
 <text x="1231.9" y="714" font-size="12.5" fill="#222222" text-anchor="middle">201 Created</text>
@@ -83,7 +83,7 @@
 <line x1="117" y1="914" x2="1608.2" y2="914" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="105" cy="914" r="10" fill="#222222"/>
 <text x="105" y="918" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">8</text>
-<rect x="75" y="936" width="1565.2" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="75" y="936" width="1565.2" height="26" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="857.6" y="953" font-size="12" fill="#333333" text-anchor="middle">Government Gateway session still live, not asked for credentials</text>
 <text x="857.6" y="988" font-size="12.5" fill="#222222" text-anchor="middle">200 organisation picker</text>
 <line x1="1598.2" y1="1000" x2="107" y2="1000" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
@@ -114,7 +114,7 @@
 <line x1="1097.1" y1="1310" x2="1376.7" y2="1310" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="1085.1" cy="1310" r="10" fill="#222222"/>
 <text x="1085.1" y="1314" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">14</text>
-<rect x="1310" y="1332" width="137.4" height="58" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1310" y="1332" width="137.4" height="58" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1378.7" y="1349" font-size="12" fill="#333333" text-anchor="middle">Round trip consumed,</text>
 <text x="1378.7" y="1365" font-size="12" fill="#333333" text-anchor="middle">binding value</text>
 <text x="1378.7" y="1381" font-size="12" fill="#333333" text-anchor="middle">and session checked</text>
@@ -129,24 +129,24 @@
 <line x1="1598.2" y1="1522" x2="1380.7" y2="1522" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="1610.2" cy="1522" r="10" fill="#222222"/>
 <text x="1610.2" y="1526" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">16</text>
-<rect x="1320.7" y="1544" width="116" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1320.7" y="1544" width="116" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1378.7" y="1561" font-size="12" fill="#333333" text-anchor="middle">ID token checked,</text>
 <text x="1378.7" y="1577" font-size="12" fill="#333333" text-anchor="middle">roles filtered</text>
-<rect x="1302" y="1600" width="153.4" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1302" y="1600" width="153.4" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1378.7" y="1617" font-size="12" fill="#333333" text-anchor="middle">Record updated in place,</text>
 <text x="1378.7" y="1633" font-size="12" fill="#333333" text-anchor="middle">lastSeenAt written</text>
 <text x="1231.9" y="1668" font-size="12.5" fill="#222222" text-anchor="middle">204 switch complete</text>
 <line x1="1366.7" y1="1680" x2="1087.1" y2="1680" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="1378.7" cy="1680" r="10" fill="#222222"/>
 <text x="1378.7" y="1684" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">17</text>
-<rect x="1003.4" y="1702" width="163.4" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1003.4" y="1702" width="163.4" height="26" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1085.1" y="1719" font-size="12" fill="#333333" text-anchor="middle">Session cookie unchanged</text>
 <text x="595.1" y="1754" font-size="12.5" fill="#222222" text-anchor="middle">302 Location: / (dashboard)</text>
 <text x="595.1" y="1770" font-size="12.5" fill="#666666" text-anchor="middle">binding cookie cleared</text>
 <line x1="1073.1" y1="1782" x2="107" y2="1782" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="1085.1" cy="1782" r="10" fill="#222222"/>
 <text x="1085.1" y="1786" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">18</text>
-<rect x="75" y="1804" width="784" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="75" y="1804" width="784" height="26" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="467" y="1821" font-size="12" fill="#333333" text-anchor="middle">Later, John submits the Northgate form</text>
 <text x="298.6" y="1856" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">POST /gbn-ag/notifications/123/commodity-lines</text>
 <text x="298.6" y="1872" font-size="12.5" fill="#666666" text-anchor="middle">second tab, Northgate anti-forgery token</text>
@@ -158,10 +158,10 @@
 <line x1="504.2" y1="1946" x2="827" y2="1946" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="492.2" cy="1946" r="10" fill="#222222"/>
 <text x="492.2" y="1950" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">20</text>
-<rect x="751.6" y="1968" width="154.7" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="751.6" y="1968" width="154.7" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="829" y="1985" font-size="12" fill="#333333" text-anchor="middle">Sealed cookie value read</text>
 <text x="829" y="2001" font-size="12" fill="#333333" text-anchor="middle">from the cookie</text>
-<rect x="756.6" y="2024" width="144.7" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="756.6" y="2024" width="144.7" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="829" y="2041" font-size="12" fill="#333333" text-anchor="middle">Anti-forgery check fails,</text>
 <text x="829" y="2057" font-size="12" fill="#333333" text-anchor="middle">csrfSecret replaced</text>
 </svg>

@@ -26,9 +26,9 @@
 <line x1="1277.1" y1="110" x2="1277.1" y2="1616" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
 <rect x="1212.1" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
 <text x="1277.1" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">IDM</text>
-<rect x="50" y="724" width="1282.1" height="334" rx="6" fill="none" stroke="#bbbbbb" stroke-width="1.2"/>
-<text x="62" y="744" font-size="10.5" fill="#666666" text-anchor="start" font-weight="700" letter-spacing="0.07em">ALTERNATIVE</text>
-<text x="154.9" y="744" font-size="12" fill="#222222" text-anchor="start">IDM accepts the hint</text>
+<rect x="50" y="724" width="1282.1" height="334" rx="6" fill="#e8f1f8" stroke="#5694ca" stroke-width="1.2"/>
+<text x="62" y="744" font-size="10.5" fill="#666666" text-anchor="start" font-weight="700" letter-spacing="0.07em">alt.</text>
+<text x="87.9" y="744" font-size="12" fill="#222222" text-anchor="start">IDM accepts the hint</text>
 <line x1="50" y1="982" x2="1332.1" y2="982" stroke="#bbbbbb" stroke-dasharray="5 4"/>
 <text x="62" y="1002" font-size="12" fill="#222222" text-anchor="start">IDM rejects the hint</text>
 <text x="237.4" y="148" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">POST /auth/sign-out</text>
@@ -41,7 +41,7 @@
 <line x1="381.8" y1="238" x2="883.5" y2="238" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="369.8" cy="238" r="10" fill="#222222"/>
 <text x="369.8" y="242" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">2</text>
-<rect x="809.1" y="260" width="152.7" height="58" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="809.1" y="260" width="152.7" height="58" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="885.5" y="277" font-size="12" fill="#333333" text-anchor="middle">Origin checked,</text>
 <text x="885.5" y="293" font-size="12" fill="#333333" text-anchor="middle">sealed cookie value read</text>
 <text x="885.5" y="309" font-size="12" fill="#333333" text-anchor="middle">from the cookie</text>
@@ -50,7 +50,7 @@
 <line x1="897.5" y1="372" x2="1105.1" y2="372" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="885.5" cy="372" r="10" fill="#222222"/>
 <text x="885.5" y="376" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">3</text>
-<rect x="1027.3" y="394" width="159.4" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1027.3" y="394" width="159.4" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1107.1" y="411" font-size="12" fill="#333333" text-anchor="middle">Every record John holds</text>
 <text x="1107.1" y="427" font-size="12" fill="#333333" text-anchor="middle">deleted, whatever its state</text>
 <text x="996.3" y="462" font-size="12.5" fill="#222222" text-anchor="middle">200 end-session address,</text>
@@ -58,7 +58,7 @@
 <line x1="1095.1" y1="490" x2="887.5" y2="490" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="1107.1" cy="490" r="10" fill="#222222"/>
 <text x="1107.1" y="494" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">4</text>
-<rect x="811.8" y="512" width="147.4" height="58" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="811.8" y="512" width="147.4" height="58" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="885.5" y="529" font-size="12" fill="#333333" text-anchor="middle">Session cookie cleared,</text>
 <text x="885.5" y="545" font-size="12" fill="#333333" text-anchor="middle">signed-out address built</text>
 <text x="885.5" y="561" font-size="12" fill="#333333" text-anchor="middle">from public base URL</text>
@@ -73,7 +73,7 @@
 <line x1="117" y1="702" x2="1275.1" y2="702" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="105" cy="702" r="10" fill="#222222"/>
 <text x="105" y="706" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">6</text>
-<rect x="1215.7" y="758" width="122.7" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1215.7" y="758" width="122.7" height="26" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1277.1" y="775" font-size="12" fill="#333333" text-anchor="middle">IDM session ended</text>
 <text x="691" y="810" font-size="12.5" fill="#222222" text-anchor="middle">302 Location: /auth/signed-out</text>
 <line x1="1265.1" y1="822" x2="107" y2="822" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
@@ -95,10 +95,10 @@
 <line x1="1265.1" y1="1036" x2="107" y2="1036" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="1277.1" cy="1036" r="10" fill="#222222"/>
 <text x="1277.1" y="1040" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">11</text>
-<rect x="75" y="1072" width="1232.1" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="75" y="1072" width="1232.1" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="691" y="1089" font-size="12" fill="#333333" text-anchor="middle">Later, other tab: no session cookie,</text>
 <text x="691" y="1105" font-size="12" fill="#333333" text-anchor="middle">sign-in, credential prompt</text>
-<rect x="75" y="1128" width="584.4" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="75" y="1128" width="584.4" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="367.2" y="1145" font-size="12" fill="#333333" text-anchor="middle">Later, second computer,</text>
 <text x="367.2" y="1161" font-size="12" fill="#333333" text-anchor="middle">session cookie still held</text>
 <text x="237.4" y="1196" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">GET /gbn-ag/notifications/123</text>
@@ -111,7 +111,7 @@
 <line x1="381.8" y1="1286" x2="627.4" y2="1286" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="369.8" cy="1286" r="10" fill="#222222"/>
 <text x="369.8" y="1290" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">13</text>
-<rect x="552" y="1308" width="154.7" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="552" y="1308" width="154.7" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="629.4" y="1325" font-size="12" fill="#333333" text-anchor="middle">Sealed cookie value read</text>
 <text x="629.4" y="1341" font-size="12" fill="#333333" text-anchor="middle">from the cookie</text>
 <text x="868.2" y="1376" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">GET /sessions/assertion</text>
@@ -120,7 +120,7 @@
 <line x1="641.4" y1="1420" x2="1105.1" y2="1420" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
 <circle cx="629.4" cy="1420" r="10" fill="#222222"/>
 <text x="629.4" y="1424" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">14</text>
-<rect x="1018" y="1442" width="178.1" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="1018" y="1442" width="178.1" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="1107.1" y="1459" font-size="12" fill="#333333" text-anchor="middle">Sealed cookie value identifies</text>
 <text x="1107.1" y="1475" font-size="12" fill="#333333" text-anchor="middle">no record</text>
 <text x="868.2" y="1510" font-size="12.5" fill="#222222" text-anchor="middle">404 session-unknown</text>

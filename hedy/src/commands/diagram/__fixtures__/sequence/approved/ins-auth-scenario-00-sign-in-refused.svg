@@ -22,16 +22,16 @@
 <line x1="1217.3" y1="110" x2="1217.3" y2="1320" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
 <rect x="1152.3" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
 <text x="1217.3" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">IDM</text>
-<rect x="598.5" y="440" width="673.8" height="704" rx="6" fill="none" stroke="#bbbbbb" stroke-width="1.2"/>
-<text x="610.5" y="460" font-size="10.5" fill="#666666" text-anchor="start" font-weight="700" letter-spacing="0.07em">ALTERNATIVE</text>
-<text x="703.4" y="460" font-size="12" fill="#222222" text-anchor="start">No round trip for the state: expired, or already used</text>
+<rect x="598.5" y="440" width="673.8" height="704" rx="6" fill="#e8f1f8" stroke="#5694ca" stroke-width="1.2"/>
+<text x="610.5" y="460" font-size="10.5" fill="#666666" text-anchor="start" font-weight="700" letter-spacing="0.07em">alt.</text>
+<text x="636.4" y="460" font-size="12" fill="#222222" text-anchor="start">No round trip for the state: expired, or already used</text>
 <line x1="598.5" y1="520" x2="1272.3" y2="520" stroke="#bbbbbb" stroke-dasharray="5 4"/>
 <text x="610.5" y="540" font-size="12" fill="#222222" text-anchor="start">Binding value missing or different</text>
 <line x1="598.5" y1="636" x2="1272.3" y2="636" stroke="#bbbbbb" stroke-dasharray="5 4"/>
 <text x="610.5" y="656" font-size="12" fill="#222222" text-anchor="start">IDM returned an error</text>
 <line x1="598.5" y1="752" x2="1272.3" y2="752" stroke="#bbbbbb" stroke-dasharray="5 4"/>
 <text x="610.5" y="772" font-size="12" fill="#222222" text-anchor="start">No approved role at the selected organisation</text>
-<rect x="75" y="136" width="1172.3" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="75" y="136" width="1172.3" height="42" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="661.1" y="153" font-size="12" fill="#333333" text-anchor="middle">Steps 1 to 7 of the sign-in above.</text>
 <text x="661.1" y="169" font-size="12" fill="#333333" text-anchor="middle">The round trip is stored and expires after 10 minutes</text>
 <text x="661.1" y="204" font-size="12.5" fill="#222222" text-anchor="middle">302 Location: /auth/callback</text>
@@ -58,19 +58,19 @@
 <line x1="973.8" y1="498" x2="694.2" y2="498" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="985.8" cy="498" r="10" fill="#222222"/>
 <text x="985.8" y="502" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">5</text>
-<rect x="918.8" y="550" width="134" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="918.8" y="550" width="134" height="26" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="985.8" y="567" font-size="12" fill="#333333" text-anchor="middle">Round trip consumed</text>
 <text x="839" y="602" font-size="12.5" fill="#222222" text-anchor="middle">422 sign-in-refused</text>
 <line x1="973.8" y1="614" x2="694.2" y2="614" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="985.8" cy="614" r="10" fill="#222222"/>
 <text x="985.8" y="618" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">6</text>
-<rect x="918.8" y="666" width="134" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="918.8" y="666" width="134" height="26" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="985.8" y="683" font-size="12" fill="#333333" text-anchor="middle">Round trip consumed</text>
 <text x="839" y="718" font-size="12.5" fill="#222222" text-anchor="middle">422 sign-in-refused</text>
 <line x1="973.8" y1="730" x2="694.2" y2="730" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="985.8" cy="730" r="10" fill="#222222"/>
 <text x="985.8" y="734" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">7</text>
-<rect x="940.4" y="782" width="90.7" height="74" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="940.4" y="782" width="90.7" height="74" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="985.8" y="799" font-size="12" fill="#333333" text-anchor="middle">Round trip</text>
 <text x="985.8" y="815" font-size="12" fill="#333333" text-anchor="middle">consumed,</text>
 <text x="985.8" y="831" font-size="12" fill="#333333" text-anchor="middle">binding value</text>
@@ -86,7 +86,7 @@
 <line x1="1205.3" y1="988" x2="987.8" y2="988" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="1217.3" cy="988" r="10" fill="#222222"/>
 <text x="1217.3" y="992" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">9</text>
-<rect x="927.8" y="1010" width="116" height="74" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="927.8" y="1010" width="116" height="74" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="985.8" y="1027" font-size="12" fill="#333333" text-anchor="middle">ID token checked,</text>
 <text x="985.8" y="1043" font-size="12" fill="#333333" text-anchor="middle">no approved role,</text>
 <text x="985.8" y="1059" font-size="12" fill="#333333" text-anchor="middle">tokens discarded,</text>
@@ -95,7 +95,7 @@
 <line x1="973.8" y1="1122" x2="694.2" y2="1122" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 <circle cx="985.8" cy="1122" r="10" fill="#222222"/>
 <text x="985.8" y="1126" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">10</text>
-<rect x="640.9" y="1158" width="102.7" height="138" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<rect x="640.9" y="1158" width="102.7" height="138" rx="4" fill="#fdf6d8" stroke="#d6c26a"/>
 <text x="692.2" y="1175" font-size="12" fill="#333333" text-anchor="middle">No session</text>
 <text x="692.2" y="1191" font-size="12" fill="#333333" text-anchor="middle">cookie set.</text>
 <text x="692.2" y="1207" font-size="12" fill="#333333" text-anchor="middle">After 404 or</text>
