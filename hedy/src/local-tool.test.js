@@ -38,6 +38,22 @@ afterEach(async () => {
 })
 
 describe('runLocalTool', () => {
+  it('writes input to the child\'s stdin and closes stdin, so the child reads the whole text', async () => {
+    const echo = "let s = ''; process.stdin.setEncoding('utf8'); process.stdin.on('data', (c) => { s += c }); process.stdin.on('end', () => process.stdout.write(s.toUpperCase()))"
+    const result = await runNode(echo, { input: 'diagram ✓\n'.repeat(5000) })
+    expect(result.stdout).toBe('DIAGRAM ✓\n'.repeat(5000))
+  })
+
+  it('resolves with the exit code when the child exits before reading its input', async () => {
+    const result = await runNode("process.stderr.write('gone'); process.exit(3)", { input: 'x'.repeat(4 * 1024 * 1024) })
+    expect(result).toMatchObject({ exitCode: 3, stderr: 'gone' })
+  })
+
+  it('gives the child an empty stdin when no input is given', async () => {
+    const result = await runNode("let n = 0; process.stdin.on('data', (c) => { n += c.length }); process.stdin.on('end', () => process.stdout.write(String(n)))")
+    expect(result.stdout).toBe('0')
+  })
+
   it('captures stdout and stderr in full and separately, decoded as UTF-8', async () => {
     const result = await runNode("process.stdout.write('café ✓ out\\n'.repeat(2000)); process.stderr.write('naïve ✗ err')")
     expect(result.stdout).toBe('café ✓ out\n'.repeat(2000))
