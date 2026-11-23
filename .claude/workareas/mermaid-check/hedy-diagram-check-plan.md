@@ -9,6 +9,7 @@ hedy gains `hedy diagram check`, which proves that each Mermaid diagram parses b
 | Learn where the Mermaid parser runs | Parser |
 | Learn how other agents find and call the command | Instructions for Agents |
 | Learn which skills check their diagrams | Skills That Write Mermaid |
+| Learn what the cutover deletes | Deletion of the Bash Check |
 | Learn how the work is tested and written | Testing, Code Standards |
 | Learn the order of the work | Order of Work |
 | Answer the open points | Decisions |
@@ -144,6 +145,23 @@ Every skill step that creates or changes a Mermaid diagram runs `hedy diagram ch
 
 `hedy diagram sequence` runs the same check before drawing, so a skill that misses the step cannot draw from a source Mermaid rejects. The skill step is still needed, because the docs repo's `build:mmd` and GitHub Pages render a `.mmd` file without the sequence renderer.
 
+## Deletion of the Bash Check
+
+The bash check is deleted in the same change that switches the skills to `hedy diagram check`, as the cutover rule in `hedy/DECISIONS.md` requires, so no check runs in both forms. The change removes every reference, found by a search of the workspace on 23 November 2026:
+
+| Place | Change |
+| --- | --- |
+| `.claude/tools/mermaid-check/` | the folder is deleted, with `render-mermaid.sh` and `start-mermaid-check.sh` |
+| `.claude/skills/mermaid-check/SKILL.md` | "Step 0", "Checking a single block" and the "Scripts cheat-sheet" call `hedy diagram check`. The frontmatter drops `npx` and `mmdc` from `workspace-soft-deps` |
+| `.claude/skills/mermaid-check/decisions.md` | the tools list names `hedy diagram check` in place of the two scripts |
+| `.claude/workareas/skill-creator/mermaid-check/decisions.json` | the tools list changes in the same way |
+| `.claude/workareas/skills-audit/mermaid-check.md` | the audit describes the deleted scripts line by line, so the file is deleted, and the next audit of the skill starts from the hedy command |
+| `AGENTS.md`, "Runnable tooling" | the `mermaid-check/` row is deleted |
+| `.claude/best-practices/skills/agent-skills.md` | the example of a soft probe, "mermaid-check trying the tooling's mmdc, then npx", is replaced with an example that still exists |
+| `.claude/settings.json` allowlist | the entries for the deleted folder are removed by Ben, because agents cannot edit the file |
+
+The deletion is finished when a search of the workspace for `render-mermaid`, `start-mermaid-check` and `tools/mermaid-check` finds nothing outside git history, and the skills lint and the dependency check pass.
+
 ## Testing
 
 The tests state the behaviours above, and follow the method of `hedy diagram sequence`.
@@ -174,7 +192,7 @@ The rest of hedy breaks the limits in 14 functions for complexity and 6 function
 5. **Check pages and folders**, with the page line worked out by the command. The help text and the `AGENTS.md` entry gain the page and folder forms.
 6. **Check a diagram held in context** through `--stdin`. The help text and the `AGENTS.md` entry gain the `--stdin` form.
 7. **Make the renderer check first**, so `hedy diagram sequence` refuses a source Mermaid rejects. The `AGENTS.md` entry for `hedy diagram sequence` says so.
-8. **Cut over.** The four skills in "Skills That Write Mermaid" call `hedy diagram check` after every step that writes Mermaid. `AGENTS.md` drops the `mermaid-check/` tooling row, the skills' records drop the bash scripts, and the two scripts are deleted in the same change. The allowlist entry for `.claude/tools/mermaid-check/` is an owner step for Ben.
+8. **Cut over.** The four skills in "Skills That Write Mermaid" call `hedy diagram check` after every step that writes Mermaid. The bash check and every reference to the check are deleted in the same change, as "Deletion of the Bash Check" lists. The allowlist entry for `.claude/tools/mermaid-check/` is an owner step for Ben.
 9. **Later:** the publish pre-flight refuses a page with a broken diagram, when decision 2 says so.
 
 Steps 1 to 8 make one pull request to hedy and one to `delivery-info-arch-tooling`. The tooling pull request merges first, because hedy runs its script.
