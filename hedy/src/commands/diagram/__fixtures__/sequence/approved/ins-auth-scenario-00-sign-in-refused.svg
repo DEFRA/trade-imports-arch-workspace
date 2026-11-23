@@ -5,6 +5,7 @@
 <text x="797.9" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PUBLIC ZONE</text>
 <rect x="906.1" y="22" width="159.4" height="1308" rx="8" fill="#fafafa" stroke="#bbbbbb" stroke-dasharray="5 4"/>
 <text x="1055.5" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PROTECTED ZONE</text>
+<rect x="598.5" y="440" width="673.8" height="704" rx="6" fill="#e8f1f8" stroke="#5694ca" stroke-width="1.2"/>
 <line x1="105" y1="110" x2="105" y2="1320" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
 <rect x="40" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
 <text x="105" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Browser</text>
@@ -22,7 +23,6 @@
 <line x1="1217.3" y1="110" x2="1217.3" y2="1320" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
 <rect x="1152.3" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
 <text x="1217.3" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">IDM</text>
-<rect x="598.5" y="440" width="673.8" height="704" rx="6" fill="#e8f1f8" stroke="#5694ca" stroke-width="1.2"/>
 <text x="610.5" y="460" font-size="10.5" fill="#666666" text-anchor="start" font-weight="700" letter-spacing="0.07em">alt.</text>
 <text x="636.4" y="460" font-size="12" fill="#222222" text-anchor="start">No round trip for the state: expired, or already used</text>
 <line x1="598.5" y1="520" x2="1272.3" y2="520" stroke="#bbbbbb" stroke-dasharray="5 4"/>
