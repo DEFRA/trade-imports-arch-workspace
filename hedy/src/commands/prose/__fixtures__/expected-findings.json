@@ -185,7 +185,13 @@
       "case": "hyphen-break",
       "input": "pages/hyphen-break.md",
       "label": "pages/hyphen-break.md",
-      "findings": [],
+      "findings": [
+        {
+          "line": 9,
+          "kind": "pattern",
+          "term": "verb-no-noun negation"
+        }
+      ],
       "deferred": [
         {
           "line": 7,

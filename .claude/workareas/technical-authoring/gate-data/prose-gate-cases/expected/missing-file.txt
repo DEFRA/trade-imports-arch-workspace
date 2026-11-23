@@ -1,2 +1,0 @@
-check-prose: file not found: WS/.claude/tools/editorial/tests/fixtures/does-not-exist.md
-exit-code: 1

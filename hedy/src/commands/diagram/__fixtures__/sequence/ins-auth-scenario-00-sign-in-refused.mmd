@@ -1,0 +1,33 @@
+%%{init: {"fontSize": 14, "themeVariables": {"fontSize": "14px"}, "sequence": {"actorMargin": 24, "messageMargin": 30, "noteMargin": 6, "width": 140, "wrap": true}}}%%
+sequenceDiagram
+    participant B as Browser
+    box PUBLIC ZONE
+        participant RS as Routing Service<br>trade-imports-<br>routing-proxy
+        participant FD as Front Door<br>trade-imports-<br>ins-frontend
+    end
+    box PROTECTED ZONE
+        participant SS as Session Service
+    end
+    participant IDM as IDM
+
+    Note over B,IDM: Steps 1 to 7 of the sign-in above.<br>The round trip is stored and expires after 10 minutes
+    IDM-->>B: 302 Location: /auth/callback<br>?code=… or ?error=…, &state=…
+    B->>RS: GET /auth/callback?code=…&state=…<br>binding cookie if the browser holds one
+    RS->>FD: GET /auth/callback?code=…&state=…<br>binding cookie if the browser holds one
+    FD->>SS: POST /sign-ins/{state}/completion<br>code or error, binding value
+    alt No round trip for the state: expired, or already used
+        SS-->>FD: 404 sign-in-unknown
+    else Binding value missing or different
+        Note over SS: Round trip consumed
+        SS-->>FD: 422 sign-in-refused
+    else IDM returned an error
+        Note over SS: Round trip consumed
+        SS-->>FD: 422 sign-in-refused
+    else No approved role at the selected organisation
+        Note over SS: Round trip<br>consumed,<br>binding value<br>checked
+        SS->>IDM: POST IDM token endpoint<br>grant_type=authorization_code,<br>via CDP's outbound proxy
+        IDM-->>SS: 200 id_token,<br>access_token, refresh_token
+        Note over SS: ID token checked,<br>no approved role,<br>tokens discarded,<br>no record created
+        SS-->>FD: 422 no-approved-role
+    end
+    Note over FD: No session<br>cookie set.<br>After 404 or<br>sign-in-refused,<br>sign-in again.<br>After no-<br>approved-role,<br>refusal page

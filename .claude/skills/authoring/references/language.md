@@ -31,6 +31,7 @@ Replace every use. There is no literal sense to keep.
 | `whitelist*`, `blacklist*`, `slave`, `slaves`, `dummy`, `grandfathered`, `man-hours`, `man hours`, `chairman`, `crazy`, `insane`, `blind spot*` | allow list, block list, replica or worker, placeholder, legacy or exempt, work-hours, chair, unreasonable, gap |
 | `defense`, `offense`, `pretense`, `fill out`, `check a box`, `check the box`, `on the weekend`, `different than`, `gotten`, `cell phone`, `zip code`, `parking lot`, `elevator`, `vacation`, `math`, `cybersecurity`, `percent`, `specialty` | British usage: defence, offence, fill in, tick a box, at the weekend, different from, got, mobile phone, postcode, car park, lift, holiday, maths, cyber security, per cent, speciality |
 | `for the benefit of`, `has nothing to ask`, `have nothing to ask`, `falls away`, `fall away`, `on the merits`, `goes and fetches`, `go and fetch` | essay idiom: that only X would use, needs no further input from, no longer applies, for the reasons given, fetches |
+| `names no`, `name no`, `naming no`, `named no` | state what is absent and where: "a relationship with no organisation", "the organisation identifier is empty" |
 | `portal` in lower case as a generic noun | website or service. A proper noun such as "CDP Portal" and a URL pass unchanged |
 
 ## Words to Examine
@@ -83,6 +84,7 @@ Each pattern is recognised by reading, and the repair is the whole fix.
 | A table header that ends on a preposition: "Set by", "Used by" | name the role: "Source", "Writer" |
 | A heading not in title case | capitalise every word except articles, short conjunctions and short prepositions after the first word: "Activity and the Idle Point" |
 | An opening sentence that lists the page's parts as noun phrases: "This page covers the assertion, the operations and the rules" | write one sentence per job of the page, each with an actor and a verb |
+| An action verb followed by `no` and a noun, in place of a negated verb: "a refresh adds no relationship", "the request carries no cookie", "IDM gives no guidance", "B2C supports no other value" | negate the verb: "a refresh does not add a relationship". Better, state what does hold about the one thing the sentence is about: "a refresh keeps the user's current relationship". `has no`, `with no` and `there is no` before a noun stay: "a relationship with no organisation" |
 | A sentence or line that ends on the pronoun `it` | name the noun the pronoun stands for. The subject the pronoun hides usually belongs at the front of the sentence |
 | A contact clause, a dropped relative pronoun that gives agency to a thing: "a store only the front door reaches" | lead with what is restricted: "Access to the store is restricted to the front door" |
 | Aside stacking, three or more spaced hyphens in one sentence | recast the asides as sentences or a list |

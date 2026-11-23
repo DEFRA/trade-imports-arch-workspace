@@ -5,7 +5,7 @@ metadata:
   workspace-deps: gh
 ---
 
-Create or edit a GitHub pull request for the workspace or any child repo. The outcome is a PR whose title and body follow [pull-requests.md](../../best-practices/git/pull-requests.md), created through the guard script so AI attribution is refused deterministically - the rule holds regardless of which agent or session runs this skill.
+Create or edit a GitHub pull request for the workspace or any child repo. The outcome is a PR whose title and body follow [pull-requests.md](../../best-practices/git/pull-requests.md), created through the guard script so AI attribution is refused deterministically - the rule holds regardless of which agent or session runs this skill. Use the authoring skill to craft the prose unless told otherwise.
 
 **Bash call hygiene** - one command per Bash call; paths relative to the workspace root, such as `.claude/tools/...`. Full rules: [`agent-skills.md`](../../best-practices/skills/agent-skills.md).
 

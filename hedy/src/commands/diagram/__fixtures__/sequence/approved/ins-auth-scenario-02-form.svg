@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1670 998" width="1670" height="998" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#555555"/></marker></defs>
+<rect x="0" y="0" width="1670" height="998" fill="#ffffff"/>
+<rect x="373.1" y="22" width="592.4" height="956" rx="8" fill="#fafafa" stroke="#bbbbbb" stroke-dasharray="5 4"/>
+<text x="955.4" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PUBLIC ZONE</text>
+<rect x="985.9" y="22" width="655.8" height="956" rx="8" fill="#fafafa" stroke="#bbbbbb" stroke-dasharray="5 4"/>
+<text x="1631.7" y="40" font-size="10.5" fill="#888888" text-anchor="end" font-weight="700" font-style="italic" letter-spacing="0.09em">PROTECTED ZONE</text>
+<line x1="105" y1="110" x2="105" y2="968" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="40" y="52" width="130" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="105" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Browser</text>
+<line x1="492.2" y1="110" x2="492.2" y2="968" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="385.1" y="52" width="214.3" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="492.2" y="76" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Routing Service</text>
+<text x="492.2" y="95" font-size="11.5" fill="#666666" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">trade-imports-routing-proxy</text>
+<line x1="829" y1="110" x2="829" y2="968" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="704.6" y="52" width="248.8" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="829" y="76" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Journey Frontend</text>
+<text x="829" y="95" font-size="11.5" fill="#666666" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">trade-imports-{journey}-frontend</text>
+<line x1="1065.6" y1="110" x2="1065.6" y2="968" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="997.9" y="52" width="135.4" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="1065.6" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Session Service</text>
+<line x1="1290.2" y1="110" x2="1290.2" y2="968" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="1169.3" y="52" width="241.9" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="1290.2" y="76" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Journey Backend</text>
+<text x="1290.2" y="95" font-size="11.5" fill="#666666" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">trade-imports-{journey}-backend</text>
+<line x1="1547.8" y1="110" x2="1547.8" y2="968" stroke="#c8c8c8" stroke-width="1.2" stroke-dasharray="4 4"/>
+<rect x="1466" y="52" width="163.7" height="58" rx="6" fill="#ffffff" stroke="#555555"/>
+<text x="1547.8" y="77" font-size="14" fill="#222222" text-anchor="middle" font-weight="700">Permissions Service</text>
+<text x="298.6" y="148" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">POST /gbn-ag/notifications/123/commodity-lines</text>
+<text x="298.6" y="164" font-size="12.5" fill="#666666" text-anchor="middle">session cookie, anti-forgery token</text>
+<line x1="117" y1="176" x2="490.2" y2="176" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
+<circle cx="105" cy="176" r="10" fill="#222222"/>
+<text x="105" y="180" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">1</text>
+<text x="660.6" y="210" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">POST /notifications/123/commodity-lines</text>
+<text x="660.6" y="226" font-size="12.5" fill="#666666" text-anchor="middle">X-Forwarded-Prefix: /gbn-ag,</text>
+<text x="660.6" y="242" font-size="12.5" fill="#666666" text-anchor="middle">session cookie, anti-forgery token</text>
+<line x1="504.2" y1="254" x2="827" y2="254" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
+<circle cx="492.2" cy="254" r="10" fill="#222222"/>
+<text x="492.2" y="258" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">2</text>
+<rect x="751.6" y="276" width="154.7" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="829" y="293" font-size="12" fill="#333333" text-anchor="middle">Sealed cookie value read</text>
+<text x="829" y="309" font-size="12" fill="#333333" text-anchor="middle">from the cookie</text>
+<text x="947.3" y="344" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">GET /sessions/assertion</text>
+<text x="947.3" y="360" font-size="12.5" fill="#666666" text-anchor="middle">Ins-Session-Token, Sec-Fetch-*,</text>
+<text x="947.3" y="376" font-size="12.5" fill="#666666" text-anchor="middle">Ins-Browser-Accept</text>
+<line x1="841" y1="388" x2="1063.6" y2="388" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
+<circle cx="829" cy="388" r="10" fill="#222222"/>
+<text x="829" y="392" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">3</text>
+<rect x="977.9" y="410" width="175.4" height="58" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="1065.6" y="427" font-size="12" fill="#333333" text-anchor="middle">Same-origin form submission</text>
+<text x="1065.6" y="443" font-size="12" fill="#333333" text-anchor="middle">recognised,</text>
+<text x="1065.6" y="459" font-size="12" fill="#333333" text-anchor="middle">lastSeenAt written</text>
+<text x="947.3" y="494" font-size="12.5" fill="#222222" text-anchor="middle">200 csrfSecret,</text>
+<text x="947.3" y="510" font-size="12.5" fill="#666666" text-anchor="middle">session assertion</text>
+<line x1="1053.6" y1="522" x2="831" y2="522" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+<circle cx="1065.6" cy="522" r="10" fill="#222222"/>
+<text x="1065.6" y="526" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">4</text>
+<rect x="747.6" y="544" width="162.7" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="829" y="561" font-size="12" fill="#333333" text-anchor="middle">Anti-forgery token checked</text>
+<text x="1059.6" y="596" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">POST /notifications/123/commodity-lines</text>
+<text x="1059.6" y="612" font-size="12.5" fill="#666666" text-anchor="middle">Ins-Session-Assertion,</text>
+<text x="1059.6" y="628" font-size="12.5" fill="#666666" text-anchor="middle">rendered organisation</text>
+<line x1="841" y1="640" x2="1288.2" y2="640" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
+<circle cx="829" cy="640" r="10" fill="#222222"/>
+<text x="829" y="644" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">5</text>
+<rect x="1212.5" y="662" width="155.4" height="42" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="1290.2" y="679" font-size="12" fill="#333333" text-anchor="middle">Assertion signature,</text>
+<text x="1290.2" y="695" font-size="12" fill="#333333" text-anchor="middle">audience, expiry checked</text>
+<text x="1419" y="730" font-size="12" fill="#222222" text-anchor="middle" font-family="Menlo, Consolas, Courier New, monospace">POST /permissions/expansions</text>
+<text x="1419" y="746" font-size="12.5" fill="#666666" text-anchor="middle">roles</text>
+<line x1="1302.2" y1="758" x2="1545.8" y2="758" stroke="#555555" stroke-width="1.4" marker-end="url(#arw)"/>
+<circle cx="1290.2" cy="758" r="10" fill="#222222"/>
+<text x="1290.2" y="762" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">6</text>
+<text x="1419" y="792" font-size="12.5" fill="#222222" text-anchor="middle">200 permissions</text>
+<line x1="1535.8" y1="804" x2="1292.2" y2="804" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+<circle cx="1547.8" cy="804" r="10" fill="#222222"/>
+<text x="1547.8" y="808" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">7</text>
+<rect x="1219.6" y="826" width="141.4" height="26" rx="4" fill="#f4f4f4" stroke="#cccccc"/>
+<text x="1290.2" y="843" font-size="12" fill="#333333" text-anchor="middle">Commodity line written</text>
+<text x="1059.6" y="878" font-size="12.5" fill="#222222" text-anchor="middle">201 commodity line</text>
+<line x1="1278.2" y1="890" x2="831" y2="890" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+<circle cx="1290.2" cy="890" r="10" fill="#222222"/>
+<text x="1290.2" y="894" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">8</text>
+<text x="467" y="924" font-size="12.5" fill="#222222" text-anchor="middle">303 Location: next page</text>
+<line x1="817" y1="936" x2="107" y2="936" stroke="#555555" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arw)"/>
+<circle cx="829" cy="936" r="10" fill="#222222"/>
+<text x="829" y="940" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="700">9</text>
+</svg>

@@ -1,0 +1,22 @@
+%%{init: {"fontSize": 14, "themeVariables": {"fontSize": "14px"}, "sequence": {"actorMargin": 24, "messageMargin": 30, "noteMargin": 6, "width": 140, "wrap": true}}}%%
+sequenceDiagram
+    participant B as Browser
+    participant S as Service
+    participant I as IDM
+    participant P as Credential provider (GOV.UK One Login or Government Gateway)
+    S->>B: Redirect to IDM's authorisation endpoint
+    B->>I: Authorisation request
+    alt No live session
+        I->>B: Send the user to the credential provider
+        B->>P: The user authenticates
+        P->>B: Return the user to IDM
+        B->>I: Authenticated user
+    else Live IDM session
+        I->>B: Single sign-on page, with no sign-in page
+    end
+    I->>B: Organisation picker
+    B->>I: The user picks an organisation, or IDM picks the only one
+    I->>B: Redirect to the service's registered redirect address with a one-time code
+    B->>S: One-time code
+    S->>I: Token request with the code and the client secret
+    I->>S: ID token, an access token when the scope holds the client ID, and a refresh token when it holds offline_access

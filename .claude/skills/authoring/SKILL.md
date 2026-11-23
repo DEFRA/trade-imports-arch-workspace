@@ -33,8 +33,8 @@ The material stays with the planning conversation. The drafting agent reads the 
 ## Checks
 
 - The plan is checked by reading the plan against [plan-template.md](assets/plan-template.md) before drafting or editing. Drafting or editing stops on any missing part, which goes to the author.
-- `hedy prose check --json <file>` checks a draft against the word tables of `language.md` and five patterns, and a short artefact goes through `hedy prose check --json --stdin --label <artefact>`. The check runs after the closing pass, and a failing run is a failing pass. Reword each banned and pattern finding with the repair the finding gives, then run the check again. Keep the word of an examine finding where the sense is literal, and reword the sentence otherwise.
-- The closing pass applies every rule in `writing.md` and every row in `language.md` by reading, including the rules the check cannot see, such as headings in title case and FAQ voice. A clean check proves only that the listed words and the five patterns are absent.
+- `hedy prose check --json <file>` checks a draft against the word tables of `language.md` and six patterns, and a short artefact goes through `hedy prose check --json --stdin --label <artefact>`. The check runs after the closing pass, and a failing run is a failing pass. Reword each banned and pattern finding with the repair the finding gives, then run the check again. Keep the word of an examine finding where the sense is literal, and reword the sentence otherwise.
+- The closing pass applies every rule in `writing.md` and every row in `language.md` by reading, including the rules the check cannot see, such as headings in title case and FAQ voice. A clean check proves only that the listed words and the six patterns are absent.
 
 ## Planning a Document
 

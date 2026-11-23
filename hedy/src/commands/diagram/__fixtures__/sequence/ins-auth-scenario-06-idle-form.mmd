@@ -1,0 +1,25 @@
+%%{init: {"fontSize": 14, "themeVariables": {"fontSize": "14px"}, "sequence": {"actorMargin": 24, "messageMargin": 30, "noteMargin": 6, "width": 140, "wrap": true}}}%%
+sequenceDiagram
+    participant B as Browser
+    box PUBLIC ZONE
+        participant RS as Routing Service<br>trade-imports-<br>routing-proxy
+        participant JF as Journey Frontend<br>trade-imports-<br>{journey}-frontend
+        participant FD as Front Door<br>trade-imports-<br>ins-frontend
+    end
+    box PROTECTED ZONE
+        participant SS as Session Service
+    end
+
+    Note over B,SS: John's form page load refreshed<br>the session, then he left his desk
+    Note over B,SS: The idle point passes,<br>nothing runs or is written
+    B->>RS: POST /gbn-ag/notifications/123/commodity-lines<br>session cookie, anti-forgery token
+    RS->>JF: POST /notifications/123/commodity-lines<br>X-Forwarded-Prefix: /gbn-ag,<br>session cookie, anti-forgery token
+    Note over JF: Sealed cookie value read<br>from the cookie
+    JF->>SS: GET /sessions/assertion<br>Ins-Session-Token, Sec-Fetch-*,<br>Ins-Browser-Accept
+    Note over SS: lastSeenAt more than<br>30 minutes old,<br>left unchanged
+    SS-->>JF: 410 idle
+    Note over JF: Form post not redirected,<br>the redirect would drop the submitted data.<br>Sign-in link carries the form page's path
+    JF-->>B: 401 page, sign-in link<br>/auth/sign-in?redirect=<br>/gbn-ag/notifications/123/commodity-lines
+    Note over B,SS: John selects the link,<br>sign-in proceeds as in scenario 0
+    Note over FD: New session cookie set
+    FD-->>B: 302 Location: /gbn-ag/notifications/123/commodity-lines<br>the empty form

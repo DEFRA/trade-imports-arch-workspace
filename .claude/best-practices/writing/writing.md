@@ -6,7 +6,7 @@ What a document contains is decided before writing, from the source analysis and
 
 ## Tone of Voice
 
-Technical text exists so that someone can act on it: run a command, make a decision, operate the service. Write in a formal register that explains and takes its time, in simple and clear language. Leave out subjective judgements, idiom, humour and chat. Write each point as a complete sentence that names who or what acts, never as a shorthand phrase the reader has to expand for themselves.
+Technical text exists so that someone can act on it: run a command, make a decision, operate the service. Write in a formal register that explains and takes its time, in simple and clear language. For clarity, we aim towards 70% ASD-STE100. Leave out subjective judgements, idiom, humour and chat. Write each point as a complete sentence that names who or what acts, never as a shorthand phrase the reader has to expand for themselves.
 
 **Claims.** State the facts about the thing: why it exists, how it works, what follows from it, and what follows from that. Then let the reader judge.
 
@@ -92,6 +92,16 @@ After:
 
 The move: keep the qualification beside the rule the qualification limits.
 
+Before:
+
+> IDM authenticates each user, states the user's relationship and service roles for INS in a signed token, states them again at every refresh, and ends its own session at sign-out. A citizen goes through the same steps with a relationship that names no organisation.
+
+After:
+
+> IDM is Defra's Identity Provider (IDP) for B2C users, such as importers, agents and citizens. INS and IDM collaborate in establishing a user's identity and starting an INS session. Once IDM has authenticated a user with Government Gateway or GOV.UK One Login, it provides INS with a signed token that states the user's relationships, service roles and in the case of agents and importers their chosen organisation. INS keeps the user information up to date with IDM using the "refresh" mechanism, and signals to IDM a session has ended at sign-out.
+
+The move: say what the thing is before what it does, and make the actor of each step its subject.
+
 ## Sentences
 
 **Actor and verb.** Make the actor the subject and the action the verb: "TIG validates the message", not "message validation takes place in TIG". Where the actor is unknown, irrelevant or whichever component happens to handle the request, use the passive so that the thing the reader is following stays in the subject, and invent no actor. Name the operation with a plain verb such as runs, creates, connects or sends a request to, never a slang verb. Unpack a stack of nouns into a clause that names the relation between them: "configuration that controls access between tenants", not "cross-tenant access control configuration".
@@ -103,6 +113,8 @@ The move: keep the qualification beside the rule the qualification limits.
 **One claim.** Give each sentence one claim. When a sentence passes 25 words, check whether a colleague could restate it after one reading, and leave a longer sentence that passes the check as written. Vary sentence length and openings, so the prose does not read as mechanical. Keep the same subject while the text describes one mechanism, and change the subject when the topic changes. Name cause, sequence and dependency with the words that carry them, such as `because`, `when`, `so` and `therefore`.
 
 **Write it forward.** Write each sentence as it would be said to a colleague who asked what was meant. Put the relation between two things in the verb, as in "A replaces B" or "A causes B", and not in a chain of prepositions and participles such as "the replacement of B by means of A". Use at most one relative clause in a sentence, and never put one inside another. Where the reader has a word for a thing, use the reader's word. Prefer a possessive, "the journey's catalogue", to an `of` phrase, "the catalogue of a journey".
+
+**Negation.** Put a negative on the verb, never on the noun after an action verb. Write "a refresh does not add a relationship", not "a refresh adds no relationship", and "IDM's guide does not say how to escape a colon", not "IDM's guide gives no rule for escaping a colon". Better, state what does hold about the one thing the sentence is about: "a refresh keeps the user's current relationship". Where the sentence describes a change of state, say so: "the user no longer holds a role". `has no`, `with no` and `there is no` before a noun stay, because they state that a thing is absent: "a relationship with no organisation".
 
 **Pronouns.** Use a pronoun wherever the reader can tell at once what it refers to, because repeating a clear noun makes the prose heavy. Repeat the precise noun wherever `it`, `this`, `that` or `they` could refer to more than one thing, or to an idea instead of a noun. Never end a sentence on the pronoun `it`.
 

@@ -1,0 +1,49 @@
+%%{init: {"fontSize": 14, "themeVariables": {"fontSize": "14px"}, "sequence": {"actorMargin": 24, "messageMargin": 30, "noteMargin": 6, "width": 140, "wrap": true}}}%%
+sequenceDiagram
+    participant B as Browser
+    box PUBLIC ZONE
+        participant RS as Routing Service<br>trade-imports-<br>routing-proxy
+        participant JF as Journey Frontend<br>trade-imports-<br>{journey}-frontend
+        participant FD as Front Door<br>trade-imports-<br>ins-frontend
+    end
+    box PROTECTED ZONE
+        participant SS as Session Service
+    end
+    participant IDM as IDM
+
+    Note over B,IDM: Administrator removes John's access<br>at IDM, which does not tell INS
+    B->>RS: GET /gbn-ag/notifications/123<br>session cookie
+    RS->>JF: GET /notifications/123<br>X-Forwarded-Prefix: /gbn-ag,<br>session cookie
+    Note over JF: Sealed cookie value read<br>from the cookie
+    JF->>SS: GET /sessions/assertion<br>Ins-Session-Token, Sec-Fetch-*,<br>Ins-Browser-Accept
+    Note over SS: Confirmation found due
+    SS->>IDM: POST IDM token endpoint<br>grant_type=refresh_token,<br>stored refreshToken
+    IDM-->>SS: 400 invalid_grant<br>grant no longer valid
+    Note over SS: Record deleted
+    SS-->>JF: 404 session-unknown
+    JF-->>B: 302 Location: /auth/sign-in<br>?redirect=/gbn-ag/notifications/123
+    B->>RS: GET /auth/sign-in<br>?redirect=/gbn-ag/notifications/123<br>old session cookie
+    RS->>FD: GET /auth/sign-in<br>?redirect=/gbn-ag/notifications/123<br>old session cookie
+    Note over FD: Sealed cookie value read<br>from the cookie
+    FD->>SS: GET /sessions/assertion<br>Ins-Session-Token, Sec-Fetch-*,<br>Ins-Browser-Accept
+    SS-->>FD: 404 session-unknown
+    FD->>SS: POST /sign-ins<br>provider IDM, mode sign-in,<br>return path
+    Note over SS: Round trip stored
+    SS-->>FD: 201 Created<br>IDM address, binding value
+    FD-->>B: 302 Location: IDM authorize endpoint<br>Set-Cookie: binding cookie
+    B->>IDM: GET IDM authorize endpoint<br>?client_id, redirect_uri,<br>scope=openid {serviceId} offline_access,<br>state, nonce, code_challenge
+    Note over B,IDM: Government Gateway session still live,<br>not asked for credentials
+    IDM-->>B: 200 organisation picker
+    B->>IDM: Picks another organisation
+    IDM-->>B: 302 Location: /auth/callback<br>?code=…&state=…
+    B->>RS: GET /auth/callback?code=…&state=…<br>binding cookie
+    RS->>FD: GET /auth/callback?code=…&state=…<br>binding cookie
+    FD->>SS: POST /sign-ins/{state}/completion<br>code, binding value
+    Note over SS: Round trip consumed,<br>binding value checked
+    SS->>IDM: POST IDM token endpoint<br>grant_type=authorization_code,<br>via CDP's outbound proxy
+    IDM-->>SS: 200 tokens for the<br>organisation picked
+    Note over SS: ID token checked,<br>roles filtered,<br>new record created
+    SS-->>FD: 201 Created<br>sealed cookie value,<br>return path
+    Note over FD: New session cookie set,<br>binding cookie cleared
+    FD-->>B: 302 Location: /gbn-ag/notifications/123<br>Set-Cookie: __Host-ins-session
+    Note over B,FD: Page shows none of<br>Northgate Produce Ltd's data
