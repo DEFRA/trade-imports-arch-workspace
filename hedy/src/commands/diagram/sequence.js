@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { HedyError } from '../../errors.js'
 import { runAction } from '../../run-action.js'
 import { readFileText } from '../prose/check.js'
+import { fileLineOf } from './mermaid-diagrams.js'
+import { parseDiagrams } from './mermaid-parser.js'
 import { layOutSequence } from './sequence-layout.js'
 import { readSequenceSource } from './sequence-source.js'
 import { diagramSize, svgOfScene } from './sequence-svg.js'
@@ -58,9 +60,22 @@ const drawing = (text, { label }) => {
   }
 }
 
-const drawSequenceFile = async ({ source, output }) => {
+const placeOf = (diagram, message) => {
+  const line = fileLineOf(diagram, message)
+  return line === undefined ? diagram.label : `${diagram.label}:${line}`
+}
+
+const refuseUnlessMermaidAccepts = async (text, { source, workspaceRoot }) => {
+  const diagram = { label: source, text, linesBefore: 0 }
+  const [verdict] = await parseDiagrams([diagram], { workspaceRoot })
+  if (verdict.ok) return
+  throw new HedyError('PARSE', `${placeOf(diagram, verdict.message)}: Mermaid does not accept the source: ${verdict.message.split('\n')[0]} Fix the line, check the file with hedy diagram check, then run the command again.`)
+}
+
+const drawSequenceFile = async ({ source, output }, { workspaceRoot }) => {
   await checkOutputFolder(output)
   const { text } = await readFileText(source)
+  await refuseUnlessMermaidAccepts(text, { source, workspaceRoot: workspaceRoot() })
   const { svg, width, height, steps } = drawing(text, { label: source })
   await writeReplacing(output, svg)
   return { source, output, width, height, steps }
@@ -69,7 +84,7 @@ const drawSequenceFile = async ({ source, output }) => {
 export const renderDrawnSequence = ({ source, output, width, height, steps }) =>
   `Drew ${output} from ${source}: ${steps} steps, ${width} by ${height}.`
 
-export const register = (group, { stdout, stderr, setExitCode }) => {
+export const register = (group, { stdout, stderr, setExitCode, workspaceRoot }) => {
   group
     .command('sequence')
     .description('Draw a Mermaid sequence diagram as an SVG in the house style')
@@ -77,7 +92,7 @@ export const register = (group, { stdout, stderr, setExitCode }) => {
     .argument('<output>', 'The SVG file to write, replaced when it exists')
     .addHelpText('after', ACCEPTED_CONSTRUCTS)
     .action((source, output, options, command) => runAction(
-      () => drawSequenceFile(sequenceInputSchema.parse({ source, output })),
+      () => drawSequenceFile(sequenceInputSchema.parse({ source, output }), { workspaceRoot }),
       { json: command.optsWithGlobals().json === true, render: renderDrawnSequence, stdout, stderr, setExitCode }
     ))
 }
