@@ -32,10 +32,13 @@ const existingFacts = {
   page: pagePath,
   title: 'Publishing to Confluence',
   space: 'DOCS',
-  existing: { id: '123456', url: 'https://example.atlassian.net/wiki/spaces/DOCS/pages/123456' }
+  existing: { id: '123456', url: 'https://example.atlassian.net/wiki/spaces/DOCS/pages/123456' },
+  warnings: []
 }
 
 const newFacts = { ...existingFacts, existing: undefined }
+
+const brokenDiagramWarning = 'Mermaid rejects the diagram at docs/systems/EUDP/publishing.md:14 (Parse error on line 3), so the published page shows the diagram broken.'
 
 const cancelledResult = { mode: 'cancelled', page: pagePath, title: existingFacts.title, space: 'DOCS' }
 
@@ -217,6 +220,13 @@ describe('useConfluenceFeature', () => {
       confluenceLine,
       'Publish the page? y/N'
     ]) expect(frame).toContain(text)
+  })
+
+  it('shows each pre-flight warning on the confirm screen, so you see a broken diagram before you publish', async () => {
+    const facts = { ...existingFacts, warnings: [brokenDiagramWarning] }
+    const feature = renderFeature({ answerPublish: publishAfterConfirm(facts, [], async () => updatedResult) })
+    await openPublishConfirm(feature)
+    expect(flat(feature.lastFrame())).toContain(`Warning: ${brokenDiagramWarning}`)
   })
 
   it('on n resolves confirm false, returns to the main menu and never detaches', async () => {

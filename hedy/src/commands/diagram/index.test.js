@@ -15,13 +15,23 @@ const harness = () => {
 }
 
 describe('the diagram group', () => {
-  it('lists the sequence command in its help and describes the group as drawing diagrams from their sources', async () => {
+  it('lists the check and sequence commands in its help and describes the group', async () => {
     const h = harness()
     const error = await rejectionOf(h.program.parseAsync(['diagram', '--help'], { from: 'user' }))
     expect(error.code).toBe('commander.helpDisplayed')
     const help = h.out.join('')
     expect(help).toMatch(/^ {2}sequence <source> <output>\s/m)
-    expect(help).toContain('Draw diagrams from their sources')
+    expect(help).toMatch(/^ {2}check \[options\] \[paths\.\.\.\]\s/m)
+    expect(help).toContain('Check and draw diagrams from their sources')
+  })
+
+  it('lists the four forms of input, the result and the exit codes in the check command\'s help', async () => {
+    const h = harness()
+    await rejectionOf(h.program.parseAsync(['diagram', 'check', '--help'], { from: 'user' }))
+    const help = h.out.join('')
+    for (const text of ['hedy diagram check flow.mmd', 'hedy diagram check docs/page.md', 'hedy diagram check docs/', '--stdin --label', 'Exit 0', 'Exit 1', 'Exit 2']) {
+      expect(help).toContain(text)
+    }
   })
 
   it('lists the Mermaid constructs the sequence command draws in its help', async () => {

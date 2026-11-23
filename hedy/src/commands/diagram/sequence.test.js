@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { Command } from 'commander'
 import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import { runCli } from '../../test-support/cli.js'
+import { createFakeMermaidWorkspace } from '../../test-support/fake-mermaid.js'
 import { captureIo } from '../../test-support/io.js'
 import { svgTokens } from '../../test-support/svg-tokens.js'
 import { register } from './sequence.js'
@@ -12,13 +13,20 @@ import { register } from './sequence.js'
 const TRIAL = fileURLToPath(new URL('./__fixtures__/sequence/body-01.mmd', import.meta.url))
 
 let folder
-beforeEach(async () => { folder = await mkdtemp(join(tmpdir(), 'hedy-diagram-')) })
-afterEach(() => rm(folder, { recursive: true, force: true }))
+let workspace
+beforeEach(async () => {
+  folder = await mkdtemp(join(tmpdir(), 'hedy-diagram-'))
+  workspace = await createFakeMermaidWorkspace()
+})
+afterEach(async () => {
+  await rm(folder, { recursive: true, force: true })
+  await rm(workspace, { recursive: true, force: true })
+})
 
 const harness = () => {
   const io = captureIo()
   const program = new Command().option('--json').exitOverride()
-  register(program.command('diagram'), io)
+  register(program.command('diagram'), { ...io, workspaceRoot: () => workspace })
   const run = (...args) => program.parseAsync(['diagram', 'sequence', ...args], { from: 'user' })
   return { run, ...io }
 }
@@ -61,6 +69,19 @@ describe('hedy diagram sequence draws a source', () => {
 })
 
 describe('hedy diagram sequence refuses what it cannot draw', () => {
+  it('refuses a source Mermaid rejects, naming the line and Mermaid\'s message, before reading the source itself, and leaves the earlier drawing untouched', async () => {
+    const h = harness()
+    const source = await writeSource('flow.mmd', 'participant A as Alpha', 'participant B as Beta', '%% FAIL on line 4', 'A->>B: Hello')
+    const output = join(folder, 'flow.svg')
+    await writeFile(output, 'earlier drawing')
+    await h.run('--json', source, output)
+    const { ok, errors } = envelopeOf(h)
+    expect(ok).toBe(false)
+    expect(errors).toEqual([{ code: 'PARSE', message: expect.stringContaining(`${source}:4: Mermaid does not accept the source: Parse error on line 4:`) }])
+    expect(h.codes).toEqual([1])
+    expect(await readFile(output, 'utf8')).toBe('earlier drawing')
+  })
+
   it('reports every refused line as a PARSE error with exit 1 and leaves the earlier drawing untouched', async () => {
     const h = harness()
     const source = await writeSource('flow.mmd', 'participant A as Alpha', 'loop Every minute', 'A->>B: Hello', 'end')
@@ -108,14 +129,14 @@ describe('hedy diagram sequence when the drawing cannot be written', () => {
 describe('hedy diagram sequence, spawned', () => {
   it('prints one envelope line and exits 0 for a drawn source', async () => {
     const output = join(folder, 'trial.svg')
-    const { exitCode, envelope } = await runCli(['--json', 'diagram', 'sequence', TRIAL, output])
+    const { exitCode, envelope } = await runCli(['--json', 'diagram', 'sequence', TRIAL, output], { workspace })
     expect(exitCode).toBe(0)
     expect(envelope.result.steps).toBe(12)
   })
 
   it('exits 1 with the line number on stderr for a source it cannot draw', async () => {
     const source = await writeSource('flow.mmd', 'participant A as Alpha', 'A-xA: lost')
-    const { exitCode, stderr } = await runCli(['diagram', 'sequence', source, join(folder, 'flow.svg')])
+    const { exitCode, stderr } = await runCli(['diagram', 'sequence', source, join(folder, 'flow.svg')], { workspace })
     expect(exitCode).toBe(1)
     expect(stderr).toContain(`${source}:3: "-x" is not a construct the renderer draws.`)
   })

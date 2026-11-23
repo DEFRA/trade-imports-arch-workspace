@@ -1,0 +1,4 @@
+flowchart LR
+    A[Request] --> B{Session live?}
+    B -->|yes| C[Page]
+    B -->|no| D[Sign in]

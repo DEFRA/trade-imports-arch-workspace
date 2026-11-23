@@ -26,7 +26,8 @@ const publishConfirmProps = ({ facts, onConfirm, onCancel }) => ({
     ['Page', facts.page],
     ['Title', facts.title],
     ['Space', facts.space],
-    ['Confluence', confluenceLineOf(facts.existing)]
+    ['Confluence', confluenceLineOf(facts.existing)],
+    ...facts.warnings.map((warning) => ['Warning', warning])
   ],
   question: 'Publish the page?',
   onConfirm,

@@ -54,7 +54,7 @@ hedy confluence publish "<page>" --json
 
 When `ok` is false, relay each message in `errors` verbatim and stop. Each message names its remedy, so never work around a refusal. A failed image upload leaves the page as it was, because the publisher attaches every image before it writes the page and retries an upload once by itself, so that failure is relayed like any other. Two failures are handled here instead:
 
-1. **Mermaid exports missing or stale.** When the message names `build:mmd`, invoke the `mermaid-check` skill on the page first, because the Mermaid build stops at the first file that fails to parse. Then run the Mermaid build, then the publish command again.
+1. **Mermaid exports missing or stale.** When the message names `build:mmd`, run `hedy diagram check <page> --json` on the page first, because the Mermaid build stops at the first file that fails to parse, and fix every line the check names through the `mermaid-check` skill. Then run the Mermaid build, then the publish command again.
 2. **LikeC4 exports missing or stale.** When the message names `build:diagrams`, run the LikeC4 build, then the publish command again.
 
 The two builds are the only commands this skill runs besides `hedy`, each one per Bash call, typed exactly as below and never copied from a message, because a page's diagram ids appear in the message text:
@@ -71,7 +71,7 @@ Each build prompts for permission by design, because both builds cover the whole
 When `ok` is true, `result` is `{ mode, page, id, title, space, url, version, warnings, links }`, and `mode` is `created` or `updated`. Report the following:
 
 - The outcome, and the page link from `url`.
-- Each line in `warnings`, naming the asset or link the line concerns. A warning marks a missing image, a link left pointing at GitHub or unchanged, an anchor that matches no heading, or an external link the publisher could not reach, which the user checks by hand.
+- Each line in `warnings`, naming the asset or link the line concerns. A warning marks a diagram Mermaid rejects, a page whose diagrams were not checked, a missing image, a link left pointing at GitHub or unchanged, an anchor that does not match a heading, or an external link the publisher could not reach, which the user checks by hand. A warning that Mermaid rejects a diagram means the published page shows the diagram broken: fix the line it names through the `mermaid-check` skill, check the page with `hedy diagram check`, and tell the user the page needs publishing again.
 - The links line from `links`, which is null when the publisher ran no link check.
 
 ## Completion Output

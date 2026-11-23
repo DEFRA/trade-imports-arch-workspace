@@ -1,0 +1,23 @@
+{
+  "source": "The verdicts start-mermaid-check.sh gave for this folder through mmdc and Mermaid 11.17.2 on 23 November 2026. A page block's label holds the line of its opening fence, and mermaidLine is the line inside the diagram that Mermaid names.",
+  "verdicts": [
+    { "label": "c4-context.mmd", "ok": true },
+    { "label": "class.mmd", "ok": true },
+    { "label": "er.mmd", "ok": true },
+    { "label": "flowchart-html-labels.mmd", "ok": true },
+    { "label": "flowchart.mmd", "ok": true },
+    { "label": "gantt.mmd", "ok": true },
+    { "label": "graph.mmd", "ok": true },
+    { "label": "page-indented-fence.md:5", "ok": true },
+    { "label": "page-two-blocks.md:12", "ok": false, "mermaidLine": 3 },
+    { "label": "page-two-blocks.md:5", "ok": true },
+    { "label": "page-unclosed-fence.md:3", "ok": true },
+    { "label": "sankey.mmd", "ok": true },
+    { "label": "sequence-no-target.mmd", "ok": false, "mermaidLine": 3 },
+    { "label": "sequence-semicolon.mmd", "ok": false, "mermaidLine": 5 },
+    { "label": "sequence.mmd", "ok": true },
+    { "label": "state.mmd", "ok": true },
+    { "label": "unknown-type.mmd", "ok": false, "mermaidLine": 1 },
+    { "label": "xychart.mmd", "ok": true }
+  ]
+}

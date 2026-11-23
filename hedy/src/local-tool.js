@@ -12,6 +12,11 @@ const spawnErrorOf = (error, command) => {
   )
 }
 
+const inputErrorHandler = (command, reject) => (error) => {
+  if (error.code === 'EPIPE') return
+  reject(new HedyError('UNKNOWN', `${command} could not be given its input. Run the command again.`, { cause: error }))
+}
+
 const collectStream = (stream, streamName, onOutput) => {
   const chunks = []
   stream.setEncoding('utf8')
@@ -47,7 +52,9 @@ const cancelTermination = ({ timers }) => {
 
 /**
  * Runs command with args and resolves to { exitCode, signal, stdout, stderr, timedOut }
- * on any exit, a non-zero exit included. env is the child's whole environment. stdout
+ * on any exit, a non-zero exit included. env is the child's whole environment. input,
+ * when given, is written to the child's stdin, which then closes; without input the
+ * child's stdin is empty. stdout
  * and stderr are collected in full as UTF-8, and onOutput, when given, receives
  * { stream, chunk } for each chunk in arrival order. The child starts in a process
  * group of its own, and a child still running after timeoutMs gets SIGTERM, then
@@ -57,15 +64,17 @@ const cancelTermination = ({ timers }) => {
  * error as the cause, for any other spawn error.
  *
  * @param {{
- *   command: string, args?: string[], cwd?: string, env?: NodeJS.ProcessEnv,
+ *   command: string, args?: string[], cwd?: string, env?: NodeJS.ProcessEnv, input?: string,
  *   timeoutMs?: number, killGraceMs?: number,
  *   onOutput?: (output: { stream: 'stdout' | 'stderr', chunk: string }) => void
  * }} options
  * @returns {Promise<{ exitCode: number | null, signal: NodeJS.Signals | null, stdout: string, stderr: string, timedOut: boolean }>}
  */
-export const runLocalTool = async ({ command, args = [], cwd, env, timeoutMs, killGraceMs = 5000, onOutput }) =>
+export const runLocalTool = async ({ command, args = [], cwd, env, input, timeoutMs, killGraceMs = 5000, onOutput }) =>
   new Promise((resolve, reject) => {
-    const child = spawn(command, args, { cwd, env, shell: false, detached: true, stdio: ['ignore', 'pipe', 'pipe'] })
+    const child = spawn(command, args, { cwd, env, shell: false, detached: true, stdio: [input === undefined ? 'ignore' : 'pipe', 'pipe', 'pipe'] })
+    child.stdin?.on('error', inputErrorHandler(command, reject))
+    child.stdin?.end(input)
     const stdoutText = collectStream(child.stdout, 'stdout', onOutput)
     const stderrText = collectStream(child.stderr, 'stderr', onOutput)
     const termination = scheduleTermination(child, { timeoutMs, killGraceMs })

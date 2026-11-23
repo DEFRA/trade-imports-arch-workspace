@@ -105,6 +105,7 @@ Practical conventions when you do add a diagram:
 - **Publishing is automatic**: the publish pipeline reads each referenced SVG, base64-encodes it, and inlines it into the Confluence page body as a `data:image/svg+xml;base64,…` `<img>` tag, so relative paths to SVGs on disk just work with no separate attachment step.
 - **Variants get one SVG each** rather than being crammed into a single diagram (for example one per commodity when the format is parameterised).
 - **Prefer Mermaid for flows** (sequence, state machine) over a static SVG, using `<MermaidDiagram diagramId="..." />` following the pattern in the ADR folder alongside; Mermaid is a first-class citizen in the repo's toolchain.
+- **Check every Mermaid diagram straight after writing it** with `hedy diagram check <file> --json`, on the `.mmd` file or the DR page that holds the diagram, and fix every line the check names before moving on. A diagram that has not been checked is not finished. The mermaid-check skill holds the authoring rules for diagrams.
 
 ### 5. Publish
 

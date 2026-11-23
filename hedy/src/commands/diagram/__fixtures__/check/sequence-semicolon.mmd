@@ -1,0 +1,5 @@
+sequenceDiagram
+    participant B as Browser
+    participant F as Front Door
+    B->>F: GET /auth/callback
+    F-->>B: Set-Cookie sid (host-only); 302 to /dashboard
