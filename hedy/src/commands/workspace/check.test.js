@@ -59,16 +59,24 @@ describe('runWorkspaceCheck', () => {
       checks: [
         failing('First', new HedyError('SETUP', 'First is wrong. Fix it.')),
         passing('Second', 'fine'),
-        failing('Third', new HedyError('USAGE', 'Third needs a value. Give one.')),
-        failing('Fourth', new Error('Fourth broke.'))
+        failing('Third', new HedyError('USAGE', 'Third needs a value. Give one.'))
       ]
     }))
     expect(error).toBeInstanceOf(AggregateError)
     expect(error.errors.map(({ code, message }) => ({ code, message }))).toEqual([
       { code: 'SETUP', message: 'First failed: First is wrong. Fix it.' },
-      { code: 'SETUP', message: 'Third failed: Third needs a value. Give one.' },
-      { code: 'SETUP', message: 'Fourth failed: Fourth broke.' }
+      { code: 'SETUP', message: 'Third failed: Third needs a value. Give one.' }
     ])
+  })
+
+  it('passes a fault inside a check through unchanged, in check order, so that it reaches the boundary as a fault in hedy', async () => {
+    const fault = new TypeError('x is not a function')
+    const error = await rejectionOf(runWorkspaceCheck({
+      workspaceRoot: () => root,
+      env: {},
+      checks: [failing('First', new HedyError('SETUP', 'First is wrong. Fix it.')), failing('Second', fault)]
+    }))
+    expect(error.errors[1]).toBe(fault)
   })
 })
 

@@ -1,11 +1,16 @@
 import { failureEnvelope, successEnvelope } from './envelope.js'
 import { resultHeldBy, toHedyErrors } from './errors.js'
 import { EXIT, exitCodeForAll } from './exit-codes.js'
+import { faultContextOf } from './fault-context.js'
+import { renderFaultReport } from './fault-report.js'
 
 const writeTextFailure = (errors, { render, stdout, stderr }) => {
   const result = resultHeldBy(errors)
   if (result !== undefined) stdout.write(`${render(result)}\n`)
-  for (const { message } of errors) stderr.write(`${message}\n`)
+  for (const { message, report } of errors) {
+    stderr.write(`${message}\n`)
+    if (report !== undefined) stderr.write(`${renderFaultReport(report)}\n`)
+  }
 }
 
 /**
@@ -14,8 +19,10 @@ const writeTextFailure = (errors, { render, stdout, stderr }) => {
  * line. In text mode a failure whose errors hold a result also writes the
  * rendered result on stdout, before the messages. An AggregateError the action
  * throws reports each error it holds, and the exit code is the lowest among
- * them. Sets the exit code through setExitCode and returns it; never calls
- * process.exit().
+ * them. An error that is not a HedyError is a fault in hedy: it reports as
+ * INTERNAL with the triage report of the fault, which text mode writes on
+ * stderr beneath the message. Sets the exit code through setExitCode and
+ * returns it; never calls process.exit().
  *
  * @param {() => unknown} action sync or async; its return value is the result
  * @param {object} [options]
@@ -24,6 +31,8 @@ const writeTextFailure = (errors, { render, stdout, stderr }) => {
  * @param {{ write: (chunk: string) => unknown }} [options.stdout]
  * @param {{ write: (chunk: string) => unknown }} [options.stderr]
  * @param {(code: number) => void} [options.setExitCode]
+ * @param {() => ReturnType<typeof faultContextOf>} [options.faultContext]
+ *   the context of a fault report, read only when the action fails
  * @returns {Promise<number>} the exit code
  */
 export async function runAction (action, {
@@ -31,14 +40,15 @@ export async function runAction (action, {
   render = (result) => String(result),
   stdout = process.stdout,
   stderr = process.stderr,
-  setExitCode = (code) => { process.exitCode = code }
+  setExitCode = (code) => { process.exitCode = code },
+  faultContext = () => faultContextOf()
 } = {}) {
   let output
   try {
     const result = await action()
     output = json ? JSON.stringify(successEnvelope(result)) : render(result)
   } catch (error) {
-    const errors = toHedyErrors(error)
+    const errors = toHedyErrors(error, faultContext())
     if (json) {
       stdout.write(`${JSON.stringify(failureEnvelope(errors))}\n`)
     } else {

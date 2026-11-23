@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import { render } from 'ink-testing-library'
 import { describe, it, expect, vi } from 'vitest'
+import { renderFaultReport } from '../../fault-report.js'
 import { ErrorScreen } from './error-screen.js'
 
 const errors = [
@@ -19,6 +20,16 @@ describe('ErrorScreen', () => {
     expect(frame).toContain('Something went wrong')
     for (const { code, message } of errors) expect(lineHolding(frame, code)).toContain(message)
     expect(lineHolding(frame, 'AUTH')).not.toBe(lineHolding(frame, 'NETWORK'))
+  })
+
+  it('renders the triage report of a fault in hedy beneath its line, each report line on a line of its own', () => {
+    const report = { fault: 'TypeError: confirm is not a function', causes: [], missingFeature: 'the function confirm', environment: 'hedy 0.1.0, linux x64', reproduction: 'hedy' }
+    const { lastFrame } = render(createElement(ErrorScreen, { errors: [{ code: 'INTERNAL', message: 'A fault in hedy.', report }] }))
+    const lines = lastFrame().split('\n').map((line) => line.trim())
+    const reportLines = renderFaultReport(report).split('\n')
+    const start = lines.indexOf(reportLines[0])
+    expect(lines.findIndex((line) => line.includes('A fault in hedy.'))).toBeLessThan(start)
+    expect(lines.slice(start, start + reportLines.length)).toEqual(reportLines)
   })
 
   it('renders no return hint when onReturn is not given', () => {

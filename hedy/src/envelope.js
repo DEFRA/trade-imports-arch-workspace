@@ -19,8 +19,12 @@ export const successEnvelope = (result) => ({
   metadata: { ranAt: new Date().toISOString() }
 })
 
+const errorEntry = ({ code, message, report }) => report === undefined ? { code, message } : { code, message, report }
+
 /**
- * The result is the result of the first error that holds one, else null.
+ * The result is the result of the first error that holds one, else null. Each
+ * error entry holds the code and the message, and the triage report when the
+ * error holds one.
  *
  * @param {import('./errors.js').HedyError | import('./errors.js').HedyError[]} errors
  */
@@ -31,6 +35,6 @@ export const failureEnvelope = (errors) => {
     schema_version: SCHEMA_VERSION,
     hedy_version: hedyVersion(),
     result: resultHeldBy(errorList) ?? null,
-    errors: errorList.map(({ code, message }) => ({ code, message }))
+    errors: errorList.map(errorEntry)
   }
 }
